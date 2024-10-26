@@ -11,25 +11,25 @@ exports.index = async (req, res) => {
     role_query = role
 
   }
-  const users = await db.user.findAll({
+  const data = await db.user.findAll({
     where: {
       role: role_query
     }
   });
-  res.render('users/index', { title: role === 'user' ? 'Users' : 'Customers', users, role });
+  res.render('users/index', { title: role === 'user' ? 'Users' : 'Customers', data, role });
 };
 
 exports.form = async (req, res) => {
   const userId = req.query.id;
   const role = req.query.role || 'user'; // Default role to 'user' if not provided
-  let user = null;
+  let data = null;
   if (userId) {
-    user = await db.user.findByPk(userId);
-    if(user.password){
-      user.password = encrypt.decrypt(user.password);
+    data = await db.user.findByPk(userId);
+    if(data.password){
+      data.password = encrypt.decrypt(data.password);
     }
   }
-  res.render('users/form', { title: user ? 'Edit User' : 'Create User', user, role });
+  res.render('users/form', { title: data ? 'Edit User' : 'Create User', data, role });
 };
 
 exports.save = async (req, res) => {

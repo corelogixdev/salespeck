@@ -1,10 +1,9 @@
 <div class="page_header d-flex justify-content-between align-items-center mb-3">
   <h3>
-    <%= role==='user' ? 'Users' : 'Customers' %>
+    <%= title %>
   </h3>
   <div>
-    <a href="/users/form?role=<%= role %>" class="btn btn-primary"><i class="fas fa-plus"></i> Create New <%=
-        role==='user' ? 'User' : 'Customer' %></a>
+    <a href="/products/form" class="btn btn-primary"><i class="fas fa-plus"></i> Create New Products</a>
   </div>
 </div>
 <div class="card">
@@ -14,44 +13,28 @@
         <tr>
           <th>ID</th>
           <th>Name</th>
-          <th>Phone</th>
-          <!-- if not customer the show -->
-          <% if (role !=='customer' ) { %>
-            <th>Username</th>
-            <th>Role</th>
-            <% } %>
-              <th>Actions</th>
+          <!-- algin at end -->
+          <th style="text-align: end;">Actions</th>
         </tr>
       </thead>
       <tbody>
-        <% users.forEach(user=> { %>
+        <% products.forEach(product=> { %>
           <tr>
             <td>
-              <%= user.id %>
+              <%= product.id %>
             </td>
             <td>
-              <%= user.name %>
+              <%= product.name %>
             </td>
-            <td>
-              <%= user.phone %>
+            <td style="text-align: end;">
+              <a href="/products/form?id=<%= product.id %>"
+                class="btn btn-warning btn-sm"><i
+                  class="fas fa-edit"></i> Edit</a>
+              <form action="/products/<%= product.id %>/delete" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-danger btn-sm" ><i
+                    class="fas fa-trash"></i> Delete</button>
+              </form>
             </td>
-            <% if (role !=='customer' ) { %>
-              <td>
-                <%= user.username %>
-              </td>
-              <td>
-                <%= user.role %>
-              </td>
-              <% } %>
-                <td>
-                  <a href="/users/form?id=<%= user.id %>&role=<%= user.role %>"
-                    class="btn btn-warning btn-sm <%= user.role == 'admin' ? 'custom_disabled' : '' %>"><i
-                      class="fas fa-edit"></i> Edit</a>
-                  <form action="/users/<%= user.id %>/delete" method="POST" style="display:inline;">
-                    <button type="submit" class="btn btn-danger btn-sm" <%=user.role=='admin' ? 'disabled' : '' %>><i
-                        class="fas fa-trash"></i> Delete</button>
-                  </form>
-                </td>
           </tr>
           <% }) %>
       </tbody>

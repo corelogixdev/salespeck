@@ -3,18 +3,18 @@ const db = require('../models');
 const encrypt = require('../utils/encrypt');
 
 exports.index = async (req, res) => {
-  const products = await db.product.findAll({
+  const data = await db.product.findAll({
   });
-  res.render('products/index', { title: "Products", products });
+  res.render('products/index', { title: "Products", data });
 };
 
 exports.form = async (req, res) => {
   const productId = req.query.id;
-  let product = null;
+  let data = null;
   if (productId) {
-    product = await db.product.findByPk(productId);
+    data = await db.product.findByPk(productId);
   }
-  res.render('products/form', { title: product ? 'Edit product' : 'Create product', product });
+  res.render('products/form', { title: product ? 'Edit product' : 'Create product', data });
 };
 
 exports.save = async (req, res) => {
