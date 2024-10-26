@@ -1,5 +1,8 @@
-const { contextBridge } = require('electron');
+const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
-  // Expose APIs to renderer process if needed
+  performAction: (data) => ipcRenderer.send('perform-action', data),
+  onActionResponse: (callback) => ipcRenderer.on('action-response', (event, response) => {
+    callback(response);
+  }),
 });
