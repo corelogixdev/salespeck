@@ -65,7 +65,6 @@ exports.index = async (req, res) => {
     total_pages: Math.ceil(total / PER_PAGE),
     page_range: getPageRange(page * 1, Math.ceil(total / PER_PAGE))
   }
-  console.log(paginator);
   res.render('users/index', { title: role === 'user' ? 'Users' : 'Customers', data, role, searchdata, paginator });
 };
 
@@ -83,17 +82,17 @@ exports.form = async (req, res) => {
 };
 
 exports.save = async (req, res) => {
-  var { id, name, phone, username, role,password } = req.body;
+  var { id, name, phone, username, role,password,address } = req.body;
   var password = password;
   if (password) {
     password = encrypt.encrypt(password);
   }
   try {
     if (id) {
-      
-      await db.user.update({ name, phone, username, role,password }, { where: { id } });
+
+      await db.user.update({ name, phone, username, role,password,address }, { where: { id } });
     } else {
-      await db.user.create({ name, phone, username, role });
+      await db.user.create({ name, phone, username, role, password,address });
     }
     res.json({ success: true, redirectUrl: `/users?role=${role}` });
   } catch (error) {

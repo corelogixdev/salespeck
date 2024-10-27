@@ -9,7 +9,8 @@ const config = require('../config.js'); // Link to the Express app
 const sessionDataMiddleware = require('../middleware/sessionData');
 const isAuthenticated = require('../middleware/isAuthenticated');
 const settings = require('../controllers/settingsController');
-
+const sales = require('../controllers/salesController');
+const adminOnly = require('../middleware/adminOnly');
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -44,6 +45,14 @@ app.use(
     saveUninitialized: true,
   })
 );
+
+app.use((req, res, next) => {
+  if(req.session){
+    res.locals.role = req.session.user ? req.session.user.role : null;
+  }
+  next();
+});
+
 // Routes
 app.get('/', (req, res) => {
   if (!req.session.user_id) {
@@ -51,8 +60,8 @@ app.get('/', (req, res) => {
   } else {
     res.redirect('/dashboard')
   }
-
 });
+
 app.get('/login', (req, res) => {
   res.render('login', { layout: false });
 });
@@ -91,24 +100,25 @@ app.get('/dashboard',isAuthenticated, (req, res) => {
 const productController = require('../controllers/productController');
 
 // Product CRUD routes
-app.get('/products',isAuthenticated, productController.index);
-app.get('/products/form',isAuthenticated, productController.form);
-app.post('/products/save',isAuthenticated, productController.save);
-app.post('/products/:id/delete',isAuthenticated, productController.delete);
-app.post('/products/search',isAuthenticated, productController.search);
+app.get('/products',isAuthenticated, adminOnly, productController.index);
+app.get('/products/form',isAuthenticated, adminOnly, productController.form);
+app.post('/products/save',isAuthenticated, adminOnly, productController.save);
+app.post('/products/:id/delete',isAuthenticated, adminOnly, productController.delete);
+app.post('/products/search',isAuthenticated, adminOnly, productController.search);
 
 // Import the product controller
 const userController = require('../controllers/userController');
 
 // User CRUD routes
-app.get('/users',isAuthenticated, userController.index);
-app.get('/users/form',isAuthenticated, userController.form); // Use the same form for creating and editing
-app.post('/users/save',isAuthenticated, userController.save); // Handle both create and edit
-app.post('/users/:id/delete',isAuthenticated, userController.delete);
+app.get('/users',isAuthenticated,adminOnly, userController.index);
+app.get('/users/form',isAuthenticated, adminOnly, userController.form); // Use the same form for creating and editing
+app.post('/users/save',isAuthenticated, adminOnly, userController.save); // Handle both create and edit
+app.post('/users/:id/delete',isAuthenticated,adminOnly, userController.delete);
 
 // Settings 
-app.get('/settings',isAuthenticated, settings.index);
-
+app.get('/settings',isAuthenticated,adminOnly, settings.index);
+// sales
+app.get('/sales',isAuthenticated, sales.index);
 // app.get('/*', (req, res) => {
 //   res.redirect('/');
 // });
