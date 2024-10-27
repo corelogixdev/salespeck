@@ -10,28 +10,8 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(50),
       allowNull: true,
     },
-    valuetype: {
-      type: DataTypes.STRING(50),
-      allowNull: true,
-    },
-    stringvalue: {
-      type: DataTypes.STRING(100),
-      allowNull: true,
-    },
-    intvalue: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    boolvalue: {
-      type: DataTypes.BOOLEAN,
-      allowNull: true,
-    },
-    floatvalue: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
-    },
-    datevalue: {
-      type: DataTypes.DATE,
+    value: {
+      type: DataTypes.TEXT('long'),
       allowNull: true,
     },
   }, {

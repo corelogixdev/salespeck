@@ -1,6 +1,7 @@
 'use strict';
 
-const { financeaccount, user } = require('../models'); // Import models directly
+const { json } = require('sequelize');
+const { financeaccount, user, softwaresetting } = require('../models'); // Import models directly
 const { encrypt } = require('../utils/encrypt');
 
 module.exports = {
@@ -50,6 +51,30 @@ module.exports = {
     for (const userRecord of users) {
       await user.upsert(userRecord);
     }
+
+    // software settings
+    const softwareSettings = [
+      { id: 1, name: 'company', value: JSON.stringify({ 
+        name: 'Company Name', 
+        address: 'Company Address', 
+        phone: 'Company Phone', 
+        email: 'Company Email' }
+      )},
+      { id: 5, name: 'printer', value: JSON.stringify(
+        {
+          printer: 'printer', 
+          paper: 'paper',
+          width: 'width',
+          height: 'height',
+          fontSize: 'fontSize',
+        }
+      )},
+    ];
+
+    for (const setting of softwareSettings) {
+      await softwaresetting.upsert(setting);
+    }
+
 
   },
 
