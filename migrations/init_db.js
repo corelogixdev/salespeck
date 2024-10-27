@@ -184,28 +184,8 @@ module.exports = {
         type: Sequelize.STRING(50),
         allowNull: true,
       },
-      valuetype: {
-        type: Sequelize.STRING(50),
-        allowNull: true,
-      },
-      stringvalue: {
-        type: Sequelize.STRING(100),
-        allowNull: true,
-      },
-      intvalue: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-      },
-      boolvalue: {
-        type: Sequelize.BOOLEAN,
-        allowNull: true,
-      },
-      floatvalue: {
-        type: Sequelize.FLOAT,
-        allowNull: true,
-      },
-      datevalue: {
-        type: Sequelize.DATE,
+      value: {
+        type: Sequelize.TEXT('long'),
         allowNull: true,
       },
     });

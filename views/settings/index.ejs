@@ -1,1 +1,47 @@
-Settings page
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Settings</h5>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <% Object.keys(settings).forEach((setting, index) => { %>
+                <li class="nav-item" role="presentation">
+                    <button
+                        class="nav-link <%= (typeof currenttab !== 'undefined' && currenttab === setting) || (typeof currenttab === 'undefined' && index === 0) ? 'active' : '' %>"
+                        id="<%= setting %>-tab" data-bs-toggle="tab" data-bs-target="#<%= setting %>" type="button"
+                        role="tab" aria-controls="<%= setting %>"
+                        aria-selected="<%= (typeof currenttab !== 'undefined' && currenttab === setting) || (typeof currenttab === 'undefined' && index === 0) ? 'true' : 'false' %>">
+                        <%= setting.charAt(0).toUpperCase() + setting.slice(1) %>
+                    </button>
+                </li>
+            <% }) %>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <% Object.keys(settings).forEach((setting, index) => { %>
+                <div class="tab-pane fade <%= (typeof currenttab !== 'undefined' && currenttab === setting) || (typeof currenttab === 'undefined' && index === 0) ? 'show active' : '' %>"
+                    id="<%= setting %>" role="tabpanel" aria-labelledby="<%= setting %>-tab">
+                    <form action="/settings/save?name=<%= setting %>" method="POST" class="p-2 card mt-3">
+                        <div class="row">
+                            <% Object.keys(settings[setting]).forEach(key => { %>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-label" for="<%= setting %>-<%= key %>">
+                                            <%= key.charAt(0).toUpperCase() + key.slice(1) %>:
+                                        </label>
+                                        <% if (typeof settings[setting][key] === 'boolean') { %>
+                                            <input type="checkbox" class="form-check-input" id="<%= setting %>-<%= key %>" name="<%= key %>" <%= settings[setting][key] ? 'checked' : '' %>>
+                                        <% } else { %>
+                                            <input type="text" class="form-control" id="<%= setting %>-<%= key %>" name="<%= key %>" value="<%= settings[setting][key] %>">
+                                        <% } %>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary mt-3">Save</button>
+                        </div>
+                    </form>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</div>
