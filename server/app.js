@@ -52,13 +52,13 @@ app.get('/', (req, res) => {
 });
 
 //run cmd command npx sequelize db:migrate
-const execSync = require('child_process').execSync;
-const migrate = execSync('npx sequelize db:migrate', { encoding: 'utf-8' });
-logi('Migrations executed:');
-logi(migrate);
-const seed = execSync('npx sequelize db:seed:all', { encoding: 'utf-8' });
-logi('seed executed:');
-logi(seed);
+// const execSync = require('child_process').execSync;
+// const migrate = execSync('npx sequelize db:migrate', { encoding: 'utf-8' });
+// logi('Migrations executed:');
+// logi(migrate);
+// const seed = execSync('npx sequelize db:seed:all', { encoding: 'utf-8' });
+// logi('seed executed:');
+// logi(seed);
 
 app.get('/login', (req, res) => {
   res.render('login', { layout: false });
@@ -103,8 +103,14 @@ app.get('/logout', (req, res) => {
   });
 });
 
-app.get('/dashboard', isAuthenticated, (req, res) => {
-  res.render('dashboard');
+app.get('/dashboard', isAuthenticated, async(req, res) => {
+  let settings =await db.softwaresetting.findOne({
+    where: {
+      name: 'company'
+    }
+  });
+  let company = JSON.parse(settings.value);
+  res.render('dashboard', { company });
 });
 
 // Import the product controller
