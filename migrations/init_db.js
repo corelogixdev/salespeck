@@ -4,6 +4,7 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     // Create financeaccount table
+    console.log('Creating tables...');
     await queryInterface.createTable('financeaccount', {
       id: {
         type: Sequelize.INTEGER,
