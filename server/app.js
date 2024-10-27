@@ -52,13 +52,13 @@ app.get('/', (req, res) => {
 });
 
 //run cmd command npx sequelize db:migrate
-const execSync = require('child_process').execSync;
-const migrate = execSync('npx sequelize db:migrate', { encoding: 'utf-8' });
-logi('Migrations executed:');
-logi(migrate);
-const seed = execSync('npx sequelize db:seed:all', { encoding: 'utf-8' });
-logi('seed executed:');
-logi(seed);
+// const execSync = require('child_process').execSync;
+// const migrate = execSync('npx sequelize db:migrate', { encoding: 'utf-8' });
+// logi('Migrations executed:');
+// logi(migrate);
+// const seed = execSync('npx sequelize db:seed:all', { encoding: 'utf-8' });
+// logi('seed executed:');
+// logi(seed);
 
 app.get('/login', (req, res) => {
   res.render('login', { layout: false });
@@ -128,6 +128,7 @@ app.post('/users/:id/delete', isAuthenticated, userController.delete);
 
 // Settings 
 app.get('/settings',isAuthenticated,adminOnly, settings.index);
+app.post('/settings/save',isAuthenticated,adminOnly, settings.save);
 // sales
 app.get('/sales',isAuthenticated, sales.index);
 // app.get('/*', (req, res) => {

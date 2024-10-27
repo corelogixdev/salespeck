@@ -4,7 +4,7 @@
     <form action="/users" method="GET">
       <div class="input-group">
         <input type="hidden" name="role" value="<%= role %>">
-        <input type="search" style="min-width: 18rem;" class="form-control" name="search" placeholder="Search by name, username or phone" required value="<%= typeof searchdata !== 'undefined' ? searchdata : '' %>">
+        <input type="search" style="min-width: 19rem;" class="form-control" name="search" placeholder="Search by name, username or phone" required value="<%= typeof searchdata !== 'undefined' ? searchdata : '' %>">
         <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
       </div>
     </form>
@@ -51,7 +51,7 @@
         <!-- if !data or data.length show no data found with an amazing icon -->
         <% if (!data || data.length === 0) { %>
           <tr>
-            <td colspan="<%= role !== 'customer' ? 6 : 3 %>" style="text-align: center;">
+            <td colspan="<%= role !== 'customer' ? 6 : 4 %>" style="text-align: center;">
               <i class="fas fa-exclamation-triangle"></i> No data found
             </td>
           </tr>
