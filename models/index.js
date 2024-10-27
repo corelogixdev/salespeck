@@ -37,6 +37,12 @@ Object.keys(db).forEach(modelName => {
   }
 });
 
+// Set timestamps globally
+sequelize.options.define = {
+  timestamps: true
+};
+
+
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
