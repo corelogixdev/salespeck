@@ -1,7 +1,6 @@
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
-const { Umzug, SequelizeStorage } = require('umzug');
 const db = require('../models'); // Sequelize models directory
 const encrypt = require('../utils/encrypt'); // Sequelize models directory
 const logi = require('../utils/logi');
@@ -9,6 +8,7 @@ const expressLayouts = require('express-ejs-layouts');
 const config = require('../config.js'); // Link to the Express app
 const sessionDataMiddleware = require('../middleware/sessionData');
 const isAuthenticated = require('../middleware/isAuthenticated');
+
 
 
 const app = express();
@@ -47,49 +47,15 @@ app.get('/', (req, res) => {
     res.redirect('/dashboard')
   }
 });
-var fs = require('fs');
-async function runMigrationsAndSeeders() {
-  // Read the migrations directory
-  const migrationsDir = path.join(__dirname, '../migrations');
-  fs.readdir(migrationsDir, (err, files) => {
-    if (err) {
-      console.error("Error reading migration directory:", err);
-      return;
-    }
 
-    // Filter for .js files
-    const migrationFiles = files.filter(file => file.endsWith('.js')).map(file => path.join(migrationsDir, file));
-    console.log('Migration files:', migrationFiles); // Log the migration files
-
-    const migrationUmzug = new Umzug({
-      migrations: migrationFiles.map(file => ({
-        name: path.basename(file),
-        up: (queryInterface, Sequelize) => require(file).up(queryInterface, Sequelize), // Use the up method from the migration file
-        down: (queryInterface, Sequelize) => require(file).down(queryInterface, Sequelize) // Use the down method from the migration file
-      })),
-      storage: new SequelizeStorage({ sequelize: db.sequelize }),
-      context: db.sequelize.getQueryInterface(),
-    });
-
-    // Run migrations and log them
-    migrationUmzug.up().then(migrations => {
-      logi("Migrations completed:", migrations);
-    }).catch(error => {
-      console.error("Error running migrations:", error);
-    });
-  });
-}
-(async () => {
-
-
-try {
-  await db.sequelize.authenticate();
-  console.log("Connection to the database has been established successfully.");
-  await runMigrationsAndSeeders();
-} catch (error) {
-  console.error("Unable to connect to the database:", error);
-}
-})();
+//run cmd command npx sequelize db:migrate
+const execSync = require('child_process').execSync;
+const migrate = execSync('npx sequelize db:migrate', { encoding: 'utf-8' });
+logi('Migrations executed:');
+logi(migrate);
+const seed = execSync('npx sequelize db:seed:all', { encoding: 'utf-8' });
+logi('seed executed:');
+logi(seed);
 
 app.get('/login', (req, res) => {
   res.render('login', { layout: false });
