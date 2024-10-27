@@ -95,6 +95,7 @@ app.get('/products',isAuthenticated, productController.index);
 app.get('/products/form',isAuthenticated, productController.form);
 app.post('/products/save',isAuthenticated, productController.save);
 app.post('/products/:id/delete',isAuthenticated, productController.delete);
+app.post('/products/search',isAuthenticated, productController.search);
 
 // Import the product controller
 const userController = require('../controllers/userController');

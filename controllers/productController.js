@@ -49,3 +49,16 @@ exports.delete = async (req, res) => {
   await db.product.destroy({ where: { id: req.params.id } });
   res.redirect(`/products`);
 };
+exports.search = async (req, res) => {
+  const searchdata = req.body.query;
+  if (!searchdata) {
+    return res.json({ success: false, data: [] });
+  }
+  const data = await db.product.findAll({
+    where: {
+      name: { [Op.like]: `%${searchdata}%` }
+    },
+    attributes: ['id', 'name', 'saleprice']
+  });
+  res.json({ success: true, data });
+}

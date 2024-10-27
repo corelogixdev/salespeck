@@ -47,7 +47,11 @@
             <a class="nav-link" href="/settings">Settings</a>
           </li>
         </ul>
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 position-relative">
+          <div class="result">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="navbar-search-input">
+            <div id="result" style="position: absolute; top: 40px; border-radius: 10px; width: 100%; display: none; z-index: 9999;" class="card"></div>
+          </div>
           <button class="btn btn-secondary" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i></button>
           <button class="btn btn-danger" id="close-btn"><i class="fa-solid fa-power-off"></i></button>
         </div>
@@ -76,29 +80,97 @@
     <% } %>
   </script>
   <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.custom_disabled').forEach(link => {
-          link.addEventListener('click', (event) => {
-            event.preventDefault();
+    document.addEventListener('DOMContentLoaded', () => {
+      async function FetchData(query){
+        try {
+          const response = await fetch('/products/search', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ query }),
           });
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      }
+      const searchInput = document.getElementById('navbar-search-input');
+      let typingTimer;
+      const typingInterval = 500; // 500ms
+      searchInput.addEventListener('input', () => {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(async () => {
+          const query = searchInput.value;
+          try {
+            let response=await FetchData(query);
+            let result = document.getElementById('result');
+            result.innerHTML = '';
+            result.style.display = 'block';
+            if(response.data.length>0){
+              response.data.forEach((item) => {
+                let a = document.createElement('a');
+                a.classList.add('dropdown-item', 'd-flex', 'justify-content-between', 'p-2', 'align-items-center', 'search-result');
+                let span = document.createElement('span');
+                span.innerText = item.name.substring(0, 20);
+                a.appendChild(span);
+                let span2 = document.createElement('span');
+                span2.innerText = 'Rs.' + item.saleprice ?? 0;
+                a.appendChild(span2);
+                result.appendChild(a);
+              });
+            }else{
+              let p = document.createElement('p');
+              p.style.textWrap = 'auto';
+              p.classList.add('dropdown-item', 'p-2', 'align-items-center', 'search-result');
+              if(query){
+                p.innerText = 'No data found for "'+query.substring(0, 20)+'"';
+              }else{
+                p.innerText = 'Type to search';
+              }
+              result.appendChild(p);
+            }
+          } catch (error) {
+            console.error('Error:', error);
+          }
+        }, typingInterval);
+      });
+      searchInput.addEventListener('focus', () => {
+        if (searchInput.value) {
+          document.getElementById('result').style.display = 'block';
+        }
+      });
+      document.addEventListener('click', (event) => {
+        if (!event.target.closest('.result')) {
+          document.getElementById('result').style.display = 'none';
+        }
+      });
+
+      document.querySelectorAll('.custom_disabled').forEach(link => {
+        link.addEventListener('click', (event) => {
+          event.preventDefault();
         });
       });
+    });
+
     document.getElementById('close-btn').addEventListener('click', () => {
       const dataToSend = { message: 'close-app' };
       if (window.api) {
         window.api.performAction(dataToSend); // Send data to main process
       }
     });
+
     document.getElementById('logout-btn').addEventListener('click', () => {
       window.location.href = '/logout';
     });
+
     if (window.api) {
       window.api.onActionResponse((response) => {
         console.log(response);
         //document.getElementById('response').innerText = response;
       });
     }
-
   </script>
 </body>
 
