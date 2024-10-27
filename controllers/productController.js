@@ -14,17 +14,29 @@ exports.form = async (req, res) => {
   if (productId) {
     data = await db.product.findByPk(productId);
   }
-  res.render('products/form', { title: product ? 'Edit product' : 'Create product', data });
+  res.render('products/form', { title: data ? 'Edit product' : 'Create product', product:data });
 };
 
 exports.save = async (req, res) => {
-  var { id, name, } = req.body;
-  
+  var body = req.body;
+  let id = body.id;
+  let data = {
+    barcode: body.barcode,
+    category: body.category,
+    carrycost: body.carrycost * 1,
+    discount: body.discount * 1,
+    name: body.name,
+    purchaseprice: body.purchaseprice * 1,
+    purchaseactive: body.purchaseactive === 'on',
+    quantity: body.quantity * 1,
+    saleprice: body.saleprice * 1,
+    saleactive: body.saleactive === 'on',
+   }
   try {
     if (id) {
-      await db.product.update({ name }, { where: { id } });
+      await db.product.update(data, { where: { id } });
     } else {
-      await db.product.create({ name });
+      await db.product.create( data );
     }
     res.json({ success: true, redirectUrl: `/products` });
   } catch (error) {

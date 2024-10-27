@@ -12,31 +12,46 @@
       <thead>
         <tr>
           <th>ID</th>
+          <th>Barcode</th>
+          <th>Category</th>
+          <th>Carry Cost</th>
+          <th>Discount</th>
           <th>Name</th>
-          <!-- algin at end -->
+          <th>Purchase Price</th>
+          <th>Purchase Active</th>
+          <th>Quantity</th>
+          <th>Sale Price</th>
+          <th>Sale Active</th>
+          <!-- align at end -->
           <th style="text-align: end;">Actions</th>
         </tr>
       </thead>
       <tbody>
-        <% products.forEach(product=> { %>
+        <% data.forEach(product => { %>
           <tr>
-            <td>
-              <%= product.id %>
-            </td>
-            <td>
-              <%= product.name %>
-            </td>
+            <td><%= product.id %></td>
+            <td><%= product.barcode %></td>
+            <td><%= product.category %></td>
+            <td><%= product.carrycost %></td>
+            <td><%= product.discount %></td>
+            <td><%= product.name %></td>
+            <td><%= product.purchaseprice %></td>
+            <td><%= product.purchaseactive ? 'Yes' : 'No' %></td>
+            <td><%= product.quantity %></td>
+            <td><%= product.saleprice %></td>
+            <td><%= product.saleactive ? 'Yes' : 'No' %></td>
             <td style="text-align: end;">
-              <a href="/products/form?id=<%= product.id %>"
-                class="btn btn-warning btn-sm"><i
-                  class="fas fa-edit"></i> Edit</a>
+              <a href="/products/form?id=<%= product.id %>" class="btn btn-warning btn-sm">
+                <i class="fas fa-edit"></i> Edit
+              </a>
               <form action="/products/<%= product.id %>/delete" method="POST" style="display:inline;">
-                <button type="submit" class="btn btn-danger btn-sm" ><i
-                    class="fas fa-trash"></i> Delete</button>
+                <button type="submit" class="btn btn-danger btn-sm">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
               </form>
             </td>
           </tr>
-          <% }) %>
+        <% }) %>
       </tbody>
     </table>
   </div>
