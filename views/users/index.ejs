@@ -4,10 +4,13 @@
     <form action="/users" method="GET">
       <div class="input-group">
         <input type="hidden" name="role" value="<%= role %>">
-        <input type="text" style="min-width: 18rem;" class="form-control" name="search" placeholder="Search by name, username or phone" required value="<%= typeof searchdata !== 'undefined' ? searchdata : '' %>">
+        <input type="search" style="min-width: 18rem;" class="form-control" name="search" placeholder="Search by name, username or phone" required value="<%= typeof searchdata !== 'undefined' ? searchdata : '' %>">
         <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
       </div>
     </form>
+    <% if (searchdata) { %>
+      <a href="/users?role=<%= role %>" title="Clear Search" class="btn btn-danger"><i class="fas fa-times"></i></a>
+    <% } %>
     <a href="/users/form?role=<%= role %>" class="btn btn-primary"><i class="fas fa-plus"></i> Create New <%= role === 'user' ? 'User' : 'Customer' %></a>
   </div>
 </div>
@@ -55,5 +58,25 @@
         <% } %>
       </tbody>
     </table>
+    <!-- Paginator -->
+
+    <nav aria-label="Page navigation">
+      <ul class="pagination justify-content-end align-items-center gap-2">
+        <p class="mb-0">
+          Showing <%= paginator.start %> - <%= paginator.end %> of <%= paginator.total %> entries
+        </p>
+          <li class="page-item <%= paginator.page > 1 ? '':'disabled' %>">
+            <a class="page-link" aria-disabled="<%= !!(paginator.page > 1) %>" href="/users?role=<%= role %>&search=<%= searchdata %>&page=<%= paginator.page - 1 %>" tabindex="-1">Previous</a>
+          </li>
+        <% for (let i = 0; i < paginator.page_range.length; i++) { %>
+         <li class="page-item <%= paginator.page_range[i] == paginator.page ? 'active' : '' %>">
+            <a class="page-link" href="/users?role=<%= role %>&search=<%= searchdata %>&page=<%= paginator.page_range[i] %>"><%= paginator.page_range[i] %></a>
+          </li>
+        <% } %>
+        <li class="page-item <%= paginator.page < paginator.total_pages ? '':'disabled' %>">
+          <a class="page-link" aria-disabled="<%= !!(paginator.page < paginator.total_pages) %>" href="/users?role=<%= role %>&search=<%= searchdata %>&page=<%= paginator.page + 1 %>" tabindex="-1">Next</a>
+        </li>
+      </ul>
+    </nav>
   </div>
 </div>
