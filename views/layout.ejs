@@ -67,12 +67,30 @@
   <script src="/node_modules/toastr/build/toastr.min.js"></script>
   <script>
     <% if (typeof message !== 'undefined' && message) { %>
-      Swal.fire({
-        icon: '<%= message.type %>',
-        title: '<%= message.text %>',
-        showConfirmButton: false,
-        timer: 1500
-      });
+      var message = JSON.parse('<%- JSON.stringify(message) %>');
+      //console.log(message);
+      // Swal.fire({
+      //   icon: '<%= message.type %>',
+      //   title: '<%= message.text %>',
+      //   showConfirmButton: false,
+      //   timer: 3000
+      // });
+
+      //show toaster
+      toastr.options = {
+        "closeButton": true,
+        "progressBar": true,
+        "positionClass": "toast-bottom-right",
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+      }
+      toastr[message.type](message.text);
     <% } %>
   </script>
   <script>

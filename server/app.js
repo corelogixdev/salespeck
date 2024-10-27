@@ -26,7 +26,27 @@ app.set('view engine', 'ejs');
 // Use express-ejs-layouts
 app.use(expressLayouts);
 //app.set('layout', 'layout'); // Default layout
+
+
+
+
+app.use(
+  session({
+    secret: 'your-secret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // Set to true if using HTTPS
+  })
+);
 app.use(sessionDataMiddleware);
+// Routes
+app.get('/', (req, res) => {
+  if (!req.session.user_id) {
+    return res.redirect('/login')
+  } else {
+    res.redirect('/dashboard')
+  }
+});
 
 // Initialize SQLite database with Sequelize
 const sequelize = new Sequelize({
@@ -37,22 +57,6 @@ const sequelize = new Sequelize({
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-app.use(
-  session({
-    secret: 'your-secret',
-    resave: false,
-    saveUninitialized: true,
-  })
-);
-// Routes
-app.get('/', (req, res) => {
-  if (!req.session.user_id) {
-    return res.redirect('/login')
-  } else {
-    res.redirect('/dashboard')
-  }
-
-});
 app.get('/login', (req, res) => {
   res.render('login', { layout: false });
 });
@@ -73,16 +77,17 @@ app.post('/login', async (req, res) => {
 app.get('/logout', (req, res) => {
   req.session.destroy(err => {
     if (err) {
-      console.log(err);
       // You can handle the error appropriately, e.g., return an error response or redirect to a dashboard
-      return res.redirect('/dashboard'); // Ensure to return here to avoid further code execution
+      res.redirect('/dashboard'); // Ensure to return here to avoid further code execution
     }
 
     // Clear the cookie and redirect only if session destruction is successful
+    //req.session.message = { type: 'success', text: 'Logout successful!' };
     res.clearCookie('connect.sid');
     res.redirect('/login'); // Redirect to login after successful logout
   });
 });
+
 app.get('/dashboard',isAuthenticated, (req, res) => {
   res.render('dashboard');
 });
