@@ -4,6 +4,8 @@ const encrypt = require('../utils/encrypt');
 
 exports.index = async (req, res) => {
   const role = req.query.role || 'user'; // Default role to 'user' if not provided
+  let searchdata = req.query.search || '';
+  searchdata = searchdata.trim();
   var role_query = {
     [Op.or]: ['user', 'admin']
   }
@@ -13,10 +15,15 @@ exports.index = async (req, res) => {
   }
   const data = await db.user.findAll({
     where: {
-      role: role_query
+      role: role_query,
+      [Op.or]: [
+        { username: { [Op.like]: `%${searchdata}%` } },
+        { phone: { [Op.like]: `%${searchdata}%` } },
+        { name: { [Op.like]: `%${searchdata}%` } }
+      ]
     }
   });
-  res.render('users/index', { title: role === 'user' ? 'Users' : 'Customers', data, role });
+  res.render('users/index', { title: role === 'user' ? 'Users' : 'Customers', data, role, searchdata });
 };
 
 exports.form = async (req, res) => {
