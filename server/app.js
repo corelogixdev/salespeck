@@ -8,7 +8,7 @@ const expressLayouts = require('express-ejs-layouts');
 const config = require('../config.js'); // Link to the Express app
 const sessionDataMiddleware = require('../middleware/sessionData');
 const isAuthenticated = require('../middleware/isAuthenticated');
-
+const settings = require('../controllers/settingsController');
 
 const app = express();
 app.use(express.json());
@@ -105,6 +105,8 @@ app.get('/users/form',isAuthenticated, userController.form); // Use the same for
 app.post('/users/save',isAuthenticated, userController.save); // Handle both create and edit
 app.post('/users/:id/delete',isAuthenticated, userController.delete);
 
+// Settings 
+app.get('/settings',isAuthenticated, settings.index);
 
 // app.get('/*', (req, res) => {
 //   res.redirect('/');
