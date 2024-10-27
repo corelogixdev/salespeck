@@ -3,9 +3,9 @@ const path = require('path');
 const expressApp = require('./server/app'); // Link to the Express app
 const config = require('./config.js'); // Link to the Express app
 
-require('electron-reload')(__dirname, {
-  electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
-});
+// require('electron-reload')(__dirname, {
+//   electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
+// });
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,

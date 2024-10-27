@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>OpenMenu</title>
+  <!-- add favicon -->
+  <link rel="icon" href="/assets/images/icon.ico" type="image/x-icon">
   <!-- Bootstrap CSS -->
   <link href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="/node_modules/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
@@ -27,7 +29,7 @@
 <body>
   <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/dashboard">Open Menu</a>
+      <a class="navbar-brand" href="/dashboard"><img src="/assets/images/icon.png" style="width: 50px;">Open Menu</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -79,12 +81,30 @@
   <script src="/node_modules/toastr/build/toastr.min.js"></script>
   <script>
     <% if (typeof message !== 'undefined' && message) { %>
-      Swal.fire({
-        icon: '<%= message.type %>',
-        title: '<%= message.text %>',
-        showConfirmButton: false,
-        timer: 1500
-      });
+      var message = JSON.parse('<%- JSON.stringify(message) %>');
+      //console.log(message);
+      // Swal.fire({
+      //   icon: '<%= message.type %>',
+      //   title: '<%= message.text %>',
+      //   showConfirmButton: false,
+      //   timer: 3000
+      // });
+
+      //show toaster
+      toastr.options = {
+        "closeButton": true,
+        "progressBar": true,
+        "positionClass": "toast-bottom-right",
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+      }
+      toastr[message.type](message.text);
     <% } %>
   </script>
   <script>
