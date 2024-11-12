@@ -51,7 +51,6 @@ app.get('/', (req, res) => {
   }
 });
 
-const execSync = require('child_process').execSync;
 const fs = require('fs');
 
 async function runMigrationsAndSeeders() {
@@ -123,8 +122,14 @@ app.get('/logout', (req, res) => {
   });
 });
 
-app.get('/dashboard', isAuthenticated, (req, res) => {
-  res.render('dashboard');
+app.get('/dashboard', isAuthenticated, async(req, res) => {
+  let settings =await db.softwaresetting.findOne({
+    where: {
+      name: 'company'
+    }
+  });
+  let company = JSON.parse(settings.value);
+  res.render('dashboard', { company });
 });
 
 // Import the product controller
