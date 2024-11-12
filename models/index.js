@@ -42,6 +42,11 @@ sequelize.options.define = {
   timestamps: true
 };
 
+sequelize.sync().then(() => {
+  console.log('Database synchronized');
+}).catch(err => {
+  console.error('Error synchronizing database:', err);
+});
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

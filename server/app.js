@@ -51,14 +51,34 @@ app.get('/', (req, res) => {
   }
 });
 
-//run cmd command npx sequelize db:migrate
 const execSync = require('child_process').execSync;
-const migrate = execSync('npx sequelize db:migrate', { encoding: 'utf-8' });
-logi('Migrations executed:');
-logi(migrate);
-const seed = execSync('npx sequelize db:seed:all', { encoding: 'utf-8' });
-logi('seed executed:');
-logi(seed);
+const fs = require('fs');
+
+async function runMigrationsAndSeeders() {
+  try {
+    const migrationsPath = path.join(__dirname, '..', 'migrations');
+    const seedersPath = path.join(__dirname, '..', 'seeders');
+
+    // Run migrations
+    const migrationFiles = fs.readdirSync(migrationsPath);
+    for (const file of migrationFiles) {
+      const migration = require(path.join(migrationsPath, file));
+      await migration.up(db.sequelize.getQueryInterface(), db.Sequelize);
+      logi(`Migration executed: ${file}`);
+    }
+
+    // Run seeders
+    const seederFiles = fs.readdirSync(seedersPath);
+    for (const file of seederFiles) {
+      const seeder = require(path.join(seedersPath, file));
+      await seeder.up(db.sequelize.getQueryInterface(), db.Sequelize);
+      logi(`Seeder executed: ${file}`);
+    }
+  } catch (error) {
+    logi('Error running migrations or seeders:');
+    logi(error);
+  }
+}
 
 app.get('/login', (req, res) => {
   res.render('login', { layout: false });
@@ -134,6 +154,8 @@ app.get('/sales',isAuthenticated, sales.index);
 // app.get('/*', (req, res) => {
 //   res.redirect('/');
 // });
+
+runMigrationsAndSeeders();
 
 app.listen(3000, () => {
   logi('Express server listening on http://localhost:' + config.port);
