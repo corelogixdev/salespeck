@@ -1,4 +1,5 @@
-const { app, BrowserWindow,ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const expressApp = require('./server/app'); // Link to the Express app
 const config = require('./config.js'); // Link to the Express app
@@ -40,10 +41,19 @@ ipcMain.on('perform-action', (event, arg) => {
 });
 
 app.whenReady().then(() => {
-  
   createWindow();
+  autoUpdater.checkForUpdatesAndNotify();
 });
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
+});
+
+autoUpdater.on('update-available', (info) => {
+  console.log('Update available:', info);
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  console.log('Update downloaded:', info);
+  autoUpdater.quitAndInstall();
 });
