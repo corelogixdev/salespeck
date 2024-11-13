@@ -4,7 +4,7 @@ const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const expressApp = require('./server/app'); // Link to the Express app
 const config = require('./config.js'); // Link to the Express app
-const logi = require('../utils/logi');
+const logi = require('./utils/logi.js');
 // require('electron-reload')(__dirname, {
 //   electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
 // });
@@ -45,7 +45,10 @@ app.whenReady().then(() => {
   createWindow();
   autoUpdater.setFeedURL({
     provider: 'generic',
-    url: 'https://gitlab.com/atta_devgiant/openmenu-desktop/-/packages'
+    url: 'https://gitlab.com/atta_devgiant/openmenu-desktop/-/packages',
+    requestHeaders: {
+      'PRIVATE-TOKEN': process.env.GITLAB_TOKEN
+    }
   });
   autoUpdater.checkForUpdatesAndNotify();
 });
@@ -54,14 +57,24 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
+autoUpdater.on('error', (error) => {
+  logi('Error in auto-updater:', error);
+});
+
+autoUpdater.on('checking-for-update', () => {
+  logi('Checking for update...');
+});
+
 autoUpdater.on('update-available', (info) => {
-  logi('Update available:');
-  logi(info);
+  logi('Update available:', info);
+});
+
+autoUpdater.on('update-not-available', (info) => {
+  logi('Update not available:', info);
 });
 
 autoUpdater.on('update-downloaded', (info) => {
-  logi('Update downloaded:');
-  logi(info);
+  logi('Update downloaded:', info);
   const options = {
     type: 'question',
     buttons: ['Install Now', 'Later'],
