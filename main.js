@@ -4,7 +4,7 @@ const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const expressApp = require('./server/app'); // Link to the Express app
 const config = require('./config.js'); // Link to the Express app
-
+const logi = require('../utils/logi');
 // require('electron-reload')(__dirname, {
 //   electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
 // });
@@ -43,6 +43,10 @@ ipcMain.on('perform-action', (event, arg) => {
 
 app.whenReady().then(() => {
   createWindow();
+  autoUpdater.setFeedURL({
+    provider: 'generic',
+    url: 'https://gitlab.com/atta_devgiant/openmenu-desktop/-/packages'
+  });
   autoUpdater.checkForUpdatesAndNotify();
 });
 
@@ -51,11 +55,13 @@ app.on('window-all-closed', () => {
 });
 
 autoUpdater.on('update-available', (info) => {
-  console.log('Update available:', info);
+  logi('Update available:');
+  logi(info);
 });
 
 autoUpdater.on('update-downloaded', (info) => {
-  console.log('Update downloaded:', info);
+  logi('Update downloaded:');
+  logi(info);
   const options = {
     type: 'question',
     buttons: ['Install Now', 'Later'],

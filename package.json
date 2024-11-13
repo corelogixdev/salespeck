@@ -33,6 +33,12 @@
       "main.js",
       "preload.js"
     ],
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "https://gitlab.com/atta_devgiant/openmenu-desktop/-/packages"
+      }
+    ],
     "win": {
       "target": "nsis",
       "icon": "build/icons/icon.ico",
