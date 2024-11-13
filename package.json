@@ -40,9 +40,16 @@
         "provider": "generic",
         "url": "https://gitlab.com/atta-devgiant/openmenu-desktop/-/jobs/artifacts/main/raw/dist?job=build"
       }
-    ]
+    ],
+    "mac": {
+      "target": []
+    },
+    "linux": {
+      "target": []
+    }
   },
   "license": "MIT",
+  "author": "Atta Rasul",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.6.0",
     "bootstrap": "^5.3.3",
