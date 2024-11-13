@@ -9,7 +9,7 @@
     "start:electron": "electron .",
     "dev": "nodemon --exec \"electron .\"",
     "build": "electron-builder",
-    "upload": "node -r dotenv/config -e \"require('child_process').execSync('curl --verbose --header \\\"PRIVATE-TOKEN: ' + process.env.GITLAB_TOKEN + '\\\" --upload-file dist/OpenMenu-' + process.env.npm_package_version + '-setup.exe \\\"https://gitlab.com/api/v4/projects/' + process.env.CI_PROJECT_ID + '/packages/generic/openmenu-desktop/' + process.env.npm_package_version + '/openmenu.exe\\\"', {stdio: 'inherit'})\""
+    "upload": "node -r dotenv/config -e \"console.log('Uploading executable...'); require('child_process').execSync('curl --verbose --header \\\"PRIVATE-TOKEN: ' + process.env.GITLAB_TOKEN + '\\\" --upload-file dist/OpenMenu-' + process.env.npm_package_version + '-setup.exe \\\"https://gitlab.com/api/v4/projects/' + process.env.CI_PROJECT_ID + '/packages/generic/openmenu-desktop/' + process.env.npm_package_version + '/openmenu.exe\\\"', {stdio: 'inherit'}); console.log('Uploading latest.yml...'); if (!require('fs').existsSync('dist/latest.yml')) { console.error('Error: latest.yml file is missing in the dist directory.'); process.exit(1); } require('child_process').execSync('curl --verbose --header \\\"PRIVATE-TOKEN: ' + process.env.GITLAB_TOKEN + '\\\" --upload-file dist/latest.yml \\\"https://gitlab.com/api/v4/projects/' + process.env.CI_PROJECT_ID + '/packages/generic/openmenu-desktop/' + process.env.npm_package_version + '/latest.yml\\\"', {stdio: 'inherit'}); console.log('Upload complete.');\""
   },
   "build": {
     "appId": "io.openmenu.app",
@@ -31,12 +31,13 @@
       "views/**/*",
       "config.js",
       "main.js",
-      "preload.js"
+      "preload.js",
+      ".env"
     ],
     "publish": [
       {
         "provider": "generic",
-        "url": "https://gitlab.com/api/v4/projects/62990895/packages/generic/openmenu-desktop"
+        "url": "https://gitlab.com/api/v4/projects/62990895/packages/generic/openmenu-desktop/"
       }
     ],
     "win": {

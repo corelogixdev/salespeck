@@ -1,7 +1,7 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const { autoUpdater } = require('electron-updater');
-const path = require('path');
 const expressApp = require('./server/app'); // Link to the Express app
 const config = require('./config.js'); // Link to the Express app
 const logi = require('./utils/logi.js');
@@ -44,13 +44,14 @@ ipcMain.on('perform-action', (event, arg) => {
 app.whenReady().then(() => {
   createWindow();
   const projectId = process.env.CI_PROJECT_ID;
+
   if (!projectId) {
     logi('Error: CI_PROJECT_ID is not defined in the environment variables.');
     return;
   }
   autoUpdater.setFeedURL({
     provider: 'generic',
-    url: `https://gitlab.com/api/v4/projects/${projectId}/packages/generic/openmenu-desktop`,
+    url: `https://gitlab.com/api/v4/projects/${projectId}/packages/generic/openmenu-desktop/${process.env.npm_package_version}/latest.yml`,
     requestHeaders: {
       'PRIVATE-TOKEN': process.env.GITLAB_TOKEN
     }
