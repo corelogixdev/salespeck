@@ -45,7 +45,7 @@ app.whenReady().then(() => {
   createWindow();
   autoUpdater.setFeedURL({
     provider: 'generic',
-    url: 'https://gitlab.com/atta_devgiant/openmenu-desktop/-/packages',
+    url: 'https://gitlab.com/api/v4/projects/' + process.env.CI_PROJECT_ID + '/packages/generic/openmenu-desktop',
     requestHeaders: {
       'PRIVATE-TOKEN': process.env.GITLAB_TOKEN
     }
@@ -58,7 +58,11 @@ app.on('window-all-closed', () => {
 });
 
 autoUpdater.on('error', (error) => {
-  logi('Error in auto-updater:', error);
+  if (error.message.includes('403')) {
+    logi('Error in auto-updater: Access denied. Please check your GitLab token and permissions.');
+  } else {
+    logi('Error in auto-updater:', error);
+  }
 });
 
 autoUpdater.on('checking-for-update', () => {
