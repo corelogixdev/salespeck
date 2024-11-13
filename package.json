@@ -1,5 +1,6 @@
 {
   "name": "openmenu",
+  "description": "OpenMenu is a desktop application for managing POS/Retails/Restaurants/Services Sale/Invoicing.",
   "version": "1.0.0",
   "private": "true",
   "main": "main.js",
@@ -7,7 +8,8 @@
     "start": "nodemon server/app.js",
     "start:electron": "electron .",
     "dev": "nodemon --exec \"electron .\"",
-    "build": "electron-builder"
+    "build": "electron-builder",
+    "upload": "node -r dotenv/config -e \"require('child_process').execSync('curl --verbose --header \\\"PRIVATE-TOKEN: ' + process.env.GITLAB_TOKEN + '\\\" --upload-file dist/OpenMenu-1.0.0-setup.exe \\\"https://gitlab.com/api/v4/projects/' + process.env.CI_PROJECT_ID + '/packages/generic/openmenu-desktop/1.0.0/openmenu.exe\\\"', {stdio: 'inherit'})\""
   },
   "build": {
     "appId": "io.openmenu.app",
@@ -33,14 +35,9 @@
     ],
     "win": {
       "target": "nsis",
-      "icon": "build/icons/icon.ico"
+      "icon": "build/icons/icon.ico",
+      "artifactName": "${productName}-${version}-setup.${ext}"
     },
-    "publish": [
-      {
-        "provider": "generic",
-        "url": "https://gitlab.com/atta-devgiant/openmenu-desktop/-/jobs/artifacts/main/raw/dist?job=build"
-      }
-    ],
     "mac": {
       "target": []
     },
@@ -55,6 +52,7 @@
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.5",
     "cross-spawn": "^7.0.3",
+    "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "electron-updater": "^5.3.0",
     "express": "^4.21.1",
