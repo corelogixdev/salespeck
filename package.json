@@ -9,7 +9,7 @@
     "start:electron": "electron .",
     "dev": "nodemon --exec \"electron .\"",
     "build": "electron-builder",
-    "upload": "node -r dotenv/config -e \"require('child_process').execSync('curl --verbose --header \\\"PRIVATE-TOKEN: ' + process.env.GITLAB_TOKEN + '\\\" --upload-file dist/OpenMenu-1.0.0-setup.exe \\\"https://gitlab.com/api/v4/projects/' + process.env.CI_PROJECT_ID + '/packages/generic/openmenu-desktop/1.0.0/openmenu.exe\\\"', {stdio: 'inherit'})\""
+    "upload": "node -r dotenv/config -e \"require('child_process').execSync('curl --verbose --header \\\"PRIVATE-TOKEN: ' + process.env.GITLAB_TOKEN + '\\\" --upload-file dist/OpenMenu-' + process.env.npm_package_version + '-setup.exe \\\"https://gitlab.com/api/v4/projects/' + process.env.CI_PROJECT_ID + '/packages/generic/openmenu-desktop/' + process.env.npm_package_version + '/openmenu.exe\\\"', {stdio: 'inherit'})\""
   },
   "build": {
     "appId": "io.openmenu.app",
