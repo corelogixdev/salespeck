@@ -1,10 +1,16 @@
 const path = require('path');
+const fs = require('fs');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const expressApp = require('./server/app'); // Link to the Express app
 const config = require('./config.js'); // Link to the Express app
 const logi = require('./utils/logi.js');
+
+// Read package.json to get the version
+const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json')));
+process.env.npm_package_version = packageJson.version;
+
 // require('electron-reload')(__dirname, {
 //   electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
 // });
@@ -51,7 +57,7 @@ app.whenReady().then(() => {
   }
   autoUpdater.setFeedURL({
     provider: 'generic',
-    url: `https://gitlab.com/api/v4/projects/${projectId}/packages/generic/openmenu-desktop/${process.env.npm_package_version}/latest.yml`,
+    url: `https://gitlab.com/api/v4/projects/${projectId}/packages/generic/openmenu-desktop/${process.env.npm_package_version}`,
     requestHeaders: {
       'PRIVATE-TOKEN': process.env.GITLAB_TOKEN
     }
