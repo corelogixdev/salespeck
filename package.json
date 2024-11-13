@@ -1,7 +1,7 @@
 {
   "name": "openmenu",
   "description": "OpenMenu is a desktop application for managing POS/Retails/Restaurants/Services Sale/Invoicing.",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "private": "true",
   "main": "main.js",
   "scripts": {
@@ -36,7 +36,7 @@
     "publish": [
       {
         "provider": "generic",
-        "url": "https://gitlab.com/atta_devgiant/openmenu-desktop/-/packages"
+        "url": "https://gitlab.com/api/v4/projects/62990895/packages/generic/openmenu-desktop"
       }
     ],
     "win": {

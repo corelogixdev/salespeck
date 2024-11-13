@@ -65,6 +65,10 @@ autoUpdater.on('checking-for-update', () => {
   logi('Checking for update...');
 });
 
+autoUpdater.on('checking-for-update', () => {
+  logi('Checking for update...');
+});
+
 autoUpdater.on('update-available', (info) => {
   logi('Update available:', info);
 });
