@@ -8,8 +8,6 @@ const logi = require('./utils/logi.js');
 // require('electron-reload')(__dirname, {
 //   electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
 // });
-console.log(process.env.CI_PROJECT_ID);
-return;
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,
