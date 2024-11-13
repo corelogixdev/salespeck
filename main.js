@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const expressApp = require('./server/app'); // Link to the Express app
@@ -56,5 +56,18 @@ autoUpdater.on('update-available', (info) => {
 
 autoUpdater.on('update-downloaded', (info) => {
   console.log('Update downloaded:', info);
-  autoUpdater.quitAndInstall();
+  const options = {
+    type: 'question',
+    buttons: ['Install Now', 'Later'],
+    defaultId: 0,
+    title: 'Update Available',
+    message: 'A new version of OpenMenu is available. Do you want to install it now?',
+    detail: 'The update will be installed the next time you restart the application if you choose "Later".'
+  };
+
+  dialog.showMessageBox(null, options).then((response) => {
+    if (response.response === 0) {
+      autoUpdater.quitAndInstall();
+    }
+  });
 });
