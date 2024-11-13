@@ -8,6 +8,8 @@ const logi = require('./utils/logi.js');
 // require('electron-reload')(__dirname, {
 //   electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
 // });
+console.log(process.env.CI_PROJECT_ID);
+return;
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,
@@ -43,9 +45,14 @@ ipcMain.on('perform-action', (event, arg) => {
 
 app.whenReady().then(() => {
   createWindow();
+  const projectId = process.env.CI_PROJECT_ID;
+  if (!projectId) {
+    logi('Error: CI_PROJECT_ID is not defined in the environment variables.');
+    return;
+  }
   autoUpdater.setFeedURL({
     provider: 'generic',
-    url: 'https://gitlab.com/api/v4/projects/' + process.env.CI_PROJECT_ID + '/packages/generic/openmenu-desktop',
+    url: `https://gitlab.com/api/v4/projects/${projectId}/packages/generic/openmenu-desktop`,
     requestHeaders: {
       'PRIVATE-TOKEN': process.env.GITLAB_TOKEN
     }

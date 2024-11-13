@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
@@ -11,8 +12,6 @@ const isAuthenticated = require('../middleware/isAuthenticated');
 const settings = require('../controllers/settingsController');
 const sales = require('../controllers/salesController');
 const adminOnly = require('../middleware/adminOnly');
-
-
 
 const app = express();
 app.use(express.json());
