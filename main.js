@@ -57,7 +57,7 @@ app.whenReady().then(() => {
   }
   autoUpdater.setFeedURL({
     provider: 'generic',
-    url: `https://gitlab.com/api/v4/projects/${projectId}/packages/generic/openmenu-desktop/${process.env.npm_package_version}`,
+    url: `https://gitlab.com/api/v4/projects/${projectId}/packages/generic/openmenu-desktop/release`,
     requestHeaders: {
       'PRIVATE-TOKEN': process.env.GITLAB_TOKEN
     }
