@@ -156,6 +156,8 @@ app.get('/settings',isAuthenticated,adminOnly, settings.index);
 app.post('/settings/save',isAuthenticated,adminOnly, settings.save);
 // sales
 app.get('/sales',isAuthenticated, sales.index);
+app.get('/sales/form',isAuthenticated, sales.form);
+
 // app.get('/*', (req, res) => {
 //   res.redirect('/');
 // });

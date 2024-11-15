@@ -1,0 +1,263 @@
+<!-- ...existing code... -->
+
+<div class="container mt-4" style="height: 76vh;">
+    <div class="row" style="height: 100%;">
+        <!-- Search and Customer Section -->
+        <div class="col-lg-6">
+            <!-- Search Product -->
+            <div class="mb-3" id="search-product-sales-page-search-seaction" style="position: relative;">
+                <label for="product-search" class="form-label">Search Product:</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="product-search" placeholder="Enter product name or ID">
+                    <div class="input-group-text">
+                        <input type="checkbox" id="search-barcode"> Barcode
+                    </div>
+                </div>
+                <div id="search-results" class="shadow rounded p-3 d-none"
+                    style="position: absolute; width: 100%; z-index: 9999; background-color: white;"></div>
+            </div>
+
+            <!-- Customer Dropdown -->
+            <div class="mb-3">
+                <label for="customer" class="form-label">Customer:</label>
+                <select id="customer" class="form-select">
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </div>
+
+            <!-- Total Bill -->
+            <div class="mb-3">
+                <label class="form-label">Total Bill:</label>
+                <span id="total-bill-amount" class="form-control-plaintext">$0.00</span>
+            </div>
+
+            <!-- Total Payment and Ledger -->
+            <div class="mb-3">
+                <label for="total-payment" class="form-label">Total Payment:</label>
+                <div class="input-group">
+                    <input type="number" class="form-control" id="total-payment">
+                    <div class="input-group-text">
+                        <input type="checkbox" id="ledger"> Ledger
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Selected Products Table -->
+        <div class="col-lg-6">
+            <div class="table-responsive border" style="height: 80%; overflow-y: auto;">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Product ID</th>
+                            <th>Name</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="selected-products">
+                        <!-- Rows will be populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn btn-primary w-100 mt-5">Sale</button>
+        </div>
+    </div>
+</div>
+<style>
+    .search-result-product:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+<script>
+    const productSearch = document.getElementById('product-search');
+    const searchBarcode = document.getElementById('search-barcode');
+    const customerDropdown = document.getElementById('customer');
+    const totalBillAmount = document.getElementById('total-bill-amount');
+    const totalPayment = document.getElementById('total-payment');
+    const ledgerCheckbox = document.getElementById('ledger');
+    const selectedProductsTable = document.getElementById('selected-products');
+    let selectedProduct = null;
+    let allProducts = [
+        { id: 1, name: 'Product 1', quantity: 1, price: 10.00 },
+        { id: 2, name: 'Product 2', quantity: 1, price: 20.00 },
+        { id: 3, name: 'Product 3', quantity: 1, price: 30.00 },
+        { id: 4, name: 'Product 4', quantity: 1, price: 40.00 },
+        { id: 5, name: 'Product 5', quantity: 1, price: 50.00 },
+        { id: 6, name: 'Product 6', quantity: 1, price: 60.00 },
+        { id: 7, name: 'Product 7', quantity: 1, price: 70.00 },
+        { id: 8, name: 'Product 8', quantity: 1, price: 80.00 },
+        { id: 9, name: 'Product 9', quantity: 1, price: 90.00 },
+        { id: 10, name: 'Product 10', quantity: 1, price: 100.00 },
+    ]
+    let products = [
+                { id: 1, name: 'Product 1', quantity: 1, price: 10.00 },
+                { id: 2, name: 'Product 2', quantity: 1, price: 20.00 },
+            ];
+    function removeProduct(productId) {
+        const row = document.getElementById(`product-row-${productId}`);
+        if (row) {
+            row.remove();
+            updateTotalBill();
+        }
+    }
+    function updateTotalBill() {
+        let total = 0;
+        document.querySelectorAll('#selected-products tr').forEach(row => {
+            const price = parseFloat(row.querySelector('.product-price').textContent);
+            total += price;
+        });
+        totalBillAmount.textContent = `$${total.toFixed(2)}`;
+    }
+    function addProduct(product) {
+        // if a product is already added, increase the quantity
+        const existingRow = document.getElementById(`product-row-${product.id}`);
+        if (existingRow) {
+            const quantityElement = existingRow.querySelector('td:nth-child(3)');
+            const priceElement = existingRow.querySelector('td:nth-child(4)');
+            const totalElement = existingRow.querySelector('td:nth-child(5)');
+            const quantity = parseInt(quantityElement.textContent);
+            quantityElement.textContent = quantity + 1;
+            totalElement.textContent = ((quantity + 1) * parseFloat(priceElement.textContent)).toFixed(2);
+            updateTotalBill();
+            return;
+        }
+        const row = document.createElement('tr');
+        row.id = `product-row-${product.id}`;
+        row.innerHTML = `
+        <td>${product.id}</td>
+        <td>${product.name}</td>
+        <td>${product.quantity}</td>
+        <td class="product-price">${product.price}</td>
+        <td>${(product.quantity * product.price).toFixed(2)}</td>
+        <td>
+          <button class="btn btn-danger btn-sm" onclick="removeProduct('${product.id}')">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </td>
+      `;
+        selectedProductsTable.appendChild(row);
+        updateTotalBill();
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('#search-product-sales-page-search-seaction')) {
+                document.getElementById('search-results').classList.add('d-none');
+            }
+        });
+        // when focused in productSearch and clicked down arrow and result is not hidden it should mark the first result hovered, and 
+        // user should be able to navigate between result with arrow keys
+        productSearch.addEventListener('keydown', (event) => {
+            const searchResults = document.getElementById('search-results');
+            if (!searchResults.classList.contains('d-none')) {
+                if(event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+                    event.preventDefault();
+                }
+                if(event.key === 'Enter') {
+                    let _selectedProduct = allProducts.find(p => p.id === parseInt(selectedProduct));
+                    console.log(_selectedProduct);
+                    if(_selectedProduct) {
+                        addProduct(_selectedProduct);
+                        productSearch.value = '';
+                        searchResults.classList.add('d-none');
+                    }
+                }
+                const productResults = searchResults.querySelectorAll('.search-result-product');
+                if (productResults.length > 0) {
+                    if (selectedProduct) {
+                        const selectedElement = document.getElementById(`product-${selectedProduct}`);
+                        selectedElement.style.backgroundColor = '';
+                        let nextElement = null;
+                        if (event.key === 'ArrowUp') {
+                            nextElement = selectedElement.previousElementSibling;
+                        } else if (event.key === 'ArrowDown') {
+                            nextElement = selectedElement.nextElementSibling;
+                        }
+                        if (nextElement) {
+                            selectedProduct = nextElement.id.split('-')[1];
+                            nextElement.style.backgroundColor = '#f8f9fa';
+                        } else {
+                            selectedProduct = productResults[0].id.split('-')[1];
+                            productResults[0].style.backgroundColor = '#f8f9fa';
+                        }
+                    } else {
+                        selectedProduct = productResults[0].id.split('-')[1];
+                        productResults[0].style.backgroundColor = '#f8f9fa';
+                    }
+                    console.log(selectedProduct);
+                }
+            }
+        });
+        // Function to fetch products based on search input
+        productSearch.addEventListener('input', async () => {
+            const query = productSearch.value;
+            if(query.length === 0) {
+                document.getElementById('search-results').classList.add('d-none');
+                return;
+            }
+            const searchByBarcode = searchBarcode.checked;
+            //   const response = await fetch(`/products?id=${query}&searchBarcode=${searchByBarcode}`);
+            //   const products = await response.json();
+
+            const searchResults = document.getElementById('search-results');
+            searchResults.classList.remove('d-none');
+            searchResults.innerHTML = '';
+            // get the matching product from all products and display them as result 
+            let filteredProds = allProducts.filter(product => product.name.toLowerCase().includes(query.toLowerCase()));
+            filteredProds.forEach(product => {
+                const productElement = document.createElement('div');
+                productElement.classList.add('search-result-product', 'p-2', 'd-flex', 'justify-content-between', 'align-items-center');
+                productElement.id = `product-${product.id}`;
+                productElement.style.cursor = 'pointer';
+                productElement.innerHTML = `
+                    <span>${product.name}</span>
+                    <span>Rs. ${product.price}</span>
+                    `;
+                productElement.addEventListener('click', () => {
+                    addProduct(product);
+                    productSearch.value = '';
+                    searchResults.classList.add('d-none');
+                });
+                searchResults.appendChild(productElement);
+            });
+
+            // products.forEach(product => {
+            //     const productElement = document.createElement('div');
+            //     productElement.classList.add('search-result-product', 'p-2', 'd-flex', 'justify-content-between', 'align-items-center');
+            //     productElement.id = `product-${product.id}`;
+            //     productElement.style.cursor = 'pointer';
+            //     productElement.innerHTML = `
+            //         <span>${product.name}</span>
+            //         <span>Rs. ${product.price}</span>
+            //         `;
+            //     productElement.addEventListener('click', () => {
+            //         addProduct(product);
+            //         productSearch.value = '';
+            //         searchResults.innerHTML = '';
+            //     });
+            //     searchResults.appendChild(productElement);
+
+            // });
+
+        });
+
+        const customers = [
+            { id: 1, name: 'Customer 1' },
+            { id: 2, name: 'Customer 2' },
+        ];
+        customers.forEach(customer => {
+            const option = document.createElement('option');
+            option.value = customer.id;
+            option.textContent = customer.name;
+            customerDropdown.appendChild(option);
+        });
+
+        // Example of adding a product (for demonstration purposes)
+        addProduct({ id: 1, name: 'Product 1', quantity: 1, price: 10.00 });
+        addProduct({ id: 2, name: 'Product 2', quantity: 2, price: 20.00 });
+    });
+</script>
+
+<!-- ...existing code... -->
