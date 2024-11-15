@@ -1,9 +1,15 @@
-require('dotenv').config();
+const path = require('path');
+const fs = require('fs');
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const { autoUpdater } = require('electron-updater');
-const path = require('path');
 const expressApp = require('./server/app'); // Link to the Express app
 const config = require('./config.js'); // Link to the Express app
+const logi = require('./utils/logi.js');
+
+// Read package.json to get the version
+const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json')));
+process.env.npm_package_version = packageJson.version;
 
 // require('electron-reload')(__dirname, {
 //   electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
@@ -43,6 +49,19 @@ ipcMain.on('perform-action', (event, arg) => {
 
 app.whenReady().then(() => {
   createWindow();
+  const projectId = process.env.CI_PROJECT_ID;
+
+  if (!projectId) {
+    logi('Error: CI_PROJECT_ID is not defined in the environment variables.');
+    return;
+  }
+  autoUpdater.setFeedURL({
+    provider: 'generic',
+    url: `https://gitlab.com/api/v4/projects/${projectId}/packages/generic/openmenu-desktop/release`,
+    requestHeaders: {
+      'PRIVATE-TOKEN': process.env.GITLAB_TOKEN
+    }
+  });
   autoUpdater.checkForUpdatesAndNotify();
 });
 
@@ -50,12 +69,32 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
+autoUpdater.on('error', (error) => {
+  if (error.message.includes('403')) {
+    logi('Error in auto-updater: Access denied. Please check your GitLab token and permissions.');
+  } else {
+    logi('Error in auto-updater:', error);
+  }
+});
+
+autoUpdater.on('checking-for-update', () => {
+  logi('Checking for update...');
+});
+
+autoUpdater.on('checking-for-update', () => {
+  logi('Checking for update...');
+});
+
 autoUpdater.on('update-available', (info) => {
-  console.log('Update available:', info);
+  logi('Update available:', info);
+});
+
+autoUpdater.on('update-not-available', (info) => {
+  logi('Update not available:', info);
 });
 
 autoUpdater.on('update-downloaded', (info) => {
-  console.log('Update downloaded:', info);
+  logi('Update downloaded:', info);
   const options = {
     type: 'question',
     buttons: ['Install Now', 'Later'],

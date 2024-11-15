@@ -11,6 +11,10 @@ function log(...message) {
     console.log(path.join(app.getPath('userData'), 'logs.txt'));
     const logFilePath = path.join(app.getPath('userData'), 'logs.txt'); 
     const timestamp = new Date().toISOString();
+    //message may be object
+    if (message.length === 1 && typeof message[0] === 'object') {
+      message = [JSON.stringify(message[0], null, 2)];
+    }
     var messages = message.join(' ');
     const logMessage = `${timestamp} - ${messages}\n`;
     
