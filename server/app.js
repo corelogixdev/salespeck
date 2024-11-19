@@ -136,6 +136,7 @@ const productController = require('../controllers/productController');
 
 // Product CRUD routes
 app.get('/products', isAuthenticated, productController.index);
+app.post('/products/get', isAuthenticated, productController.get);
 app.get('/products/form', isAuthenticated, productController.form);
 app.post('/products/save', isAuthenticated, productController.save);
 app.post('/products/:id/delete', isAuthenticated, productController.delete);
@@ -148,6 +149,7 @@ app.get('/users', isAuthenticated, userController.index);
 app.get('/users/form', isAuthenticated, userController.form); // Use the same form for creating and editing
 app.post('/users/save', isAuthenticated, userController.save); // Handle both create and edit
 app.post('/users/:id/delete', isAuthenticated, userController.delete);
+app.get('/users/customers', isAuthenticated, userController.getCustomers);
 
 
 // Settings 
@@ -156,6 +158,7 @@ app.post('/settings/save',isAuthenticated,adminOnly, settings.save);
 // sales
 app.get('/sales',isAuthenticated, sales.index);
 app.get('/sales/form',isAuthenticated, sales.form);
+app.post('/sales/save',isAuthenticated, sessionDataMiddleware, sales.save);
 
 // app.get('/*', (req, res) => {
 //   res.redirect('/');

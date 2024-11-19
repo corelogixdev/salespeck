@@ -109,3 +109,12 @@ exports.delete = async (req, res) => {
   await db.user.destroy({ where: { id: req.params.id } });
   res.redirect(`/users?role=${role}`);
 };
+
+exports.getCustomers = async (req, res) => {
+  const data = await db.user.findAll({
+    where: {
+      role: 'customer'
+    }
+  });
+  res.json(data);
+}

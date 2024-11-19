@@ -8,6 +8,12 @@ exports.index = async (req, res) => {
   res.render('products/index', { title: "Products", data });
 };
 
+exports.get = async (req, res) => {
+  let body = req.body;
+  const data = await db.product.findAll(body);
+  res.json(data);
+}
+
 exports.form = async (req, res) => {
   const productId = req.query.id;
   let data = null;

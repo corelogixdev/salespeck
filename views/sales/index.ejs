@@ -1,0 +1,48 @@
+<div class="page_header d-flex justify-content-between align-items-center mb-3">
+    <h3>
+        <%= title %>
+    </h3>
+    <div>
+        <a href="/sales/form" class="btn btn-primary"><i class="fas fa-plus"></i> Sales</a>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                <% sales.forEach(sale => { %>
+                    <pre>
+                        <%= JSON.stringify(sale) %>
+                    </pre>
+                    <tr>
+                        <td><%= sale.id %></td>
+                        <td><%= sale.product %></td>
+                        <td><%= sale.quantity %></td>
+                        <td><%= sale.price %></td>
+                        <td><%= sale.total %></td>
+                        <td style="text-align: end;">
+                            <a href="/sales/form?id=<%= sale.id %>" class="btn btn-warning btn-sm">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <form action="/sales/<%= sale.id %>/delete" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>

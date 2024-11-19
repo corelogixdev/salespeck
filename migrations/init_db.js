@@ -410,6 +410,125 @@ module.exports = {
       onDelete: 'set null',
       onUpdate: 'cascade',
     });
+    
+    // create soldproducts table
+    await queryInterface.createTable('soldproducts', {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER
+      },
+      sale: Sequelize.INTEGER,
+      product: Sequelize.INTEGER,
+      quantity: Sequelize.INTEGER,
+    });
+
+    // create sale table
+    await queryInterface.createTable('sale', {
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      user: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
+      },
+      customer: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
+      },
+      deliveryuser: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
+      },
+      invoicenum: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
+      },
+      discountpercentage: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
+      },
+      saleid: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+    });
+
+    // Add foreign keys and indexes
+    await queryInterface.addConstraint('soldproducts', {
+      fields: ['sale'],
+      type: 'foreign key',
+      name: 'soldproducts_sale_fk',
+      references: {
+        table: 'sale',
+        field: 'id',
+      },
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    });
+
+    await queryInterface.addConstraint('soldproducts', {
+      fields: ['product'],
+      type: 'foreign key',
+      name: 'soldproducts_product_fk',
+      references: {
+        table: 'product',
+        field: 'id',
+      },
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    });
+
+    await queryInterface.addConstraint('sale', {
+      fields: ['user'],
+      type: 'foreign key',
+      name: 'sale_user_fk',
+      references: {
+        table: 'user',
+        field: 'id',
+      },
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    });
+
+    await queryInterface.addConstraint('sale', {
+      fields: ['customer'],
+      type: 'foreign key',
+      name: 'sale_customer_fk',
+      references: {
+        table: 'user',
+        field: 'id',
+      },
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    });
+
+    await queryInterface.addConstraint('sale', {
+      fields: ['deliveryuser'],
+      type: 'foreign key',
+      name: 'sale_deliveryuser_fk',
+      references: {
+        table: 'user',
+        field: 'id',
+      },
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    });
+
+    await queryInterface.addConstraint('sale', {
+      fields: ['saleid'],
+      type: 'foreign key',
+      name: 'sale_saleid_fk',
+      references: {
+        table: 'soldproducts',
+        field: 'id',
+      },
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    });
   },
 
   down: async (queryInterface) => {
