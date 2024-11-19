@@ -450,11 +450,7 @@ module.exports = {
       discountpercentage: {
         type: Sequelize.STRING(50),
         allowNull: true,
-      },
-      saleid: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-      },
+      }
     });
 
     // Add foreign keys and indexes
@@ -512,18 +508,6 @@ module.exports = {
       name: 'sale_deliveryuser_fk',
       references: {
         table: 'user',
-        field: 'id',
-      },
-      onDelete: 'cascade',
-      onUpdate: 'cascade',
-    });
-
-    await queryInterface.addConstraint('sale', {
-      fields: ['saleid'],
-      type: 'foreign key',
-      name: 'sale_saleid_fk',
-      references: {
-        table: 'soldproducts',
         field: 'id',
       },
       onDelete: 'cascade',

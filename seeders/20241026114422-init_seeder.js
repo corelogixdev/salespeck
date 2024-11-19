@@ -1,7 +1,7 @@
 'use strict';
 
 const { json } = require('sequelize');
-const { financeaccount, user, softwaresetting } = require('../models'); // Import models directly
+const { financeaccount, user, softwaresetting,product } = require('../models'); // Import models directly
 const { encrypt } = require('../utils/encrypt');
 
 module.exports = {
@@ -75,7 +75,13 @@ module.exports = {
       await softwaresetting.upsert(setting);
     }
 
-
+    const dumyproducts = [
+      { id: 1, name: 'test product 1', saleprice: 100, barcode: '123456789', saleactive: true,purchaseactive: true,quantity: 100 },
+      { id: 2, name: 'test product 2', saleprice: 200, },
+    ]
+    for (const productobj of dumyproducts) {
+      await product.upsert(productobj);
+    }
   },
 
   async down(queryInterface, Sequelize) {

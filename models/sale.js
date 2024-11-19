@@ -28,11 +28,7 @@ module.exports = (sequelize, DataTypes) => {
       discountpercentage: {
         type: DataTypes.STRING(50),
         allowNull: true,
-      },
-      saleid: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-      },
+      }
     },
     {
       tableName: "sale",
@@ -44,7 +40,6 @@ module.exports = (sequelize, DataTypes) => {
     Sale.belongsTo(models.user , { foreignKey: 'user', as: 'User' });
     Sale.belongsTo(models.user , { foreignKey: 'customer', as: 'Customer' });
     Sale.belongsTo(models.user , { foreignKey: 'deliveryuser', as: 'DeliveryUser' });
-    Sale.belongsTo(models.soldproducts , { foreignKey: 'saleid', as: 'SoldProducts' });
   };
 
   return Sale;

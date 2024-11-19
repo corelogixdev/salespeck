@@ -17,18 +17,7 @@ exports.index = async (req, res) => {
         model: db.user,
         as: "User",
         attributes: ["id", "name"],
-      },
-      {
-        model: db.soldproducts,
-        as: 'SoldProducts',
-        // include: [
-        //   {
-        //     model: db.product,
-        //     as: 'Product',
-        //     attributes: [ "id",'name'],
-        //   },
-        // ],
-      },
+      }
     ],
   });
   console.log(salesa);
@@ -59,7 +48,7 @@ exports.save = async (req, res) => {
           quantity: product.quantity,
         });
       }
-      sale.saleid = result.id;
+      // sale.saleid = result.id;
       await sale.save();
       res.redirect("/sales");
     } else {
