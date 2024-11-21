@@ -29,10 +29,17 @@
                         <input type="text" class="form-control" id="product-id-search" name="productId" placeholder="Search by product ID" value="<%= searchquery.productId %>">
                     </div>
                 </div>
-                <div class="col-2">
-                    <button type="submit" class="btn btn-primary mt-4">
-                        <i class="fas fa-search"></i> &nbsp; Search
-                    </button>
+                <div class="col-md-2 d-flex flex-column align-items-center justify-content-center">
+                    <div class="col w-75">
+                        <button type="submit" class="btn btn-sm btn-primary w-100 d-block">
+                            <i class="fas fa-search"></i> &nbsp; Search
+                        </button>
+                    </div>
+                    <div class="col w-75 mt-1">
+                        <button id="reset" type="button" class="btn btn-sm btn-info w-100 d-block">
+                            <i class="fas fa-x"></i> &nbsp; Clear Search
+                        </button>
+                    </div>
                 </div>
             </div>
         </form>
@@ -99,5 +106,10 @@
     // format all dates with class 'date'
     $('.date').each(function () {
         $(this).text(moment($(this).text()).format('MMM DD, YYYY'));
+    });
+    // on click of reset button clear form and refresh route
+    $('#reset').click(function () {
+        $('#search-form').trigger('reset');
+        window.location.href = '/sales';
     });
 </script>
