@@ -91,7 +91,8 @@
         </table>
     </div>
 </div>
-<script src="/node_modules/jquery/dist/jquery.min.js"></script>
+<!-- <script src="/node_modules/jquery/dist/jquery.min.js"></script> -->
+<script src="../../assets/js/jquery.min.js"></script>
 <script src="../../assets/js/moment.min.js"></script>
 <script src="../../assets/js/daterangepicker.min.js"></script>
 <script>
@@ -106,6 +107,7 @@
     // format all dates with class 'date'
     $('.date').each(function () {
         $(this).text(moment($(this).text()).format('MMM DD, YYYY'));
+        console.clear();
     });
     // on click of reset button clear form and refresh route
     $('#reset').click(function () {

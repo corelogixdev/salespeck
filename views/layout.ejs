@@ -9,23 +9,15 @@
   <!-- add favicon -->
   <link rel="icon" href="/assets/images/icon.ico" type="image/x-icon">
   <!-- Bootstrap CSS -->
-  <link href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
   <link href="/node_modules/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
 
   <!-- Include SweetAlert2 CSS -->
-  <link rel="stylesheet" href="/node_modules/sweetalert2/dist/sweetalert2.min.css">
+  <link rel="stylesheet" href="/assets/css/sweetalert2.min.css">
   <!-- Include Toastr CSS -->
-  <link rel="stylesheet" href="/node_modules/toastr/build/toastr.min.css">
+  <link rel="stylesheet" href="/assets/css/toastr.min.css">
   <link rel="stylesheet" href="../assets/css/daterangepicker.css">
   <link rel="stylesheet" href="../assets/css/styles.css">
-
-  <style>
-    .custom_disabled {
-      pointer-events: none;
-      cursor: not-allowed;
-      opacity: 0.5;
-    }
-  </style>
 </head>
 
 <body>
@@ -38,31 +30,97 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <% if (user.role == 'admin') { %>
-            <li class="nav-item">
-              <a class="nav-link" href="/users?role=user">Users</a>
-            </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/products">Products</a>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Staff
+            </a>
+            <ul class="dropdown-menu">
+              <% if (user.role=='admin' ) { %>
+                <li><a class="dropdown-item" href="/users?role=user">Users</a></li>
+                <% } %>
+                  <li><a class="dropdown-item" href="/users?role=customer">Customers</a></li>
+            </ul>
           </li>
+          <% if (user.role=='admin' ) { %>
+            <li class="nav-item">
+              <a class="nav-link" href="/products">Products</a>
+            </li>
             <li class="nav-item">
               <a class="nav-link" href="/settings">Settings</a>
             </li>
             <% } %>
-            <li class="nav-item">
-              <a class="nav-link" href="/users?role=customer">Customers</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/sales">Sales Report</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/sales/form" target="_blank">New Sale</a>
-            </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                  aria-expanded="false">
+                  Sales
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="/sales">Sales Report</a></li>
+                  <li><a class="dropdown-item" href="/sales/form" target="_blank">New Sale</a></li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                  aria-expanded="false">
+                  Notifications
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#">Notification 1</a></li>
+                  <li><a class="dropdown-item" href="#">Notification 2</a></li>
+                  <li><a class="dropdown-item" href="#">Notification 3</a></li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                  aria-expanded="false">
+                  HR
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="/attendance">Attendance</a></li>
+                  <li><a class="dropdown-item" href="/leaves">Leaves</a></li>
+                  <li style="position:relative">
+                    <a href="#" class="dropdown-item custom-dropdown">
+                      Salaries
+                      <span style="font-size: 10px; vertical-align: middle">
+                        <i class="fa-solid fa-chevron-right"></i>
+                      </span>
+                    </a>
+                    <ul class="custom-dropdown-item">
+                      <li><a class="dropdown-item" href="/salaries/templates">Salery Templates</a></li>
+                      <li><a class="dropdown-item" href="/salaries/calculate">Calculate Salaries</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                  aria-expanded="false">
+                  Accounting
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="/accounting/chartofaccount">Chart of Account</a></li>
+                  <li style="position:relative">
+                    <a href="#" class="dropdown-item custom-dropdown">
+                      Expences
+                      <span style="font-size: 10px; vertical-align: middle">
+                        <i class="fa-solid fa-chevron-right"></i>
+                      </span>
+                    </a>
+                    <ul class="custom-dropdown-item">
+                      <li><a class="dropdown-item" href="/accounting/transaction">Transaction</a></li>
+                      <li><a class="dropdown-item" href="/accounting/cashclosing">Cash Closing</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
         </ul>
         <div class="d-flex gap-2 position-relative">
           <div class="result">
-            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="navbar-search-input">
-            <div id="result" style="position: absolute; top: 40px; border-radius: 10px; width: 100%; display: none; z-index: 9999;" class="card"></div>
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"
+              id="navbar-search-input">
+            <div id="result"
+              style="position: absolute; top: 40px; border-radius: 10px; width: 100%; display: none; z-index: 9999;"
+              class="card"></div>
           </div>
           <button class="btn btn-secondary" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i></button>
           <button class="btn btn-danger" id="close-btn"><i class="fa-solid fa-power-off"></i></button>
@@ -73,17 +131,17 @@
   <div class="m-3">
     <%- body %>
   </div>
-  <!-- Bootstrap JS, Popper.js, and jQuery -->
-  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
-  <script src="/node_modules/popper.js/dist/umd/popper.min.js"></script>
-  <script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-  <!-- Include SweetAlert2 JS -->
-  <script src="/node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
+  <!-- <script src="/node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script> -->
   <!-- Include Toastr JS -->
-  <script src="/node_modules/toastr/build/toastr.min.js"></script>
-  <script src="/node_modules/chart.js/dist/chart.umd.js"></script>
-  <script src="../assets/js/daterangepicker.min.js"></script>
+  <!-- <script src="/node_modules/toastr/build/toastr.min.js"></script> -->
+  <!-- <script src="/node_modules/chart.js/dist/chart.umd.js"></script> -->
   <script src="../assets/js/moment.min.js"></script>
+  <script src="../assets/js/popper.min.js"></script>
+  <script src="../assets/js/bootstrap.min.js"></script>
+  <script src="../assets/js/sweetalert2.all.min.js"></script>
+  <script src="../assets/js/toastr.min.js"></script>
+  <script src="../assets/js/chart.min.js"></script>
+  <!-- <script src="../assets/js/daterangepicker.min.js"></script> -->
 
   <script>
     <% if (typeof message !== 'undefined' && message) { %>
@@ -114,79 +172,79 @@
     <% } %>
   </script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      async function FetchData(query){
-        try {
-          const response = await fetch('/products/search', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ query }),
-          });
-          const data = await response.json();
-          return data;
-        } catch (error) {
-          console.error('Error:', error);
-        }
-      }
-      const searchInput = document.getElementById('navbar-search-input');
-      let typingTimer;
-      const typingInterval = 500; // 500ms
-      searchInput.addEventListener('input', () => {
-        clearTimeout(typingTimer);
-        typingTimer = setTimeout(async () => {
-          const query = searchInput.value;
+      document.addEventListener('DOMContentLoaded', () => {
+        async function FetchData(query) {
           try {
-            let response=await FetchData(query);
-            let result = document.getElementById('result');
-            result.innerHTML = '';
-            result.style.display = 'block';
-            if(response.data.length>0){
-              response.data.forEach((item) => {
-                let a = document.createElement('a');
-                a.classList.add('dropdown-item', 'd-flex', 'justify-content-between', 'p-2', 'align-items-center', 'search-result');
-                let span = document.createElement('span');
-                span.innerText = item.name.substring(0, 20);
-                a.appendChild(span);
-                let span2 = document.createElement('span');
-                span2.innerText = 'Rs.' + item.saleprice ?? 0;
-                a.appendChild(span2);
-                result.appendChild(a);
-              });
-            }else{
-              let p = document.createElement('p');
-              p.style.textWrap = 'auto';
-              p.classList.add('dropdown-item', 'p-2', 'align-items-center', 'search-result');
-              if(query){
-                p.innerText = 'No data found for "'+query.substring(0, 20)+'"';
-              }else{
-                p.innerText = 'Type to search';
-              }
-              result.appendChild(p);
-            }
+            const response = await fetch('/products/search', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ query }),
+            });
+            const data = await response.json();
+            return data;
           } catch (error) {
             console.error('Error:', error);
           }
-        }, typingInterval);
-      });
-      searchInput.addEventListener('focus', () => {
-        if (searchInput.value) {
-          document.getElementById('result').style.display = 'block';
         }
-      });
-      document.addEventListener('click', (event) => {
-        if (!event.target.closest('.result')) {
-          document.getElementById('result').style.display = 'none';
-        }
-      });
+        const searchInput = document.getElementById('navbar-search-input');
+        let typingTimer;
+        const typingInterval = 500; // 500ms
+        searchInput.addEventListener('input', () => {
+          clearTimeout(typingTimer);
+          typingTimer = setTimeout(async () => {
+            const query = searchInput.value;
+            try {
+              let response = await FetchData(query);
+              let result = document.getElementById('result');
+              result.innerHTML = '';
+              result.style.display = 'block';
+              if (response.data.length > 0) {
+                response.data.forEach((item) => {
+                  let a = document.createElement('a');
+                  a.classList.add('dropdown-item', 'd-flex', 'justify-content-between', 'p-2', 'align-items-center', 'search-result');
+                  let span = document.createElement('span');
+                  span.innerText = item.name.substring(0, 20);
+                  a.appendChild(span);
+                  let span2 = document.createElement('span');
+                  span2.innerText = 'Rs.' + item.saleprice ?? 0;
+                  a.appendChild(span2);
+                  result.appendChild(a);
+                });
+              } else {
+                let p = document.createElement('p');
+                p.style.textWrap = 'auto';
+                p.classList.add('dropdown-item', 'p-2', 'align-items-center', 'search-result');
+                if (query) {
+                  p.innerText = 'No data found for "' + query.substring(0, 20) + '"';
+                } else {
+                  p.innerText = 'Type to search';
+                }
+                result.appendChild(p);
+              }
+            } catch (error) {
+              console.error('Error:', error);
+            }
+          }, typingInterval);
+        });
+        searchInput.addEventListener('focus', () => {
+          if (searchInput.value) {
+            document.getElementById('result').style.display = 'block';
+          }
+        });
+        document.addEventListener('click', (event) => {
+          if (!event.target.closest('.result')) {
+            document.getElementById('result').style.display = 'none';
+          }
+        });
 
-      document.querySelectorAll('.custom_disabled').forEach(link => {
-        link.addEventListener('click', (event) => {
-          event.preventDefault();
+        document.querySelectorAll('.custom_disabled').forEach(link => {
+          link.addEventListener('click', (event) => {
+            event.preventDefault();
+          });
         });
       });
-    });
 
     document.getElementById('close-btn').addEventListener('click', () => {
       const dataToSend = { message: 'close-app' };

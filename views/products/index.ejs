@@ -10,6 +10,12 @@
   td{
     background-color: inherit !important;
   }
+  .limit-text {
+    width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 </style>
 <div class="card">
   <div class="card-body">
@@ -18,10 +24,10 @@
         <tr>
           <th>ID</th>
           <th>Barcode</th>
+          <th>Name</th>
           <th>Category</th>
           <th>Carry Cost</th>
           <th>Discount</th>
-          <th>Name</th>
           <th>Purchase Price</th>
           <th>Purchase Active</th>
           <th>Quantity</th>
@@ -38,22 +44,22 @@
             <tr style="<%= product.quantity === 0 ? 'background-color: rgb(255, 106, 106);' : product.quantity < 10 ? 'background-color: rgb(247, 247, 144);' : '' %>">
             <td><%= product.id %></td>
             <td><%= product.barcode %></td>
+            <td class="limit-text" title="<%= product.name %>"><%= product.name %></td>
             <td><%= product.category %></td>
             <td><%= product.carrycost %></td>
             <td><%= product.discount %></td>
-            <td><%= product.name %></td>
             <td><%= product.purchaseprice %></td>
             <td><%= product.purchaseactive ? 'Yes' : 'No' %></td>
             <td><%= product.quantity %></td>
             <td><%= product.saleprice %></td>
             <td><%= product.saleactive ? 'Yes' : 'No' %></td>
             <td style="text-align: end;">
-              <a href="/products/form?id=<%= product.id %>" class="btn btn-warning btn-sm">
-                <i class="fas fa-edit"></i> Edit
+              <a href="/products/form?id=<%= product.id %>" class="btn btn-warning btn-sm" title="Edit Product">
+                <i class="fas fa-edit"></i>
               </a>
               <form action="/products/<%= product.id %>/delete" method="POST" style="display:inline;">
-                <button type="submit" class="btn btn-danger btn-sm">
-                  <i class="fas fa-trash"></i> Delete
+                <button type="submit" class="btn btn-danger btn-sm" title="Delete Product">
+                  <i class="fas fa-trash"></i>
                 </button>
               </form>
             </td>
