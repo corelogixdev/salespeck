@@ -74,10 +74,10 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   WappChat.associate = function (models) {
-    WappChat.belongsTo(models.WappTemplate, {
-      foreignKey: "template_id",
-      as: "template",
-    });
+    // WappChat.belongsTo(models.WappTemplate, {
+    //   foreignKey: "template_id",
+    //   as: "template",
+    // });
   };
 
   return WappChat;

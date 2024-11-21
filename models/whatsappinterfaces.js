@@ -55,10 +55,10 @@ module.exports = (sequelize, DataTypes) => {
 
   SiteSmediaWappInterface.associate = function (models) {
     // Foreign key to the `sites` table
-    SiteSmediaWappInterface.belongsTo(models.Site, {
-      foreignKey: "site_id",
-      as: "Site",
-    });
+    // SiteSmediaWappInterface.belongsTo(models.Site, {
+    //   foreignKey: "site_id",
+    //   as: "Site",
+    // });
   };
 
   return SiteSmediaWappInterface;

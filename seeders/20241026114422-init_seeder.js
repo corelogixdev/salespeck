@@ -76,8 +76,8 @@ module.exports = {
     }
 
     const dumyproducts = [
-      { id: 1, name: 'test product 1', saleprice: 100, barcode: '123456789', saleactive: true,purchaseactive: true,quantity: 100 },
-      { id: 2, name: 'test product 2', saleprice: 200, },
+      { id: 1, name: 'test product 1', purchaseprice: 90, saleprice: 100, barcode: '123456789', saleactive: true,purchaseactive: true,quantity: 10 },
+      { id: 2, name: 'test product 2', purchaseprice: 180, saleprice: 200, barcode: '123456789', saleactive: true,purchaseactive: true,quantity: 5 },
     ]
     for (const productobj of dumyproducts) {
       await product.upsert(productobj);

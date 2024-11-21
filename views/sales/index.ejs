@@ -8,41 +8,96 @@
 </div>
 <div class="card">
     <div class="card-body">
+        <!-- SEARCH SECTION -->
+        <form id="search-form" class="mb-4" action="/sales/search" method="POST">
+            <div class="row align-items-center justify-content-center">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="customer-search">Customer Name:</label>
+                        <input type="text" class="form-control" id="customer-search" name="customer" placeholder="Search by customer name" value="<%= searchquery.customer %>">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="date-range">Date Range:</label>
+                        <input type="text" class="form-control" id="date-range" name="daterange" placeholder="Select date range" value="<%= searchquery.daterange %>">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="product-id-search">Product ID:</label>
+                        <input type="text" class="form-control" id="product-id-search" name="productId" placeholder="Search by product ID" value="<%= searchquery.productId %>">
+                    </div>
+                </div>
+                <div class="col-2">
+                    <button type="submit" class="btn btn-primary mt-4">
+                        <i class="fas fa-search"></i> &nbsp; Search
+                    </button>
+                </div>
+            </div>
+        </form>
+        <hr class="my-2">
         <table class="table table-striped">
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Product</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
+                    <th>Discount Percentage</th>
                     <th>Total</th>
+                    <th>Created At</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                
-                <% sales.forEach(sale => { %>
-                    <pre>
-                        <%= JSON.stringify(sale) %>
-                    </pre>
-                    <tr>
-                        <td><%= sale.id %></td>
-                        <td><%= sale.product %></td>
-                        <td><%= sale.quantity %></td>
-                        <td><%= sale.price %></td>
-                        <td><%= sale.total %></td>
-                        <td style="text-align: end;">
-                            <a href="/sales/form?id=<%= sale.id %>" class="btn btn-warning btn-sm">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                            <form action="/sales/<%= sale.id %>/delete" method="POST" style="display:inline;">
-                                <button type="submit" class="btn btn-danger btn-sm">
-                                    <i class="fas fa-trash"></i> Delete
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                <% }) %>
+                <% sales.forEach((sale, index)=> { %>
+                    <% let products=sale.SoldPoducts.map(({Product})=>Product.name).join(', ') %>
+                        <tr>
+                            <td>
+                                <%= index+1 %>
+                            </td>
+                            <td class="limit-text" title="<%= products %>">
+                                <%= sale.SoldPoducts.map(({Product})=>Product.name).join(', ') %>
+                            </td>
+                            <td>
+                                <%= sale.discountpercentage %>
+                            </td>
+                            <td>
+                                <%= sale.total %>
+                            </td>
+                            <td class="date">
+                                <%= sale.createdAt %>
+                            </td>
+                            <td>
+                                <a href="/sales/<%= sale.id %>" class="btn btn-primary btn-sm" title="View Sale"><i
+                                        class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <% }) %>
+                        <% if (!sales.length) { %>
+                            <tr>
+                                <td colspan="6" style="text-align: center;">
+                                    <i class="fas fa-exclamation-triangle"></i> No data found
+                                </td>
+                            </tr>
+                            <% } %>
             </tbody>
         </table>
     </div>
+</div>
+<script src="/node_modules/jquery/dist/jquery.min.js"></script>
+<script src="../../assets/js/moment.min.js"></script>
+<script src="../../assets/js/daterangepicker.min.js"></script>
+<script>
+    let daterange;
+    $(function () {
+        $('#date-range').daterangepicker({
+            opens: 'center'
+        }, function (start, end, label) {
+            daterange = start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD');
+        });
+    });
+    // format all dates with class 'date'
+    $('.date').each(function () {
+        $(this).text(moment($(this).text()).format('MMM DD, YYYY'));
+    });
+</script>

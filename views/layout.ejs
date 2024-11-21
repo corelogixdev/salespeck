@@ -16,6 +16,8 @@
   <link rel="stylesheet" href="/node_modules/sweetalert2/dist/sweetalert2.min.css">
   <!-- Include Toastr CSS -->
   <link rel="stylesheet" href="/node_modules/toastr/build/toastr.min.css">
+  <link rel="stylesheet" href="../assets/css/daterangepicker.css">
+  <link rel="stylesheet" href="../assets/css/styles.css">
 
   <style>
     .custom_disabled {
@@ -51,7 +53,7 @@
               <a class="nav-link" href="/users?role=customer">Customers</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/sales">Sales</a>
+              <a class="nav-link" href="/sales">Sales Report</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/sales/form" target="_blank">New Sale</a>
@@ -80,6 +82,8 @@
   <!-- Include Toastr JS -->
   <script src="/node_modules/toastr/build/toastr.min.js"></script>
   <script src="/node_modules/chart.js/dist/chart.umd.js"></script>
+  <script src="../assets/js/daterangepicker.min.js"></script>
+  <script src="../assets/js/moment.min.js"></script>
 
   <script>
     <% if (typeof message !== 'undefined' && message) { %>

@@ -450,7 +450,11 @@ module.exports = {
       discountpercentage: {
         type: Sequelize.STRING(50),
         allowNull: true,
-      }
+      },
+      total: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
+      },
     });
 
     // Add foreign keys and indexes

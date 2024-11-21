@@ -6,6 +6,11 @@
     <a href="/products/form" class="btn btn-primary"><i class="fas fa-plus"></i> Create New Products</a>
   </div>
 </div>
+<style>
+  td{
+    background-color: inherit !important;
+  }
+</style>
 <div class="card">
   <div class="card-body">
     <table class="table table-striped">
@@ -28,7 +33,9 @@
       </thead>
       <tbody>
         <% data.forEach(product => { %>
-          <tr>
+          <!-- make the tr red if the quantitiy is zero or make it yellow if the quantity is less then 10 -->
+          <!-- <tr> -->
+            <tr style="<%= product.quantity === 0 ? 'background-color: rgb(255, 106, 106);' : product.quantity < 10 ? 'background-color: rgb(247, 247, 144);' : '' %>">
             <td><%= product.id %></td>
             <td><%= product.barcode %></td>
             <td><%= product.category %></td>

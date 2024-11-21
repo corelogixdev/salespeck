@@ -159,12 +159,14 @@ app.post('/settings/save',isAuthenticated,adminOnly, settings.save);
 app.get('/sales',isAuthenticated, sales.index);
 app.get('/sales/form',isAuthenticated, sales.form);
 app.post('/sales/save',isAuthenticated, sessionDataMiddleware, sales.save);
+app.get('/sales/:id',isAuthenticated, sales.saleview);
+app.post('/sales/search',isAuthenticated, sales.search);
 
 // app.get('/*', (req, res) => {
 //   res.redirect('/');
 // });
 
-runMigrationsAndSeeders();
+// runMigrationsAndSeeders(); // Uncomment to run migrations and seeders
 
 app.listen(3000, () => {
   logi('Express server listening on http://localhost:' + config.port);

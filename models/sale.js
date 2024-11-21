@@ -28,7 +28,11 @@ module.exports = (sequelize, DataTypes) => {
       discountpercentage: {
         type: DataTypes.STRING(50),
         allowNull: true,
-      }
+      },
+      total: {
+        type: DataTypes.STRING(50),
+        allowNull: true,
+      },
     },
     {
       tableName: "sale",
@@ -37,6 +41,7 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   Sale.associate = function (models) {
+    Sale.hasMany(models.soldproducts, { foreignKey: 'sale', as: 'SoldPoducts' });
     Sale.belongsTo(models.user , { foreignKey: 'user', as: 'User' });
     Sale.belongsTo(models.user , { foreignKey: 'customer', as: 'Customer' });
     Sale.belongsTo(models.user , { foreignKey: 'deliveryuser', as: 'DeliveryUser' });
