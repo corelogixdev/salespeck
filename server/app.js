@@ -166,7 +166,7 @@ app.post('/sales/search',isAuthenticated, sales.search);
 //   res.redirect('/');
 // });
 
-// runMigrationsAndSeeders(); // Uncomment to run migrations and seeders
+runMigrationsAndSeeders(); // Uncomment to run migrations and seeders
 
 app.listen(3000, () => {
   logi('Express server listening on http://localhost:' + config.port);

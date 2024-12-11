@@ -7,17 +7,17 @@
 
   <title>OpenMenu</title>
   <!-- add favicon -->
-  <link rel="icon" href="/assets/images/icon.ico" type="image/x-icon">
+  <link rel="icon" href="/assets/images/icon.png" type="image/x-icon">
   <!-- Bootstrap CSS -->
   <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
-  <link href="/node_modules/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/assets/css/fa-all.min.css" rel="stylesheet">
 
   <!-- Include SweetAlert2 CSS -->
   <link rel="stylesheet" href="/assets/css/sweetalert2.min.css">
   <!-- Include Toastr CSS -->
   <link rel="stylesheet" href="/assets/css/toastr.min.css">
-  <link rel="stylesheet" href="../assets/css/daterangepicker.css">
-  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="/assets/css/daterangepicker.css">
+  <link rel="stylesheet" href="/assets/css/styles.css">
 </head>
 
 <body>
@@ -135,18 +135,18 @@
   <!-- Include Toastr JS -->
   <!-- <script src="/node_modules/toastr/build/toastr.min.js"></script> -->
   <!-- <script src="/node_modules/chart.js/dist/chart.umd.js"></script> -->
-  <script src="../assets/js/moment.min.js"></script>
-  <script src="../assets/js/popper.min.js"></script>
-  <script src="../assets/js/bootstrap.min.js"></script>
-  <script src="../assets/js/sweetalert2.all.min.js"></script>
-  <script src="../assets/js/toastr.min.js"></script>
-  <script src="../assets/js/chart.min.js"></script>
-  <!-- <script src="../assets/js/daterangepicker.min.js"></script> -->
+  <script src="/assets/js/moment.min.js"></script>
+  <script src="/assets/js/popper.min.js"></script>
+  <script src="/assets/js/bootstrap.min.js"></script>
+  <script src="/assets/js/sweetalert2.all.min.js"></script>
+  <script src="/assets/js/toastr.min.js"></script>
+  <script src="/assets/js/chart.min.js"></script>
+  <!-- <script src="/assets/js/daterangepicker.min.js"></script> -->
 
   <script>
     <% if (typeof message !== 'undefined' && message) { %>
       var message = JSON.parse('<%- JSON.stringify(message) %>');
-      //console.log(message);
+      console.log(message);
       // Swal.fire({
       //   icon: '<%= message.type %>',
       //   title: '<%= message.text %>',
