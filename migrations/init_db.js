@@ -82,6 +82,10 @@ module.exports = {
         type: Sequelize.STRING(100),
         allowNull: true,
       },
+      brand: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
+      },
       category: {
         type: Sequelize.STRING(50),
         allowNull: true,
@@ -92,6 +96,14 @@ module.exports = {
       },
       discount: {
         type: Sequelize.FLOAT,
+        allowNull: true,
+      },
+      ispurchaseable: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+      },
+      issaleable: {
+        type: Sequelize.BOOLEAN,
         allowNull: true,
       },
       name: {
