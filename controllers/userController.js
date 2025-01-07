@@ -90,9 +90,9 @@ exports.save = async (req, res) => {
   try {
     if (id) {
 
-      await db.user.update({ name, phone, username, role,password,address }, { where: { id } });
+      await db.user.update({ name, phone, username, role, password, address, createdby}, { where: { id } });
     } else {
-      await db.user.create({ name, phone, username, role, password,address });
+      await db.user.create({ name, phone, username, role, password, address, createdby});
     }
     res.json({ success: true, redirectUrl: `/users?role=${role}` });
   } catch (error) {

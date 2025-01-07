@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="/assets/css/toastr.min.css">
   <link rel="stylesheet" href="/assets/css/daterangepicker.css">
   <link rel="stylesheet" href="/assets/css/styles.css">
+  <link rel="stylesheet" href="/assets/css/jquery-confirm.min.css">
+  <script src="/assets/js/jquery.min.js"></script>
 </head>
 
 <body>
@@ -133,42 +135,34 @@
   </div>
 
   <script src="/assets/js/popper.min.js"></script>
-  <script src="/assets/js/jquery.min.js"></script>
   <script src="/assets/js/moment.min.js"></script>
   <script src="/assets/js/bootstrap.min.js"></script>
   <script src="/assets/js/sweetalert2.all.min.js"></script>
   <script src="/assets/js/toastr.min.js"></script>
   <script src="/assets/js/chart.min.js"></script>
-  <!-- <script src="/assets/js/daterangepicker.min.js"></script> -->
-
+  <script src="/assets/js/jquery-confirm.min.js"></script>
   <script>
-    <% if (typeof message !== 'undefined' && message) { %>
-      var message = JSON.parse('<%- JSON.stringify(message) %>');
-      console.log(message);
-      // Swal.fire({
-      //   icon: '<%= message.type %>',
-      //   title: '<%= message.text %>',
-      //   showConfirmButton: false,
-      //   timer: 3000
-      // });
-
-      //show toaster
-      toastr.options = {
-        "closeButton": true,
-        "progressBar": true,
-        "positionClass": "toast-bottom-right",
-        "showDuration": "300",
-        "hideDuration": "1000",
-        "timeOut": "5000",
-        "extendedTimeOut": "1000",
-        "showEasing": "swing",
-        "hideEasing": "linear",
-        "showMethod": "fadeIn",
-        "hideMethod": "fadeOut"
-      }
+    toastr.options = {
+      "closeButton": true,
+      "progressBar": true,
+      "positionClass": "toast-bottom-right",
+      "showDuration": "300",
+      "hideDuration": "1000",
+      "timeOut": "5000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut",
+      "toastClass": "toast",
+    };
+  </script>
+  <script>
+    var message = "<%- JSON.stringify(message) %>";
+    if (message && message.length > 0) {
+      var message = JSON.parse(message);
       toastr[message.type](message.text);
-
-    <% } %>
+    }
   </script>
   <script>
       document.addEventListener('DOMContentLoaded', () => {

@@ -58,6 +58,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.FLOAT,
       allowNull: true,
     },
+    createdby: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    updatedby: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
   }, {
     tableName: 'product',
     timestamps: false,

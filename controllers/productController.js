@@ -1,9 +1,9 @@
 const { Op } = require('sequelize');
 const db = require('../models');
-const encrypt = require('../utils/encrypt');
 
 exports.index = async (req, res) => {
   const data = await db.product.findAll({
+    createdby: req.session.user.id
   });
   res.render('products/index', { title: "Products", data });
 };
@@ -26,6 +26,15 @@ exports.form = async (req, res) => {
 exports.save = async (req, res) => {
   var body = req.body;
   let id = body.id;
+  
+  const product = await db.product.findOne({ where: { name: body.name } });
+  if (product && product.id != id) {
+    return res.status(400).json({ success: false, message: 'Product with this name already exists' });
+  }
+  const barcode = await db.product.findOne({ where: { barcode: body.barcode } });
+  if (barcode && barcode.id != id) {
+    return res.status(400).json({ success: false, message: 'Product with this barcode already exists' });
+  }
   let data = {
     barcode: body.barcode,
     category: body.category,
@@ -44,16 +53,19 @@ exports.save = async (req, res) => {
     } else {
       await db.product.create( data );
     }
-    res.json({ success: true, redirectUrl: `/products` });
+    res.send({ success: true, redirectUrl: `/products` });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 };
 
 exports.delete = async (req, res) => {
-  const product = await db.product.findByPk(req.params.id);
-  await db.product.destroy({ where: { id: req.params.id } });
-  res.redirect(`/products`);
+  try {
+    await db.product.destroy({ where: { id: req.params.id } });
+    res.send({ success: true, redirectUrl: `/products` });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
 };
 exports.search = async (req, res) => {
   const searchdata = req.body.query;

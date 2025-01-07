@@ -35,6 +35,22 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       defaultValue: 'user',
     },
+    createdby: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    updatedby: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    createdat: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    updatedat: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   }, {
     tableName: 'user',
     timestamps: false,

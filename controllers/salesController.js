@@ -37,7 +37,14 @@ exports.index = async (req, res) => {
 };
 
 exports.form = async (req, res) => {
-  res.render("sales/form");
+  let customers = await db.user.findAll({
+    where: {
+      role: "customer",
+      createdby: res.locals.user.id,
+    },
+    attributes: ["id", "name"],
+  });
+  res.render("sales/form" , { customers});
 };
 
 exports.save = async (req, res) => {
@@ -65,10 +72,8 @@ exports.save = async (req, res) => {
         quantity: products.find((p) => Number.parseInt(p.productId) === product.id).quantity,
         price: product.saleprice,
       }));
-      // Use bulkCreate for efficient insertion
       let result = await db.soldproducts.bulkCreate(saleProductsData);
       if(result){
-        // Update product quantity
         for (let i = 0; i < allProducts.length; i++) {
           const product = allProducts[i];
           const productData = products.find((p) => Number.parseInt(p.productId) === product.id);
@@ -177,10 +182,8 @@ exports.saleview = async (req, res) => {
       },
     ],
   });
-  //format date
   let result = JSON.parse(JSON.stringify(sale));
   result.createdAt = moment(result.createdAt).format("MMMM Do YYYY");
-  // get all settings relatted to company
   let companySettings = await db.softwaresetting.findOne({
     where: {
       name: "company",

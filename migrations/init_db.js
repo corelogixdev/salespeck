@@ -130,6 +130,14 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         allowNull: true,
       },
+      createdby: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      updatedby: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
     });
 
     // Create productsub table
@@ -238,6 +246,14 @@ module.exports = {
         type: Sequelize.STRING(20),
         allowNull: true,
         defaultValue: 'user',
+      },
+      createdby: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      updatedby: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
       },
     });
 
