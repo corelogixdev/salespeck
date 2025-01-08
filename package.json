@@ -37,13 +37,19 @@
     "publish": [
       {
         "provider": "generic",
-         "url": "https://gitlab.com/api/v4/projects/62990895/packages/generic/openmenu-desktop/release"
+        "url": "https://gitlab.com/api/v4/projects/62990895/packages/generic/openmenu-desktop/release"
       }
     ],
     "win": {
       "target": "nsis",
       "icon": "build/icons/icon.ico",
-      "artifactName": "${productName}.${ext}"
+      "artifactName": "${productName}.${ext}",
+      "requestedExecutionLevel": "requireAdministrator"
+    },
+    "nsis": {
+      "oneClick": true,
+      "allowElevation": true,
+      "runAfterFinish": true
     },
     "mac": {
       "target": []
@@ -58,6 +64,7 @@
     "cross-spawn": "^7.0.3",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
+    "electron-log": "^5.2.4",
     "electron-updater": "^5.3.0",
     "express": "^4.21.1",
     "express-ejs-layouts": "^2.5.1",

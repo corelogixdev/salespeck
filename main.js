@@ -7,6 +7,7 @@ const expressApp = require('./server/app'); // Link to the Express app
 const config = require('./config.js'); // Link to the Express app
 const logi = require('./utils/logi.js');
 
+
 //log starting app and date time to log file
 logi('Starting OpenMenu Desktop...');
 logi('Date:', new Date().toISOString());
@@ -59,6 +60,14 @@ app.whenReady().then(() => {
     logi('Error: CI_PROJECT_ID is not defined in the environment variables.');
     return;
   }
+  autoUpdater.autoDownload = false;
+  autoUpdater.autoInstallOnAppQuit = false;
+  autoUpdater.forceDevUpdateConfig= true,
+  autoUpdater.fullChangelog = true,
+  autoUpdater.disableWebInstaller = true;
+  autoUpdater.logger = require('electron-log');
+  autoUpdater.logger.transports.file.level = 'debug';
+
   autoUpdater.setFeedURL({
     provider: 'generic',
     url: `https://gitlab.com/api/v4/projects/${projectId}/packages/generic/openmenu-desktop/release`,
@@ -122,10 +131,50 @@ autoUpdater.on('update-downloaded', (info) => {
     message: 'A new version of OpenMenu is available. Do you want to install it now?',
     detail: 'The update will be installed the next time you restart the application if you choose "Later".'
   };
-
+  const appDir = path.join(app.getPath('exe'), '..'); // Get the app directory
+  logi('appDir:', appDir);
   dialog.showMessageBox(null, options).then((response) => {
     if (response.response === 0) {
-      autoUpdater.quitAndInstall();
+      try {
+        logi('quitAndInstall new version');
+        //C:\Users\IT LAND\AppData\Local\Programs\openmenu
+
+        // Remove old files manually
+        deleteOldFiles(appDir); // This function will delete the old files
+        
+        autoUpdater.quitAndInstall(false, true); // Explicitly quit and install
+      } catch (err) {
+        logi('Error during quitAndInstall:', err.message);
+      }
     }
   });
 });
+
+autoUpdater.on('error', (error) => {
+  logi('Update error:', error.message);
+  dialog.showErrorBox('Update Failed', 'The update could not be installed. Please try again.');
+});
+
+// Function to delete old files
+function deleteOldFiles(directory) {
+  try {
+    // Get all files in the directory
+    const files = fs.readdirSync(directory);
+    
+    // Loop through and remove each file
+    files.forEach((file) => {
+      const filePath = path.join(directory, file);
+      const stats = fs.statSync(filePath);
+      if (stats.isDirectory()) {
+        // If it's a directory, delete recursively
+        deleteOldFiles(filePath);
+      } else {
+        // If it's a file, delete it
+        fs.unlinkSync(filePath);
+        logi(`Deleted file: ${filePath}`);
+      }
+    });
+  } catch (err) {
+    logi('Error deleting old files:', err.message);
+  }
+}
