@@ -158,10 +158,10 @@
     };
   </script>
   <script>
-    var message = "<%- JSON.stringify(message) %>";
-    if (message && message.length > 0) {
-      var message = JSON.parse(message);
-      toastr[message.type](message.text);
+    var message = '<%- JSON.stringify(message || null ) %>';
+    message = JSON.parse(message.replace(/^'(.*)'$/, '$1'));
+    if (message) {
+      toastr[message['type']](message['text']);
     }
   </script>
   <script>

@@ -33,6 +33,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(50),
         allowNull: true,
       },
+      createdby: {
+        type: DataTypes.STRING(50),
+        allowNull: true,
+      },
+      updatedby: {
+        type: DataTypes.STRING(50),
+        allowNull: true,
+      },
     },
     {
       tableName: "sale",
