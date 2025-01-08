@@ -483,6 +483,14 @@ module.exports = {
         type: Sequelize.STRING(50),
         allowNull: true,
       },
+      createdby: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
+      },
+      updatedby: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
+      },
     });
 
     // Add foreign keys and indexes

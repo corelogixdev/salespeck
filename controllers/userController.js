@@ -84,12 +84,12 @@ exports.form = async (req, res) => {
 exports.save = async (req, res) => {
   var { id, name, phone, username, role,password,address } = req.body;
   var password = password;
+  var createdby = res.locals.user.id;
   if (password) {
     password = encrypt.encrypt(password);
   }
   try {
     if (id) {
-
       await db.user.update({ name, phone, username, role, password, address, createdby}, { where: { id } });
     } else {
       await db.user.create({ name, phone, username, role, password, address, createdby});

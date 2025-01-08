@@ -3,11 +3,7 @@ const db = require('../models');
 const { findLike } = require('../utils/searchquery');
 
 exports.index = async (req, res) => {
-  const data = await db.product.findAll({
-    where: {
-      createdby: req.session.user.id
-    }
-  });
+  const data = await db.product.findAll();
   res.render('products/index', { title: "Products", data });
 };
 
@@ -16,7 +12,7 @@ exports.get = async (req, res) => {
   const data = await db.product.findAll({
     where: {
       ...findLike(body),
-      createdby: req.session.user.id
+      quantity: { [Op.gt]: 0 }
     }
   });
   res.json(data);
@@ -70,6 +66,10 @@ exports.save = async (req, res) => {
 
 exports.delete = async (req, res) => {
   try {
+    let alreadyInSale = await db.soldproducts.findOne({ where: { product: req.params.id } });
+    if(alreadyInSale) {
+      return res.status(400).json({ success: false, message: 'You cannot delete a product that is already in sale' });
+    }
     await db.product.destroy({ where: { id: req.params.id } });
     res.send({ success: true, redirectUrl: `/products` });
   } catch (error) {

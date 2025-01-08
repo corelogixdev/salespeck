@@ -2,6 +2,9 @@ const { Op } = require("sequelize");
 var db = require("../models");
 exports.index = async (req, res) => {
   let sales = await db.sale.findAll({
+    where: {  
+      createdby: res.locals.user.id,
+    },
     include: [
       {
         model: db.user,
@@ -40,7 +43,6 @@ exports.form = async (req, res) => {
   let customers = await db.user.findAll({
     where: {
       role: "customer",
-      createdby: res.locals.user.id,
     },
     attributes: ["id", "name"],
   });
@@ -58,6 +60,7 @@ exports.save = async (req, res) => {
       discountpercentage,
       total: totalPayment,
       invoicenum: 'INV-' + randomInvoice,
+      createdby: user.id,
     });
     if (sale) {
       let allProductIds = products.map((product) => product.productId);
@@ -66,12 +69,15 @@ exports.save = async (req, res) => {
           id: allProductIds,
         },
       });
-      const saleProductsData = allProducts.map((product) => ({
-        sale: sale.id,
-        product: product.id,
-        quantity: products.find((p) => Number.parseInt(p.productId) === product.id).quantity,
-        price: product.saleprice,
-      }));
+      const saleProductsData = allProducts.map((product) => {
+        let p = products.find((p) => Number.parseInt(p.productId) === product.id);
+        return {
+          sale: sale.id,
+          product: product.id,
+          quantity: p.quantity,
+          price: p.price,
+        }
+      });
       let result = await db.soldproducts.bulkCreate(saleProductsData);
       if(result){
         for (let i = 0; i < allProducts.length; i++) {

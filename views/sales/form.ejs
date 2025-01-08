@@ -8,7 +8,7 @@
                         <input type="text" class="form-control" id="product-search"
                             placeholder="Enter product name or barcode.">
                         <div class="input-group-text">
-                            <input type="checkbox" class="form-check mb-0" id="search-barcode">&nbsp; Barcode
+                            <input type="checkbox" class="form-check mb-0" checked id="search-barcode">&nbsp; Barcode
                         </div>
                     </div>
                     <div id="search-results" class="shadow rounded p-3 d-none"
@@ -94,6 +94,8 @@
     const totalPayment = document.getElementById('total-payment');
     const ledgerCheckbox = document.getElementById('ledger');
     const selectedProductsTable = document.getElementById('selected-products');
+    const discountpercentage = document.getElementById('discountpercentage');
+    let ErrorString = '';
     let selectedProduct = null;
     let allProducts = [];
     function removeProduct(productId) {
@@ -106,27 +108,38 @@
     function updateTotalBill() {
         let total = 0;
         let rows = document.querySelectorAll('#selected-products tr');
+        let discountpercentage = parseInt(document.getElementById('discountpercentage').value || 0);
         rows.forEach(row => {
             const price = parseFloat(row.querySelector('.total-price').textContent);
             total += price;
         });
-        totalBillAmount.textContent = `Rs. ${total.toFixed(2)}`;
+        total = total - (total * discountpercentage / 100);
+        totalBillAmount.textContent = `Rs. ${parseInt(total)}`;
         UpdateChangePrice();
     }
     function addProduct(product) {
+        console.log(product)
+        if(product.quantity <= 0){
+            toastr.warning('Product quantity is not available');
+            return;
+        }
+        let discountedPrice = product.saleprice - (product.saleprice * product.discount / 100);
+        discountedPrice = Math.round(discountedPrice);
+
         const existingRow = document.getElementById(`product-row-${product.id}`);
         if (existingRow) {
-            const quantityElement = existingRow.querySelector('td:nth-child(3)');
-            const priceElement = existingRow.querySelector('td:nth-child(4)');
+            const quantityElement = existingRow.querySelector('td:nth-child(3)').querySelector('.editable-input');
+            const priceElement = existingRow.querySelector('td:nth-child(4)').querySelector('.editable-input');
             const totalElement = existingRow.querySelector('td:nth-child(5)');
-            const quantity = parseInt(quantityElement.textContent);
+            const quantity = parseInt(quantityElement.value);
             if (product.quantity <= quantity) {
+                ErrorString = "Please enter valid quantity";
                 toastr.warning('Product quantity is not available');
                 return;
             }
-            quantityElement.textContent = quantity + 1;
+            quantityElement.value = quantity + 1;
 
-            totalElement.textContent = ((quantity + 1) * parseFloat(priceElement.textContent)).toFixed(2);
+            totalElement.textContent = Math.round((quantity + 1) * parseFloat(priceElement.value));
             updateTotalBill();
             return;
         }
@@ -139,8 +152,10 @@
         <td>
             <input type="text" class="editable-input" value="${newQuantity}" readonly>
         </td>
-        <td class="product-price">${product.saleprice}</td>
-        <td class="total-price">${(newQuantity * product.saleprice).toFixed(2)}</td>
+        <td class="product-price">
+            <input type="text" class="editable-input" value="${discountedPrice}" readonly>
+        </td>
+        <td class="total-price">${newQuantity * product.saleprice}</td>
         <td>
           <button class="btn btn-danger btn-sm" onclick="removeProduct('${product.id}')">
             <i class="fas fa-trash-alt"></i>
@@ -162,16 +177,33 @@
         changeEl.textContent = `Rs. ${Math.round(change)}`;
     }
     function sale(){
-        const customer = customerDropdown.value;
-        const discountpercentage = parseInt(document.getElementById('discountpercentage').value);
-        const totalPaymentValue = parseFloat(totalPayment.value);
-        const ledger = ledgerCheckbox.checked;
+        if(ErrorString){
+            toastr.warning(ErrorString);
+            return;
+        }
         const products = [];
         document.querySelectorAll('#selected-products tr').forEach(row => {
             const productId = row.querySelector('td:nth-child(1)').textContent;
-            const quantity = parseInt(row.querySelector('td:nth-child(3)').textContent);
-            products.push({ productId, quantity  });
+            const quantity = parseInt(row.querySelector('td:nth-child(3)').querySelector('.editable-input').value);
+            const price = parseFloat(row.querySelector('td:nth-child(4)').querySelector('.editable-input').value);
+            products.push({ productId, quantity , price });
         });
+        if(products.length === 0){
+            toastr.warning('Please select products');
+            return;
+        }
+        const customer = customerDropdown.value;
+        if(!customer){
+            toastr.warning('Please select customer');
+            return;
+        }
+        const discountpercentage = parseInt(document.getElementById('discountpercentage').value);
+        const totalPaymentValue = parseFloat(totalPayment.value);
+        if(!totalPaymentValue){
+            toastr.warning('Please enter total payment, 0 for nothing');
+            return;
+        }
+        const ledger = ledgerCheckbox.checked;
         fetch('/sales/save', {
             method: 'POST',
             headers: {
@@ -196,6 +228,7 @@
             body: JSON.stringify(body),
         });
         const products = await response.json();
+        allProducts = products;
         return products;
     }
     async function searchProductByBarcode(barcode){
@@ -207,6 +240,41 @@
             toastr.warning('No product found with this barcode');
         }
     }
+    function postSaveInput(input){
+        input.style.borderBottom = '1px solid transparent';
+        input.setAttribute('readonly', 'readonly');
+        input.style.pointerEvents = 'none';
+        input.onblur = null;
+        input.onkeyup = null;
+    }
+    function createEdiableInput(onSave, value, target){
+        const input = target.querySelector('.editable-input') || document.createElement('input');
+        input.classList.add('editable-input');
+        input.style.borderBottom = '1px solid #000';
+        input.style.pointerEvents = 'all';
+        input.removeAttribute('readonly');
+        input.onkeyup = (event) => {
+            if (event.key === 'Enter') {
+                let success = onSave(event, input);
+                if(success !== false){
+                    postSaveInput(input);
+                }
+            }
+        };
+        input.onblur = () => {
+            let success = onSave({key: 'Enter'}, input);
+            if(success !== false){
+                postSaveInput(input);
+            }
+        };
+        input.addEventListener('keypress', (event) => {
+            if (event.key < '0' || event.key > '9') {
+                event.preventDefault();
+            }
+        });
+        input.focus();
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('click', (event) => {
             if (!event.target.closest('#search-product-sales-page-search-seaction')) {
@@ -234,6 +302,10 @@
                 }
                 const productResults = searchResults.querySelectorAll('.search-result-product');
                 if (productResults.length > 0) {
+                    if(productResults.length === 1){
+                        selectedProduct = productResults[0].id.split('-')[1];
+                        productResults[0].style.backgroundColor = '#f8f9fa';
+                    }
                     if (selectedProduct) {
                         const selectedElement = document.getElementById(`product-${selectedProduct}`);
                         selectedElement.style.backgroundColor = '';
@@ -275,7 +347,7 @@
             const searchResults = document.getElementById('search-results');
             searchResults.classList.remove('d-none');
             searchResults.innerHTML = '';
-            // get the matching product from all products and display them as result 
+            
             let filteredProds = products.filter(product => product.name.toLowerCase().includes(query.toLowerCase()));
             filteredProds.forEach(product => {
                 const productElement = document.createElement('div');
@@ -287,7 +359,6 @@
                     <span>Rs. ${product.saleprice}</span>
                     `;
                 productElement.addEventListener('click', () => {
-                    debugger;
                     addProduct(product);
                     productSearch.value = '';
                     searchResults.classList.add('d-none');
@@ -298,7 +369,6 @@
         totalPayment.addEventListener('input', () => {
             UpdateChangePrice();
         });
-        // make the quantity editable
         selectedProductsTable.addEventListener('click', (event) => {
             function UpdateProductQuantity(event, input, quantityElement , price, totalElement){
                 if (event.key === 'Enter') {
@@ -306,30 +376,32 @@
                     let productTotalQuantity = allProducts.find(p => p.id === parseInt(target.parentElement.children[0].textContent)).quantity;
                     if (newQuantity <= 0) {
                         input.style.borderBottomColor = 'red';
+                        ErrorString = "Please enter valid quantity";
                         toastr.warning('Quantity should be greater than 0');
-                        return;
+                        return false;
                     }else if(newQuantity > productTotalQuantity){
                         input.style.borderBottomColor = 'red';
+                        ErrorString = "Please enter valid quantity";
                         toastr.warning('Product quantity is not available');
-                        return;
+                        return false;
                     }
+                    ErrorString = '';
                     quantityElement.textContent = newQuantity;
-                    totalElement.textContent = (newQuantity * price).toFixed(2);
+                    totalElement.textContent = Math.round(newQuantity * price);
                     updateTotalBill();
                 }
             }
             const target = event.target;
-            debugger
             if(target.tagName === 'TD'){
                 if (target.cellIndex === 2) {
                     let quantityElement = target.querySelector('.editable-input');
-                     if(!quantityElement){
+                    if(!quantityElement){
                         return;
-                     }
-                    const quantity = parseInt(quantityElement.value);
-                    const priceElement = target.nextElementSibling;
-                    const totalElement = priceElement.nextElementSibling;
-                    const price = parseFloat(priceElement.textContent);
+                    }
+                    const quantity = Math.round(quantityElement.value);
+                    const priceElement = target.nextElementSibling.querySelector('.editable-input');
+                    const totalElement = target.nextElementSibling.nextElementSibling;
+                    const price = parseFloat(priceElement.value);
                     const total = parseFloat(totalElement.textContent);
                     createEdiableInput( 
                         (event, input) => UpdateProductQuantity(event, input, quantityElement , price, totalElement), 
@@ -338,21 +410,21 @@
                     );
                 }
                 else if (target.cellIndex === 3) {
-                    let priceElement = target;
-                    const price = parseFloat(priceElement.textContent);
-                    const quantityElement = priceElement.previousElementSibling;
-                    const totalElement = priceElement.nextElementSibling;
+                    let priceElement = target.querySelector('.editable-input');
+                    const price = parseFloat(priceElement.value);
+                    const quantityElement = target.previousElementSibling.querySelector('.editable-input');
+                    const totalElement = target.nextElementSibling;
                     createEdiableInput( 
                         (event, input) => {
                             if (event.key === 'Enter') {
-                                const newPrice = parseFloat(input.value);
+                                const newPrice = parseInt(input.value);
                                 if (newPrice <= 0) {
                                     input.style.borderBottomColor = 'red';
                                     toastr.warning('Price should be greater than 0');
-                                    return;
+                                    return false;
                                 }
-                                priceElement.textContent = newPrice.toFixed(2);
-                                totalElement.textContent = (parseInt(quantityElement.textContent) * newPrice).toFixed(2);
+                                priceElement.value = newPrice;
+                                totalElement.textContent = parseInt((parseInt(quantityElement.value) * newPrice))
                                 updateTotalBill();
                             }
                         },
@@ -363,34 +435,7 @@
             }
         });
     });
-    function postSaveInput(input){
-        input.style.borderBottom = '1px solid transparent';
-        input.setAttribute('readonly', 'readonly');
-        input.style.pointerEvents = 'none';
-        input.onblur = null;
-        input.onkeyup = null;
-    }
-    function createEdiableInput(onSave, value, target){
-        const input = target.querySelector('.editable-input') || document.createElement('input');
-        input.classList.add('editable-input');
-        input.style.borderBottom = '1px solid #000';
-        input.style.pointerEvents = 'all';
-        input.removeAttribute('readonly');
-        input.onkeyup = (event) => {
-            if (event.key === 'Enter') {
-                onSave(event, input);
-                postSaveInput(input);
-            }
-        };
-        input.onblur = () => {
-            onSave({key: 'Enter'}, input);
-            postSaveInput(input);
-        };
-        input.addEventListener('keypress', (event) => {
-            if (event.key < '0' || event.key > '9') {
-                event.preventDefault();
-            }
-        });
-        input.focus();
-    }
-</script>
+    discountpercentage.addEventListener('input', () => {
+        updateTotalBill();
+    });
+    </script>

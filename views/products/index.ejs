@@ -95,7 +95,7 @@
               method: 'POST',
             });
             let result = await response.json();
-            if (result.success) {
+            if (result.success === true) {
               $.alert({
                 title: 'Success!',
                 content: result.message,
