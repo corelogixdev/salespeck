@@ -1,16 +1,24 @@
 const { Op } = require('sequelize');
 const db = require('../models');
+const { findLike } = require('../utils/searchquery');
 
 exports.index = async (req, res) => {
   const data = await db.product.findAll({
-    createdby: req.session.user.id
+    where: {
+      createdby: req.session.user.id
+    }
   });
   res.render('products/index', { title: "Products", data });
 };
 
 exports.get = async (req, res) => {
   let body = req.body;
-  const data = await db.product.findAll(body);
+  const data = await db.product.findAll({
+    where: {
+      ...findLike(body),
+      createdby: req.session.user.id
+    }
+  });
   res.json(data);
 }
 
@@ -46,6 +54,7 @@ exports.save = async (req, res) => {
     quantity: body.quantity * 1,
     saleprice: body.saleprice * 1,
     saleactive: body.saleactive === 'on',
+    createdby: req.session.user.id
    }
   try {
     if (id) {

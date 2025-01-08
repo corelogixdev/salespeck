@@ -6,7 +6,7 @@
                     <label for="product-search" class="form-label">Search Product:</label>
                     <div class="input-group d-flex align-items-center justify-content-between">
                         <input type="text" class="form-control" id="product-search"
-                            placeholder="Enter product name or ID">
+                            placeholder="Enter product name or barcode.">
                         <div class="input-group-text">
                             <input type="checkbox" class="form-check mb-0" id="search-barcode">&nbsp; Barcode
                         </div>
@@ -55,7 +55,7 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>Product ID</th>
+                            <th>ID</th>
                             <th>Name</th>
                             <th>Quantity</th>
                             <th>Price</th>
@@ -74,6 +74,16 @@
 <style>
     .search-result-product:hover {
         background-color: #f8f9fa;
+    }
+    .editable-input {
+        outline: none;
+        width: 50px;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        background-color: transparent;
+        border-bottom: 1px solid transparent;
+        pointer-events: none;
     }
 </style>
 <script>
@@ -104,7 +114,6 @@
         UpdateChangePrice();
     }
     function addProduct(product) {
-        // if a product is already added, increase the quantity
         const existingRow = document.getElementById(`product-row-${product.id}`);
         if (existingRow) {
             const quantityElement = existingRow.querySelector('td:nth-child(3)');
@@ -127,7 +136,9 @@
         row.innerHTML = `
         <td>${product.id}</td>
         <td>${product.name}</td>
-        <td>${newQuantity}</td>
+        <td>
+            <input type="text" class="editable-input" value="${newQuantity}" readonly>
+        </td>
         <td class="product-price">${product.saleprice}</td>
         <td class="total-price">${(newQuantity * product.saleprice).toFixed(2)}</td>
         <td>
@@ -143,10 +154,12 @@
         const totalBill = parseFloat(totalBillAmount.textContent.split(' ')[1]);
         const totalPaymentValue = parseFloat(totalPayment.value);
         const change = totalPaymentValue - totalBill;
+        const changeEl = document.getElementById('change');
         if (change < 0 || isNaN(change)) {
+            changeEl.textContent = 'Rs. 0.00';
             return;
         }
-        document.getElementById('change').textContent = `Rs. ${Math.round(change)}`;
+        changeEl.textContent = `Rs. ${Math.round(change)}`;
     }
     function sale(){
         const customer = customerDropdown.value;
@@ -157,7 +170,7 @@
         document.querySelectorAll('#selected-products tr').forEach(row => {
             const productId = row.querySelector('td:nth-child(1)').textContent;
             const quantity = parseInt(row.querySelector('td:nth-child(3)').textContent);
-            products.push({ productId, quantity });
+            products.push({ productId, quantity  });
         });
         fetch('/sales/save', {
             method: 'POST',
@@ -174,13 +187,38 @@
             }
         });
     }
+    async function getProducts(body){
+        const response = await fetch('/products/get', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body),
+        });
+        const products = await response.json();
+        return products;
+    }
+    async function searchProductByBarcode(barcode){
+        const products = await getProducts({ barcode });
+        if(products.length > 0){
+            addProduct(products[0]);
+            productSearch.value = '';
+        }else{
+            toastr.warning('No product found with this barcode');
+        }
+    }
     document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('click', (event) => {
             if (!event.target.closest('#search-product-sales-page-search-seaction')) {
                 document.getElementById('search-results').classList.add('d-none');
             }
         });
-        productSearch.addEventListener('keydown', (event) => {
+        productSearch.addEventListener('keydown', async (event) => {
+            if(searchBarcode.checked && event.key === 'Enter'){
+                event.preventDefault();
+                await searchProductByBarcode(productSearch.value);
+                return;
+            }
             const searchResults = document.getElementById('search-results');
             if (!searchResults.classList.contains('d-none')) {
                 if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
@@ -220,20 +258,19 @@
             }
         });
         productSearch.addEventListener('input', async () => {
+            if(searchBarcode.checked){
+                return;
+            }
             const query = productSearch.value;
             if (query.length === 0) {
                 document.getElementById('search-results').classList.add('d-none');
                 return;
             }
-            const searchByBarcode = searchBarcode.checked;
-            const response = await fetch('/products/get', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(searchByBarcode ? { barcode: query } : { name: query }),
-            });
-            const products = await response.json();
+            const products = await getProducts({ name: query });
+            if (products.length === 0) {
+                document.getElementById('search-results').classList.add('d-none');
+                return;
+            }
             allProducts = products;
             const searchResults = document.getElementById('search-results');
             searchResults.classList.remove('d-none');
@@ -266,11 +303,12 @@
             function UpdateProductQuantity(event, input, quantityElement , price, totalElement){
                 if (event.key === 'Enter') {
                     const newQuantity = parseInt(input.value);
+                    let productTotalQuantity = allProducts.find(p => p.id === parseInt(target.parentElement.children[0].textContent)).quantity;
                     if (newQuantity <= 0) {
                         input.style.borderBottomColor = 'red';
                         toastr.warning('Quantity should be greater than 0');
                         return;
-                    }else if(newQuantity > allProducts.find(p => p.id === parseInt(quantityElement.parentElement.children[0].textContent)).quantity){
+                    }else if(newQuantity > productTotalQuantity){
                         input.style.borderBottomColor = 'red';
                         toastr.warning('Product quantity is not available');
                         return;
@@ -281,37 +319,78 @@
                 }
             }
             const target = event.target;
-            if (target.tagName === 'TD' && target.cellIndex === 2) {
-                let quantityElement = target;
-                const quantity = parseInt(quantityElement.textContent);
-                const priceElement = target.nextElementSibling;
-                const totalElement = priceElement.nextElementSibling;
-                const price = parseFloat(priceElement.textContent);
-                const total = parseFloat(totalElement.textContent);
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.value = quantity;
-                input.style.outline = 'none';
-                input.style.width = '50px';
-                input.style.borderTop = 'none';
-                input.style.borderLeft = 'none';
-                input.style.borderRight = 'none';
-                input.style.borderBottom = '1px solid #000';
-                input.addEventListener('keydown', (event) => {
-                    UpdateProductQuantity(event, input, target , price, totalElement);
-                });
-                input.addEventListener('blur', () => {
-                    UpdateProductQuantity({key: 'Enter'}, input, target , price, totalElement);
-                });
-                input.addEventListener('keypress', (event) => {
-                    if (event.key < '0' || event.key > '9') {
-                        event.preventDefault();
-                    }
-                });
-                target.textContent = '';
-                target.appendChild(input);
-                input.focus();
+            debugger
+            if(target.tagName === 'TD'){
+                if (target.cellIndex === 2) {
+                    let quantityElement = target.querySelector('.editable-input');
+                     if(!quantityElement){
+                        return;
+                     }
+                    const quantity = parseInt(quantityElement.value);
+                    const priceElement = target.nextElementSibling;
+                    const totalElement = priceElement.nextElementSibling;
+                    const price = parseFloat(priceElement.textContent);
+                    const total = parseFloat(totalElement.textContent);
+                    createEdiableInput( 
+                        (event, input) => UpdateProductQuantity(event, input, quantityElement , price, totalElement), 
+                        quantity, 
+                        target
+                    );
+                }
+                else if (target.cellIndex === 3) {
+                    let priceElement = target;
+                    const price = parseFloat(priceElement.textContent);
+                    const quantityElement = priceElement.previousElementSibling;
+                    const totalElement = priceElement.nextElementSibling;
+                    createEdiableInput( 
+                        (event, input) => {
+                            if (event.key === 'Enter') {
+                                const newPrice = parseFloat(input.value);
+                                if (newPrice <= 0) {
+                                    input.style.borderBottomColor = 'red';
+                                    toastr.warning('Price should be greater than 0');
+                                    return;
+                                }
+                                priceElement.textContent = newPrice.toFixed(2);
+                                totalElement.textContent = (parseInt(quantityElement.textContent) * newPrice).toFixed(2);
+                                updateTotalBill();
+                            }
+                        },
+                        price, 
+                        target
+                    );
+                }
             }
         });
     });
+    function postSaveInput(input){
+        input.style.borderBottom = '1px solid transparent';
+        input.setAttribute('readonly', 'readonly');
+        input.style.pointerEvents = 'none';
+        input.onblur = null;
+        input.onkeyup = null;
+    }
+    function createEdiableInput(onSave, value, target){
+        const input = target.querySelector('.editable-input') || document.createElement('input');
+        input.classList.add('editable-input');
+        input.style.borderBottom = '1px solid #000';
+        input.style.pointerEvents = 'all';
+        input.removeAttribute('readonly');
+        input.onkeyup = (event) => {
+            if (event.key === 'Enter') {
+                onSave(event, input);
+                postSaveInput(input);
+            }
+        };
+        input.onblur = () => {
+            onSave({key: 'Enter'}, input);
+            postSaveInput(input);
+        };
+        input.addEventListener('keypress', (event) => {
+            if (event.key < '0' || event.key > '9') {
+                event.preventDefault();
+            }
+        });
+        input.focus();
+    }
 </script>
