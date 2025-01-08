@@ -5,12 +5,12 @@ module.exports = (sequelize, DataTypes) => {
     "SiteSmediaWappInterface",
     {
       id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
       site_id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         allowNull: true,
       },
       wapp_cellno_id: {

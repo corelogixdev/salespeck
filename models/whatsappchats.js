@@ -5,24 +5,24 @@ module.exports = (sequelize, DataTypes) => {
     "WappChat",
     {
       id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
       site_id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         allowNull: true,
       },
       staff_id: {
-        type: DataTypes.BIGINT.UNSIGNED,
+        type: DataTypes.INTEGER,
         allowNull: true,
       },
       template_id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         allowNull: true,
       },
       conversation_id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         allowNull: true,
       },
       meta_wapp_message_id: {
@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
       client_id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         allowNull: true,
       },
       client_name: {

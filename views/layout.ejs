@@ -32,35 +32,47 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Staff
-            </a>
-            <ul class="dropdown-menu">
-              <% if (user.role=='admin' ) { %>
-                <li><a class="dropdown-item" href="/users?role=user">Users</a></li>
-                <% } %>
-                  <li><a class="dropdown-item" href="/users?role=customer">Customers</a></li>
-            </ul>
-          </li>
-          <% if (user.role=='admin' ) { %>
-            <li class="nav-item">
-              <a class="nav-link" href="/products">Products</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/settings">Settings</a>
-            </li>
-            <% } %>
+            <% if ( permissions.users || permissions.customers ) { %>
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                  aria-expanded="false">
-                  Sales
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Staff
                 </a>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="/sales">Sales Report</a></li>
-                  <li><a class="dropdown-item" href="/sales/form" target="_blank">New Sale</a></li>
-                </ul>
+                  <ul class="dropdown-menu">
+                    <% if ( permissions.users ) { %>
+                      <li><a class="dropdown-item" href="/users?role=user">Users</a></li>
+                      <% } %>
+                      <% if ( permissions.customers ) { %>
+                        <li><a class="dropdown-item" href="/users?role=customer">Customers</a></li>
+                        <% } %>  
+                  </ul>
+                </li>
+            <% } %>
+            <% if ( permissions.productsList ) { %>
+              <li class="nav-item">
+                <a class="nav-link" href="/products">Products</a>
               </li>
+            <% } %>
+            <% if ( permissions.settings ) { %>
+              <li class="nav-item">
+                <a class="nav-link" href="/settings">Settings</a>
+              </li>
+            <% } %>
+              <% if ( permissions.salesView || permissions.salesCreate || permissions.salesList ) { %>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    Sales
+                  </a>
+                  <ul class="dropdown-menu">
+                    <% if (permissions.salesView) { %>
+                      <li><a class="dropdown-item" href="/sales">Sales Report</a></li>
+                    <% } %>
+                    <% if ( permissions.salesCreate ) { %>
+                      <li><a class="dropdown-item" href="/sales/form" target="_blank">New Sale</a></li>
+                    <% } %>
+                  </ul>
+                </li>
+              <% } %>
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                   aria-expanded="false">

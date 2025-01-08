@@ -205,7 +205,7 @@ module.exports = {
         allowNull: true,
       },
       value: {
-        type: Sequelize.TEXT('long'),
+        type: Sequelize.TEXT,
         allowNull: true,
       },
     });
@@ -552,6 +552,38 @@ module.exports = {
       },
       onDelete: 'cascade',
       onUpdate: 'cascade',
+    });
+
+    await queryInterface.createTable('permissions', {
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      name: {
+        type: Sequelize.STRING(100),
+        allowNull: true,
+      },
+      description: {
+        type: Sequelize.STRING(200),
+        allowNull: true,
+      },
+    });
+
+    await queryInterface.createTable('userpermissions', {
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      user_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      permission_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
     });
   },
 

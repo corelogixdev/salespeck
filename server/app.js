@@ -12,7 +12,8 @@ const isAuthenticated = require('../middleware/isAuthenticated');
 const settings = require('../controllers/settingsController');
 const sales = require('../controllers/salesController');
 const adminOnly = require('../middleware/adminOnly');
-
+const { permissions } = require('../middleware/populatePermissions.js');
+const { allowed } = require('../middleware/isAllowed');
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -41,6 +42,7 @@ app.use(
   })
 );
 app.use(sessionDataMiddleware);
+app.use(permissions);
 // Routes
 app.get('/', (req, res) => {
   if (!req.session.user_id) {
@@ -127,6 +129,7 @@ app.get('/dashboard', isAuthenticated, async(req, res) => {
       name: 'company'
     }
   });
+  console.log(req.session.permissions)
   let company = JSON.parse(settings.value);
   res.render('dashboard', { company });
 });
@@ -135,32 +138,32 @@ app.get('/dashboard', isAuthenticated, async(req, res) => {
 const productController = require('../controllers/productController');
 
 // Product CRUD routes
-app.get('/products', isAuthenticated, productController.index);
-app.post('/products/get', isAuthenticated, productController.get);
-app.get('/products/form', isAuthenticated, productController.form);
-app.post('/products/save', isAuthenticated, productController.save);
-app.post('/products/:id/delete', isAuthenticated, productController.delete);
-app.post('/products/search', isAuthenticated, productController.search);
+app.get('/products', allowed(['productsList']), productController.index);
+app.post('/products/get', allowed(['productsList', 'productsView']), productController.get);
+app.get('/products/form', allowed(['productsCreate']), productController.form);
+app.post('/products/save', allowed(['productsCreate']), productController.save);
+app.post('/products/:id/delete', allowed(['productsDelete']), productController.delete);
+app.post('/products/search', allowed(['productsView']), productController.search);
 // Import the product controller
 const userController = require('../controllers/userController');
 
 // User CRUD routes
-app.get('/users', isAuthenticated, userController.index);
-app.get('/users/form', isAuthenticated, userController.form); // Use the same form for creating and editing
-app.post('/users/save', isAuthenticated, userController.save); // Handle both create and edit
-app.post('/users/:id/delete', isAuthenticated, userController.delete);
-app.get('/users/customers', isAuthenticated, userController.getCustomers);
+app.get('/users', allowed(['usersList']), userController.index);
+app.get('/users/form', allowed(['usersCreate']), userController.form); // Use the same form for creating and editing
+app.post('/users/save', allowed(['usersCreate']), userController.save); // Handle both create and edit
+app.post('/users/:id/delete', allowed(['usersDelete']), userController.delete);
+app.get('/users/customers', allowed(['customersList']), userController.getCustomers);
 
 
-// Settings 
-app.get('/settings',isAuthenticated,adminOnly, settings.index);
-app.post('/settings/save',isAuthenticated,adminOnly, settings.save);
+// Settings
+app.get('/settings', allowed(['all']), settings.index);
+app.post('/settings/save', allowed(['all']), settings.save);
 // sales
-app.get('/sales',isAuthenticated, sales.index);
-app.get('/sales/form',isAuthenticated, sales.form);
-app.post('/sales/save',isAuthenticated, sessionDataMiddleware, sales.save);
-app.get('/sales/:id',isAuthenticated, sales.saleview);
-app.post('/sales/search',isAuthenticated, sales.search);
+app.get('/sales', allowed(['salesList']), sales.index);
+app.get('/sales/form', allowed(['salesCreate']), sales.form);
+app.post('/sales/save', allowed(['salesCreate']), sessionDataMiddleware, sales.save);
+app.get('/sales/:id', allowed(['salesView']), sales.saleview);
+app.post('/sales/search', allowed(['salesSearch']), sales.search);
 
 // app.get('/*', (req, res) => {
 //   res.redirect('/');
