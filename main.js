@@ -75,15 +75,12 @@ app.on('window-all-closed', () => {
 });
 
 autoUpdater.on('error', (error) => {
-  if (error.message.includes('403')) {
-    logi('Error in auto-updater: Access denied. Please check your GitLab token and permissions.');
-  } else {
-    logi('Error in auto-updater:', error);
+  logi('Error in auto-updater:', error);
+  if (error.message.includes('EPERM')) {
+    logi('Permission error: Please ensure the application has write permissions to the specified directory.');
+  } else if (error.message.includes('ENOENT')) {
+    logi('File not found error: Please check the file paths and ensure the files exist.');
   }
-});
-
-autoUpdater.on('checking-for-update', () => {
-  logi('Checking for update...');
 });
 
 autoUpdater.on('checking-for-update', () => {
