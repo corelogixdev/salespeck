@@ -7,6 +7,10 @@ const expressApp = require('./server/app'); // Link to the Express app
 const config = require('./config.js'); // Link to the Express app
 const logi = require('./utils/logi.js');
 
+//log starting app and date time to log file
+logi('Starting OpenMenu Desktop...');
+logi('Date:', new Date().toISOString());
+
 // Read package.json to get the version
 const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json')));
 process.env.npm_package_version = packageJson.version;
@@ -62,6 +66,7 @@ app.whenReady().then(() => {
       'PRIVATE-TOKEN': process.env.GITLAB_TOKEN
     }
   });
+  logi(`Current version: ${packageJson.version}`);
   autoUpdater.checkForUpdatesAndNotify();
 });
 
@@ -87,6 +92,23 @@ autoUpdater.on('checking-for-update', () => {
 
 autoUpdater.on('update-available', (info) => {
   logi('Update available:', info);
+  logi(`New version: ${info.version}`);
+  const options = {
+    type: 'question',
+    buttons: ['Download Now', 'Do Not Download'],
+    defaultId: 0,
+    title: 'Update Available',
+    message: 'A new version of OpenMenu is available. Do you want to download it now?',
+    detail: 'You can choose to download the update now or skip it.'
+  };
+
+  dialog.showMessageBox(null, options).then((response) => {
+    if (response.response === 0) {
+      autoUpdater.downloadUpdate();
+    } else {
+      logi('User chose not to download the update.');
+    }
+  });
 });
 
 autoUpdater.on('update-not-available', (info) => {

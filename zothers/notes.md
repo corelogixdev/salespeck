@@ -1,8 +1,13 @@
 the install location will be
-C:\Users\IT LAND\AppData\Roaming\openmenu
-C:\Users\IT LAND\AppData\Local\Programs\openmenu
+C:\Users\IT LAND\AppData\Local\Programs\openmenu (contain the software files and db)
+C:\Users\IT LAND\AppData\Local\openmenu-updater (will contain the updater)
+C:\Users\IT LAND\AppData\Roaming\openmenu (userData folter, App folter contain the logs and other cache files)
 
 
+
+change version in package.json "version": "1.0.0"
 building the project
-npm run build
-npm run upload
+`npm run build`
+`npm run upload` (it will upload the new build on https://gitlab.com/api/v4/projects/62990895/packages/generic/openmenu-desktop/release)
+we need to delete the files from https://gitlab.com/atta_devgiant/openmenu-desktop/-/packages until we successfully test the update
+Important Note a single file cannot be uploaded to (https://gitlab.com/api/v4/projects/' + process.env.CI_PROJECT_ID + '/packages/generic/openmenu-desktop), it should be some folder
