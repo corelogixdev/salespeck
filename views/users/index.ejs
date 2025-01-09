@@ -1,17 +1,21 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h3><%= role === 'user' ? 'User' : 'Customers' %></h3>
   <div class="d-flex align-items-center gap-2 justify-content-center">
-    <form action="/users" method="GET">
-      <div class="input-group">
-        <input type="hidden" name="role" value="<%= role %>">
-        <input type="search" style="min-width: 19rem;" class="form-control" name="search" placeholder="Search by name, username or phone" required value="<%= typeof searchdata !== 'undefined' ? searchdata : '' %>">
-        <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
-      </div>
-    </form>
+    <% if ((role == 'user' && permissions.usersSearch) || (role == 'customer' && permissions.customersSearch)) { %> 
+      <form action="/users" method="GET">
+        <div class="input-group">
+          <input type="hidden" name="role" value="<%= role %>">
+          <input type="search" style="min-width: 19rem;" class="form-control" name="search" placeholder="Search by name, username or phone" required value="<%= typeof searchdata !== 'undefined' ? searchdata : '' %>">
+          <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
+        </div>
+      </form>
+    <% } %>
     <% if (searchdata) { %>
       <a href="/users?role=<%= role %>" title="Clear Search" class="btn btn-danger"><i class="fas fa-times"></i></a>
     <% } %>
-    <a href="/users/form?role=<%= role %>" class="btn btn-primary"><i class="fas fa-plus"></i> Create New <%= role === 'user' ? 'User' : 'Customer' %></a>
+    <% if ((role == 'user' && permissions.usersCreate) || (role == 'customer' && permissions.customersCreate)) { %>
+      <a href="/users/form?role=<%= role %>" class="btn btn-primary"><i class="fas fa-plus"></i> Create New <%= role === 'user' ? 'User' : 'Customer' %></a>
+    <% } %>
   </div>
 </div>
 <div class="card">
@@ -27,7 +31,9 @@
           <th>Username</th>
           <th>Role</th>
           <% } %>
-          <th style="text-align: end;">Actions</th>
+          <% if ((role == 'user' && (permissions.usersUpdate || permissions.usersDelete)) || (role == 'customer' && (permissions.customersUpdate || permissions.customersDelete))) { %>
+            <th style="text-align: end;">Actions</th>
+          <% } %>
         </tr>
       </thead>
       <tbody>
@@ -40,13 +46,19 @@
             <td><%= obj.username %></td>
             <td><%= obj.role %></td>
             <% } %>
-            <td style="text-align: end;">
-              <a href="/users/form?id=<%= obj.id %>&role=<%= obj.role %>" class="btn btn-warning btn-sm <%= obj.role == 'admin' ? 'custom_disabled' : '' %>"><i class="fas fa-edit"></i> Edit</a>
-              <form action="/users/<%= obj.id %>/delete" method="POST" style="display:inline;">
-                <button type="submit" class="btn btn-danger btn-sm" <%= obj.role == 'admin' ? 'disabled' : '' %>><i class="fas fa-trash"></i> Delete</button>
-              </form>
-            </td>
-          </tr>
+            <% if ((role == 'user' && (permissions.usersUpdate || permissions.usersDelete)) || (role == 'customer' && (permissions.customersUpdate || permissions.customersDelete))) { %>
+              <td style="text-align: end;">
+                <% if ((role == 'user' && permissions.usersUpdate) || (role == 'customer' && permissions.customersUpdate)) { %>
+                  <a href="/users/form?id=<%= obj.id %>&role=<%= obj.role %>" class="btn btn-warning btn-sm <%= obj.role == 'admin' ? 'custom_disabled' : '' %>"><i class="fas fa-edit"></i> Edit</a>
+                <% } %>
+                <% if ((role == 'user' && permissions.usersDelete) || (role == 'customer' && permissions.customersDelete)) { %>
+                  <form action="/users/<%= obj.id %>/delete" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm" <%= obj.role == 'admin' ? 'disabled' : '' %>><i class="fas fa-trash"></i> Delete</button>
+                  </form>
+                <% } %>
+              </td>
+            </tr>
+          <% } %>
         <% }) %>
         <!-- if !data or data.length show no data found with an amazing icon -->
         <% if (!data || data.length === 0) { %>

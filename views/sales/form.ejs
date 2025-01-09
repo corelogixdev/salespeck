@@ -118,7 +118,6 @@
         UpdateChangePrice();
     }
     function addProduct(product) {
-        console.log(product)
         if(product.quantity <= 0){
             toastr.warning('Product quantity is not available');
             return;
@@ -192,11 +191,6 @@
             toastr.warning('Please select products');
             return;
         }
-        const customer = customerDropdown.value;
-        if(!customer){
-            toastr.warning('Please select customer');
-            return;
-        }
         const discountpercentage = parseInt(document.getElementById('discountpercentage').value);
         const totalPaymentValue = parseFloat(totalPayment.value);
         if(!totalPaymentValue){
@@ -204,6 +198,7 @@
             return;
         }
         const ledger = ledgerCheckbox.checked;
+        const customer = customerDropdown.value || null;
         fetch('/sales/save', {
             method: 'POST',
             headers: {
@@ -212,15 +207,43 @@
             body: JSON.stringify({ customer, discountpercentage, totalPayment: totalPaymentValue, ledger, products }),
         }).then(response => {
             if (response.ok) {
-                toastr.success('Sale added successfully');
-                window.location.href = '/sales';
+                $.alert({
+                    title: 'Success!',
+                    content: 'Sale added successfully',
+                    theme: 'material',
+                    useBootstrap: false,
+                    boxWidth: '30%',
+                    type: 'green',
+                    buttons: {
+                        confirm: {
+                            text: 'Ok',
+                            btnClass: 'btn-success',
+                            action: function () {
+                                window.location.reload();
+                            }
+                        }
+                    }
+                });
             } else {
-                toastr.error('Failed to add sale');
+                $.alert({
+                    title: 'Error!',
+                    content: 'Error adding sale',
+                    theme: 'material',
+                    useBootstrap: false,
+                    boxWidth: '30%',
+                    type: 'red',
+                    buttons: {
+                        confirm: {
+                            text: 'Ok',
+                            btnClass: 'btn-danger',
+                        }
+                    }
+                });
             }
         });
     }
     async function getProducts(body){
-        const response = await fetch('/products/get', {
+        const response = await fetch('/sales/productsget', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

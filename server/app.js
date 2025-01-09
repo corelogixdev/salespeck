@@ -129,7 +129,6 @@ app.get('/dashboard', isAuthenticated, async(req, res) => {
       name: 'company'
     }
   });
-  console.log(req.session.permissions)
   let company = JSON.parse(settings.value);
   res.render('dashboard', { company });
 });
@@ -161,7 +160,8 @@ app.post('/settings/save', allowed(['all']), settings.save);
 // sales
 app.get('/sales', allowed(['salesList']), sales.index);
 app.get('/sales/form', allowed(['salesCreate']), sales.form);
-app.post('/sales/save', allowed(['salesCreate']), sessionDataMiddleware, sales.save);
+app.post('/sales/save', allowed(['salesCreate']), sales.save);
+app.post('/sales/productsget', allowed(['salesCreate']), sales.productsget);
 app.get('/sales/:id', allowed(['salesView']), sales.saleview);
 app.post('/sales/search', allowed(['salesSearch']), sales.search);
 

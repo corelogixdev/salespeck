@@ -3,7 +3,9 @@ const db = require('../models');
 const { findLike } = require('../utils/searchquery');
 
 exports.index = async (req, res) => {
-  const data = await db.product.findAll();
+  const data = await db.product.findAll({
+    sort: { createdAt: -1 }
+  });
   res.render('products/index', { title: "Products", data });
 };
 

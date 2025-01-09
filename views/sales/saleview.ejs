@@ -18,15 +18,17 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-xl-8">
-                        <ul class="list-unstyled">
-                            <li class="text-muted">To: <span style="color:#8f8061 ;">
-                                &nbsp;<%= sale.Customer?.name %>
-                            </span></li>
-                            <li class="text-muted"><i class="fas fa-map-marker-alt"></i> &nbsp; <%= sale.Customer?.address %></li>
-                            <li class="text-muted"><i class="fas fa-phone"></i>&nbsp; <%= sale.Customer?.phone %></li>
-                        </ul>
-                    </div>
+                    <% if(sale.Customer){ %>
+                        <div class="col-xl-8">
+                            <ul class="list-unstyled">
+                                <li class="text-muted">To: <span style="color:#8f8061 ;">
+                                    &nbsp;<%= sale.Customer?.name %>
+                                </span></li>
+                                <li class="text-muted"><i class="fas fa-map-marker-alt"></i> &nbsp; <%= sale.Customer?.address %></li>
+                                <li class="text-muted"><i class="fas fa-phone"></i>&nbsp; <%= sale.Customer?.phone %></li>
+                            </ul>
+                        </div>
+                    <% } %>
                     <div class="col-xl-4">
                         <ul class="list-unstyled">
                             <li class="text-muted"><i class="fas fa-circle" style="color:#8f8061 ;"></i> <span
