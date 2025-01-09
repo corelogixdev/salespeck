@@ -127,20 +127,24 @@ exports.save = async (req, res) => {
         await db.userpermissions.create({ user_id: id, permission_id: permissionId });
       });
     }
-    res.json({ success: true, redirectUrl: `/users?role=${role}` });
+    res.json({ success: true, message: 'User saved successfully' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 };
 
 exports.delete = async (req, res) => {
-  const user = await db.user.findByPk(req.params.id);
-  var role = user.role;
-  if(role==='admin'){
-     role = "user";
+  try {
+    const user = await db.user.findByPk(req.params.id);
+    var role = user.role;
+    if(role==='admin'){
+      role = "user";
+    }
+    await db.user.destroy({ where: { id: req.params.id } });
+    res.send({ success: true, message: 'User deleted successfully', redirect: '/users?role='+role });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
-  await db.user.destroy({ where: { id: req.params.id } });
-  res.redirect(`/users?role=${role}`);
 };
 
 exports.getCustomers = async (req, res) => {

@@ -14,7 +14,7 @@
       <a href="/users?role=<%= role %>" title="Clear Search" class="btn btn-danger"><i class="fas fa-times"></i></a>
     <% } %>
     <% if ((role == 'user' && permissions.usersCreate) || (role == 'customer' && permissions.customersCreate)) { %>
-      <a href="/users/form?role=<%= role %>" class="btn btn-primary"><i class="fas fa-plus"></i> Create New <%= role === 'user' ? 'User' : 'Customer' %></a>
+      <a href="/users/form?role=<%= role %>" class="btn btn-primary" target="_blank"><i class="fas fa-plus"></i> Create New <%= role === 'user' ? 'User' : 'Customer' %></a>
     <% } %>
   </div>
 </div>
@@ -49,10 +49,10 @@
             <% if ((role == 'user' && (permissions.usersUpdate || permissions.usersDelete)) || (role == 'customer' && (permissions.customersUpdate || permissions.customersDelete))) { %>
               <td style="text-align: end;">
                 <% if ((role == 'user' && permissions.usersUpdate) || (role == 'customer' && permissions.customersUpdate)) { %>
-                  <a href="/users/form?id=<%= obj.id %>&role=<%= obj.role %>" class="btn btn-warning btn-sm <%= obj.role == 'admin' ? 'custom_disabled' : '' %>"><i class="fas fa-edit"></i> Edit</a>
+                  <a href="/users/form?id=<%= obj.id %>&role=<%= obj.role %>" class="btn btn-warning btn-sm <%= obj.role == 'admin' ? 'custom_disabled' : '' %>" target="_blank"><i class="fas fa-edit"></i> Edit</a>
                 <% } %>
                 <% if ((role == 'user' && permissions.usersDelete) || (role == 'customer' && permissions.customersDelete)) { %>
-                  <form action="/users/<%= obj.id %>/delete" method="POST" style="display:inline;">
+                  <form onsubmit="event.preventDefault();deleteRecord('<%= obj.id %>')" style="display:inline;">
                     <button type="submit" class="btn btn-danger btn-sm" <%= obj.role == 'admin' ? 'disabled' : '' %>><i class="fas fa-trash"></i> Delete</button>
                   </form>
                 <% } %>
@@ -92,3 +92,64 @@
     </nav>
   </div>
 </div>
+<script>
+  async function deleteRecord(id) {
+    $.alert({
+      title: 'Confirm!',
+      content: 'Are you sure you want to delete this record?',
+      theme: 'material',
+      useBootstrap: false,
+      boxWidth: '30%',
+      buttons: {
+        confirm: {
+          text: 'Yes',
+          btnClass: 'btn-danger',
+          action: async function () {
+            const response = await fetch(`/users/${id}/delete`, {
+              method: 'POST'
+            });
+            let result = await response.json();
+            if (result.success === true) {
+              $.alert({
+                title: 'Success!',
+                content: result.message,
+                boxWidth: '30%',
+                theme: 'material',
+                useBootstrap: false,
+                type: 'green',
+                buttons: {
+                  confirm: {
+                    text: 'OK',
+                    btnClass: 'btn-success',
+                    action: function () {
+                      location.reload();
+                    }
+                  }
+                }
+              });
+            } else {
+              $.alert({
+                title: 'Error!',
+                content: result.message,
+                boxWidth: '30%',
+                theme: 'material',
+                useBootstrap: false,
+                type: 'red',
+                buttons: {
+                  confirm: {
+                    text: 'OK',
+                    btnClass: 'btn-danger',
+                  }
+                }
+              });
+            }
+          }
+        },
+        cancel: {
+          text: 'No',
+          btnClass: 'btn-primary',
+        }
+      }
+    });
+  }
+</script>
