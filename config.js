@@ -1,5 +1,5 @@
-var env = "development";
-//var env = "production";
+//var env = "development";
+var env = "production";
 var path = require('path');
 var config = () =>{
   var obj ={
