@@ -1,8 +1,5 @@
 // middleware/sessionData.js
 module.exports = (req, res, next) => {
-  //if user
-  //console.log('session data');
-  //console.log(req.session);
   if(!req.session){
     req.session.isAuthenticated = false;
   }

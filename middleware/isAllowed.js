@@ -1,5 +1,5 @@
 // middleware/authorize.js
-exports.allowed = (requiredPermissions) => {
+exports.allowed = (requiredPermissions, redirectUrl = '/login') => {
   return (req, res, next) => {
     try {
         
@@ -14,7 +14,7 @@ exports.allowed = (requiredPermissions) => {
       );
 
       if (!hasPermission) {
-        return res.redirect('/login');
+        return res.redirect(redirectUrl);
       }
 
       next();

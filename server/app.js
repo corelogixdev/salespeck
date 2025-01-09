@@ -2,19 +2,20 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
-const db = require('../models'); // Sequelize models directory
-const encrypt = require('../utils/encrypt'); // Sequelize models directory
 const logi = require('../utils/logi');
 const expressLayouts = require('express-ejs-layouts');
 const config = require('../config.js'); // Link to the Express app
 const sessionDataMiddleware = require('../middleware/sessionData');
-const isAuthenticated = require('../middleware/isAuthenticated');
-const settings = require('../controllers/settingsController');
-const sales = require('../controllers/salesController');
-const adminOnly = require('../middleware/adminOnly');
+const productRoutes = require('../routes/productRoutes');
+const userRoutes = require('../routes/userRoutes');
+const settingRoutes = require('../routes/settingRoutes');
+const mainRoutes = require('../routes/mainRoutes');
+const saleRoutes = require('../routes/saleRoutes');
 const { permissions } = require('../middleware/populatePermissions.js');
-const { allowed } = require('../middleware/isAllowed');
 const app = express();
+const runMigrationsAndSeeders = require('../utils/runMigrationsAndSeeders.js');
+
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -22,17 +23,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
 // Serve static files from the "node_modules" directory
 app.use('/node_modules', express.static(path.join(__dirname, '..', 'node_modules')));
-
 // Set view engine
 app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'ejs');
-
 // Use express-ejs-layouts
 app.use(expressLayouts);
-
-
-
-
+// Session middleware
 app.use(
   session({
     secret: 'your-secret',
@@ -43,6 +39,7 @@ app.use(
 );
 app.use(sessionDataMiddleware);
 app.use(permissions);
+
 // Routes
 app.get('/', (req, res) => {
   if (!req.session.user_id) {
@@ -51,119 +48,11 @@ app.get('/', (req, res) => {
     res.redirect('/dashboard')
   }
 });
-
-const fs = require('fs');
-
-async function runMigrationsAndSeeders() {
-  try {
-    const migrationsPath = path.join(__dirname, '..', 'migrations');
-    const seedersPath = path.join(__dirname, '..', 'seeders');
-
-    // Run migrations
-    const migrationFiles = fs.readdirSync(migrationsPath);
-    for (const file of migrationFiles) {
-      const migration = require(path.join(migrationsPath, file));
-      await migration.up(db.sequelize.getQueryInterface(), db.Sequelize);
-      logi(`Migration executed: ${file}`);
-    }
-
-    // Run seeders
-    const seederFiles = fs.readdirSync(seedersPath);
-    for (const file of seederFiles) {
-      const seeder = require(path.join(seedersPath, file));
-      await seeder.up(db.sequelize.getQueryInterface(), db.Sequelize);
-      logi(`Seeder executed: ${file}`);
-    }
-  } catch (error) {
-    logi('Error running migrations or seeders:');
-    logi(error);
-  }
-}
-
-app.get('/login', (req, res) => {
-  res.render('login', { layout: false });
-});
-app.post('/login', async (req, res) => {
-  logi('Login request received');
-  const { username, password } = req.body;
-  logi('Username:', username);
-  logi('Password received:', password);
-  try {
-    const user = await db.user.findOne({ where: { username } });
-    logi('User found:', user.name);
-    if (user && encrypt.compare(user.password, password)) {
-      logi('Login successful');
-      req.session.user_id = user.id;
-      req.session.user = user;
-      req.session.message = { type: 'success', text: 'Login successful!' };
-      res.redirect('/dashboard');
-    } else {
-      logi('Login failed');
-      req.session.message = { type: 'error', text: 'Invalid username or password.' };
-      res.redirect('/login');
-    }
-  } catch (e) {
-    logi('Error:');
-    logi(e)
-  }
-});
-
-
-app.get('/logout', (req, res) => {
-  req.session.destroy(err => {
-    if (err) {
-      // You can handle the error appropriately, e.g., return an error response or redirect to a dashboard
-      res.redirect('/dashboard'); // Ensure to return here to avoid further code execution
-    }
-
-    // Clear the cookie and redirect only if session destruction is successful
-    //req.session.message = { type: 'success', text: 'Logout successful!' };
-    res.clearCookie('connect.sid');
-    res.redirect('/login'); // Redirect to login after successful logout
-  });
-});
-
-app.get('/dashboard', isAuthenticated, async(req, res) => {
-  let settings =await db.softwaresetting.findOne({
-    where: {
-      name: 'company'
-    }
-  });
-  console.log(req.session.permissions)
-  let company = JSON.parse(settings.value);
-  res.render('dashboard', { company });
-});
-
-// Import the product controller
-const productController = require('../controllers/productController');
-
-// Product CRUD routes
-app.get('/products', allowed(['productsList']), productController.index);
-app.post('/products/get', allowed(['productsList', 'productsView']), productController.get);
-app.get('/products/form', allowed(['productsCreate']), productController.form);
-app.post('/products/save', allowed(['productsCreate']), productController.save);
-app.post('/products/:id/delete', allowed(['productsDelete']), productController.delete);
-app.post('/products/search', allowed(['productsView']), productController.search);
-// Import the product controller
-const userController = require('../controllers/userController');
-
-// User CRUD routes
-app.get('/users', allowed(['usersList']), userController.index);
-app.get('/users/form', allowed(['usersCreate']), userController.form); // Use the same form for creating and editing
-app.post('/users/save', allowed(['usersCreate']), userController.save); // Handle both create and edit
-app.post('/users/:id/delete', allowed(['usersDelete']), userController.delete);
-app.get('/users/customers', allowed(['customersList']), userController.getCustomers);
-
-
-// Settings
-app.get('/settings', allowed(['all']), settings.index);
-app.post('/settings/save', allowed(['all']), settings.save);
-// sales
-app.get('/sales', allowed(['salesList']), sales.index);
-app.get('/sales/form', allowed(['salesCreate']), sales.form);
-app.post('/sales/save', allowed(['salesCreate']), sessionDataMiddleware, sales.save);
-app.get('/sales/:id', allowed(['salesView']), sales.saleview);
-app.post('/sales/search', allowed(['salesSearch']), sales.search);
+app.use('/', mainRoutes);
+app.use('/products', productRoutes);
+app.use('/users', userRoutes);
+app.use('/settings', settingRoutes);
+app.use('/sales', saleRoutes);
 
 // app.get('/*', (req, res) => {
 //   res.redirect('/');

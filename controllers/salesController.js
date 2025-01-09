@@ -2,9 +2,6 @@ const { Op } = require("sequelize");
 var db = require("../models");
 exports.index = async (req, res) => {
   let sales = await db.sale.findAll({
-    where: {  
-      createdby: res.locals.user.id,
-    },
     include: [
       {
         model: db.user,
@@ -51,6 +48,12 @@ exports.form = async (req, res) => {
 
 exports.save = async (req, res) => {
   const { customer, products, discountpercentage, totalPayment } = req.body;
+  if(!products || products.length === 0){
+    return res.status(400).send({ status: "error", message: "Please add products to the sale" });
+  }
+  if(!totalPayment || totalPayment < 0){
+    return res.status(400).send({ status: "error", message: "Invalid total payment" });
+  }
   const { user } = res.locals;
   const randomInvoice = Math.floor(Math.random() * 1000000);
   try {
@@ -87,7 +90,7 @@ exports.save = async (req, res) => {
           await product.save();
         }
       }
-      res.redirect("/sales");
+      res.send({ status: "success", message: "Sale created successfully" });
     } else {
       res.status(500).send("Internal Server Error");
     }
@@ -156,10 +159,13 @@ exports.search = async (req, res) => {
 
 
 var moment = require("moment");
+const { findLike } = require("../utils/searchquery");
 exports.saleview = async (req, res) => {
   const { id } = req.params;
   const sale = await db.sale.findOne({
-    where: { id },
+    where: { 
+      id:parseInt(id)
+     },
     include: [
       {
         model: db.user,
@@ -196,4 +202,14 @@ exports.saleview = async (req, res) => {
     },
   });
   res.render("sales/saleview", { sale:result, companySettings: JSON.parse(companySettings.value) });
-}
+};
+exports.productsget = async (req, res) => {
+  let body = req.body;
+  const data = await db.product.findAll({
+    where: {
+      ...findLike(body),
+      quantity: { [Op.gt]: 0 }
+    }
+  });
+  res.json(data);
+};

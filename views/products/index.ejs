@@ -2,9 +2,11 @@
   <h3>
     <%= title %>
   </h3>
-  <div>
-    <a href="/products/form" class="btn btn-primary"><i class="fas fa-plus"></i> Create New Products</a>
-  </div>
+  <% if (permissions.productsCreate) { %>
+    <div>
+      <a href="/products/form" class="btn btn-primary"><i class="fas fa-plus"></i> Create New Products</a>
+    </div>
+  <% } %>
 </div>
 <style>
   td{
@@ -33,14 +35,13 @@
           <th>Quantity</th>
           <th>Sale Price</th>
           <th>Sale Active</th>
-          <!-- align at end -->
-          <th style="text-align: end;">Actions</th>
+          <% if (permissions.productsUpdate || permissions.productsView ) { %>
+            <th style="text-align: end;">Actions</th>
+          <% } %>
         </tr>
       </thead>
       <tbody>
         <% data.forEach(product => { %>
-          <!-- make the tr red if the quantitiy is zero or make it yellow if the quantity is less then 10 -->
-          <!-- <tr> -->
             <tr data-bg="<%- product.quantity === 0 ? 'rgb(255, 106, 106)' : product.quantity < 10 ? 'rgb(247, 247, 144)' : '' %>">
             <td><%= product.id %></td>
             <td><%= product.barcode %></td>
@@ -53,16 +54,22 @@
             <td><%= product.quantity %></td>
             <td><%= product.saleprice %></td>
             <td><%= product.saleactive ? 'Yes' : 'No' %></td>
-            <td style="text-align: end;">
-              <a href="/products/form?id=<%= product.id %>" class="btn btn-warning btn-sm" title="Edit Product">
-                <i class="fas fa-edit"></i>
-              </a>
-              <form onsubmit="event.preventDefault(); deleteProduct('<%- product.id %>')" style="display:inline;">
-                <button type="submit" class="btn btn-danger btn-sm" title="Delete Product">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </form>
-            </td>
+            <% if (permissions.productsUpdate || permissions.productsView ) { %>
+              <td style="text-align: end;">
+                <% if (permissions.productsUpdate) { %>
+                  <a href="/products/form?id=<%= product.id %>" class="btn btn-warning btn-sm" title="Edit Product">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                <% } %>
+                <% if (permissions.productsView) { %>
+                <form onsubmit="event.preventDefault(); deleteProduct('<%- product.id %>')" style="display:inline;">
+                  <button type="submit" class="btn btn-danger btn-sm" title="Delete Product">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </form>
+                <% } %>
+              </td>
+            <% } %>
           </tr>
         <% }) %>
       </tbody>

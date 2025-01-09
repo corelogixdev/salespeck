@@ -28,15 +28,9 @@ exports.index = async (req, res) => {
   let searchdata = req.query.search || '';
   searchdata = searchdata.trim();
   let page = req.query.page || 1;
-  var role_query = {
-    [Op.or]: ['user', 'admin']
-  }
-  if (role === 'customer') {
-    role_query = role
-  }
   const data = await db.user.findAll({
     where: {
-      role: role_query,
+      role: role,
       [Op.or]: [
         { username: { [Op.like]: `%${searchdata}%` } },
         { phone: { [Op.like]: `%${searchdata}%` } },
@@ -48,7 +42,7 @@ exports.index = async (req, res) => {
   });
   let total = await db.user.count({
     where: {
-      role: role_query,
+      role: role,
       [Op.or]: [
         { username: { [Op.like]: `%${searchdata}%` } },
         { phone: { [Op.like]: `%${searchdata}%` } },
@@ -71,9 +65,12 @@ exports.index = async (req, res) => {
 exports.form = async (req, res) => {
   let permissions = await db.permissions.findAll();
   permissions = permissions.filter(permission => permission.name !== 'all' && !permission.name.includes('settings'));
-  let currentUserPermissions = await db.userpermissions.findAll({
-    where: { user_id: req.query.id }
-  });
+  let currentUserPermissions = [];
+  if(req.query.id){
+    currentUserPermissions = await db.userpermissions.findAll({
+      where: { user_id: req.query.id }
+    });
+  }
   const groupedPermissions = permissions.reduce((acc, perm) => {
     let currentUserHasPermission = currentUserPermissions.some(up => up.permission_id === perm.id)
     if (currentUserHasPermission) {
@@ -104,7 +101,7 @@ exports.form = async (req, res) => {
 };
 
 exports.save = async (req, res) => {
-  var { id, name, phone, username, role,password,address,permissions } = req.body;
+  var { id, name, phone, username, role,password,address, permissions } = req.body;
   let allPermissions = await db.permissions.findAll();
   var password = password;
   var createdby = res.locals.user.id;
@@ -123,25 +120,31 @@ exports.save = async (req, res) => {
       let res = await db.user.create({ name, phone, username, role, password, address, createdby});
       id = res.id;
     }
-    await db.userpermissions.destroy({ where: { user_id: id } });
-    Object.keys(permissions).forEach(async permission => {
-      let permissionId = allPermissions.find(p => p.name === permission).id;
-      await db.userpermissions.create({ user_id: id, permission_id: permissionId });
-    });
-    res.json({ success: true, redirectUrl: `/users?role=${role}` });
+    if(role == 'user'){
+      await db.userpermissions.destroy({ where: { user_id: id } });
+      Object.keys(permissions).forEach(async permission => {
+        let permissionId = allPermissions.find(p => p.name === permission).id;
+        await db.userpermissions.create({ user_id: id, permission_id: permissionId });
+      });
+    }
+    res.json({ success: true, message: 'User saved successfully' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 };
 
 exports.delete = async (req, res) => {
-  const user = await db.user.findByPk(req.params.id);
-  var role = user.role;
-  if(role==='admin'){
-     role = "user";
+  try {
+    const user = await db.user.findByPk(req.params.id);
+    var role = user.role;
+    if(role==='admin'){
+      role = "user";
+    }
+    await db.user.destroy({ where: { id: req.params.id } });
+    res.send({ success: true, message: 'User deleted successfully', redirect: '/users?role='+role });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
-  await db.user.destroy({ where: { id: req.params.id } });
-  res.redirect(`/users?role=${role}`);
 };
 
 exports.getCustomers = async (req, res) => {

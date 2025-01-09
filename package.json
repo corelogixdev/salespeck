@@ -25,6 +25,7 @@
       "middleware/**/*",
       "migrations/**/*",
       "models/**/*",
+      "routes/**/*",
       "seeders/**/*",
       "server/**/*",
       "utils/**/*",
