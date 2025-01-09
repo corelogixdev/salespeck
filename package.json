@@ -47,9 +47,10 @@
       "requestedExecutionLevel": "requireAdministrator"
     },
     "nsis": {
-      "oneClick": true,
+      "oneClick": false,
       "allowElevation": true,
-      "runAfterFinish": true
+      "runAfterFinish": false,
+      "allowToChangeInstallationDirectory": true
     },
     "mac": {
       "target": []
@@ -65,7 +66,7 @@
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "electron-log": "^5.2.4",
-    "electron-updater": "^5.3.0",
+    "electron-updater": "^6.3.9",
     "express": "^4.21.1",
     "express-ejs-layouts": "^2.5.1",
     "express-session": "^1.18.1",
@@ -75,7 +76,7 @@
     "umzug": "^3.8.2"
   },
   "devDependencies": {
-    "electron": "^33.0.2",
+    "electron": "^33.3.1",
     "electron-builder": "^25.1.8",
     "electron-reload": "^1.5.0",
     "nodemon": "^3.1.7"

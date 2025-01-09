@@ -97,8 +97,8 @@ autoUpdater.on('checking-for-update', () => {
 });
 
 autoUpdater.on('update-available', (info) => {
-  logi('Update available:', info);
-  logi(`New version: ${info.version}`);
+  logi('Update available:');
+  logi(info);
   const options = {
     type: 'question',
     buttons: ['Download Now', 'Do Not Download'],
@@ -118,11 +118,13 @@ autoUpdater.on('update-available', (info) => {
 });
 
 autoUpdater.on('update-not-available', (info) => {
-  logi('Update not available:', info);
+  logi('Update not available:');
+  logi(info);
 });
 
 autoUpdater.on('update-downloaded', (info) => {
-  logi('Update downloaded:', info);
+  logi('Update downloaded:');
+  logi(info);
   const options = {
     type: 'question',
     buttons: ['Install Now', 'Later'],
@@ -140,9 +142,9 @@ autoUpdater.on('update-downloaded', (info) => {
         //C:\Users\IT LAND\AppData\Local\Programs\openmenu
 
         // Remove old files manually
-        deleteOldFiles(appDir); // This function will delete the old files
+        //deleteOldFiles(appDir); // This function will delete the old files
         
-        autoUpdater.quitAndInstall(false, true); // Explicitly quit and install
+        autoUpdater.quitAndInstall(true, false); // Explicitly quit and install
       } catch (err) {
         logi('Error during quitAndInstall:', err.message);
       }
@@ -151,7 +153,8 @@ autoUpdater.on('update-downloaded', (info) => {
 });
 
 autoUpdater.on('error', (error) => {
-  logi('Update error:', error.message);
+  logi('Update error:');
+  logi(error);
   dialog.showErrorBox('Update Failed', 'The update could not be installed. Please try again.');
 });
 
