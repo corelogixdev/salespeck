@@ -192,8 +192,8 @@
             return;
         }
         const discountpercentage = parseInt(document.getElementById('discountpercentage').value);
-        const totalPaymentValue = parseFloat(totalPayment.value);
-        if(!totalPaymentValue){
+        const totalPaymentValue = parseFloat(totalPayment.value) || 0;
+        if(!totalPayment.value || totalPaymentValue < 0){
             toastr.warning('Please enter total payment, 0 for nothing');
             return;
         }

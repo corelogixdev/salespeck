@@ -60,7 +60,7 @@
                     <% let products=sale.SoldPoducts.map(({Product})=>Product.name).join(', ') %>
                         <tr>
                             <td>
-                                <%= index+1 %>
+                                <%= sale.id %>
                             </td>
                             <td class="limit-text" title="<%= products %>">
                                 <%= sale.SoldPoducts.map(({Product})=>Product.name).join(', ') %>
