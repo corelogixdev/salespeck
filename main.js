@@ -32,7 +32,7 @@ function createWindow() {
   });
 
   //to open dev tools
-  win.webContents.openDevTools();
+  //win.webContents.openDevTools();
   win.loadURL('http://localhost:'+config.port); // Serve Express on localhost:3000
   ipcMain.on('close-app', () => {
     win.close();
@@ -62,9 +62,6 @@ app.whenReady().then(() => {
   }
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = false;
-  autoUpdater.forceDevUpdateConfig= true,
-  autoUpdater.fullChangelog = true,
-  autoUpdater.disableWebInstaller = true;
   autoUpdater.logger = require('electron-log');
   autoUpdater.logger.transports.file.level = 'debug';
 
@@ -144,7 +141,7 @@ autoUpdater.on('update-downloaded', (info) => {
         // Remove old files manually
         //deleteOldFiles(appDir); // This function will delete the old files
         
-        autoUpdater.quitAndInstall(true, false); // Explicitly quit and install
+        autoUpdater.quitAndInstall(false, true); // Explicitly quit and install
       } catch (err) {
         logi('Error during quitAndInstall:', err.message);
       }

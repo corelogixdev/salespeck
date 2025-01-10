@@ -53,6 +53,9 @@
       "runAfterFinish": false,
       "allowToChangeInstallationDirectory": true
     },
+    "portable": {
+      "requestExecutionLevel": "admin"
+    },
     "mac": {
       "target": []
     },
@@ -74,7 +77,8 @@
     "sequelize": "^6.37.5",
     "sequelize-cli": "^6.6.2",
     "sqlite3": "^5.1.7",
-    "umzug": "^3.8.2"
+    "umzug": "^3.8.2",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "electron": "^33.3.1",
