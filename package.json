@@ -8,7 +8,8 @@
     "start": "nodemon server/app.js",
     "start:electron": "electron .",
     "dev": "nodemon --exec \"electron .\"",
-    "build": "electron-builder --win --x64",
+    "prebuild": "rimraf dist/",
+    "build": "electron-builder",
     "postbuild": "rimraf dist/win-unpacked",
     "upload": "node build/upload.js"
   },
