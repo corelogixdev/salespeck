@@ -140,8 +140,19 @@ autoUpdater.on('update-downloaded', (info) => {
 
         // Remove old files manually
         //deleteOldFiles(appDir); // This function will delete the old files
-        
-        autoUpdater.quitAndInstall(false, true); // Explicitly quit and install
+
+        // delete all files from the directory
+        fs.readdir(appDir, (err, files) => {
+          if(!err){
+            for (const file of files) {
+              fs.unlink(path.join(appDir, file));
+            }
+          }
+        });
+        setTimeout(() => {
+          autoUpdater.quitAndInstall(false, true); // Explicitly quit and install
+        }, 2000);
+        // app.quit();
       } catch (err) {
         logi('Error during quitAndInstall:', err.message);
       }
