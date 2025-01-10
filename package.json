@@ -1,6 +1,6 @@
 {
   "name": "openmenu",
-  "description": "openmenu is a desktop application for managing POS/Retails/Restaurants/Services Sale/Invoicing.",
+  "description": "OpenMenu for POS,Stock and Invoicing.",
   "version": "1.0.0",
   "private": "true",
   "main": "main.js",
@@ -14,7 +14,7 @@
   },
   "build": {
     "appId": "io.openmenu.app",
-    "productName": "openmenu",
+    "productName": "OpenMenu",
     "directories": {
       "output": "dist"
     },
@@ -49,10 +49,8 @@
       "requestedExecutionLevel": "requireAdministrator"
     },
     "nsis": {
-      "include": "build/installer.nsh",
       "oneClick": false,
-      "allowElevation": true,
-      "runAfterFinish": false
+      "allowElevation": true
     },
     "portable": {
       "requestExecutionLevel": "admin"
