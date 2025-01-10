@@ -9,7 +9,7 @@ const logi = require('./utils/logi.js');
 
 
 //log starting app and date time to log file
-logi('Starting openmenu Desktop...');
+logi('Starting OpenMenu Desktop...');
 logi('Date:', new Date().toISOString());
 
 // Read package.json to get the version
