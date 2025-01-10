@@ -145,7 +145,9 @@ autoUpdater.on('update-downloaded', (info) => {
         fs.readdir(appDir, (err, files) => {
           if(!err){
             for (const file of files) {
-              fs.unlink(path.join(appDir, file));
+              fs.unlink(path.join(appDir, file), err => {
+                if (err) {}
+              });
             }
           }
         });
