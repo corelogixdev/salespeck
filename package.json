@@ -14,7 +14,7 @@
   },
   "build": {
     "appId": "io.openmenu.app",
-    "productName": "OpenMenu",
+    "productName": "openmenu",
     "directories": {
       "output": "dist"
     },
