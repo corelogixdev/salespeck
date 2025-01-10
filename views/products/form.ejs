@@ -99,13 +99,32 @@
         });
         const result = await response.json();
         if (result.success) {
-          window.location.href = result.redirectUrl;
+          $.alert({
+            title: 'Success!',
+            content: result.message,
+            type: 'green',
+            theme: 'modern',
+            buttons: {
+              ok: function () {
+                $('#form').trigger('reset');
+              },
+            },
+          });
         } else {
-          toastr.error(result.message);
+          $.alert({
+            title: 'Error!',
+            content: result.message,
+            type: 'red',
+            theme: 'modern',
+          });
         }
       } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred while saving the product.');
+        $.alert({
+          title: 'Error!',
+          content: 'An error occurred while saving the product.',
+          type: 'red',
+          theme: 'modern',
+        });
       }
     });
   });
