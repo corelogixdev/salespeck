@@ -1,26 +1,25 @@
-!define MUI_PAGE_DEBUG
+!define NSIS_CONFIG_LOG 1  ; Enable logging configuration
 !include "LogicLib.nsh"
-
-!macro customWelcomePage
-  DetailPrint "Starting Welcome Page setup..."
-  !insertMacro skipPageIfUpdated
-  DetailPrint "Skipping Welcome Page if updated..."
-  !insertMacro MUI_PAGE_WELCOME
-  DetailPrint "Welcome Page setup complete."
-!macroend
+!include "MUI2.nsh"
 
 Function WriteToLogFile
-  !define NSIS_CONFIG_LOG
-  LogSet on
+  Push $0
+  Push $1
+  
   StrCpy $0 "$INSTDIR\installer-log.txt"
   FileOpen $1 $0 "a"
-  FileWrite $1 "$R0$\n"
+  FileWrite $1 "$\r$\n[${__DATE__} ${__TIME__}] $R0"
   FileClose $1
+  
+  Pop $1
+  Pop $0
 FunctionEnd
 
+ShowInstDetails show  ; Show detailed installation log
+
+!insertmacro MUI_PAGE_INSTFILES  ; Show installation progress directly
+
 Section "UpdateSection"
-  !define NSIS_CONFIG_LOG
-  LogSet on
   DetailPrint "Beginning update process..."
   StrCpy $R0 "Beginning update process..."
   Call WriteToLogFile
@@ -29,13 +28,19 @@ Section "UpdateSection"
   StrCpy $R0 "Copying new files..."
   Call WriteToLogFile
 
+  ClearErrors
   CopyFiles "$INSTDIR\update-files\*" "$INSTDIR"
-  IfErrors 0 +2
-    DetailPrint "Error: File copy failed."
+  IfErrors 0 +3
     StrCpy $R0 "Error: File copy failed."
-    Call WriteToLogFile
+    Goto updateError
 
-  DetailPrint "Update complete."
   StrCpy $R0 "Update complete."
   Call WriteToLogFile
+  Goto updateEnd
+
+  updateError:
+    Call WriteToLogFile
+    DetailPrint $R0
+
+  updateEnd:
 SectionEnd
