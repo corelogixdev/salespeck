@@ -4,9 +4,16 @@ const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 const process = require('process');
+const { app } = require('electron');
 const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV || 'production';
 const config = require(__dirname + '/../config/config.json')[env];
+
+// Modify storage path for production
+if (env === 'production') {
+  config.storage = path.join(app.getPath('userData'), 'database.sqlite');
+}
+
 const db = {};
 
 let sequelize;
