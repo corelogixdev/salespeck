@@ -4,7 +4,7 @@
   </h3>
   <% if (permissions.productsCreate) { %>
     <div>
-      <a href="/products/form" class="btn btn-primary"><i class="fas fa-plus"></i> Create New Products</a>
+      <a href="/products/form" class="btn btn-primary" target="_blank"><i class="fas fa-plus"></i> Add Product</a>
     </div>
   <% } %>
 </div>
@@ -28,7 +28,6 @@
           <th>Barcode</th>
           <th>Name</th>
           <th>Category</th>
-          <th>Carry Cost</th>
           <th>Discount</th>
           <th>Purchase Price</th>
           <th>Purchase Active</th>
@@ -44,10 +43,9 @@
         <% data.forEach(product => { %>
             <tr data-bg="<%- product.quantity === 0 ? 'rgb(255, 106, 106)' : product.quantity < 10 ? 'rgb(247, 247, 144)' : '' %>">
             <td><%= product.id %></td>
-            <td><%= product.barcode %></td>
+            <td class="limit-text" title="<%= product.barcode %>"><%= product.barcode %></td>
             <td class="limit-text" title="<%= product.name %>"><%= product.name %></td>
-            <td><%= product.category %></td>
-            <td><%= product.carrycost %></td>
+            <td class="limit-text" title="<%= product.category %>"><%= product.category %></td>
             <td><%= product.discount %></td>
             <td><%= product.purchaseprice %></td>
             <td><%= product.purchaseactive ? 'Yes' : 'No' %></td>

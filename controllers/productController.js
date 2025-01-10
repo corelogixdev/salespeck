@@ -60,7 +60,7 @@ exports.save = async (req, res) => {
     } else {
       await db.product.create( data );
     }
-    res.send({ success: true, redirectUrl: `/products` });
+    res.send({ success: true, message: 'Product saved successfully'});
   } catch (error) {
     res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
