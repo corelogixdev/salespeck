@@ -48,6 +48,7 @@
       "requestedExecutionLevel": "requireAdministrator"
     },
     "nsis": {
+      "include": "build/installer.nsh",
       "oneClick": false,
       "allowElevation": true,
       "runAfterFinish": false,
