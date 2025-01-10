@@ -10,7 +10,7 @@
     "dev": "nodemon --exec \"electron .\"",
     "build": "electron-builder --win --x64",
     "postbuild": "rimraf dist/win-unpacked",
-    "upload": "node -r dotenv/config -e \"console.log('Uploading executable...'); require('child_process').execSync('curl --verbose --header \\\"PRIVATE-TOKEN: ' + process.env.GITLAB_TOKEN + '\\\" --upload-file dist/openmenu.exe \\\"https://gitlab.com/api/v4/projects/' + process.env.CI_PROJECT_ID + '/packages/generic/openmenu/release/openmenu.exe\\\"', {stdio: 'inherit'}); console.log('Uploading latest.yml...'); if (!require('fs').existsSync('dist/latest.yml')) { console.error('Error: latest.yml file is missing in the dist directory.'); process.exit(1); } require('child_process').execSync('curl --verbose --header \\\"PRIVATE-TOKEN: ' + process.env.GITLAB_TOKEN + '\\\" --upload-file dist/latest.yml \\\"https://gitlab.com/api/v4/projects/' + process.env.CI_PROJECT_ID + '/packages/generic/openmenu/release/latest.yml\\\"', {stdio: 'inherit'}); console.log('Upload complete.');\""
+    "upload": "node build/upload.js"
   },
   "build": {
     "appId": "io.openmenu.app",
