@@ -1,19 +1,20 @@
 {
   "name": "openmenu",
-  "description": "OpenMenu is a desktop application for managing POS/Retails/Restaurants/Services Sale/Invoicing.",
-  "version": "1.0.1",
+  "description": "openmenu is a desktop application for managing POS/Retails/Restaurants/Services Sale/Invoicing.",
+  "version": "1.0.0",
   "private": "true",
   "main": "main.js",
   "scripts": {
     "start": "nodemon server/app.js",
     "start:electron": "electron .",
     "dev": "nodemon --exec \"electron .\"",
-    "build": "electron-builder",
-    "upload": "node -r dotenv/config -e \"console.log('Uploading executable...'); require('child_process').execSync('curl --verbose --header \\\"PRIVATE-TOKEN: ' + process.env.GITLAB_TOKEN + '\\\" --upload-file dist/OpenMenu.exe \\\"https://gitlab.com/api/v4/projects/' + process.env.CI_PROJECT_ID + '/packages/generic/openmenu-desktop/release/OpenMenu.exe\\\"', {stdio: 'inherit'}); console.log('Uploading latest.yml...'); if (!require('fs').existsSync('dist/latest.yml')) { console.error('Error: latest.yml file is missing in the dist directory.'); process.exit(1); } require('child_process').execSync('curl --verbose --header \\\"PRIVATE-TOKEN: ' + process.env.GITLAB_TOKEN + '\\\" --upload-file dist/latest.yml \\\"https://gitlab.com/api/v4/projects/' + process.env.CI_PROJECT_ID + '/packages/generic/openmenu-desktop/release/latest.yml\\\"', {stdio: 'inherit'}); console.log('Upload complete.');\""
+    "build": "electron-builder --win --x64",
+    "postbuild": "rimraf dist/win-unpacked",
+    "upload": "node -r dotenv/config -e \"console.log('Uploading executable...'); require('child_process').execSync('curl --verbose --header \\\"PRIVATE-TOKEN: ' + process.env.GITLAB_TOKEN + '\\\" --upload-file dist/openmenu.exe \\\"https://gitlab.com/api/v4/projects/' + process.env.CI_PROJECT_ID + '/packages/generic/openmenu/release/openmenu.exe\\\"', {stdio: 'inherit'}); console.log('Uploading latest.yml...'); if (!require('fs').existsSync('dist/latest.yml')) { console.error('Error: latest.yml file is missing in the dist directory.'); process.exit(1); } require('child_process').execSync('curl --verbose --header \\\"PRIVATE-TOKEN: ' + process.env.GITLAB_TOKEN + '\\\" --upload-file dist/latest.yml \\\"https://gitlab.com/api/v4/projects/' + process.env.CI_PROJECT_ID + '/packages/generic/openmenu/release/latest.yml\\\"', {stdio: 'inherit'}); console.log('Upload complete.');\""
   },
   "build": {
     "appId": "io.openmenu.app",
-    "productName": "OpenMenu",
+    "productName": "openmenu",
     "directories": {
       "output": "dist"
     },
@@ -38,7 +39,7 @@
     "publish": [
       {
         "provider": "generic",
-        "url": "https://gitlab.com/api/v4/projects/62990895/packages/generic/openmenu-desktop/release"
+        "url": "https://gitlab.com/api/v4/projects/62990895/packages/generic/openmenu/release"
       }
     ],
     "win": {
@@ -48,6 +49,7 @@
       "requestedExecutionLevel": "requireAdministrator"
     },
     "nsis": {
+      "include": "build/installer.nsh",
       "oneClick": false,
       "allowElevation": true,
       "runAfterFinish": false
@@ -83,6 +85,7 @@
     "electron": "^33.3.1",
     "electron-builder": "^25.1.8",
     "electron-reload": "^1.5.0",
-    "nodemon": "^3.1.7"
+    "nodemon": "^3.1.7",
+    "rimraf": "^6.0.1"
   }
 }

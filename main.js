@@ -9,7 +9,7 @@ const logi = require('./utils/logi.js');
 
 
 //log starting app and date time to log file
-logi('Starting OpenMenu Desktop...');
+logi('Starting openmenu Desktop...');
 logi('Date:', new Date().toISOString());
 
 // Read package.json to get the version
@@ -67,7 +67,7 @@ app.whenReady().then(() => {
 
   autoUpdater.setFeedURL({
     provider: 'generic',
-    url: `https://gitlab.com/api/v4/projects/${projectId}/packages/generic/openmenu-desktop/release`,
+    url: `https://gitlab.com/api/v4/projects/${projectId}/packages/generic/openmenu/release`,
     requestHeaders: {
       'PRIVATE-TOKEN': process.env.GITLAB_TOKEN
     }
@@ -101,7 +101,7 @@ autoUpdater.on('update-available', (info) => {
     buttons: ['Download Now', 'Do Not Download'],
     defaultId: 0,
     title: 'Update Available',
-    message: 'A new version of OpenMenu is available. Do you want to download it now?',
+    message: 'A new version of openmenu is available. Do you want to download it now?',
     detail: 'You can choose to download the update now or skip it.'
   };
 
@@ -127,7 +127,7 @@ autoUpdater.on('update-downloaded', (info) => {
     buttons: ['Install Now', 'Later'],
     defaultId: 0,
     title: 'Update Available',
-    message: 'A new version of OpenMenu is available. Do you want to install it now?',
+    message: 'A new version of openmenu is available. Do you want to install it now?',
     detail: 'The update will be installed the next time you restart the application if you choose "Later".'
   };
   const appDir = path.join(app.getPath('exe'), '..'); // Get the app directory

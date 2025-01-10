@@ -8,6 +8,6 @@ C:\Users\IT LAND\AppData\Roaming\openmenu (userData folter, App folter contain t
 change version in package.json "version": "1.0.0"
 building the project
 `npm run build`
-`npm run upload` (it will upload the new build on https://gitlab.com/api/v4/projects/62990895/packages/generic/openmenu-desktop/release)
-we need to delete the files from https://gitlab.com/atta_devgiant/openmenu-desktop/-/packages until we successfully test the update
-Important Note a single file cannot be uploaded to (https://gitlab.com/api/v4/projects/' + process.env.CI_PROJECT_ID + '/packages/generic/openmenu-desktop), it should be some folder
+`npm run upload` (it will upload the new build on https://gitlab.com/api/v4/projects/62990895/packages/generic/openmenu/release)
+we need to delete the files from https://gitlab.com/atta_devgiant/openmenu/-/packages until we successfully test the update
+Important Note a single file cannot be uploaded to (https://gitlab.com/api/v4/projects/' + process.env.CI_PROJECT_ID + '/packages/generic/openmenu), it should be some folder
