@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     tableName: 'inventorylog',
-    timestamps: false,
+    timestamps: true,
   });
 
   InventoryLog.associate = function(models) {

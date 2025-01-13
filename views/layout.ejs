@@ -23,125 +23,128 @@
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="/dashboard"><img src="/assets/images/icon.png" style="width: 50px;">Open Menu</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <% if ( permissions.usersList || permissions.customersList ) { %>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Staff
-                </a>
-                  <ul class="dropdown-menu">
-                    <% if ( permissions.usersList ) { %>
-                      <li><a class="dropdown-item" href="/users?role=user">Users</a></li>
-                      <% } %>
-                      <% if ( permissions.customersList ) { %>
-                        <li><a class="dropdown-item" href="/users?role=customer">Customers</a></li>
-                        <% } %>  
-                  </ul>
-                </li>
-            <% } %>
-            <% if ( permissions.productsList ) { %>
-              <li class="nav-item">
-                <a class="nav-link" href="/products">Products</a>
-              </li>
-            <% } %>
-            <% if ( permissions.settings ) { %>
-              <li class="nav-item">
-                <a class="nav-link" href="/settings">Settings</a>
-              </li>
-            <% } %>
-              <% if ( permissions.salesView || permissions.salesCreate || permissions.salesList ) { %>
+  <% if (typeof hidenav === 'undefined' || hidenav !== true) { %>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/dashboard"><img src="/assets/images/icon.png" style="width: 50px;">Open Menu</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <% if ( permissions.usersList || permissions.customersList ) { %>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                    aria-expanded="false">
-                    Sales
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Staff
                   </a>
-                  <ul class="dropdown-menu">
-                    <% if (permissions.salesView) { %>
-                      <li><a class="dropdown-item" href="/sales">Sales Report</a></li>
-                    <% } %>
-                    <% if ( permissions.salesCreate ) { %>
-                      <li><a class="dropdown-item" href="/sales/form" target="_blank">New Sale</a></li>
-                    <% } %>
-                  </ul>
+                    <ul class="dropdown-menu">
+                      <% if ( permissions.usersList ) { %>
+                        <li><a class="dropdown-item" href="/users?role=user">Users</a></li>
+                        <% } %>
+                        <% if ( permissions.customersList ) { %>
+                          <li><a class="dropdown-item" href="/users?role=customer">Customers</a></li>
+                          <% } %>  
+                    </ul>
+                  </li>
+              <% } %>
+              <% if ( permissions.productsList ) { %>
+                <li class="nav-item">
+                  <a class="nav-link" href="/products">Products</a>
                 </li>
               <% } %>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                  aria-expanded="false">
-                  Notifications
-                </a>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#">Notification 1</a></li>
-                  <li><a class="dropdown-item" href="#">Notification 2</a></li>
-                  <li><a class="dropdown-item" href="#">Notification 3</a></li>
-                </ul>
-              </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                  aria-expanded="false">
-                  HR
-                </a>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="/attendance">Attendance</a></li>
-                  <li><a class="dropdown-item" href="/leaves">Leaves</a></li>
-                  <li style="position:relative">
-                    <a href="#" class="dropdown-item custom-dropdown">
-                      Salaries
-                      <span style="font-size: 10px; vertical-align: middle">
-                        <i class="fa-solid fa-chevron-right"></i>
-                      </span>
+              <% if ( permissions.settings ) { %>
+                <li class="nav-item">
+                  <a class="nav-link" href="/settings">Settings</a>
+                </li>
+              <% } %>
+                <% if ( permissions.salesView || permissions.salesCreate || permissions.salesList ) { %>
+                  <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                      aria-expanded="false">
+                      Sales
                     </a>
-                    <ul class="custom-dropdown-item">
-                      <li><a class="dropdown-item" href="/salaries/templates">Salery Templates</a></li>
-                      <li><a class="dropdown-item" href="/salaries/calculate">Calculate Salaries</a></li>
+                    <ul class="dropdown-menu">
+                      <% if (permissions.salesView) { %>
+                        <li><a class="dropdown-item" href="/sales">Sales Report</a></li>
+                      <% } %>
+                      <% if ( permissions.salesCreate ) { %>
+                        <li><a class="dropdown-item" href="/sales/form" target="_blank">New Sale</a></li>
+                      <% } %>
                     </ul>
                   </li>
-                </ul>
-              </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                  aria-expanded="false">
-                  Accounting
-                </a>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="/accounting/chartofaccount">Chart of Account</a></li>
-                  <li style="position:relative">
-                    <a href="#" class="dropdown-item custom-dropdown">
-                      Expences
-                      <span style="font-size: 10px; vertical-align: middle">
-                        <i class="fa-solid fa-chevron-right"></i>
-                      </span>
-                    </a>
-                    <ul class="custom-dropdown-item">
-                      <li><a class="dropdown-item" href="/accounting/transaction">Transaction</a></li>
-                      <li><a class="dropdown-item" href="/accounting/cashclosing">Cash Closing</a></li>
-                    </ul>
-                  </li>
-                </ul>
-              </li>
-        </ul>
-        <div class="d-flex gap-2 position-relative">
-          <div class="result">
-            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"
-              id="navbar-search-input">
-            <div id="result"
-              style="position: absolute; top: 40px; border-radius: 10px; width: 100%; display: none; z-index: 9999;"
-              class="card"></div>
+                <% } %>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    Notifications
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Notification 1</a></li>
+                    <li><a class="dropdown-item" href="#">Notification 2</a></li>
+                    <li><a class="dropdown-item" href="#">Notification 3</a></li>
+                  </ul>
+                </li>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    HR
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/attendance">Attendance</a></li>
+                    <li><a class="dropdown-item" href="/leaves">Leaves</a></li>
+                    <li style="position:relative">
+                      <a href="#" class="dropdown-item custom-dropdown">
+                        Salaries
+                        <span style="font-size: 10px; vertical-align: middle">
+                          <i class="fa-solid fa-chevron-right"></i>
+                        </span>
+                      </a>
+                      <ul class="custom-dropdown-item">
+                        <li><a class="dropdown-item" href="/salaries/templates">Salery Templates</a></li>
+                        <li><a class="dropdown-item" href="/salaries/calculate">Calculate Salaries</a></li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    Accounting
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/accounting/chartofaccount">Chart of Account</a></li>
+                    <li style="position:relative">
+                      <a href="#" class="dropdown-item custom-dropdown">
+                        Expences
+                        <span style="font-size: 10px; vertical-align: middle">
+                          <i class="fa-solid fa-chevron-right"></i>
+                        </span>
+                      </a>
+                      <ul class="custom-dropdown-item">
+                        <li><a class="dropdown-item" href="/accounting/transaction">Transaction</a></li>
+                        <li><a class="dropdown-item" href="/accounting/cashclosing">Cash Closing</a></li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+          </ul>
+          <div class="d-flex gap-2 position-relative">
+            <div class="result">
+              <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"
+                id="navbar-search-input">
+              <div id="result"
+                style="position: absolute; top: 40px; border-radius: 10px; width: 100%; display: none; z-index: 9999;"
+                class="card"></div>
+            </div>
+            <button class="btn btn-secondary" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i></button>
+            <button class="btn btn-danger" id="close-btn"><i class="fa-solid fa-power-off"></i></button>
           </div>
-          <button class="btn btn-secondary" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i></button>
-          <button class="btn btn-danger" id="close-btn"><i class="fa-solid fa-power-off"></i></button>
         </div>
       </div>
-    </div>
-  </nav>
+    </nav>
+  <% } %>
+
   <div class="m-3">
     <%- body %>
   </div>

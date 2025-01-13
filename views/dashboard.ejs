@@ -8,7 +8,9 @@
         <div class="d-flex justify-content-between align-items-center">
           <div>
             <h5 class="text-secondary">Today's Sales</h5>
-            <h3 class="text-success">10</h3>
+            <h3 class="text-success">
+              <%= todaySalesCount %>
+            </h3>
           </div>
           <div class="icon">
             <i class="fas fa-shopping-cart fa-3x text-success"></i>
@@ -26,7 +28,9 @@
         <div class="d-flex justify-content-between align-items-center">
           <div>
             <h5 class="text-secondary">Today's Customers</h5>
-            <h3 class="text-success">5</h3>
+            <h3 class="text-success">
+              <%= todayCustomersCount %>
+            </h3>
           </div>
           <div class="icon">
             <i class="fas fa-users fa-3x text-success"></i>
@@ -44,7 +48,9 @@
         <div class="d-flex justify-content-between align-items-center">
           <div>
             <h5 class="text-secondary">Total Sales</h5>
-            <h3 class="text-success">100</h3>
+            <h3 class="text-success">
+              <%= totalSalesCount %>
+            </h3>
           </div>
           <div class="icon">
             <i class="fas fa-chart-line fa-3x text-success"></i>
@@ -74,6 +80,30 @@
 </div>
 
 <script>
+  let topProducts = <%- JSON.stringify(topFiveSoldProductsWithSoldQuantity) %>;
+  let topProducts_chartData = topProducts.reduce((acc, product) => {
+    acc.labels.push(product?.product_name || 'Unknown');
+    acc.data.push(product?.total_quantity || 0);
+    return acc;
+  }, {
+    labels: [],
+    data: []
+  });
+
+  let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  let totalSales = <%- JSON.stringify(salesCountByMonth) %>;
+  let totalSales_chartData = months.reduce((acc, month, index) => {
+    let monthNumber = (index+1).toString().padStart(2, '0');
+    acc.labels.push(month);
+    let sales = totalSales.find(sale => sale.month === monthNumber);
+    acc.data.push(sales?.total || 0);
+    return acc;
+  }, {
+    labels: [],
+    data: []
+  });
+
   document.addEventListener('DOMContentLoaded', () => {
     const topProductsSales = document.getElementById('barChart').getContext('2d');
     const monthSaleGraph = document.getElementById('usersChart').getContext('2d');
@@ -81,10 +111,10 @@
     const topProductsSalesChart = new Chart(topProductsSales, {
       type: 'bar',
       data: {
-        labels: ['Product 1', 'Product 2', 'Product 3', 'Product 4', 'Product 5'],
+        labels: topProducts_chartData.labels,
         datasets: [{
           label: 'Top Products Sales',
-          data: [10, 20, 30, 40, 50],
+          data: topProducts_chartData.data,
           backgroundColor: [
             'rgba(255, 99, 132, 0.2)',
             'rgba(54, 162, 235, 0.2)',
@@ -105,7 +135,10 @@
       options: {
         scales: {
           y: {
-            beginAtZero: true
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
           }
         }
       }
@@ -114,10 +147,10 @@
     const monthSaleGraphChart = new Chart(monthSaleGraph, {
       type: 'line',
       data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        labels: totalSales_chartData.labels,
         datasets: [{
           label: 'Monthly Sales',
-          data: [10, 20, 0, 30, 20, 60, 30, 80, 40, 100, 80, 120],
+          data: totalSales_chartData.data,
           backgroundColor: [
             'rgba(255, 99, 132, 0.2)',
           ],

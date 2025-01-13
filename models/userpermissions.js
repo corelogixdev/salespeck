@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       tableName: "userpermissions",
-      timestamps: false,
+      timestamps: true,
     }
   );
   UserPermissions.associate = function (models) {

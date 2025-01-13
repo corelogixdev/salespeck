@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     tableName: 'cashclosing',
-    timestamps: false,
+    timestamps: true,
   });
 
   CashClosing.associate = function(models) {

@@ -6,7 +6,7 @@ const Sequelize = require('sequelize');
 const process = require('process');
 const { app } = require('electron');
 const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || 'production';
+const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config.json')[env];
 
 // Modify storage path for production

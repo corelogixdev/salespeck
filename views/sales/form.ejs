@@ -166,8 +166,8 @@
     }
     function UpdateChangePrice(){
         const totalBill = parseFloat(totalBillAmount.textContent.split(' ')[1]);
-        const totalPaymentValue = parseFloat(totalPayment.value);
-        const change = totalPaymentValue - totalBill;
+        const totalPrice = parseFloat(totalPayment.value) || 0;
+        const change = totalPrice - totalBill;
         const changeEl = document.getElementById('change');
         if (change < 0 || isNaN(change)) {
             changeEl.textContent = 'Rs. 0.00';
@@ -180,6 +180,9 @@
             toastr.warning(ErrorString);
             return;
         }
+        const customer = customerDropdown.value || null;
+        const ledger = ledgerCheckbox.checked;
+        const discountpercentage = parseInt(document.getElementById('discountpercentage').value);
         const products = [];
         document.querySelectorAll('#selected-products tr').forEach(row => {
             const productId = row.querySelector('td:nth-child(1)').textContent;
@@ -191,25 +194,31 @@
             toastr.warning('Please select products');
             return;
         }
-        const discountpercentage = parseInt(document.getElementById('discountpercentage').value);
-        const totalPaymentValue = parseFloat(totalPayment.value) || 0;
-        if(!totalPayment.value || totalPaymentValue < 0){
-            toastr.warning('Please enter total payment, 0 for nothing');
+        const totalPaymentVal = parseFloat(totalPayment.value);
+        const priceWithoutDiscount = products.reduce((acc, product) => acc + (product.quantity * product.price), 0);
+        
+        const totalPrice = Math.round(priceWithoutDiscount);
+
+        // check if discount percent is valid
+
+        if(discountpercentage < 0 || discountpercentage > 100){
+            toastr.warning('Please enter valid discount percentage');
             return;
         }
-        const ledger = ledgerCheckbox.checked;
-        const customer = customerDropdown.value || null;
+
         fetch('/sales/save', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ customer, discountpercentage, totalPayment: totalPaymentValue, ledger, products }),
-        }).then(response => {
+            body: JSON.stringify({ customer, discountpercentage, totalPrice, ledger, products, totalPayment: totalPaymentVal }),
+        }).then(async response => {
+            let data = await response.json();
+            console.log(data)
             if (response.ok) {
                 $.alert({
                     title: 'Success!',
-                    content: 'Sale added successfully',
+                    content: data.message,
                     theme: 'material',
                     useBootstrap: false,
                     boxWidth: '30%',
@@ -219,6 +228,7 @@
                             text: 'Ok',
                             btnClass: 'btn-success',
                             action: function () {
+                                window.open('/sales/'+ data.saleId, '_blank');
                                 window.location.reload();
                             }
                         }
@@ -227,7 +237,7 @@
             } else {
                 $.alert({
                     title: 'Error!',
-                    content: 'Error adding sale',
+                    content: data.message,
                     theme: 'material',
                     useBootstrap: false,
                     boxWidth: '30%',

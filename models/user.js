@@ -43,17 +43,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
-    createdat: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
-    updatedat: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
   }, {
     tableName: 'user',
-    timestamps: false,
+    timestamps: true,
   });
 
   return User;

@@ -479,7 +479,11 @@ module.exports = {
         type: Sequelize.STRING(50),
         allowNull: true,
       },
-      total: {
+      totalprice: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
+      },
+      totalpayment: {
         type: Sequelize.STRING(50),
         allowNull: true,
       },

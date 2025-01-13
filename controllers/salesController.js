@@ -1,4 +1,4 @@
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 var db = require("../models");
 exports.index = async (req, res) => {
   let sales = await db.sale.findAll({
@@ -43,15 +43,15 @@ exports.form = async (req, res) => {
     },
     attributes: ["id", "name"],
   });
-  res.render("sales/form" , { customers});
+  res.render("sales/form" , { customers, hidenav: true});
 };
 
 exports.save = async (req, res) => {
-  const { customer, products, discountpercentage, totalPayment } = req.body;
+  const { customer, products, discountpercentage, totalPayment, totalPrice } = req.body;
   if(!products || products.length === 0){
     return res.status(400).send({ status: "error", message: "Please add products to the sale" });
   }
-  if(!totalPayment || totalPayment < 0){
+  if(totalPayment < 0){
     return res.status(400).send({ status: "error", message: "Invalid total payment" });
   }
   const { user } = res.locals;
@@ -61,7 +61,8 @@ exports.save = async (req, res) => {
       user: user.id,
       customer:customer? customer : null,
       discountpercentage,
-      total: totalPayment,
+      totalpayment: totalPayment, // The amount user paid
+      totalprice: totalPrice, // The total price of all products
       invoicenum: 'INV-' + randomInvoice,
       createdby: user.id,
     });
@@ -90,67 +91,74 @@ exports.save = async (req, res) => {
           await product.save();
         }
       }
-      res.send({ status: "success", message: "Sale created successfully" });
+      res.send({ status: "success", message: "Sale created successfully", saleId: sale.id });
     } else {
       res.status(500).send("Internal Server Error");
     }
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).send({ status: "error", message: "Internal Server Error" });
   }
 };
 
 exports.search = async (req, res) => {
   let { customer, daterange, productId } = req.body;
-
-  const { sale, soldproducts, product, user } = db;
-
   try {
-    // Initialize query options
     let queryOptions = {
-      where: {},
       include: [
         {
-          model: soldproducts,
-          as: "SoldPoducts",
+          model: db.user,
+          as: "Customer",
+          attributes: ["id", "name"],
+        },
+        {
+          model: db.user,
+          as: "DeliveryUser",
+          attributes: ["id", "name"],
+        },
+        {
+          model: db.user,
+          as: "User",
+          attributes: ["id", "name"],
+        },
+        {
+          model: db.soldproducts,
+          as: 'SoldPoducts',
           include: [
             {
-              model: product,
-              as: "Product",
+              model: db.product,
+              as: 'Product',
+              attributes: ['name', 'saleprice'], // Fetch product name and price
             },
           ],
         },
-        {
-          model: user,
-          as: "Customer",
-          where: {},
-        },
-      ],
-    };
-    // Filter by customer name if provided
+      ]
+    }
+
     if (customer) {
-      customer = customer.trim();
-      queryOptions.include[1].where.name = {
-        [Op.like]: `%${customer}%`, // Allows partial match
+      queryOptions.where = {
+        customer: {
+          [Op.like]: `%${customer}%`,
+        }
       };
     }
-
     if (daterange) {
-      const [startDate, endDate] = daterange
-        .split(" - ")
-        .map((date) => new Date(date.trim()));
-      queryOptions.where.createdAt = {
-        [Op.between]: [startDate, endDate],
+      let [start,end] = daterange.split(" - ");
+      start = moment(new Date(start)).startOf("day").toDate();
+      end = moment(new Date(end)).endOf("day").toDate();
+      queryOptions.where = {
+        ...queryOptions.where,
+        createdAt: {
+          [Op.between]: [start, end],
+        },
       };
     }
-
     if (productId) {
-      queryOptions.include[0].where = { product: productId };
+      queryOptions.include[3].where = {
+        product: productId,
+      };
     }
-
-    const sales = await sale.findAll(queryOptions);
-
-    // Render the sales index page
-    res.  render("sales/index", { sales, title: "Sales Report", searchquery: req.body}, );
+    const sales = await db.sale.findAll(queryOptions);
+    res.render("sales/index", { sales, title: "Sales Report", searchquery: req.body });
   } catch (error) {
     console.error("Error fetching sales:", error);
     res.status(500).send("Internal Server Error");
@@ -195,19 +203,41 @@ exports.saleview = async (req, res) => {
     ],
   });
   let result = JSON.parse(JSON.stringify(sale));
+  result.totalprice = parseFloat(result.totalprice).toFixed(2);
+  result.totalpayment = parseFloat(result.totalpayment).toFixed(2);
+
+  let totalPrice = result.totalprice;
+  let discount = result.discountpercentage;
+  let priceAfterDiscount = totalPrice - (totalPrice * (discount / 100));
+  
+  let userPaid = result.totalpayment;
+
+  let change = userPaid - priceAfterDiscount;
+  if(change < 0) change = 0;
+
+  let balance = priceAfterDiscount - userPaid; // 10
+  if(balance < 0) balance = 0;
+  
+  result.balance = balance.toFixed(2);
+  result.change = change.toFixed(2);
+
   result.createdAt = moment(result.createdAt).format("MMMM Do YYYY");
   let companySettings = await db.softwaresetting.findOne({
     where: {
       name: "company",
     },
   });
-  res.render("sales/saleview", { sale:result, companySettings: JSON.parse(companySettings.value) });
+  res.render("sales/saleview", { sale:result, companySettings: JSON.parse(companySettings.value) , hidenav: true });
 };
 exports.productsget = async (req, res) => {
   let body = req.body;
+  let search = findLike(body);
+  if(req.body.barcode){
+    search = { ...search, barcode: req.body.barcode };
+  }
   const data = await db.product.findAll({
     where: {
-      ...findLike(body),
+      ...search,
       quantity: { [Op.gt]: 0 }
     }
   });
