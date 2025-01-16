@@ -1,7 +1,7 @@
 'use strict';
 
 const { json } = require('sequelize');
-const { financeaccount, user, softwaresetting,product, permissions, userpermissions } = require('../models'); // Import models directly
+const { financeaccount, user, softwaresetting,product, permissions, userpermissions, taxes } = require('../models'); // Import models directly
 const { encrypt } = require('../utils/encrypt');
 
 module.exports = {
@@ -135,6 +135,10 @@ module.exports = {
 
     userpermissions.create({ user_id: 1, permission_id: 777 });
 
+
+    // in taxes table add vat with 18% and gst with 5%
+    await taxes.create({ id: 1, name: 'vat', percentage: 18 });
+    await taxes.create({ id: 2, name: 'gst', percentage: 5 });
   },
 
   async down(queryInterface, Sequelize) {

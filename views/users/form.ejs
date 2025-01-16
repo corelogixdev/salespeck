@@ -1,113 +1,137 @@
-<div class="page_header d-flex justify-content-between align-items-center mb-3">
-  <h3>Create <%= role==='user' ? 'User' : 'Customer' %>
-  </h3>
-</div>
-<% if ( role == 'user') { %> 
-<ul class="nav nav-tabs" id="myTab" role="tablist">
-  <li class="nav-item" role="presentation">
-    <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general-tab-pane"
-      type="button" role="tab" aria-controls="general-tab-pane" aria-selected="true">General</button>
-  </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="permissions-tab" data-bs-toggle="tab" data-bs-target="#permissions-tab-pane"
-      type="button" role="tab" aria-controls="permissions-tab-pane" aria-selected="false">Permissions</button>
-    </li>
-  </ul>
-  <% } %>
-<div class="tab-content">
-  <div class="tab-pane fade show active" id="general-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
-    <form id="form">
-      <% if (data) { %>
-        <input type="hidden" name="id" value="<%= data.id %>">
-        <% } %>
-        <div class="form-group">
-          <label for="name">Name:</label>
-          <input type="text" class="form-control" id="name" name="name" value="<%= data ? data.name : '' %>" required>
-        </div>
-        
-        <div class="form-group">
-          <label for="username">Username:</label>
-          <input type="text" class="form-control" id="username" name="username"
-            value="<%= data ? data.username : '' %>" required>
-        </div>
-        
-          <div class="form-group">
-            <label for="phone">Phone:</label>
-            <input type="text" class="form-control" id="phone" name="phone" value="<%= data ? data.phone : '' %>"
-              required>
-          </div>
-          <div class="form-group">
-            <label for="address">Address:</label>
-            <input type="text" class="form-control" id="address" name="address" value="<%= data ? data.address : '' %>"
-              required>
-          </div>
-
-          <% if (role !=='customer' ) { %>
-            <div class="form-group">
-              <label for="password">Password:</label>
-              <input type="text" class="form-control" id="password" name="password"
-                value="<%= data ? data.password : '' %>" required>
-            </div>
-            <% } %>
-
-            <input type="hidden" name="role" value="<%= role %>">
-            <button type="submit" class="btn btn-primary mt-3">
-              <%= data ? 'Update' : 'Create' %>
-            </button>
-    </form>
-  </div>
-  <% if (role == 'user') { %>   
-      <div class="tab-pane fade" id="permissions-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-        <form id="permissions-form" onsubmit="event.preventDefault();">
-            <div class="permissions-container container mt-4">
-                <% Object.entries(groupedPermissions).forEach(([category, actions]) => { %>
-                  <div class="card mb-3 shadow-sm">
-                    <div class="card-header bg-secondary text-white">
-                      <h5 class="mb-0">
-                        <label class="form-check-label d-flex align-items-center text-capitalize">
-                          <input
-                            type="checkbox"
-                            class="form-check-input me-2 category-checkbox"
-                            data-category="<%= category %>"
-                            <%= actions.slice(1,actions.length).every(action => action.checked) ? 'checked' : '' %>
-                          />
-                          <%= category.charAt(0).toUpperCase() + category.slice(1) %>
-                        </label>
-                      </h5>
-                    </div>
-                    <div class="card-body">
-                      <div class="row g-3">
-                        <% actions.forEach(({ action, description, checked }) => { %>
-                          <% if (action) { %>
-                            <div class="col-md-4 col-sm-6">
-                              <label class="form-check-label text-capitalize">
-                                <input
-                                  type="checkbox"
-                                  class="form-check-input action-checkbox"
-                                  data-category="<%= category %>"
-                                  value="<%= category + '.' + action %>"
-                                  <%= checked ? 'checked' : '' %>
-                                />
-                                <span class="ms-2">
-                                  <%= action %>
-                                </span>
-                              </label>
-                            </div>
-                          <% } %>
-                        <% }); %>
-                      </div>
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-header align-items-center d-flex">
+        <h4 class="card-title mb-0 flex-grow-1">Create <%= role==='user' ? 'User' : 'Customer' %></h4>
+      </div>
+      <div class="card-body">
+        <% if ( role == 'user') { %> 
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general-tab-pane"
+              type="button" role="tab" aria-controls="general-tab-pane" aria-selected="true">General</button>
+          </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="permissions-tab" data-bs-toggle="tab" data-bs-target="#permissions-tab-pane"
+              type="button" role="tab" aria-controls="permissions-tab-pane" aria-selected="false">Permissions</button>
+            </li>
+          </ul>
+          <% } %>
+        <div class="tab-content">
+          <div class="tab-pane fade show active" id="general-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+            <form id="form">
+              <div class="row gy-4 mt-1">
+                <% if (data) { %>
+                  <input type="hidden" name="id" value="<%= data.id %>">
+                <% } %>
+                <div class="col-xxl-3 col-md-6">
+                  <div>
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" 
+                      value="<%= data ? data.name : '' %>" placeholder="Enter name" required>
+                  </div>
+                </div>
+                <div class="col-xxl-3 col-md-6">
+                  <div>
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username"
+                      value="<%= data ? data.username : '' %>" placeholder="Enter username" required>
+                  </div>
+                </div>
+                <div class="col-xxl-3 col-md-6">
+                  <div>
+                    <label for="phone" class="form-label">Phone</label>
+                    <div class="form-icon">
+                      <input type="text" class="form-control form-control-icon" id="phone" name="phone"
+                        value="<%= data ? data.phone : '' %>" placeholder="Enter phone number" required>
+                      <i class="ri-phone-line"></i>
                     </div>
                   </div>
-                <% }); %>
-            </div>
-        </form>
+                </div>
+                <div class="col-xxl-3 col-md-6">
+                  <div>
+                    <label for="address" class="form-label">Address</label>
+                    <textarea class="form-control" id="address" name="address" rows="1" 
+                      placeholder="Enter address" required><%= data ? data.address : '' %></textarea>
+                  </div>
+                </div>
+                <% if (role !=='customer' ) { %>
+                  <div class="col-xxl-3 col-md-6">
+                    <div>
+                      <label for="password" class="form-label">Password</label>
+                      <div class="form-icon position-relative">
+                        <input type="password" class="form-control form-control-icon" id="password" name="password" autocomplete="on"
+                          value="<%= data ? data.password : '' %>" placeholder="Enter password" required>
+                        <i class="ri-lock-2-line"></i>
+                      </div>
+                      <i class="ri-eye-line position-absolute translate-middle-y me-2" 
+                          style="cursor: pointer; right: 10px; top: 50px;" 
+                          onclick="togglePassword(this)"></i>
+                    </div>
+                  </div>
+                <% } %>
+                <input type="hidden" name="role" value="<%= role %>">
+                <div class="col-12">
+                  <button type="submit" class="btn btn-primary"><%= data ? 'Update' : 'Create' %></button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <% if (role == 'user') { %>   
+              <div class="tab-pane fade" id="permissions-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+                <form id="permissions-form" onsubmit="event.preventDefault();">
+                    <div class="permissions-container container mt-4">
+                        <% Object.entries(groupedPermissions).forEach(([category, actions]) => { %>
+                          <div class="card mb-3 shadow-sm">
+                            <div class="card-header bg-secondary text-white">
+                              <h5 class="mb-0">
+                                <label class="form-check-label d-flex align-items-center text-capitalize">
+                                  <input
+                                    type="checkbox"
+                                    class="form-check-input me-2 category-checkbox"
+                                    data-category="<%= category %>"
+                                    <%= actions.slice(1,actions.length).every(action => action.checked) ? 'checked' : '' %>
+                                  />
+                                  <%= category.charAt(0).toUpperCase() + category.slice(1) %>
+                                </label>
+                              </h5>
+                            </div>
+                            <div class="card-body">
+                              <div class="row g-3">
+                                <% actions.forEach(({ action, description, checked }) => { %>
+                                  <% if (action) { %>
+                                    <div class="col-md-4 col-sm-6">
+                                      <label class="form-check-label text-capitalize">
+                                        <input
+                                          type="checkbox"
+                                          class="form-check-input action-checkbox"
+                                          data-category="<%= category %>"
+                                          value="<%= category + '.' + action %>"
+                                          <%= checked ? 'checked' : '' %>
+                                        />
+                                        <span class="ms-2">
+                                          <%= action %>
+                                        </span>
+                                      </label>
+                                    </div>
+                                  <% } %>
+                                <% }); %>
+                              </div>
+                            </div>
+                          </div>
+                        <% }); %>
+                    </div>
+                </form>
+              </div>
+          <% } %>
+        </div>
       </div>
-  <% } %>
+    </div>
+  </div>
 </div>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-
-    document.querySelector('form').addEventListener('submit', async (event) => {
+    document.querySelector('#form').addEventListener('submit', async (event) => {
       event.preventDefault();
       document.querySelectorAll('input').forEach(input => {
         input.style.borderColor = '';
@@ -205,5 +229,19 @@
 
   function savePermissions(){
 
+  }
+
+  // Add this to your existing scripts section
+  function togglePassword(element) {
+    const passwordInput = document.getElementById('password');
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      element.classList.remove('ri-eye-line');
+      element.classList.add('ri-eye-off-line');
+    } else {
+      passwordInput.type = 'password';
+      element.classList.remove('ri-eye-off-line');
+      element.classList.add('ri-eye-line');
+    }
   }
 </script>

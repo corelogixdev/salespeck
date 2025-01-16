@@ -58,6 +58,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.FLOAT,
       allowNull: true,
     },
+    taxid: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     createdby: {
       type: DataTypes.INTEGER,
       allowNull: true,
@@ -70,6 +74,10 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'product',
     timestamps: false,
   });
-
+  Product.associate = function (models) {
+    Product.belongsTo(models.taxes, { foreignKey: 'taxid', as: 'Tax' });
+    Product.belongsTo(models.user, { foreignKey: 'createdby', as: 'CreatedBy' });
+    Product.belongsTo(models.user, { foreignKey: 'updatedby', as: 'UpdatedBy' });
+  };
   return Product;
 };

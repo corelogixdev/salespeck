@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>OpenMenu</title>
+  <!-- add favicon -->
+  <link rel="icon" href="/assets/images/icon.png" type="image/x-icon">
+  <!-- Bootstrap CSS -->
+  <!-- jsvectormap css -->
+  <link href="/assets/libs/jsvectormap/jsvectormap.min.css" rel="stylesheet" type="text/css" />
+  <link href="/assets/css/toastr.min.css" rel="stylesheet" type="text/css" />
+
+  <!--Swiper slider css-->
+  <link href="/assets/libs/swiper/swiper-bundle.min.css" rel="stylesheet" type="text/css" />
+
+  <!-- Layout config Js -->
+  <script src="/assets/js/layout.js"></script>
+  <!-- Bootstrap Css -->
+  <link href="/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+  <!-- Icons Css -->
+  <link href="/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+  <!-- App Css-->
+  <link href="/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+  <!-- custom Css-->
+  <link href="/assets/css/custom.min.css" rel="stylesheet" type="text/css" />
+  <link href="/assets/css/toastr.min.css" rel="stylesheet" type="text/css" />
+
+  <script src="/assets/js/jquery.min.js"></script>
+</head>
+<body>
+  <% if (typeof hidenav === 'undefined' || hidenav !== true) { %>
+    <nav class="navbar navbar-expand-lg bg-white">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/dashboard"><img src="/assets/images/icon.png" style="width: 50px;">Open Menu</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <% if ( permissions.usersList || permissions.customersList ) { %>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Staff
+                  </a>
+                    <ul class="dropdown-menu">
+                      <% if ( permissions.usersList ) { %>
+                        <li><a class="dropdown-item" href="/users?role=user">Users</a></li>
+                        <% } %>
+                        <% if ( permissions.customersList ) { %>
+                          <li><a class="dropdown-item" href="/users?role=customer">Customers</a></li>
+                          <% } %>  
+                    </ul>
+                  </li>
+              <% } %>
+              <% if ( permissions.productsList ) { %>
+                <li class="nav-item">
+                  <a class="nav-link" href="/products">Products</a>
+                </li>
+              <% } %>
+              <% if ( permissions.settings ) { %>
+                <li class="nav-item">
+                  <a class="nav-link" href="/settings">Settings</a>
+                </li>
+              <% } %>
+                <% if ( permissions.salesView || permissions.salesCreate || permissions.salesList ) { %>
+                  <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                      aria-expanded="false">
+                      Sales
+                    </a>
+                    <ul class="dropdown-menu">
+                      <% if (permissions.salesView) { %>
+                        <li><a class="dropdown-item" href="/sales">Sales Report</a></li>
+                      <% } %>
+                      <% if ( permissions.salesCreate ) { %>
+                        <li><a class="dropdown-item" href="/sales/form" target="_blank">New Sale</a></li>
+                      <% } %>
+                    </ul>
+                  </li>
+                <% } %>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    Notifications
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Notification 1</a></li>
+                    <li><a class="dropdown-item" href="#">Notification 2</a></li>
+                    <li><a class="dropdown-item" href="#">Notification 3</a></li>
+                  </ul>
+                </li>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    HR
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/attendance">Attendance</a></li>
+                    <li><a class="dropdown-item" href="/leaves">Leaves</a></li>
+                    <li style="position:relative">
+                      <a href="#" class="dropdown-item custom-dropdown">
+                        Salaries
+                        <span style="font-size: 10px; vertical-align: middle">
+                          <i class="fa-solid fa-chevron-right"></i>
+                        </span>
+                      </a>
+                      <ul class="custom-dropdown-item">
+                        <li><a class="dropdown-item" href="/salaries/templates">Salery Templates</a></li>
+                        <li><a class="dropdown-item" href="/salaries/calculate">Calculate Salaries</a></li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    Accounting
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/accounting/chartofaccount">Chart of Account</a></li>
+                    <li style="position:relative">
+                      <a href="#" class="dropdown-item custom-dropdown">
+                        Expences
+                        <span style="font-size: 10px; vertical-align: middle">
+                          <i class="fa-solid fa-chevron-right"></i>
+                        </span>
+                      </a>
+                      <ul class="custom-dropdown-item">
+                        <li><a class="dropdown-item" href="/accounting/transaction">Transaction</a></li>
+                        <li><a class="dropdown-item" href="/accounting/cashclosing">Cash Closing</a></li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+          </ul>
+          <div class="d-flex gap-2 position-relative">
+            <div class="result">
+              <!-- <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"
+                id="navbar-search-input"> -->
+                <form class="app-search d-none d-md-block">
+                  <div class="position-relative">
+                      <input type="text" class="form-control" placeholder="Search..." autocomplete="off" id="search-options" value="">
+                      <span class="mdi mdi-magnify search-widget-icon"></span>
+                      <span class="mdi mdi-close-circle search-widget-icon search-widget-icon-close d-none" id="search-close-options"></span>
+                  </div>
+                  <div class="dropdown-menu dropdown-menu-lg" id="search-dropdown">
+                      <div data-simplebar style="max-height: 320px;">
+                          <!-- item-->
+                          <div class="dropdown-header">
+                              <h6 class="text-overflow text-muted mb-0 text-uppercase">Recent Searches</h6>
+                          </div>
+                
+                          <div class="dropdown-item bg-transparent text-wrap">
+                              <a href="index.html" class="btn btn-soft-secondary btn-sm rounded-pill">how to setup <i class="mdi mdi-magnify ms-1"></i></a>
+                              <a href="index.html" class="btn btn-soft-secondary btn-sm rounded-pill">buttons <i class="mdi mdi-magnify ms-1"></i></a>
+                          </div>
+                          <!-- item-->
+                          <div class="dropdown-header mt-2">
+                              <h6 class="text-overflow text-muted mb-1 text-uppercase">Pages</h6>
+                          </div>
+                
+                          <!-- item-->
+                          <a href="javascript:void(0);" class="dropdown-item notify-item">
+                              <i class="ri-bubble-chart-line align-middle fs-18 text-muted me-2"></i>
+                              <span>Analytics Dashboard</span>
+                          </a>
+                
+                          <!-- item-->
+                          <a href="javascript:void(0);" class="dropdown-item notify-item">
+                              <i class="ri-lifebuoy-line align-middle fs-18 text-muted me-2"></i>
+                              <span>Help Center</span>
+                          </a>
+                
+                          <!-- item-->
+                          <a href="javascript:void(0);" class="dropdown-item notify-item">
+                              <i class="ri-user-settings-line align-middle fs-18 text-muted me-2"></i>
+                              <span>My account settings</span>
+                          </a>
+                
+                          <!-- item-->
+                          <div class="dropdown-header mt-2">
+                              <h6 class="text-overflow text-muted mb-2 text-uppercase">Members</h6>
+                          </div>
+                
+                          <div class="notification-list">
+                              <!-- item -->
+                              <a href="javascript:void(0);" class="dropdown-item notify-item py-2">
+                                  <div class="d-flex">
+                                      <img src="assets/images/users/avatar-2.jpg" class="me-3 rounded-circle avatar-xs" alt="user-pic">
+                                      <div class="flex-grow-1">
+                                          <h6 class="m-0">Angela Bernier</h6>
+                                          <span class="fs-11 mb-0 text-muted">Manager</span>
+                                      </div>
+                                  </div>
+                              </a>
+                              <!-- item -->
+                              <a href="javascript:void(0);" class="dropdown-item notify-item py-2">
+                                  <div class="d-flex">
+                                      <img src="assets/images/users/avatar-3.jpg" class="me-3 rounded-circle avatar-xs" alt="user-pic">
+                                      <div class="flex-grow-1">
+                                          <h6 class="m-0">David Grasso</h6>
+                                          <span class="fs-11 mb-0 text-muted">Web Designer</span>
+                                      </div>
+                                  </div>
+                              </a>
+                              <!-- item -->
+                              <a href="javascript:void(0);" class="dropdown-item notify-item py-2">
+                                  <div class="d-flex">
+                                      <img src="assets/images/users/avatar-5.jpg" class="me-3 rounded-circle avatar-xs" alt="user-pic">
+                                      <div class="flex-grow-1">
+                                          <h6 class="m-0">Mike Bunch</h6>
+                                          <span class="fs-11 mb-0 text-muted">React Developer</span>
+                                      </div>
+                                  </div>
+                              </a>
+                          </div>
+                      </div>
+                
+                      <div class="text-center pt-3 pb-1">
+                          <a href="pages-search-results.html" class="btn btn-primary btn-sm">View All Results <i class="ri-arrow-right-line ms-1"></i></a>
+                      </div>
+                  </div>
+                </form>
+              <div id="result"
+                style="position: absolute; top: 40px; border-radius: 10px; width: 100%; display: none; z-index: 9999;"
+                class="card"></div>
+            </div>
+            <button class="btn btn-secondary" id="logout-btn">
+              <i class="bx bx-log-out"></i>
+            </button>
+            <button class="btn btn-danger" id="close-btn">
+              <!-- <i class="fa-solid fa-power-off"></i> -->
+              <i class="bx bx-power-off"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+  <% } %>
+  <div class="m-3">
+    <%- body %>
+  </div>
+
+ <!-- JAVASCRIPT -->
+    <script src="/assets/js/toastr.min.js"></script>
+    <script src="/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/libs/simplebar/simplebar.min.js"></script>
+    <script src="/assets/libs/node-waves/waves.min.js"></script>
+    <script src="/assets/libs/feather-icons/feather.min.js"></script>
+    <script src="/assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
+    <script src="/assets/js/plugins.js"></script>
+    <script src="/assets/js/app.js"></script>
+
+    <!-- apexcharts -->
+    <script src="/assets/libs/apexcharts/apexcharts.min.js"></script>
+
+    <!-- Vector map-->
+    <script src="/assets/libs/jsvectormap/jsvectormap.min.js"></script>
+    <script src="/assets/libs/jsvectormap/maps/world-merc.js"></script>
+
+    <!--Swiper slider js-->
+    <script src="/assets/libs/swiper/swiper-bundle.min.js"></script>
+
+    <!-- Dashboard init -->
+    <script src="/assets/js/pages/dashboard-ecommerce.init.js"></script>
+
+    <!-- App js -->
+    
+  <script>
+    toastr.options = {
+      "closeButton": true,
+      "progressBar": true,
+      "positionClass": "toast-bottom-right",
+      "showDuration": "300",
+      "hideDuration": "1000",
+      "timeOut": "5000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut",
+      "toastClass": "toast",
+    };
+  </script>
+  <script>
+    var message = '<%- JSON.stringify(message || null ) %>';
+    message = JSON.parse(message.replace(/^'(.*)'$/, '$1'));
+    if (message) {
+      toastr[message['type']](message['text']);
+    }
+  </script>
+    <% if (typeof hidenav === 'undefined' || hidenav !== true) { %>
+    <script>
+            document.addEventListener('DOMContentLoaded', () => {
+            async function FetchData(query) {
+              try {
+                const response = await fetch('/products/search', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ query }),
+                });
+                const data = await response.json();
+                return data;
+              } catch (error) {
+                console.error('Error:', error);
+              }
+            }
+            const searchInput = document.getElementById('navbar-search-input');
+            let typingTimer;
+            const typingInterval = 500; // 500ms
+            searchInput.addEventListener('input', () => {
+              clearTimeout(typingTimer);
+              typingTimer = setTimeout(async () => {
+                const query = searchInput.value;
+                try {
+                  let response = await FetchData(query);
+                  let result = document.getElementById('result');
+                  result.innerHTML = '';
+                  result.style.display = 'block';
+                  if (response.data.length > 0) {
+                    response.data.forEach((item) => {
+                      let a = document.createElement('a');
+                      a.classList.add('dropdown-item', 'd-flex', 'justify-content-between', 'p-2', 'align-items-center', 'search-result');
+                      let span = document.createElement('span');
+                      span.innerText = item.name.substring(0, 20);
+                      a.appendChild(span);
+                      let span2 = document.createElement('span');
+                      span2.innerText = 'Rs.' + item.saleprice ?? 0;
+                      a.appendChild(span2);
+                      result.appendChild(a);
+                    });
+                  } else {
+                    let p = document.createElement('p');
+                    p.style.textWrap = 'auto';
+                    p.classList.add('dropdown-item', 'p-2', 'align-items-center', 'search-result');
+                    if (query) {
+                      p.innerText = 'No data found for "' + query.substring(0, 20) + '"';
+                    } else {
+                      p.innerText = 'Type to search';
+                    }
+                    result.appendChild(p);
+                  }
+                } catch (error) {
+                  console.error('Error:', error);
+                }
+              }, typingInterval);
+            });
+            searchInput.addEventListener('focus', () => {
+              if (searchInput.value) {
+                document.getElementById('result').style.display = 'block';
+              }
+            });
+            document.addEventListener('click', (event) => {
+              if (!event.target.closest('.result')) {
+                document.getElementById('result').style.display = 'none';
+              }
+            });
+          });
+
+            document.getElementById('close-btn').addEventListener('click', () => {
+              const dataToSend = { message: 'close-app' };
+              if (window.api) {
+                window.api.performAction(dataToSend); // Send data to main process
+              }
+            });
+            
+            document.getElementById('logout-btn').addEventListener('click', () => {
+              window.location.href = '/logout';
+            });
+
+      if (window.api) {
+        window.api.onActionResponse((response) => {
+          console.log(response);
+          //document.getElementById('response').innerText = response;
+        });
+      }
+    </script>
+  <% } %>
+</body>
+
+</html>

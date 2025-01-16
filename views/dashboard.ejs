@@ -1,63 +1,120 @@
-<h4 class="text-secondary">Welcome <%= user.name %>, <span class="text-success">
-      <%= company.name %>
-    </span></h4>
+<div class="flex-grow-1">
+  <h4 class="fs-16 mb-1">Good Morning, <%= user.name %>!</h4>
+  <p class="text-muted mb-0">Here's what's happening with your store
+      today.</p>
+</div>
 <div class="row my-3">
   <div class="col-lg-4">
-    <div class="card">
+    <div class="card card-animate">
       <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            <h5 class="text-secondary">Today's Sales</h5>
-            <h3 class="text-success">
-              <%= todaySalesCount %>
-            </h3>
+        <div class="d-flex align-items-center">
+          <div class="flex-grow-1 overflow-hidden">
+            <p class="text-uppercase fw-medium text-muted text-truncate mb-0">
+              Today's Sales
+            </p>
           </div>
-          <div class="icon">
-            <i class="fas fa-shopping-cart fa-3x text-success"></i>
+          <div class="flex-shrink-0">
+            <% if (salesArrowDirection === 'up') { %>
+            <h5 class="text-success fs-14 mb-0">
+              <i class="ri-arrow-right-up-line fs-13 align-middle"></i>
+              +<%= salesPercentageChange %> %
+            </h5>
+            <% } else { %>
+            <h5 class="text-danger fs-14 mb-0">
+              <i class="ri-arrow-right-down-line fs-13 align-middle"></i>
+              <%= salesPercentageChange %> %
+            </h5>                  
+            <% } %>
+          </div>
+        </div>
+        <div class="d-flex align-items-end justify-content-between mt-4">
+          <div>
+            <h4 class="fs-22 fw-semibold ff-secondary mb-4">
+              Rs.<span class="counter-value" data-target="<%= todaysSalesAmount %>">
+                <%= todaysSalesAmount %>
+              </span>
+            </h4>
+            <a href="/sales" class="text-decoration-underline text-muted">View Sales</a>
+          </div>
+          <div class="avatar-sm flex-shrink-0">
+            <span class="avatar-title bg-success-subtle rounded fs-3">
+              <span class="text-success fs-5">PKR</span>
+            </span>
+          </div>
+        </div>
+      </div><!-- end card body -->
+    </div><!-- end card -->
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card card-animate">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="flex-grow-1 overflow-hidden">
+            <p class="text-uppercase fw-medium text-muted text-truncate mb-0">
+              Today's Customers
+            </p>
+          </div>
+          <div class="flex-shrink-0">
+            <% if (customerArrowDirection === 'up') { %>
+            <h5 class="text-success fs-14 mb-0">
+              <i class="ri-arrow-right-up-line fs-13 align-middle"></i>
+              +<%= customerPercentageChange %> %
+            </h5>
+            <% } else { %>
+            <h5 class="text-danger fs-14 mb-0">
+              <i class="ri-arrow-right-down-line fs-13 align-middle"></i>
+              <%= customerPercentageChange %> %
+            </h5>
+            <% } %>
+          </div>
+        </div>
+        <div class="d-flex align-items-end justify-content-between mt-4">
+          <div>
+            <h4 class="fs-22 fw-semibold ff-secondary mb-4">
+              <span class="counter-value" data-target="<%= todayCustomersCount %>">
+                <%= todayCustomersCount %>
+              </span>
+            </h4>
+            <a href="/users?role=customer" class="text-decoration-underline text-muted">View Customers</a>
+          </div>
+          <div class="avatar-sm flex-shrink-0">
+            <span class="avatar-title bg-success-subtle rounded fs-1">
+              <i class="bx bx-user-plus fs-3 text-success"></i>
+            </span>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- today customers -->
-
   <div class="col-lg-4">
-    <div class="card">
+    <div class="card card-animate">
       <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            <h5 class="text-secondary">Today's Customers</h5>
-            <h3 class="text-success">
-              <%= todayCustomersCount %>
-            </h3>
-          </div>
-          <div class="icon">
-            <i class="fas fa-users fa-3x text-success"></i>
+        <div class="d-flex align-items-center">
+          <div class="flex-grow-1 overflow-hidden">
+            <p class="text-uppercase fw-medium text-muted text-truncate mb-0">
+              Total Sales
+            </p>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- total sales -->
-
-  <div class="col-lg-4">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-end justify-content-between mt-4">
           <div>
-            <h5 class="text-secondary">Total Sales</h5>
-            <h3 class="text-success">
-              <%= totalSalesCount %>
-            </h3>
+            <h4 class="fs-22 fw-semibold ff-secondary mb-4">
+              <span class="counter-value" data-target="<%= totalSalesCount %>">
+                <%= totalSalesCount %>
+              </span>
+            </h4>
+            <a href="/sales" class="text-decoration-underline text-muted">View Sales</a>
           </div>
-          <div class="icon">
-            <i class="fas fa-chart-line fa-3x text-success"></i>
+          <div class="avatar-sm flex-shrink-0">
+            <span class="avatar-title bg-success-subtle rounded fs-3">
+              <i class="bx bx-cart fs-2 text-success"></i>
+            </span>
           </div>
         </div>
-      </div>
-    </div>
+      </div><!-- end card body -->
+    </div><!-- end card -->
   </div>
 
 </div>
@@ -66,14 +123,14 @@
   <div class="col-lg-6">
     <div class="card">
       <div class="card-body">
-        <canvas id="barChart"></canvas>
+        <div id="barChart"></div>
       </div>
     </div>
   </div>
   <div class="col-lg-6">
     <div class="card">
       <div class="card-body">
-        <canvas id="usersChart"></canvas>
+        <div id="usersChart"></div>
       </div>
     </div>
   </div>
@@ -81,20 +138,20 @@
 
 <script>
   let topProducts = <%- JSON.stringify(topFiveSoldProductsWithSoldQuantity) %>;
-  let topProducts_chartData = topProducts.reduce((acc, product) => {
-    acc.labels.push(product?.product_name || 'Unknown');
-    acc.data.push(product?.total_quantity || 0);
-    return acc;
-  }, {
+  let topProducts_chartData = {
     labels: [],
     data: []
-  });
+  };
+  for (let i = 0; i < 5; i++) {
+    topProducts_chartData.labels.push(topProducts[i]?.product_name || '');
+    topProducts_chartData.data.push(topProducts[i]?.total_quantity || 0);
+  }
 
   let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   let totalSales = <%- JSON.stringify(salesCountByMonth) %>;
   let totalSales_chartData = months.reduce((acc, month, index) => {
-    let monthNumber = (index+1).toString().padStart(2, '0');
+    let monthNumber = (index + 1).toString().padStart(2, '0');
     acc.labels.push(month);
     let sales = totalSales.find(sale => sale.month === monthNumber);
     acc.data.push(sales?.total || 0);
@@ -103,70 +160,56 @@
     labels: [],
     data: []
   });
-
   document.addEventListener('DOMContentLoaded', () => {
-    const topProductsSales = document.getElementById('barChart').getContext('2d');
-    const monthSaleGraph = document.getElementById('usersChart').getContext('2d');
+    const topProductsSales = document.getElementById('barChart')
+    const monthSaleGraph = document.getElementById('usersChart')
 
-    const topProductsSalesChart = new Chart(topProductsSales, {
-      type: 'bar',
-      data: {
-        labels: topProducts_chartData.labels,
-        datasets: [{
-          label: 'Top Products Sales',
-          data: topProducts_chartData.data,
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.2)',
-            'rgba(54, 162, 235, 0.2)',
-            'rgba(255, 206, 86, 0.2)',
-            'rgba(75, 192, 192, 0.2)',
-            'rgba(153, 102, 255, 0.2)'
-          ],
-          borderColor: [
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(153, 102, 255, 1)'
-          ],
-          borderWidth: 1
-        }]
+    const topProductsSalesChart = new ApexCharts(topProductsSales, {
+      chart: {
+        type: 'bar',
+        height: 350
       },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              stepSize: 1
-            }
-          }
+      series: [{
+        name: 'Quantity',
+        data: topProducts_chartData.data
+      }],
+      xaxis: {
+        categories: topProducts_chartData.labels
+      },
+      colors: ['#7084C7'],
+      plotOptions: {
+        bar: {
+          horizontal: true
         }
       }
     });
-   
-    const monthSaleGraphChart = new Chart(monthSaleGraph, {
-      type: 'line',
-      data: {
-        labels: totalSales_chartData.labels,
-        datasets: [{
-          label: 'Monthly Sales',
-          data: totalSales_chartData.data,
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.2)',
-          ],
-          borderColor: [
-            'rgba(255, 99, 132, 1)',
-          ],
-          borderWidth: 1
-        }]
+
+    const monthSaleGraphChart = new ApexCharts(monthSaleGraph, {
+      chart: {
+        type: 'line',
+        height: 350
       },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true
-          }
-        }
-      }
+      series: [{
+        name: 'Sales',
+        data: totalSales_chartData.data
+      }],
+      xaxis: {
+        categories: totalSales_chartData.labels
+      },
+      colors: ['#7084C7'],
+      menubar: false
     });
+
+    topProductsSalesChart.render();
+    monthSaleGraphChart.render();
   });
 </script>
+<style>
+  .apexcharts-zoomin-icon,
+  .apexcharts-zoomout-icon,
+  .apexcharts-zoom-icon,
+  .apexcharts-pan-icon,
+  .apexcharts-reset-icon {
+    display: none !important;
+  }
+</style>

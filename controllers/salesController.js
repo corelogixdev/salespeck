@@ -135,14 +135,20 @@ exports.search = async (req, res) => {
     }
 
     if (customer) {
-      queryOptions.where = {
-        customer: {
+      // queryOptions.where = {
+      //   customer: {
+      //     [Op.like]: `%${customer}%`,
+      //   }
+      // };
+      // customer will be customer's name
+      queryOptions.include[0].where = {
+        name: {
           [Op.like]: `%${customer}%`,
         }
-      };
     }
+  }
     if (daterange) {
-      let [start,end] = daterange.split(" - ");
+      let [start,end] = daterange.split(" to ");
       start = moment(new Date(start)).startOf("day").toDate();
       end = moment(new Date(end)).endOf("day").toDate();
       queryOptions.where = {
@@ -210,13 +216,13 @@ exports.saleview = async (req, res) => {
   let discount = result.discountpercentage;
   let priceAfterDiscount = totalPrice - (totalPrice * (discount / 100));
   
-  let userPaid = result.totalpayment;
+  let userPaid = parseFloat(result.totalpayment);
 
   let change = userPaid - priceAfterDiscount;
-  if(change < 0) change = 0;
+  // if(change < 0) change = 0;
 
-  let balance = priceAfterDiscount - userPaid; // 10
-  if(balance < 0) balance = 0;
+  let balance = userPaid - priceAfterDiscount; // 10
+  // if(balance < 0) balance = 0;
   
   result.balance = balance.toFixed(2);
   result.change = change.toFixed(2);

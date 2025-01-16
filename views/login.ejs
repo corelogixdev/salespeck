@@ -1,34 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - OpenMenu</title>
-  <!-- Bootstrap CSS -->
-  <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - OpenMenu</title>
+    <link rel="icon" href="/assets/images/icon.png" type="image/x-icon">
+    <link href="/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/custom.min.css" rel="stylesheet" type="text/css" />
 </head>
-<body>
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-md-4">
-        <h1 class="mt-5 text-center">Login</h1>
-        <form action="/login" method="post">
-          <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" class="form-control" id="username" name="username" value="admin" required>
-          </div>
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" autocomplete="on" class="form-control" id="password" name="password" value="admin@123" required>
-          </div>
-          <button type="submit" class="btn btn-primary btn-block mt-3">Login</button>
-        </form>
-      </div>
+<body class="auth-bg">
+    <div class="auth-page-wrapper">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6 col-xl-5">
+                    <div class="card mt-4 card-bg-fill">
+                        <div class="card-body p-4">
+                            <div class="text-center mt-2">
+                                <img src="/assets/images/icon.png" alt="" height="100" class="mb-4">
+                                <h3 class="text-primary mb-3">Welcome Back!</h3>
+                                <p class="text-muted">Sign in to continue to OpenMenu.</p>
+                            </div>
+                            <div class="p-2 mt-4">
+                                <form action="/login" method="post">
+                                    <div class="mb-3">
+                                        <label for="username" class="form-label">Username</label>
+                                        <div class="position-relative auth-pass-inputgroup">
+                                            <input type="text" 
+                                                    class="form-control pe-5" 
+                                                    id="username" 
+                                                    name="username" 
+                                                    value="admin"
+                                                    placeholder="Enter username" 
+                                                    required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label" for="password">Password</label>
+                                        <div class="position-relative auth-pass-inputgroup">
+                                            <input type="password" 
+                                                    class="form-control pe-5" 
+                                                    id="password"
+                                                    name="password" 
+                                                    value="admin@123"
+                                                    placeholder="Enter password" 
+                                                    autocomplete="on"
+                                                    required>
+                                            <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted" 
+                                                    type="button" 
+                                                    onclick="togglePassword(this)">
+                                                <i class="ri-eye-fill align-middle"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <button class="btn btn-primary w-100" type="submit">
+                                            <i class="ri-login-box-line align-middle me-1"></i> Sign In
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <p class="mb-0 text-muted">
+                            Powered by <a href="javascript:void(0);" class="fw-semibold text-primary text-decoration-underline">OpenMenu</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-  <!-- Bootstrap JS, Popper.js, and jQuery -->
-  <script src="/assets/js/jquery.min.js"></script>
-  <script src="/assets/js/popper.min.js"></script>
-  <script src="/assets/js/bootstrap.min.js"></script>
+
+    <script src="/assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
+    <script src="/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function togglePassword(button) {
+            const input = button.parentElement.querySelector('input');
+            const icon = button.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('ri-eye-fill');
+                icon.classList.add('ri-eye-off-fill');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('ri-eye-off-fill');
+                icon.classList.add('ri-eye-fill');
+            }
+        }
+    </script>
 </body>
 </html>

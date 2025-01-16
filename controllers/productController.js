@@ -21,12 +21,17 @@ exports.get = async (req, res) => {
 }
 
 exports.form = async (req, res) => {
-  const productId = req.query.id;
-  let data = null;
-  if (productId) {
-    data = await db.product.findByPk(productId);
+  try{
+    let taxes = await db.taxes.findAll();
+    const productId = req.query.id;
+    let data = null;
+    if (productId) {
+      data = await db.product.findByPk(productId);
+    }
+    res.render('products/form', { title: data ? 'Edit product' : 'Create product', product:data, taxes });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
-  res.render('products/form', { title: data ? 'Edit product' : 'Create product', product:data });
 };
 
 exports.save = async (req, res) => {
@@ -52,7 +57,8 @@ exports.save = async (req, res) => {
     quantity: body.quantity * 1,
     saleprice: body.saleprice * 1,
     saleactive: body.saleactive === 'on',
-    createdby: req.session.user.id
+    createdby: req.session.user.id,
+    taxid: body.taxid ? body.taxid : null
    }
   try {
     if (id) {

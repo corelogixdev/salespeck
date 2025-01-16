@@ -7,7 +7,7 @@
       <% if (product) { %>
         <input type="hidden" name="id" value="<%= product.id %>">
       <% } %>
-      <div class="row">
+      <div class="row gy-2">
         <div class="col-lg-6">
           <div class="form-group">
             <label for="name" class="form-label">Name:</label>
@@ -18,6 +18,17 @@
           <div class="form-group">
             <label for="barcode" class="form-label">Barcode:</label>
             <input type="text" class="form-control" id="barcode" name="barcode" value="<%= product ? product.barcode : '' %>">
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="form-group">
+            <label for="taxid" class="form-label">Tax Type:</label>
+            <select class="form-control" id="taxid" name="taxid" class="text-uppercase">
+              <option value="">Select Tax Type</option>
+              <% taxes.forEach(tax => { %>
+                <option value="<%= tax.id %>" <%= product?.taxid == tax.id ? 'selected' : '' %>><%= tax.name.toUpperCase() %> (<%= tax.percentage  %>%)</option>
+              <% }); %>
+            </select>
           </div>
         </div>
         <div class="col-lg-6">
@@ -106,7 +117,7 @@
             theme: 'modern',
             buttons: {
               ok: function () {
-                $('#form').trigger('reset');
+                window.location.reload();
               },
             },
           });

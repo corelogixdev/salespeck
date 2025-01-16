@@ -1,91 +1,123 @@
-<div class="container" style="height: 83vh;">
-    <div class="row justify-content-between" style="height: 100%;">
-        <div class="col-lg-6 row flex-column justify-content-between h-100">
-            <div>
-                <div class="mb-3" id="search-product-sales-page-search-seaction" style="position: relative;">
-                    <label for="product-search" class="form-label">Search Product:</label>
-                    <div class="input-group d-flex align-items-center justify-content-between">
-                        <input type="text" class="form-control" id="product-search"
-                            placeholder="Enter product name or barcode.">
-                        <div class="input-group-text">
-                            <input type="checkbox" class="form-check mb-0" checked id="search-barcode">&nbsp; Barcode
+<div class="" style="height: 85vh;">
+    <div class="row justify-content-between flex-wrap" style="height: 100%;">
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div class="mb-4" id="search-product-sales-page-search-seaction" style="position: relative;">
+                        <label for="product-search" class="form-label text-muted text-uppercase fw-semibold">Search Product</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="product-search" 
+                                placeholder="Enter product name or barcode">
+                            <div class="input-group-text">
+                                <div class="form-check mb-0">
+                                    <input type="checkbox" class="form-check-input" checked id="search-barcode">
+                                    <label class="form-check-label">Barcode</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="search-results" class="shadow-lg rounded p-3 d-none" 
+                            style="position: absolute; width: 100%; z-index: 9999; background-color: white;">
                         </div>
                     </div>
-                    <div id="search-results" class="shadow rounded p-3 d-none"
-                        style="position: absolute; width: 100%; z-index: 9999; background-color: white;"></div>
-                </div>
-            </div>
-            <div>
-                <div class="mb-3">
-                    <label for="customer" class="form-label">Customer:</label>
-                    <select id="customer" class="form-select">
-                    <option value="">Select Customer</option>
-                        <% customers.forEach(customer => { %>
-                            <option value="<%= customer.id %>"><%= customer.name %></option>
-                        <% }); %>
-                    </select>
-                </div>
-                <div>
-                    <label class="form-label fw-bold">Total Bill:</label>
-                    <span id="total-bill-amount" class="form-control-plaintext d-inline">Rs.0.00</span>
-                </div>
-                <div>
-                    <label for="discountpercentage" class="form-label">Discount Percentage</label>
-                    <div class="input-group">
-                        <input type="number" class="form-control" id="discountpercentage" value="0">
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label for="total-payment" class="form-label">Total Payment:</label>
-                    <div class="input-group">
-                        <input type="number" class="form-control" id="total-payment">
-                        <div class="input-group-text d-flex align-items-center justify-content-between">
-                            <input type="checkbox" class="form-check mb-0" id="ledger">&nbsp; Ledger
+
+                    <div class="pt-3">
+                        <div class="mb-3">
+                            <label for="customer" class="form-label text-muted text-uppercase fw-semibold">Customer</label>
+                            <select id="customer" class="form-select">
+                                <option value="">Select Customer</option>
+                                <% customers.forEach(customer => { %>
+                                    <option value="<%= customer.id %>"><%= customer.name %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label text-muted text-uppercase fw-semibold">Total Bill</label>
+                                <h4 id="total-bill-amount" class="mb-0">Rs.0.00</h4>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="discountpercentage" class="form-label text-muted text-uppercase fw-semibold">Discount %</label>
+                                <input type="number" class="form-control" id="discountpercentage" value="0">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="total-payment" class="form-label text-muted text-uppercase fw-semibold">Payment</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="total-payment">
+                                    <div class="input-group-text">
+                                        <div class="form-check mb-0">
+                                            <input type="checkbox" class="form-check-input" id="ledger">
+                                            <label class="form-check-label">Ledger</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label text-muted text-uppercase fw-semibold">Change</label>
+                                <h4 id="change" class="mb-0 text-success">Rs.0.00</h4>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div>
-                    <label class="form-label fw-bold">Change:</label>
-                    <span id="change" class="form-control-plaintext d-inline">Rs.0.00</span>
                 </div>
             </div>
         </div>
+
         <div class="col-lg-6">
-            <div class="table-responsive border" style="height: 80%; overflow-y: auto;">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Quantity</th>
-                            <th>Price</th>
-                            <th>Total</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="selected-products">
-                    </tbody>
-                </table>
+            <div class="card h-100">
+                <div class="card-header align-items-center d-flex">
+                    <h4 class="card-title mb-0 flex-grow-1">Selected Products</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="height: calc(65vh);">
+                        <table class="table table-striped table-nowrap align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Qty</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Total</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="selected-products"></tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3">
+                        <button class="btn btn-primary w-100" onclick="sale()">
+                            Complete Sale
+                        </button>
+                    </div>
+                </div>
             </div>
-            <button class="btn btn-primary w-100 mt-5" onclick="sale()">Sale</button>
         </div>
     </div>
 </div>
+
 <style>
-    .search-result-product:hover {
-        background-color: #f8f9fa;
-    }
-    .editable-input {
-        outline: none;
-        width: 50px;
-        border-top: none;
-        border-left: none;
-        border-right: none;
-        background-color: transparent;
-        border-bottom: 1px solid transparent;
-        pointer-events: none;
-    }
+.search-result-product {
+    transition: all 0.2s;
+}
+.search-result-product:hover {
+    background-color: var(--vz-light);
+}
+.editable-input {
+    outline: none;
+    width: 50px;
+    border: none;
+    background-color: transparent;
+    border-bottom: 1px solid transparent;
+    pointer-events: none;
+    text-align: center;
+}
+#search-results {
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+}
 </style>
+
 <script>
     const productSearch = document.getElementById('product-search');
     const searchBarcode = document.getElementById('search-barcode');
@@ -122,6 +154,7 @@
             toastr.warning('Product quantity is not available');
             return;
         }
+        debugger;
         let discountedPrice = product.saleprice - (product.saleprice * product.discount / 100);
         discountedPrice = Math.round(discountedPrice);
 
@@ -154,10 +187,10 @@
         <td class="product-price">
             <input type="text" class="editable-input" value="${discountedPrice}" readonly>
         </td>
-        <td class="total-price">${newQuantity * product.saleprice}</td>
+        <td class="total-price">${newQuantity * discountedPrice}</td>
         <td>
           <button class="btn btn-danger btn-sm" onclick="removeProduct('${product.id}')">
-            <i class="fas fa-trash-alt"></i>
+            <i class="bx bx-trash"></i>
           </button>
         </td>
       `;
