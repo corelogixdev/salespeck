@@ -41,13 +41,7 @@ app.use(sessionDataMiddleware);
 app.use(permissions);
 
 // Routes
-app.get('/', (req, res) => {
-  if (!req.session.user_id) {
-    return res.redirect('/login')
-  } else {
-    res.redirect('/dashboard')
-  }
-});
+
 app.use('/', mainRoutes);
 app.use('/products', productRoutes);
 app.use('/users', userRoutes);
