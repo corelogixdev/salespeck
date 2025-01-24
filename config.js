@@ -1,14 +1,15 @@
-var env = "development";
-// var env = "production";
-var path = require('path');
-var config = () =>{
-  var obj ={
-    env: env,
-    port: 3000,
-  };
-  if(env === 'production'){
+var env = process.env.NODE_ENV || 'development';
+const config = {
+  "development": {
+    "env": "development",
+    "port": 3000,
+    "webUrl": "http://localhost:5000",
+  },
+  "production": {
+    "env": "production",
+    "port": 3000,
+    "webUrl": "http://localhost:5000",
   }
-  return obj;
-};
+}
 
-module.exports = config();
+module.exports = config[env];

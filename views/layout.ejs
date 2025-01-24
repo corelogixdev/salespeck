@@ -15,6 +15,7 @@
     <link href="/assets/css/jquery-confirm.min.css" rel="stylesheet" type="text/css" />
     <script src="/assets/js/jquery.min.js"></script>
     <script src="/assets/js/jquery-confirm.min.js"></script>
+    <script src="/assets/js/theme-manager.js"></script>
     <script src="/assets/libs/flatpickr/flatpickr.min.js"></script>
 </head>
 <style>
@@ -87,10 +88,24 @@
                                 </li>
                             <% } %>
                             <% if (permissions.productsList) { %>
-                                <li class="nav-item">
-                                    <a class="nav-link menu-link pe-0" href="/products" role="button">
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link menu-link" href="#sidebarProducts"
+                                        data-bs-toggle="collapse" role="button"
+                                        aria-expanded="false" aria-controls="sidebarProducts">
                                         <i class="las la-box"></i> <span>Products</span>
                                     </a>
+                                    <div class="collapse menu-dropdown" id="sidebarProducts">
+                                        <ul class="nav nav-sm flex-column">
+                                            <li class="nav-item">
+                                                <a href="/products" class="nav-link">Products List</a>
+                                            </li>
+                                            <% if (permissions.productsCreate) { %>
+                                                <li class="nav-item">
+                                                    <a href="/products/form" class="nav-link" target="_blank">New Product</a>
+                                                </li>
+                                            <% } %>
+                                        </ul>
+                                    </div>
                                 </li>
                             <% } %>
                             <% if (permissions.settings) { %>
@@ -166,6 +181,35 @@
                                     </ul>
                                 </div>
                             </li>
+
+                            <!-- Add new Others dropdown menu -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link menu-link" href="#sidebarOthers"
+                                    data-bs-toggle="collapse" role="button"
+                                    aria-expanded="false" aria-controls="sidebarOthers">
+                                    <!-- <i class="las la-ellipsis-h"></i>  -->
+                                    <span>Others</span>
+                                </a>
+                                <div class="collapse menu-dropdown" id="sidebarOthers">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="https://openmenu.live" target="_blank" class="nav-link">
+                                                <i class="las la-globe"></i> OpenMenu Live
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/news" class="nav-link">
+                                                <i class="las la-newspaper"></i> News
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/help" class="nav-link">
+                                                <i class="las la-question-circle"></i> Help
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
                         </ul>
                     </div>
                     <div class="d-flex align-items-center">
@@ -177,7 +221,7 @@
                         </div> -->
 
                         <div class="ms-1 header-item d-none d-sm-flex">
-                            <button type="button"
+                            <button type="button" id="themeToggleBtn"
                                 class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle light-dark-mode">
                                 <i class='bx bx-moon fs-22'></i>
                             </button>
@@ -597,6 +641,5 @@
         <script src="/assets/js/app.js"></script>
     <% } %>
     <script src="/assets/libs/apexcharts/apexcharts.min.js"></script>
-    <!-- <script src="/assets/js/pages/dashboard-ecommerce.init.js"></script> -->
 </body>
 </html>

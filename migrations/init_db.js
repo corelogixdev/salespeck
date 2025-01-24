@@ -130,6 +130,10 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         allowNull: true,
       },
+      taxid: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       createdby: {
         type: Sequelize.INTEGER,
         allowNull: true,

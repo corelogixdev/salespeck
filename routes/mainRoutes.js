@@ -3,6 +3,8 @@ const isAuthenticated = require("../middleware/isAuthenticated");
 const mainController = require("../controllers/mainController");
 
 router.get("/", mainController.index);
+router.get("/register", mainController.registerget);
+router.post("/register", mainController.registerpost);
 router.get("/dashboard", isAuthenticated, mainController.dashboard);
 router.get("/login", mainController.loginGet);
 router.post("/login", mainController.loginPost);

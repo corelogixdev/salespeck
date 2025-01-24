@@ -2,10 +2,10 @@ const db = require("../models");
 let permissions = null;
 exports.permissions = async (req, res, next) => {
   if (req.session.user_id) {
-    if (permissions === null) {
+    if (permissions === null || JSON.stringify(req.session.permissions) === "{}") {
       let allPermissions = await db.permissions.findAll();
 
-      let userPermissions = await db.userpermissions.findAll({
+      let userPermissions =   await db.userpermissions.findAll({
         where: { user_id: req.session.user_id },
         include: [{ model: db.permissions, as: "permission" }],
       });

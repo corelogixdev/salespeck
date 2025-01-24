@@ -16,7 +16,7 @@ const dashboard = async (req, res) => {
   try {
     // Fetch company settings
     const settings = await db.softwaresetting.findOne({ where: { name: "company" } });
-    const company = JSON.parse(settings.value);
+    const company = JSON.parse(settings?.value || "{}");
 
     // Define start and end of today's date
     const todayStartDate = moment().startOf("day").toDate();
@@ -126,8 +126,17 @@ function calculatePercentageChange(previous=0, current) {
   }
   return 0;
 }
-const loginGet = (req, res) => {
-  res.render("login", { hidenav: true });
+const loginGet = async (req, res) => {
+  const adminExists = await db.user.findOne({ where: { role: "admin" } });
+  if (!adminExists) {
+    return res.redirect("/register");
+  }  
+  res.render("login", { hidenav: true ,
+    errors:{
+      username: req.session.message?.type === "error" ? "Invalid username or password" : "",
+      password: req.session.message?.type === "error" ? "Invalid username or password" : "",
+    }
+  });
 };
 
 const loginPost = async (req, res) => {
@@ -137,8 +146,8 @@ const loginPost = async (req, res) => {
   logi("Password received:", password);
   try {
     const user = await db.user.findOne({ where: { username } });
-    logi("User found:", user.name);
     if (user && encrypt.compare(user.password, password)) {
+      logi("User found:", user.name);
       logi("Login successful");
       req.session.user_id = user.id;
       req.session.user = user;
@@ -146,11 +155,12 @@ const loginPost = async (req, res) => {
       res.redirect("/dashboard");
     } else {
       logi("Login failed");
-      req.session.message = {
-        type: "error",
-        text: "Invalid username or password.",
-      };
-      res.redirect("/login");
+      res.render("login", {
+        hidenav: true,
+        errors: {
+          password: "Invalid password",
+        },
+      });
     }
   } catch (e) {
     logi("Error:");
@@ -160,15 +170,69 @@ const loginPost = async (req, res) => {
 const logout = (req, res) => {
   req.session.destroy((err) => {
     if (err) {
-      // You can handle the error appropriately, e.g., return an error response or redirect to a dashboard
       res.redirect("/dashboard"); // Ensure to return here to avoid further code execution
     }
-
-    // Clear the cookie and redirect only if session destruction is successful
-    //req.session.message = { type: 'success', text: 'Logout successful!' };
     res.clearCookie("connect.sid");
     res.redirect("/login"); // Redirect to login after successful logout
   });
 };
 
-module.exports = { index, dashboard, loginGet, loginPost, logout };
+const registerget = (req, res) => {
+  res.render("register", { hidenav: true, errors:{
+    username: '',
+  }});
+};
+
+const config = require("../config");
+const registerpost = async (req, res) => {
+  logi("Register request received");
+  logi("Data:", req.body);
+  const { name, username, password } = req.body;
+  
+  try {
+    const response = await fetch(`${config.webUrl}/api/validate/${username}`);
+    // const data = await response.json();
+    // if (data.valid) {
+    //   logi("Username is valid");
+    //   return createAdminUser(req, res);
+    // } else {
+    //   logi("Username is invalid");
+    //   res.render("register", {
+    //     hidenav: true,
+    //     errors: {
+    //       username: "Username is invalid",
+    //     },
+    //   });
+    // }
+  } catch (e) {
+    logi("Error:");
+    logi(e);
+    req.session.message = { type: "error", text: "An error occurred. Please try again." };
+    res.redirect("/register");
+  }
+
+
+
+
+  logi("Register request received");
+  logi("Data:", req.body);
+  try {
+    const hashedPassword = encrypt.encrypt(password);
+    let user = await db.user.create({ name, username, password: hashedPassword, role: "admin" });
+
+    logi("Admin user created successfully!");
+
+    await db.userpermissions.create({user_id: user.id, permission_id: 777});
+    logi("Admin user permissions set successfully");
+
+    req.session.message = { type: "success", text: "Admin user created successfully!" };
+    res.redirect("/login");
+  } catch (e) {
+    logi("Error:");
+    logi(e);
+    req.session.message = { type: "error", text: "An error occurred. Please try again." };
+    res.redirect("/register");
+  }
+}
+
+module.exports = { index, dashboard, loginGet, loginPost, logout, registerget,registerpost };

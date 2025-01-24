@@ -20,6 +20,9 @@
 <div class="card">
   <div class="card-header align-items-center d-flex">
     <h4 class="card-title mb-0 flex-grow-1"><%= role === 'user' ? 'Users' : 'Customers' %> List</h4>
+    <button onclick="window.location.reload()" class="btn btn-soft-success btn-sm" title="Refresh">
+      <i class="ri-refresh-line align-middle"></i> Refresh
+    </button>
   </div>
   <div class="card-body">
     <div class="live-preview">

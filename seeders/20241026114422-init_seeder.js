@@ -43,14 +43,14 @@ module.exports = {
       await financeaccount.upsert(account);
     }
 
-    var pass = encrypt('admin@123');
-    const users = [
-      { id: 1, address: null, name: 'admin', password:  pass, username: 'admin', phone: '00000000000', phone2: null, role: 'admin' },
-    ];
+    // var pass = encrypt('admin@123');
+    // const users = [
+    //   { id: 1, address: null, name: 'admin', password:  pass, username: 'admin', phone: '00000000000', phone2: null, role: 'admin' },
+    // ];
 
-    for (const userRecord of users) {
-      await user.upsert(userRecord);
-    }
+    // for (const userRecord of users) {
+    //   await user.upsert(userRecord);
+    // }
 
     // software settings
     const softwareSettings = [
@@ -133,12 +133,10 @@ module.exports = {
       await permissions.upsert(permission);
     }
 
-    userpermissions.create({ user_id: 1, permission_id: 777 });
-
 
     // in taxes table add vat with 18% and gst with 5%
-    await taxes.create({ id: 1, name: 'vat', percentage: 18 });
-    await taxes.create({ id: 2, name: 'gst', percentage: 5 });
+    await taxes.upsert({ id: 1, name: 'vat', percentage: 18 });
+    await taxes.upsert({ id: 2, name: 'gst', percentage: 5 });
   },
 
   async down(queryInterface, Sequelize) {
