@@ -6,11 +6,7 @@ const logi = require('../utils/logi');
 const expressLayouts = require('express-ejs-layouts');
 const config = require('../config.js'); // Link to the Express app
 const sessionDataMiddleware = require('../middleware/sessionData');
-const productRoutes = require('../routes/productRoutes');
-const userRoutes = require('../routes/userRoutes');
-const settingRoutes = require('../routes/settingRoutes');
-const mainRoutes = require('../routes/mainRoutes');
-const saleRoutes = require('../routes/saleRoutes');
+const routes = require('../routes');
 const { permissions } = require('../middleware/populatePermissions.js');
 const app = express();
 const runMigrationsAndSeeders = require('../utils/runMigrationsAndSeeders.js');
@@ -34,20 +30,22 @@ app.use(
     secret: 'your-secret',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false } // Set to true if using HTTPS
+    cookie: { 
+      secure: false, // Set to true if using HTTPS
+      maxAge: 3600000 // 1 hour
+    }
   })
 );
 app.use(sessionDataMiddleware);
 app.use(permissions);
 
 // Routes
-
-app.use('/', mainRoutes);
-app.use('/products', productRoutes);
-app.use('/users', userRoutes);
-app.use('/settings', settingRoutes);
-app.use('/sales', saleRoutes);
-
+app.use('/', routes.mainRoutes);
+app.use('/products', routes.productRoutes);
+app.use('/users', routes.userRoutes);
+app.use('/settings', routes.settingRoutes);
+app.use('/sales', routes.saleRoutes);
+app.use('/accounting', routes.accountingRoutes);
 // app.get('/*', (req, res) => {
 //   res.redirect('/');
 // });

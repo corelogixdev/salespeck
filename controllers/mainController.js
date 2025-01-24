@@ -183,14 +183,14 @@ const registerget = (req, res) => {
 const registerpost = async (req, res) => {
   logi("Register request received");
   logi("Data:", req.body);
-  const { name, username, password } = req.body;
+  const { username, password, firstName, lastName } = req.body;
   // TODO: REGISTER user on the web app
   // TEST: res.redirect("/login");
   logi("Register request received");
   logi("Data:", req.body);
   try {
     const hashedPassword = encrypt.encrypt(password);
-    let user = await db.user.create({ name: req.body.firstname + req.body.lastname, username, password: hashedPassword, role: "branchmanager" });
+    let user = await db.user.create({ name: firstName +" "+ lastName, username, password: hashedPassword, role: "branchmanager" });
     logi("BranchManager user created successfully!");
     await db.userpermissions.create({user_id: user.id, permission_id: 777});
     logi("BranchManager user permissions set successfully");
