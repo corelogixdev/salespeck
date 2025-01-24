@@ -5,15 +5,26 @@ const path = require('path');
 const Sequelize = require('sequelize');
 const process = require('process');
 const basename = path.basename(__filename);
-
+const env = process.env.NODE_ENV || 'development';
+exports.env = env;
+const config = require('../config');
+const dbConfig = require('../config/config.json')[env];
+exports.config = dbConfig;
 
 const db = {};
-
+if(config.env === 'production') {
+  let appDataPath = process.env.APPDATA || 
+  (process.platform === 'darwin' 
+      ? path.join(os.homedir(), 'Library', 'Application Support') 
+      : path.join(os.homedir(), '.config'));
+  const dbFilePath = path.join(appDataPath, 'openmenu', 'database.sqlite');
+  dbConfig.storage = dbFilePath;
+}
 let sequelize;
-if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], config);
+if (dbConfig.use_env_variable) {
+  sequelize = new Sequelize(process.env[config.use_env_variable], dbConfig);
 } else {
-  sequelize = new Sequelize(config.database, config.username, config.password, config);
+  sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, dbConfig);
 }
 
 fs

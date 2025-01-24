@@ -169,13 +169,8 @@ const loginPost = async (req, res) => {
   }
 };
 const logout = (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      res.redirect("/dashboard"); // Ensure to return here to avoid further code execution
-    }
-    res.clearCookie("connect.sid");
-    res.redirect("/login"); // Redirect to login after successful logout
-  });
+  req.session = null;
+  res.redirect("/login");
 };
 
 const registerget = (req, res) => {
@@ -195,7 +190,7 @@ const registerpost = async (req, res) => {
   logi("Data:", req.body);
   try {
     const hashedPassword = encrypt.encrypt(password);
-    let user = await db.user.create({ name, username, password: hashedPassword, role: "BranchManager" });
+    let user = await db.user.create({ name: req.body.firstname + req.body.lastname, username, password: hashedPassword, role: "branchmanager" });
     logi("BranchManager user created successfully!");
     await db.userpermissions.create({user_id: user.id, permission_id: 777});
     logi("BranchManager user permissions set successfully");

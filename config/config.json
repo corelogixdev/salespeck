@@ -6,7 +6,7 @@
   },
   "production": {
     "dialect": "sqlite",
-    "storage": "database.sqlite",
+    "storage": "./db/database.sqlite",
     "logging": false
   }
 }

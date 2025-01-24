@@ -3,7 +3,6 @@ const fs = require('fs');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const { autoUpdater } = require('electron-updater');
-const expressApp = require('./server/app'); // Link to the Express app
 const config = require('./config.js'); // Link to the Express app
 const logi = require('./utils/logi.js');
 
@@ -16,10 +15,6 @@ logi('Date:', new Date().toISOString());
 const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json')));
 process.env.npm_package_version = packageJson.version;
 
-const env = process.env.NODE_ENV || 'development';
-if (env === 'production') {
-  config.storage = path.join(app.getPath('userData'), 'database.sqlite');
-}
 
 // Now require models after configuring the database path
 // const db = require('./models');
