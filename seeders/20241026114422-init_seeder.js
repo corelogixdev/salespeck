@@ -135,8 +135,8 @@ module.exports = {
 
 
     // in taxes table add vat with 18% and gst with 5%
-    await taxes.upsert({ id: 1, name: 'vat', percentage: 18 });
-    await taxes.upsert({ id: 2, name: 'gst', percentage: 5 });
+    // await taxes.upsert({ id: 1, name: 'vat', percentage: 18 });
+    // await taxes.upsert({ id: 2, name: 'gst', percentage: 5 });
   },
 
   async down(queryInterface, Sequelize) {
