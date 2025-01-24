@@ -137,7 +137,7 @@ exports.delete = async (req, res) => {
   try {
     const user = await db.user.findByPk(req.params.id);
     var role = user.role;
-    if(role==='admin'){
+    if(role==='branchmanager'){
       role = "user";
     }
     await db.user.destroy({ where: { id: req.params.id } });

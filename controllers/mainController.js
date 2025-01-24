@@ -3,6 +3,7 @@ const encrypt = require("../utils/encrypt");
 const moment = require("moment");
 const logi = require("../utils/logi");
 const { Op } = require("sequelize");
+const config = require("../config");
 
 const index = (req, res) => {
   if (!req.session.user_id) {
@@ -127,8 +128,8 @@ function calculatePercentageChange(previous=0, current) {
   return 0;
 }
 const loginGet = async (req, res) => {
-  const adminExists = await db.user.findOne({ where: { role: "admin" } });
-  if (!adminExists) {
+  const BranchManagerExists = await db.user.findOne({ where: { role: "branchmanager" } });
+  if (!BranchManagerExists) {
     return res.redirect("/register");
   }  
   res.render("login", { hidenav: true ,
@@ -183,49 +184,22 @@ const registerget = (req, res) => {
   }});
 };
 
-const config = require("../config");
+
 const registerpost = async (req, res) => {
   logi("Register request received");
   logi("Data:", req.body);
   const { name, username, password } = req.body;
-  
-  try {
-    const response = await fetch(`${config.webUrl}/api/validate/${username}`);
-    // const data = await response.json();
-    // if (data.valid) {
-    //   logi("Username is valid");
-    //   return createAdminUser(req, res);
-    // } else {
-    //   logi("Username is invalid");
-    //   res.render("register", {
-    //     hidenav: true,
-    //     errors: {
-    //       username: "Username is invalid",
-    //     },
-    //   });
-    // }
-  } catch (e) {
-    logi("Error:");
-    logi(e);
-    req.session.message = { type: "error", text: "An error occurred. Please try again." };
-    res.redirect("/register");
-  }
-
-
-
-
+  // TODO: REGISTER user on the web app
+  // TEST: res.redirect("/login");
   logi("Register request received");
   logi("Data:", req.body);
   try {
     const hashedPassword = encrypt.encrypt(password);
-    let user = await db.user.create({ name, username, password: hashedPassword, role: "admin" });
-
-    logi("Admin user created successfully!");
-
+    let user = await db.user.create({ name, username, password: hashedPassword, role: "BranchManager" });
+    logi("BranchManager user created successfully!");
     await db.userpermissions.create({user_id: user.id, permission_id: 777});
-    logi("Admin user permissions set successfully");
-
-    req.session.message = { type: "success", text: "Admin user created successfully!" };
+    logi("BranchManager user permissions set successfully");
+    req.session.message = { type: "success", text: "BranchManager user created successfully!" };
     res.redirect("/login");
   } catch (e) {
     logi("Error:");
@@ -234,5 +208,14 @@ const registerpost = async (req, res) => {
     res.redirect("/register");
   }
 }
+const exportDb = async (req, res) => {
+  try {
+    let file = config.storage;
+    res.download(file);
+  } catch (error) {
+    logi("Error:", error);
+    res.json({ error: "An error occurred. Please try again" });
+  }
+}
 
-module.exports = { index, dashboard, loginGet, loginPost, logout, registerget,registerpost };
+module.exports = { index, dashboard, loginGet, loginPost, logout, registerget,registerpost , exportDb };

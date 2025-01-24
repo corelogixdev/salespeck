@@ -1,8 +1,8 @@
-function adminOnly(req, res, next) {
+function branchmanagerOnly(req, res, next) {
     if (!req.session.user) {
         return res.redirect('/login');
     } 
-    if (req.session.user.role === 'admin') {
+    if (req.session.user.role === 'branchmanager') {
       next();
     } else {
       if ((req.path.startsWith('/users') && (req.query.role=="customer") || req.body.role =="customer") || req.path === '/sales') {
@@ -14,4 +14,4 @@ function adminOnly(req, res, next) {
     }
   }
 
-module.exports = adminOnly;
+module.exports = branchmanagerOnly;

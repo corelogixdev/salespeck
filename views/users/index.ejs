@@ -66,7 +66,7 @@
                       <% if ((role == 'user' && permissions.usersUpdate) || 
                             (role == 'customer' && permissions.customersUpdate)) { %>
                         <a href="/users/form?id=<%= obj.id %>&role=<%= obj.role %>" 
-                            class="btn btn-soft-warning btn-sm <%= obj.role == 'admin' ? 'custom_disabled' : '' %>" 
+                            class="btn btn-soft-warning btn-sm <%= obj.role == 'branchmanager' ? 'custom_disabled' : '' %>" 
                             target="_blank">
                           <i class="ri-pencil-fill align-middle"></i> Edit
                         </a>
@@ -76,7 +76,7 @@
                         <button type="button" 
                                 onclick="deleteRecord('<%= obj.id %>')"
                                 class="btn btn-soft-danger btn-sm" 
-                                <%= obj.role == 'admin' ? 'disabled' : '' %>>
+                                <%= obj.role == 'branchmanager' ? 'disabled' : '' %>>
                           <i class="ri-delete-bin-fill align-middle"></i> Delete
                         </button>
                       <% } %>

@@ -20,7 +20,25 @@
 </head>
 <style>
     .logo img {
-        height: 50px;
+        height: 35px !important; /* Reduced from 50px */
+    }
+    .logo-sm img {
+        height: 18px !important; /* Reduced from 22px */
+    }
+    .logo-lg img {
+        height: 30px !important; /* Reduced from 17px */
+    }
+    .navbar-header .fs-2 {
+        font-size: 1.25rem !important; /* Reduce OpenMenu text size */
+    }
+    #navbar-nav {
+        font-size: 0.9rem; /* Reduce navbar menu text size */
+    }
+    #navbar-nav .nav-link {
+        padding: 0.4rem 0.9rem; 
+    }
+    .menu-dropdown {
+        font-size: 0.85rem; /* Reduce dropdown menu text size */
     }
 </style>
 <body>
@@ -64,148 +82,124 @@
                                     <i class="las la-tachometer-alt"></i> <span>Dashboard</span>
                                 </a>
                             </li>
-                            <% if (permissions.usersList || permissions.customersList) { %>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link menu-link" href="#sidebarStaff" data-bs-toggle="collapse"
-                                        role="button" aria-expanded="false" aria-controls="sidebarStaff">
-                                        <i class="las la-users"></i> <span>Staff</span>
-                                    </a>
-                                    <div class="collapse menu-dropdown" id="sidebarStaff">
-                                        <ul class="nav nav-sm flex-column">
-                                            <% if (permissions.usersList) { %>
-                                                <li class="nav-item">
-                                                    <a href="/users?role=user" class="nav-link">Users</a>
-                                                </li>
-                                            <% } %>
-                                            <% if (permissions.customersList) { %>
-                                                <li class="nav-item">
-                                                    <a href="/users?role=customer"
-                                                        class="nav-link">Customers</a>
-                                                </li>
-                                            <% } %>
-                                        </ul>
-                                    </div>
-                                </li>
-                            <% } %>
-                            <% if (permissions.productsList) { %>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link menu-link" href="#sidebarProducts"
-                                        data-bs-toggle="collapse" role="button"
-                                        aria-expanded="false" aria-controls="sidebarProducts">
-                                        <i class="las la-box"></i> <span>Products</span>
-                                    </a>
-                                    <div class="collapse menu-dropdown" id="sidebarProducts">
-                                        <ul class="nav nav-sm flex-column">
-                                            <li class="nav-item">
-                                                <a href="/products" class="nav-link">Products List</a>
-                                            </li>
-                                            <% if (permissions.productsCreate) { %>
-                                                <li class="nav-item">
-                                                    <a href="/products/form" class="nav-link" target="_blank">New Product</a>
-                                                </li>
-                                            <% } %>
-                                        </ul>
-                                    </div>
-                                </li>
-                            <% } %>
-                            <% if (permissions.settings) { %>
-                                <li class="nav-item">
-                                    <a class="nav-link menu-link pe-0" href="/settings" role="button">
-                                        <i class="las la-cog"></i> <span>Settings</span>
-                                    </a>
-                                </li>
-                            <% } %>
-                            <% if (permissions.salesView || permissions.salesCreate ||
-                                permissions.salesList) { %>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link menu-link" href="#sidebarSales"
-                                        data-bs-toggle="collapse" role="button"
-                                        aria-expanded="false" aria-controls="sidebarSales">
-                                        <i class="las la-shopping-cart"></i> <span>Sales</span>
-                                    </a>
-                                    <div class="collapse menu-dropdown" id="sidebarSales">
-                                        <ul class="nav nav-sm flex-column">
-                                            <% if (permissions.salesView) { %>
-                                                <li class="nav-item">
-                                                    <a href="/sales" class="nav-link">Sales Report</a>
-                                                </li>
-                                            <% } %>
-                                            <% if (permissions.salesCreate) { %>
-                                                <li class="nav-item">
-                                                    <a href="/sales/form"
-                                                        class="nav-link"
-                                                        target="_blank">New Sale</a>
-                                                </li>
-                                            <% } %>
-                                        </ul>
-                                    </div>
-                                </li>
-                            <% } %>
                             <li class="nav-item dropdown">
-                                <a class="nav-link menu-link" href="#sidebarHR"
-                                    data-bs-toggle="collapse" role="button"
-                                    aria-expanded="false" aria-controls="sidebarHR">
-                                    <i class="las la-user-tie"></i> <span>HR</span>
+                                <a class="nav-link menu-link" href="#sidebarStock" data-bs-toggle="collapse" role="button">
+                                    <i class="las la-box"></i> <span>Stock</span>
                                 </a>
-                                <div class="collapse menu-dropdown" id="sidebarHR">
+                                <div class="collapse menu-dropdown" id="sidebarStock">
                                     <ul class="nav nav-sm flex-column">
                                         <li class="nav-item">
-                                            <a href="/attendance"
-                                                class="nav-link">Attendance</a>
+                                            <a href="/products/form" class="nav-link">New Products</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="/leaves"
-                                                class="nav-link">Leaves</a>
+                                            <a href="/products" class="nav-link">Products List</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link menu-link" href="#sidebarSalaries"
-                                                data-bs-toggle="collapse" role="button"
-                                                aria-expanded="false" aria-controls="sidebarSalaries">
-                                                Salaries
-                                            </a>
-                                            <div class="collapse menu-dropdown" id="sidebarSalaries">
-                                                <ul class="nav nav-sm flex-column">
-                                                    <li class="nav-item">
-                                                        <a href="/salaries/templates"
-                                                            class="nav-link">Salery
-                                                            Templates</a>
-                                                    </li>
-                                                    <li class="nav-item">
-                                                        <a href="/salaries/calculate"
-                                                            class="nav-link">Calculate
-                                                            Salaries</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
+                                            <a href="/inventory/logs" class="nav-link disabled">Inventory Logs</a>
                                         </li>
                                     </ul>
                                 </div>
                             </li>
-
-                            <!-- Add new Others dropdown menu -->
                             <li class="nav-item dropdown">
-                                <a class="nav-link menu-link" href="#sidebarOthers"
-                                    data-bs-toggle="collapse" role="button"
-                                    aria-expanded="false" aria-controls="sidebarOthers">
-                                    <!-- <i class="las la-ellipsis-h"></i>  -->
-                                    <span>Others</span>
+                                <a class="nav-link menu-link" href="#sidebarParties" data-bs-toggle="collapse" role="button">
+                                    <i class="las la-users"></i> <span>Parties</span>
+                                </a>
+                                <div class="collapse menu-dropdown" id="sidebarParties">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="/users?role=customers" class="nav-link">Customers</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/users?role=user" class="nav-link">Vendors</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link menu-link" href="#sidebarSales" data-bs-toggle="collapse" role="button">
+                                    <i class="las la-shopping-cart"></i> <span>Sales</span>
+                                </a>
+                                <div class="collapse menu-dropdown" id="sidebarSales">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="/sales" class="nav-link">POS Sales</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/sales/form" target="_blank" class="nav-link">New Sale</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/sales/returns" class="nav-link disabled">Returns</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link menu-link" href="#sidebarAccounting" data-bs-toggle="collapse" role="button">
+                                    <i class="las la-calculator"></i> <span>Accounting</span>
+                                </a>
+                                <div class="collapse menu-dropdown" id="sidebarAccounting">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="/accounting/coa" class="nav-link disabled">Chart of Accounts</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/accounting/balance-sheet" class="nav-link disabled">Balance Sheet</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/accounting/purchases" class="nav-link disabled">Purchases</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/accounting/expenses" class="nav-link disabled">Expenses</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/accounting/transactions" class="nav-link disabled">Transactions</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/accounting/cash-closing" class="nav-link disabled">Cash Closing</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/accounting/cash-closing-report" class="nav-link disabled">Cash Closing Report</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link menu-link" href="#sidebarMarketing" data-bs-toggle="collapse" role="button">
+                                    <i class="las la-bullhorn"></i> <span>Marketing</span>
+                                </a>
+                                <div class="collapse menu-dropdown" id="sidebarMarketing">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="/marketing/whatsapp" class="nav-link disabled">WhatsApp</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/marketing/sms" class="nav-link disabled">SMS</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link disabled" href="/hr" role="button">
+                                    <i class="las la-user-tie"></i> <span>HR Links</span>
+                                </a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link menu-link" href="#sidebarOthers" data-bs-toggle="collapse" role="button">
+                                    <i class="las la-ellipsis-h"></i> <span>Others</span>
                                 </a>
                                 <div class="collapse menu-dropdown" id="sidebarOthers">
                                     <ul class="nav nav-sm flex-column">
                                         <li class="nav-item">
-                                            <a href="https://openmenu.live" target="_blank" class="nav-link">
-                                                <i class="las la-globe"></i> OpenMenu Live
-                                            </a>
+                                            <a href="/settings" class="nav-link">Settings</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="/news" class="nav-link">
-                                                <i class="las la-newspaper"></i> News
-                                            </a>
+                                            <a href="/export-db" class="nav-link">Export DB</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="/help" class="nav-link">
-                                                <i class="las la-question-circle"></i> Help
-                                            </a>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/pos-live" class="nav-link disabled">POS Live</a>
                                         </li>
                                     </ul>
                                 </div>
@@ -567,6 +561,13 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- add a logout button. no dropdown. icon only -->
+                        <div class="ms-1 header-item d-none d-sm-flex" title="Logout">
+                            <a href="/logout" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle">
+                                <i class='bx bx-log-out fs-22'></i>
+                            </a>
                         </div>
                     </div>
                 </div>

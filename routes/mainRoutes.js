@@ -3,6 +3,7 @@ const isAuthenticated = require("../middleware/isAuthenticated");
 const mainController = require("../controllers/mainController");
 
 router.get("/", mainController.index);
+router.get('/export-db', mainController.exportDb);
 router.get("/register", mainController.registerget);
 router.post("/register", mainController.registerpost);
 router.get("/dashboard", isAuthenticated, mainController.dashboard);

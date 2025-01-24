@@ -7,7 +7,7 @@ const expressApp = require('./server/app'); // Link to the Express app
 const config = require('./config.js'); // Link to the Express app
 const logi = require('./utils/logi.js');
 
-
+app.setAppLogsPath();
 //log starting app and date time to log file
 logi('Starting OpenMenu Desktop...');
 logi('Date:', new Date().toISOString());
@@ -15,6 +15,14 @@ logi('Date:', new Date().toISOString());
 // Read package.json to get the version
 const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json')));
 process.env.npm_package_version = packageJson.version;
+
+const env = process.env.NODE_ENV || 'development';
+if (env === 'production') {
+  config.storage = path.join(app.getPath('userData'), 'database.sqlite');
+}
+
+// Now require models after configuring the database path
+// const db = require('./models');
 
 // require('electron-reload')(__dirname, {
 //   electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
@@ -29,6 +37,8 @@ function createWindow() {
       nodeIntegration: false, // Disable Node.js integration in renderer process
       contextIsolation: true, // Enable context isolation
     },
+    // remove the menu bar
+    autoHideMenuBar: true,
   });
 
   //to open dev tools
