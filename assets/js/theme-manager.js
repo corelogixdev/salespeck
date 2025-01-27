@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('data-bs-theme', theme);
         
         // Update button icon
+        if(!themeToggleBtn) return;
         const icon = themeToggleBtn.querySelector('i');
         if (theme === 'dark') {
             icon.classList.remove('bx-moon');
@@ -21,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const currentTheme = localStorage.getItem('data-bs-theme') || 'light';
     updateTheme(currentTheme);
 
-    themeToggleBtn.addEventListener('click', function() {
+    themeToggleBtn?.addEventListener('click', function() {
         const currentTheme = html.getAttribute('data-layout-mode');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         updateTheme(newTheme);

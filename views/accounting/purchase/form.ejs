@@ -8,13 +8,16 @@
                         <div class="input-group">
                             <input type="text" class="form-control" id="product-search" 
                                 placeholder="Enter product name or barcode">
-                            <div class="input-group-text">
-                                <div class="form-check mb-0">
-                                    <input type="checkbox" class="form-check-input" checked id="search-barcode">
-                                    <label class="form-check-label">Barcode</label>
+                                <div class="input-group-text">
+                                    <div class="form-check mb-0">
+                                        <input type="checkbox" class="form-check-input" checked id="search-barcode">
+                                        <label class="form-check-label">Barcode</label>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                            <small class="text-warning">
+                                Products with inactive purchases won’t appear in search results.
+                            </small>
                         <div id="search-results" class="shadow-lg rounded p-3 d-none" 
                             style="position: absolute; width: 100%; z-index: 9999; background-color: white;">
                         </div>
@@ -253,7 +256,7 @@
         });
     }
     async function getProducts(body){
-        const response = await fetch('/sales/productsget', {
+        const response = await fetch('/accounting/purchase/productsget', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -264,10 +267,15 @@
         allProducts = products;
         return products;
     }
+    let previousEntry;
     async function searchProductByBarcode(barcode){
+        if(!barcode){
+            return addProduct(previousEntry);
+        }
         const products = await getProducts({ barcode });
         if(products.length > 0){
             addProduct(products[0]);
+            previousEntry = products[0];
             productSearch.value = '';
         }else{
             toastr.warning('No product found with this barcode');

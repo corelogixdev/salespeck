@@ -243,6 +243,7 @@ exports.productsget = async (req, res) => {
     where: {
       ...search,
       quantity: { [Op.gt]: 0 },
+      saleactive: true,
     },
   });
   res.json(data);

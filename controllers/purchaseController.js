@@ -224,3 +224,18 @@ exports.form = async (_, res) => {
     hidenav: true,
   });
 };
+const {findLike} = require("../utils/searchquery");
+exports.productsget = async (req, res) => {
+  let body = req.body;
+  let search = findLike(body);
+  if (req.body.barcode) {
+    search = { ...search, barcode: req.body.barcode };
+  }
+  const data = await db.product.findAll({
+    where: {
+      ...search,
+      purchaseactive: true,
+    },
+  });
+  res.json(data);
+};
