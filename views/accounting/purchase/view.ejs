@@ -1,0 +1,180 @@
+<div class="row mx-auto cstm-row" style="width: 500px;">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Invoice Details</h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="/accounting/purchase">Purchase</a></li>
+                    <li class="breadcrumb-item active">Invoice Details</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center mx-auto cstm-row" style="width: 500px;">
+    <div class="col-lg-12">
+        <div class="card" id="demo">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card-header border-bottom-dashed px-4">
+                        <img src="/assets/images/icon.png" class="card-logo card-logo-dark mx-auto mb-3" alt="logo" height="50">
+                        <img src="/assets/images/icon.png" class="card-logo card-logo-light mx-auto mb-3" alt="logo" height="50">
+                        <div class="d-flex justify-content-between">
+                            <div class="flex-grow-1">
+                                <div class="mt-1">
+                                    <h6 class="text-muted text-uppercase fw-semibold">Company Details</h6>
+                                    <p class="text-muted mb-1"><%= companySettings.name %></p>
+                                    <p class="text-muted mb-0"><%= companySettings.address %></p>
+                                    <p class="text-muted mb-0">Contact: <%= companySettings.phone %></p>
+                                </div>
+                            </div>
+                            <% if(purchase.Vendor) { %>
+                            <div class="flex-shrink-0">
+                                <h6 class="text-muted text-uppercase fw-semibold mt-1">Vendor Details</h6>
+                                <p class="text-muted mb-2"><%= purchase.Vendor.name %></p>
+                                <p class="text-muted mb-1"><%= purchase.Vendor.address %></p>
+                                <p class="text-muted mb-1">Phone: <%= purchase.Vendor.phone %></p>
+                            </div>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <div class="card-body pt-4 pb-0 px-4">
+                        <div class="row g-3">
+                            <div class="col-4">
+                                <p class="text-muted mb-2 text-uppercase fw-semibold">
+                                    <small>
+                                        Invoice No
+                                    </small>
+                                </p>
+                                <h5 class="fs-14 mb-0">
+                                    <small>
+                                        <%= purchase.invoicenum %>
+                                    </small>
+                                </h5>
+                            </div>
+                            <div class="col-4">
+                                <p class="text-muted mb-2 text-uppercase fw-semibold">
+                                    <small>
+                                        Date
+                                    </small>
+                                </p>
+                                <h5 class="fs-14 mb-0">
+                                    <small class="format-date">
+                                        <%= purchase.createdAt %>
+                                    </small>
+                                </h5>
+                            </div>
+                            <div class="col-4">
+                                <p class="text-muted mb-2 text-uppercase fw-semibold">
+                                    <small>
+                                        Total Amount
+                                    </small>
+                                </p>
+                                <h5 class="fs-14 mb-0">
+                                    <small>
+                                        Rs.<%= purchase.totalAmount %>
+                                    </small>
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body py-4 px-3 fs-6">
+                        <div class="table-responsive">
+                            <table class="table table-borderless text-center table-nowrap align-middle mb-0">
+                                <thead>
+                                    <tr class="table-active">
+                                        <th scope="col" style="width: 50px;">#</th>
+                                        <th scope="col">Product</th>
+                                        <th scope="col">Rate</th>
+                                        <th scope="col">Qty</th>
+                                        <th scope="col" class="text-end">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% purchase.PurchasedItems.forEach((product, index) => { %>
+                                    <tr>
+                                        <th scope="row"><%= index + 1 %></th>
+                                        <td class="text-center">
+                                            <span class="fw-medium"><%= product.Product.name %></span>
+                                        </td>
+                                        <td class="code">Rs.<%= product.Product.saleprice %></td>
+                                        <td class="code"><%= product.quantity %></td>
+                                        <td class="text-end code">Rs.<%= (product.quantity * product.Product.saleprice).toFixed(2) %></td>
+                                    </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="border-top border-top-dashed mt-2 fs-7">
+                            <table class="table table-borderless table-nowrap align-middle mb-0 ms-auto" style="width:250px">
+                                <tbody>
+                                    <tr>
+                                        <td class="p-1">Sub Total</td>
+                                        <td class="text-end code p-1">Rs.<%= purchase.totalAmount %></td>
+                                    </tr>
+                                    <% if(parseFloat(purchase.balance)) { %>
+                                        <tr>
+                                            <td class="fw-bold p-1">Paid</td>
+                                            <td class="text-end code p-1">Rs.<%= parseFloat(purchase.totalPayment).toFixed(2) %></td>
+                                        </tr>
+                                    <% } %>
+                                    <tr class="border-top border-top-dashed fs-15">
+                                        <th scope="row" class="p-1">Total</th>
+                                        <th class="text-end code p-1">Rs.<%= purchase.totalAmount %></th>
+                                    </tr>
+                                    <% if(parseFloat(purchase.balance)) { %>
+                                    <tr>
+                                        <th class="p-1">Balance</th>
+                                        <th class="text-end code p-1">Rs.<%= purchase.balance %></th>
+                                    </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                            <p class="text-end border-top pt-2">
+                                <small class="text-muted">
+                                    Powered by <strong>OpenMenu</strong>
+                                </small>
+                            </p>
+
+                        </div>
+
+                        <div class="hstack gap-2 justify-content-end d-print-none mt-4">
+                            <button onclick="window.print()" class="btn btn-success">
+                                <i class="ri-printer-line align-bottom me-1"></i> Print
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        #demo, #demo * {
+            visibility: visible;
+        }
+        #demo {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+        .d-print-none {
+            display: none !important;
+        }
+        .cstm-row {
+            width: 100% !important;
+        }
+    }
+    .code {
+        font-family: monospace !important;
+    }
+</style>

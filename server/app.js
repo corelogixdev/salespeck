@@ -22,6 +22,8 @@ app.use('/node_modules', express.static(path.join(__dirname, '..', 'node_modules
 // Set view engine
 app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'ejs');
+app.set('view cache', false);
+
 // Use express-ejs-layouts
 app.use(expressLayouts);
 // Session middleware

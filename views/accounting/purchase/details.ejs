@@ -1,0 +1,144 @@
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Purchase Details</h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="/accounting/purchase">Purchase</a></li>
+                    <li class="breadcrumb-item active">Details</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Purchase Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <h5 class="text-muted fw-semibold">Company Details</h5>
+                            <p class="mb-1"><%= companySettings.name %></p>
+                            <p class="mb-1"><%= companySettings.address %></p>
+                            <p class="mb-0">Contact: <%= companySettings.phone %></p>
+                        </div>
+                    </div>
+                    <% if(purchase.Vendor) { %>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <h5 class="text-muted fw-semibold">Vendor Information</h5>
+                            <p class="mb-1"><%= purchase.Vendor.name %></p>
+                            <p class="mb-1"><%= purchase.Vendor.address %></p>
+                            <p class="mb-0">Phone: <%= purchase.Vendor.phone %></p>
+                        </div>
+                    </div>
+                    <% } %>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card mini-stats-wid">
+                            <div class="card-body">
+                                <div class="d-flex">
+                                    <div class="flex-grow-1">
+                                        <p class="text-muted fw-medium">Invoice Number</p>
+                                        <h4 class="mb-0"><%= purchase.invoicenum %></h4>
+                                    </div>
+                                    <div class="avatar-sm rounded-circle bg-primary align-self-center mini-stat-icon">
+                                        <span class="avatar-title rounded-circle bg-primary">
+                                            <i class="ri-file-list-3-line font-size-24"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card mini-stats-wid">
+                            <div class="card-body">
+                                <div class="d-flex">
+                                    <div class="flex-grow-1">
+                                        <p class="text-muted fw-medium">Purchase Date</p>
+                                        <h4 class="mb-0 format-date"><%= purchase.createdAt %></h4>
+                                    </div>
+                                    <div class="avatar-sm rounded-circle bg-info align-self-center mini-stat-icon">
+                                        <span class="avatar-title rounded-circle bg-info">
+                                            <i class="ri-calendar-2-line font-size-24"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card mini-stats-wid">
+                            <div class="card-body">
+                                <div class="d-flex">
+                                    <div class="flex-grow-1">
+                                        <p class="text-muted fw-medium">Total Amount</p>
+                                        <h4 class="mb-0">Rs.<%= purchase.totalAmount %></h4>
+                                    </div>
+                                    <div class="avatar-sm rounded-circle bg-success align-self-center mini-stat-icon">
+                                        <span class="avatar-title rounded-circle bg-success">
+                                            <i class="ri-money-dollar-circle-line font-size-24"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle table-nowrap mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Product Name</th>
+                                <th scope="col">Rate</th>
+                                <th scope="col">Quantity</th>
+                                <th scope="col" class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% purchase.PurchasedItems.forEach((product, index) => { %>
+                            <tr>
+                                <td><%= index + 1 %></td>
+                                <td><%= product.Product.name %></td>
+                                <td>Rs.<%= product.Product.saleprice %></td>
+                                <td><%= product.quantity %></td>
+                                <td class="text-end">Rs.<%= (product.quantity * product.Product.saleprice).toFixed(2) %></td>
+                            </tr>
+                            <% }); %>
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <td colspan="4" class="text-end fw-bold">Sub Total:</td>
+                                <td class="text-end">Rs.<%= purchase.totalAmount %></td>
+                            </tr>
+                            <% if(parseFloat(purchase.balance)) { %>
+                            <tr>
+                                <td colspan="4" class="text-end fw-bold">Paid Amount:</td>
+                                <td class="text-end">Rs.<%= parseFloat(purchase.totalPayment).toFixed(2) %></td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" class="text-end fw-bold">Balance:</td>
+                                <td class="text-end">Rs.<%= purchase.balance %></td>
+                            </tr>
+                            <% } %>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a href="/accounting/purchase/view/<%= purchase.id %>" class="btn btn-primary">View Invoice</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

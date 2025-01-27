@@ -78,6 +78,10 @@ module.exports = (sequelize, DataTypes) => {
     Product.belongsTo(models.taxes, { foreignKey: 'taxid', as: 'Tax' });
     Product.belongsTo(models.user, { foreignKey: 'createdby', as: 'CreatedBy' });
     Product.belongsTo(models.user, { foreignKey: 'updatedby', as: 'UpdatedBy' });
+    Product.hasMany(models.inventorylogs, {
+      foreignKey: 'product_id',
+      as: 'InventoryLogs'
+    });
   };
   return Product;
 };

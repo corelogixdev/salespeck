@@ -213,4 +213,171 @@ const exportDb = async (req, res) => {
   }
 }
 
-module.exports = { index, dashboard, loginGet, loginPost, logout, registerget,registerpost , exportDb };
+const inventorylogs = async (req, res) => {
+  try {
+    let logs = await db.inventorylogs.findAll({
+      include: [
+        {
+          model: db.product,
+          as: "Product",
+          attributes: ["id", "name"]
+        },
+        {
+          model: db.user,
+          as: "User",
+          attributes: ["id", "name"]
+        }
+      ],
+      order: [["createdAt", "DESC"]]
+    });
+
+    if (!logs) logs = [];
+    logs = logs.map(log => {
+      const plainLog = log.get({ plain: true });
+      return {
+        ...plainLog,
+        Product: plainLog.Product || { name: 'Unknown Product' },
+        User: plainLog.User || { name: 'Unknown User' }
+      };
+    });
+
+    res.render("inventorylogs", { 
+      logs,
+      searchParams: {} 
+    });
+  } catch (error) {
+    console.error("Error fetching inventory logs:", error);
+    req.session.message = { 
+      type: "error", 
+      text: "An error occurred while fetching inventory logs." 
+    };
+    res.redirect("/dashboard");
+  }
+};
+
+const searchInventoryLogs = async (req, res) => {
+  try {
+    const { dateRange, product, createdBy } = req.body;
+
+    let whereClause = {};
+    let includeOptions = [
+      {
+        model: db.product,
+        as: "Product",
+        attributes: ["id", "name"],
+        where: {}
+      },
+      {
+        model: db.user,
+        as: "User",
+        attributes: ["id", "name"],
+        where: {}
+      }
+    ];
+
+    if (dateRange) {
+      const [startDate, endDate] = dateRange.split(' to ').map(date => date.trim());
+      if (startDate && endDate) {
+        whereClause.createdAt = {
+          [Op.between]: [
+            moment(startDate).startOf('day').toDate(),
+            moment(endDate).endOf('day').toDate()
+          ]
+        };
+      }
+    }
+
+    if (product) {
+      if (!isNaN(product)) {
+        includeOptions[0].where.id = product;
+      } else {
+        includeOptions[0].where.name = { [Op.like]: `%${product}%` };
+      }
+    }
+
+    if (createdBy) {
+      includeOptions[1].where.name = { [Op.like]: `%${createdBy}%` };
+    }
+
+    let logs = await db.inventorylogs.findAll({
+      where: whereClause,
+      include: includeOptions,
+      order: [["createdAt", "DESC"]]
+    });
+
+    if (!logs) logs = [];
+    logs = logs.map(log => {
+      const plainLog = log.get({ plain: true });
+      return {
+        ...plainLog,
+        Product: plainLog.Product || { name: 'Unknown Product' },
+        User: plainLog.User || { name: 'Unknown User' }
+      };
+    });
+
+    res.render("inventorylogs", { 
+      logs,
+      searchParams: req.body
+    });
+  } catch (error) {
+    console.error("Error searching inventory logs:", error);
+    req.session.message = { 
+      type: "error", 
+      text: "An error occurred while searching inventory logs." 
+    };
+    res.redirect("/inventorylogs");
+  }
+};
+
+const inventorylogsById = async (req, res) => {
+  try {
+    const productId = req.params.id;
+    let logs = await db.inventorylogs.findAll({
+      where: {
+        product_id: productId
+      },
+      include: [
+        {
+          model: db.product,
+          as: "Product",
+          attributes: ["id", "name"],
+        },
+        {
+          model: db.user,
+          as: "User",
+          attributes: ["id", "name"],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    if (!logs) {
+      logs = [];
+    }
+
+    // Add error handling for missing associations
+    logs = logs.map(log => {
+      const plainLog = log.get({ plain: true });
+      return {
+        ...plainLog,
+        Product: plainLog.Product || { name: 'Unknown Product' },
+        User: plainLog.User || { name: 'Unknown User' }
+      };
+    });
+
+    res.render("inventorylogs", { 
+      logs,
+      title: `Inventory Logs - ${logs[0]?.Product?.name || 'Product'}`,
+      hidenav: true
+    });
+  } catch (error) {
+    console.error("Error fetching inventory logs:", error);
+    req.session.message = { 
+      type: "error", 
+      text: "An error occurred while fetching inventory logs." 
+    };
+    res.redirect("/dashboard");
+  }
+};
+
+module.exports = { index, dashboard, loginGet, loginPost, logout, registerget,registerpost , exportDb , inventorylogs, searchInventoryLogs, inventorylogsById };

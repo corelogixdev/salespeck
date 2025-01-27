@@ -1,0 +1,466 @@
+<div class="" style="height: 85vh;">
+    <div class="row justify-content-between flex-wrap" style="height: 100%;">
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div class="mb-4" id="search-product-sales-page-search-seaction" style="position: relative;">
+                        <label for="product-search" class="form-label text-muted text-uppercase fw-semibold">Search Product</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="product-search" 
+                                placeholder="Enter product name or barcode">
+                            <div class="input-group-text">
+                                <div class="form-check mb-0">
+                                    <input type="checkbox" class="form-check-input" checked id="search-barcode">
+                                    <label class="form-check-label">Barcode</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="search-results" class="shadow-lg rounded p-3 d-none" 
+                            style="position: absolute; width: 100%; z-index: 9999; background-color: white;">
+                        </div>
+                    </div>
+
+                    <div class="pt-3">
+                        <div class="mb-3">
+                            <label for="vendor" class="form-label text-muted text-uppercase fw-semibold">Vendor</label>
+                            <select id="vendor" class="form-select">
+                                <option value="">Select Vendor</option>
+                                <% vendors.forEach(vendor => { %>
+                                    <option value="<%= vendor.id %>"><%= vendor.name %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label text-muted text-uppercase fw-semibold">Total Bill</label>
+                                <h4 id="total-bill-amount" class="mb-0">Rs.0.00</h4>
+                            </div>
+                            <div class="col-md-12">
+                                <label for="total-payment" class="form-label text-muted text-uppercase fw-semibold">Payment</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="total-payment">
+                                    <div class="input-group-text">
+                                        <div class="form-check mb-0">
+                                            <input type="checkbox" class="form-check-input" id="ledger">
+                                            <label class="form-check-label">Ledger</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label text-muted text-uppercase fw-semibold">Change</label>
+                                <h4 id="change" class="mb-0 text-success">Rs.0.00</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header align-items-center d-flex">
+                    <h4 class="card-title mb-0 flex-grow-1">Selected Products</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="height: calc(65vh);">
+                        <table class="table table-striped table-nowrap align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Qty</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Total</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="selected-products"></tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3">
+                        <button class="btn btn-primary w-100" onclick="purchase()">
+                            Complete Purchase
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.search-result-product {
+    transition: all 0.2s;
+}
+.search-result-product:hover {
+    background-color: var(--vz-light);
+}
+.editable-input {
+    outline: none;
+    width: 50px;
+    border: none;
+    background-color: transparent;
+    border-bottom: 1px solid transparent;
+    pointer-events: none;
+    text-align: center;
+}
+#search-results {
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+}
+</style>
+
+<script>
+    const productSearch = document.getElementById('product-search');
+    const searchBarcode = document.getElementById('search-barcode');
+    const vendorDropdown = document.getElementById('vendor');
+    const totalBillAmount = document.getElementById('total-bill-amount');
+    const totalPayment = document.getElementById('total-payment');
+    const ledgerCheckbox = document.getElementById('ledger');
+    const selectedProductsTable = document.getElementById('selected-products');
+    let ErrorString = '';
+    let selectedProduct = null;
+    let allProducts = [];
+    function removeProduct(productId) {
+        const row = document.getElementById(`product-row-${productId}`);
+        if (row) {
+            row.remove();
+            updateTotalBill();
+        }
+    }
+    function updateTotalBill() {
+        let total = 0;
+        let rows = document.querySelectorAll('#selected-products tr');
+        rows.forEach(row => {
+            const price = parseFloat(row.querySelector('.total-price').textContent);
+            total += price;
+        });
+        totalBillAmount.textContent = `Rs. ${parseInt(total)}`;
+        UpdateChangePrice();
+    }
+    function addProduct(product) {
+        const existingRow = document.getElementById(`product-row-${product.id}`);
+        if (existingRow) {
+            const quantityElement = existingRow.querySelector('td:nth-child(3)').querySelector('.editable-input');
+            const priceElement = existingRow.querySelector('td:nth-child(4)').querySelector('.editable-input');
+            const totalElement = existingRow.querySelector('td:nth-child(5)');
+            const quantity = parseInt(quantityElement.value);
+            quantityElement.value = quantity + 1;
+            totalElement.textContent = Math.round((quantity + 1) * parseFloat(priceElement.value));
+            updateTotalBill();
+            return;
+        }
+        let newQuantity = 1;
+        const row = document.createElement('tr');
+        row.id = `product-row-${product.id}`;
+        row.innerHTML = `
+        <td>${product.id}</td>
+        <td>${product.name}</td>
+        <td>
+            <input type="text" class="editable-input" value="${newQuantity}" readonly>
+        </td>
+        <td>
+            <input type="text" class="editable-input" value="${product.saleprice}" readonly>
+        </td>
+        <td class="total-price">${product.saleprice}</td>
+        <td>
+          <button class="btn btn-danger btn-sm" onclick="removeProduct('${product.id}')">
+            <i class="bx bx-trash"></i>
+          </button>
+        </td>
+      `;
+        selectedProductsTable.appendChild(row);
+        updateTotalBill();
+    }
+    function UpdateChangePrice(){
+        const totalBill = parseFloat(totalBillAmount.textContent.split(' ')[1]);
+        const totalPrice = parseFloat(totalPayment.value) || 0;
+        const change = totalPrice - totalBill;
+        const changeEl = document.getElementById('change');
+        if (change < 0 || isNaN(change)) {
+            changeEl.textContent = 'Rs. 0.00';
+            return;
+        }
+        changeEl.textContent = `Rs. ${Math.round(change)}`;
+    }
+    function purchase(){
+        if(ErrorString){
+            toastr.warning(ErrorString);
+            return;
+        }
+        const vendor = vendorDropdown.value || null;
+        const ledger = ledgerCheckbox.checked;
+        const products = [];
+        document.querySelectorAll('#selected-products tr').forEach(row => {
+            const productId = row.querySelector('td:nth-child(1)').textContent;
+            const quantity = parseInt(row.querySelector('td:nth-child(3)').querySelector('.editable-input').value);
+            const price = parseFloat(row.querySelector('td:nth-child(4)').querySelector('.editable-input').value);
+            products.push({ productId, quantity , price });
+        });
+        if(products.length === 0){
+            toastr.warning('Please select products');
+            return;
+        }
+        const totalPaymentVal = parseFloat(totalPayment.value);
+        
+        const totalPrice = parseFloat(totalBillAmount.textContent.split(' ')[1]);
+
+        fetch('/accounting/purchase/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ vendor , totalPrice, ledger, products, totalPayment: totalPaymentVal }),
+        }).then(async response => {
+            let data = await response.json();
+            if (response.ok) {
+                $.alert({
+                    title: 'Success!',
+                    content: data.message,
+                    theme: 'material',
+                    useBootstrap: false,
+                    boxWidth: '30%',
+                    type: 'green',
+                    buttons: {
+                        confirm: {
+                            text: 'Ok',
+                            btnClass: 'btn-success',
+                            action: function () {
+                                // window.open('/sales/'+ data.saleId, '_blank');
+                                // window.location.reload();
+                            }
+                        }
+                    }
+                });
+            } else {
+                $.alert({
+                    title: 'Error!',
+                    content: data.message,
+                    theme: 'material',
+                    useBootstrap: false,
+                    boxWidth: '30%',
+                    type: 'red',
+                    buttons: {
+                        confirm: {
+                            text: 'Ok',
+                            btnClass: 'btn-danger',
+                        }
+                    }
+                });
+            }
+        });
+    }
+    async function getProducts(body){
+        const response = await fetch('/sales/productsget', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body),
+        });
+        const products = await response.json();
+        allProducts = products;
+        return products;
+    }
+    async function searchProductByBarcode(barcode){
+        const products = await getProducts({ barcode });
+        if(products.length > 0){
+            addProduct(products[0]);
+            productSearch.value = '';
+        }else{
+            toastr.warning('No product found with this barcode');
+        }
+    }
+    function postSaveInput(input){
+        input.style.borderBottom = '1px solid transparent';
+        input.setAttribute('readonly', 'readonly');
+        input.style.pointerEvents = 'none';
+        input.onblur = null;
+        input.onkeyup = null;
+    }
+    function createEdiableInput(onSave, value, target){
+        const input = target.querySelector('.editable-input') || document.createElement('input');
+        input.classList.add('editable-input');
+        input.style.borderBottom = '1px solid #000';
+        input.style.pointerEvents = 'all';
+        input.removeAttribute('readonly');
+        input.onkeyup = (event) => {
+            if (event.key === 'Enter') {
+                let success = onSave(event, input);
+                if(success !== false){
+                    postSaveInput(input);
+                }
+            }
+        };
+        input.onblur = () => {
+            let success = onSave({key: 'Enter'}, input);
+            if(success !== false){
+                postSaveInput(input);
+            }
+        };
+        input.addEventListener('keypress', (event) => {
+            if (event.key < '0' || event.key > '9') {
+                event.preventDefault();
+            }
+        });
+        input.focus();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('#search-product-sales-page-search-seaction')) {
+                document.getElementById('search-results').classList.add('d-none');
+            }
+        });
+        productSearch.addEventListener('keydown', async (event) => {
+            if(searchBarcode.checked && event.key === 'Enter'){
+                event.preventDefault();
+                await searchProductByBarcode(productSearch.value);
+                return;
+            }
+            const searchResults = document.getElementById('search-results');
+            if (!searchResults.classList.contains('d-none')) {
+                if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+                    event.preventDefault();
+                }
+                if (event.key === 'Enter') {
+                    let _selectedProduct = allProducts.find(p => p.id === parseInt(selectedProduct));
+                    if (_selectedProduct) {
+                        addProduct(_selectedProduct);
+                        productSearch.value = '';
+                        searchResults.classList.add('d-none');
+                    }
+                }
+                const productResults = searchResults.querySelectorAll('.search-result-product');
+                if (productResults.length > 0) {
+                    if(productResults.length === 1){
+                        selectedProduct = productResults[0].id.split('-')[1];
+                        productResults[0].style.backgroundColor = '#f8f9fa';
+                    }
+                    if (selectedProduct) {
+                        const selectedElement = document.getElementById(`product-${selectedProduct}`);
+                        selectedElement.style.backgroundColor = '';
+                        let nextElement = null;
+                        if (event.key === 'ArrowUp') {
+                            nextElement = selectedElement.previousElementSibling;
+                        } else if (event.key === 'ArrowDown') {
+                            nextElement = selectedElement.nextElementSibling;
+                        }
+                        if (nextElement) {
+                            selectedProduct = nextElement.id.split('-')[1];
+                            nextElement.style.backgroundColor = '#f8f9fa';
+                        } else {
+                            selectedProduct = productResults[0].id.split('-')[1];
+                            productResults[0].style.backgroundColor = '#f8f9fa';
+                        }
+                    } else {
+                        selectedProduct = productResults[0].id.split('-')[1];
+                        productResults[0].style.backgroundColor = '#f8f9fa';
+                    }
+                }
+            }
+        });
+        productSearch.addEventListener('input', async () => {
+            if(searchBarcode.checked){
+                return;
+            }
+            const query = productSearch.value;
+            if (query.length === 0) {
+                document.getElementById('search-results').classList.add('d-none');
+                return;
+            }
+            const products = await getProducts({ name: query });
+            if (products.length === 0) {
+                document.getElementById('search-results').classList.add('d-none');
+                return;
+            }
+            allProducts = products;
+            const searchResults = document.getElementById('search-results');
+            searchResults.classList.remove('d-none');
+            searchResults.innerHTML = '';
+            
+            let filteredProds = products.filter(product => product.name.toLowerCase().includes(query.toLowerCase()));
+            filteredProds.forEach(product => {
+                const productElement = document.createElement('div');
+                productElement.classList.add('search-result-product', 'p-2', 'd-flex', 'justify-content-between', 'align-items-center');
+                productElement.id = `product-${product.id}`;
+                productElement.style.cursor = 'pointer';
+                productElement.innerHTML = `
+                    <span>${product.name}</span>
+                    <span>Rs. ${product.saleprice}</span>
+                    `;
+                productElement.addEventListener('click', () => {
+                    addProduct(product);
+                    productSearch.value = '';
+                    searchResults.classList.add('d-none');
+                });
+                searchResults.appendChild(productElement);
+            });
+        });
+        totalPayment.addEventListener('input', () => {
+            UpdateChangePrice();
+        });
+        selectedProductsTable.addEventListener('click', (event) => {
+            function UpdateProductQuantity(event, input, quantityElement , price, totalElement){
+                if (event.key === 'Enter') {
+                    const newQuantity = parseInt(input.value);
+                    let productTotalQuantity = allProducts.find(p => p.id === parseInt(target.parentElement.children[0].textContent)).quantity;
+                    if (newQuantity <= 0) {
+                        input.style.borderBottomColor = 'red';
+                        ErrorString = "Please enter valid quantity";
+                        toastr.warning('Quantity should be greater than 0');
+                        return false;
+                    }
+                    ErrorString = '';
+                    quantityElement.textContent = newQuantity;
+                    totalElement.textContent = Math.round(newQuantity * price);
+                    updateTotalBill();
+                }
+            }
+            const target = event.target;
+            if(target.tagName === 'TD'){
+                if (target.cellIndex === 2) {
+                    let quantityElement = target.querySelector('.editable-input');
+                    if(!quantityElement){
+                        return;
+                    }
+                    const quantity = Math.round(quantityElement.value);
+                    const priceElement = target.nextElementSibling.querySelector('.editable-input');
+                    const totalElement = target.nextElementSibling.nextElementSibling;
+                    const price = parseFloat(priceElement.value);
+                    const total = parseFloat(totalElement.textContent);
+                    createEdiableInput( 
+                        (event, input) => UpdateProductQuantity(event, input, quantityElement , price, totalElement), 
+                        quantity, 
+                        target
+                    );
+                }
+                else if (target.cellIndex === 3) {
+                    let priceElement = target.querySelector('.editable-input');
+                    const price = parseFloat(priceElement.value);
+                    const quantityElement = target.previousElementSibling.querySelector('.editable-input');
+                    const totalElement = target.nextElementSibling;
+                    createEdiableInput( 
+                        (event, input) => {
+                            if (event.key === 'Enter') {
+                                const newPrice = parseInt(input.value);
+                                if (newPrice <= 0) {
+                                    input.style.borderBottomColor = 'red';
+                                    toastr.warning('Price should be greater than 0');
+                                    return false;
+                                }
+                                priceElement.value = newPrice;
+                                totalElement.textContent = parseInt((parseInt(quantityElement.value) * newPrice))
+                                updateTotalBill();
+                            }
+                        },
+                        price, 
+                        target
+                    );
+                }
+            }
+        });
+    });
+    </script>

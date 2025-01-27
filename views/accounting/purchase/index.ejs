@@ -1,0 +1,199 @@
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Purchase List</h4>
+            <div class="page-title-right">
+                <button type="button" class="btn btn-primary" onclick="window.location.href='/accounting/purchase/form'">
+                    <i class="bx bx-plus me-1"></i> New Purchase
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <form id="search-form" class="row g-3 mb-4" action="/accounting/purchase/search" method="POST">
+                    <div class="col-xxl-3 col-sm-4">
+                        <div class="search-box">
+                            <input type="text" 
+                                   class="form-control search flatpickr-range"
+                                   data-provider="flatpickr" 
+                                   data-range="true"
+                                   data-date-format="Y-m-d"
+                                   name="daterange" 
+                                   placeholder="Filter by date range..."
+                                   value="<%= searchquery ? searchquery.daterange : '' %>">
+                            <i class="ri-calendar-2-line search-icon"></i>
+                        </div>
+                    </div>
+                    <div class="col-xxl-3 col-sm-3">
+                        <div class="search-box">
+                            <input type="text" 
+                                   class="form-control search" 
+                                   name="vendor"
+                                   placeholder="Search by vendor name..."
+                                   value="<%= searchquery ? searchquery.vendor : '' %>">
+                            <i class="ri-user-line search-icon"></i>
+                        </div>
+                    </div>
+                    <div class="col-xxl-3 col-sm-3">
+                        <div class="search-box">
+                            <input type="text" 
+                                   class="form-control search" 
+                                   name="invoicenum"
+                                   placeholder="Search by invoice number..."
+                                   value="<%= searchquery ? searchquery.invoicenum : '' %>">
+                            <i class="ri-file-list-line search-icon"></i>
+                        </div>
+                    </div>
+                    <div class="col-xxl-2 col-sm-2 d-flex align-items-center justify-content-end">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-sm btn-primary">
+                                <i class="ri-search-line me-1 align-bottom"></i> Search
+                            </button>
+                            <% if (searchquery?.daterange || searchquery?.vendor || searchquery?.invoicenum) { %>
+                                <button type="button" id="reset" class="btn btn-sm btn-danger">
+                                    <i class="ri-close-line align-bottom me-1"></i> Clear
+                                </button>
+                            <% } %>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Purchase List Table -->
+                <div class="table-responsive">
+                    <table class="table table-striped table-nowrap align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Id</th>
+                                <th>Date</th>
+                                <th>Creator</th>
+                                <th>Vendor</th>
+                                <th>Amount</th>
+                                <th>Invoice Id</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (!purchases.length) { %>
+                                <tr>
+                                    <td colspan="7" class="text-center">
+                                    <i class="ri-error-warning-line align-middle me-1"></i> No data found
+                                    </td>
+                                </tr>
+                                <% } else { %>
+                                    <% purchases.forEach(purchase => { %>
+                                        <tr>
+                                            <td><%= purchase.id %></td>
+                                            <td class="date"><%= purchase.createdAt %></td>
+                                            <td><%= purchase.createdby %></td>
+                                            <td><%= purchase.vendor ? purchase.vendor : "None" %></td>
+                                            <td><%= purchase.totalAmount %></td>
+                                            <td><%= purchase.invoicenum %></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary" onclick="viewPurchase('<%= purchase.id %>')">
+                                                    <i class="bx bx-detail"></i>
+                                                    Invoice
+                                                </button>
+                                                <button class="btn btn-sm btn-primary btn-secondary" onclick="viewPurchaseDetails('<%= purchase.id %>')">
+                                                    <i class="bx bx-file text-white"></i>
+                                                    Details
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <style>
+                .search-box {
+                    position: relative;
+                }
+
+                .search-box .search-icon {
+                    position: absolute;
+                    left: 13px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    font-size: 18px;
+                    color: var(--vz-gray-600);
+                }
+
+                .search-box .form-control {
+                    padding-left: 35px;
+                    background-color: var(--vz-card-bg-custom);
+                    border-color: var(--vz-border-color);
+                }
+
+                .search-box .form-control:focus {
+                    border-color: var(--vz-primary);
+                }
+
+                .search-box .flatpickr-range {
+                    background-color: var(--vz-card-bg-custom);
+                }
+            </style>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    $('#reset').click(function () {
+        $('#search-form').find('input').val('');
+        $('#search-form').submit();
+    });
+
+    $('.dash-filter-picker').attr('placeholder', moment().format('D MMM, YYYY'));
+    if (!$('.dash-filter-picker').val()) {
+        $('.dash-filter-picker').val(moment().format('D MMM, YYYY'));
+    }
+
+    $('.date').each(function () {
+        let date = new Date($(this).text());
+        $(this).text(moment(date).format('D MMM, YYYY'));
+    });
+});
+
+function filterPurchases() {
+    // Implement filter logic here
+    console.log('Filtering purchases...');
+}
+
+function viewPurchase(id) {
+    window.open(`/accounting/purchase/view/${id}`, '_blank');
+}
+function viewPurchaseDetails(id) {
+    window.open(`/accounting/purchase/details/${id}`, '_blank');
+}
+
+$('.date').each(function() {
+    const date = new Date($(this).text());
+    $(this).text(date.toLocaleDateString());
+});
+
+$(document).ready(function() {
+    // Initialize flatpickr
+    flatpickr(".flatpickr-range", {
+        mode: "range",
+        placeholder: "Filter by date range",
+        dateFormat: "Y-m-d"
+    });
+
+    // Reset form
+    $('#reset').click(function() {
+        window.location.href = '/accounting/purchase';
+    });
+
+    // Format dates
+    $('.date').each(function() {
+        let date = new Date($(this).text());
+        $(this).text(moment(date).format('D MMM, YYYY'));
+    });
+});
+</script>

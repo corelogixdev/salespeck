@@ -1,0 +1,250 @@
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header align-items-center d-flex">
+                <h4 class="card-title mb-0 flex-grow-1">Inventory Logs</h4>
+                <div class="d-flex gap-2">
+                    <button onclick="window.location.reload()" class="btn btn-soft-success btn-sm">
+                        <i class="ri-refresh-line align-middle"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="live-preview">
+                    <!-- Search Form -->
+                    <form id="searchForm" method="POST" action="/inventorylogs/search" class="row g-3 mb-0">
+                        <div class="col-xxl-3 col-sm-4">
+                            <div class="search-box">
+                                <input type="text" 
+                                       class="form-control search flatpickr-range"
+                                       data-provider="flatpickr" 
+                                       data-range="true"
+                                       data-date-format="Y-m-d"
+                                       name="dateRange" 
+                                       placeholder="Filter by date range..."
+                                       value="<%= searchParams?.dateRange || '' %>">
+                                <i class="ri-calendar-2-line search-icon"></i>
+                            </div>
+                        </div>
+                        <div class="col-xxl-3 col-sm-3">
+                            <div class="search-box">
+                                <input type="text" 
+                                       class="form-control search" 
+                                       name="product"
+                                       placeholder="Filter by product name or ID..."
+                                       value="<%= searchParams?.product || '' %>">
+                                <i class="ri-shopping-basket-2-line search-icon"></i>
+                            </div>
+                        </div>
+                        <div class="col-xxl-3 col-sm-3">
+                            <div class="search-box">
+                                <input type="text" 
+                                       class="form-control search" 
+                                       name="createdBy"
+                                       placeholder="Filter by user..."
+                                       value="<%= searchParams?.createdBy || '' %>">
+                                <i class="ri-user-line search-icon"></i>
+                            </div>
+                        </div>
+                        <div class="col-xxl-2 col-sm-2 d-flex align-items-center justify-content-end">
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-sm btn-primary">
+                                    <i class="ri-search-line me-1 align-bottom"></i> Search
+                                </button>
+                                <% if (searchParams?.dateRange || searchParams?.product || searchParams?.createdBy) { %>
+                                    <a href="/inventorylogs" class="btn btn-sm btn-danger">
+                                        <i class="ri-close-line align-bottom me-1"></i> Clear
+                                    </a>
+                                <% } %>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Table -->
+                    <div class="table-responsive mt-4">
+                        <table class="table table-striped table-nowrap align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Date</th>
+                                    <th>Product</th>
+                                    <th>Type</th>
+                                    <th>Quantity</th>
+                                    <th>Note</th>
+                                    <th>Created By</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (!logs.length) { %>
+                                    <tr>
+                                        <td colspan="8" class="text-center">
+                                            <i class="ri-error-warning-line align-middle me-1"></i> No logs found
+                                        </td>
+                                    </tr>
+                                <% } else { %>
+                                    <% logs.forEach(log => { %>
+                                        <tr>
+                                            <td><%= log.id %></td>
+                                            <td class="date"><%= log.createdAt %></td>
+                                            <td>
+                                                <% const productName = log.Product ? log.Product.name : 'Unknown Product' %>
+                                                <span class="limited-text" title="<%= productName %>">
+                                                    <%= productName.length > 20 ? productName.substring(0, 20) + '...' : productName %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-<%= log.type === 'sale' ? 'danger' : 'success' %>">
+                                                    <%= log.type ? (log.type.charAt(0).toUpperCase() + log.type.slice(1)) : 'Unknown' %>
+                                                </span>
+                                            </td>
+                                            <td class="<%= parseInt(log.quantity) < 0 ? 'text-danger' : 'text-success' %>">
+                                                <%= log.quantity || 0 %>
+                                            </td>
+                                            <td>
+                                                <% const note = log.note || '-' %>
+                                                <span class="limited-note" title="<%= note %>">
+                                                    <%= note.length > 30 ? note.substring(0, 30) + '...' : note %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <% const userName = log.User ? log.User.name : 'Unknown User' %>
+                                                <span class="limited-text" title="<%= userName %>">
+                                                    <%= userName.length > 15 ? userName.substring(0, 15) + '...' : userName %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-soft-primary btn-sm" 
+                                                        onclick="viewDetails('<%= log.id %>', '<%= productName %>', `<%= note %>`, '<%= log.createdAt %>', '<%= log.type %>', '<%= log.quantity %>', '<%= userName %>')" 
+                                                        title="View Details">
+                                                    <i class="ri-eye-line align-middle"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Modal -->
+<div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Inventory Log Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold border-bottom w-100 pb-1">Log ID</label>
+                        <p id="modalId" class="form-control-plaintext"></p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold border-bottom w-100 pb-1">Date & Time</label>
+                        <p id="modalDate" class="form-control-plaintext"></p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold border-bottom w-100 pb-1">Product Name</label>
+                        <p id="modalProduct" class="form-control-plaintext"></p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold border-bottom w-100 pb-1">Operation Type</label>
+                        <p id="modalType" class="form-control-plaintext"></p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold border-bottom w-100 pb-1">Quantity Changed</label>
+                        <p id="modalQuantity" class="form-control-plaintext"></p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold border-bottom w-100 pb-1">Created By</label>
+                        <p id="modalUser" class="form-control-plaintext"></p>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold border-bottom w-100 pb-1">Note</label>
+                        <p id="modalNote" class="form-control-plaintext"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Format dates
+    $('.date').each(function() {
+        let date = new Date($(this).text());
+        $(this).text(moment(date).format('D MMM, YYYY HH:mm'));
+    });
+
+    // Initialize flatpickr with custom settings
+    flatpickr(".flatpickr-range", {
+        mode: "range",
+        placeholder: "Filter by date range",
+        defaultDate: "<%= searchParams?.dateRange?.split(' to ') || '' %>"
+    });
+});
+
+function viewDetails(id, product, note, createdAt, type, quantity, user) {
+    document.getElementById('modalId').textContent = id;
+    document.getElementById('modalDate').textContent = moment(createdAt).format('D MMM, YYYY HH:mm');
+    document.getElementById('modalProduct').textContent = product;
+    document.getElementById('modalType').innerHTML = `<span class="badge bg-${type === 'sale' ? 'danger' : 'success'}">${type.charAt(0).toUpperCase() + type.slice(1)}</span>`;
+    document.getElementById('modalQuantity').innerHTML = `<span class="${parseInt(quantity) < 0 ? 'text-danger' : 'text-success'}">${quantity}</span>`;
+    document.getElementById('modalUser').textContent = user;
+    document.getElementById('modalNote').textContent = note;
+    
+    const viewModal = new bootstrap.Modal(document.getElementById('viewModal'));
+    viewModal.show();
+}
+</script>
+
+<style>
+.limited-note,
+.limited-text {
+    display: inline-block;
+    vertical-align: middle;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Search box styling */
+.search-box {
+    position: relative;
+}
+
+.search-box .search-icon {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: var(--vz-gray-600);
+}
+
+.search-box .form-control {
+    padding-left: 35px;
+    background-color: var(--vz-card-bg-custom);
+    border-color: var(--vz-border-color);
+}
+
+.search-box .form-control:focus {
+    border-color: var(--vz-primary);
+}
+
+.search-box .flatpickr-range {
+    background-color: var(--vz-card-bg-custom);
+}
+</style>

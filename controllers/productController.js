@@ -3,10 +3,39 @@ const db = require('../models');
 const { findLike } = require('../utils/searchquery');
 
 exports.index = async (req, res) => {
-  const data = await db.product.findAll({
-    sort: { createdAt: -1 }
-  });
-  res.render('products/index', { title: "Products", data });
+  try {
+    const { name, barcode, category } = req.body;
+    let whereClause = {};
+
+    // Build search criteria
+    if (name) {
+      whereClause.name = { [Op.like]: `%${name}%` };
+    }
+    if (barcode) {
+      whereClause.barcode = { [Op.like]: `%${barcode}%` };
+    }
+    if (category) {
+      whereClause.category = { [Op.like]: `%${category}%` };
+    }
+
+    const data = await db.product.findAll({
+      where: whereClause,
+      order: [['id', 'DESC']]
+    });
+
+    res.render('products/index', { 
+      title: "Products", 
+      data,
+      searchParams: req.body 
+    });
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    req.session.message = { 
+      type: "error", 
+      text: "An error occurred while fetching products." 
+    };
+    res.redirect("/dashboard");
+  }
 };
 
 exports.get = async (req, res) => {
@@ -84,6 +113,7 @@ exports.delete = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 };
+
 exports.search = async (req, res) => {
   const searchdata = req.body.query;
   if (!searchdata) {
@@ -97,3 +127,70 @@ exports.search = async (req, res) => {
   });
   res.json({ success: true, data });
 }
+
+exports.quantityForm = async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const product = await db.product.findByPk(productId);
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+    res.render('products/quantity-form', { 
+      title: 'Add Product Quantity', 
+      product,
+      hidenav: true 
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+};
+
+exports.saveQuantity = async (req, res) => {
+  let { id, quantity, note } = req.body;
+  
+  if (!quantity) {
+    return res.status(400).json({ 
+      success: false, 
+      message: 'Please enter a valid quantity' 
+    });
+  }
+
+  if (!note.trim()) {
+    note = 'Manual quantity update';
+  }
+
+  try {
+    const product = await db.product.findByPk(id);
+    if (!product) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Product not found' 
+      });
+    }
+
+    // Update product quantity
+    await product.update({
+      quantity: db.sequelize.literal(`quantity + ${quantity}`)
+    });
+
+    // Create inventory log
+    await db.inventorylogs.create({
+      product_id: id,
+      quantity: quantity,
+      note: note,
+      createdby: req.session.user.id,
+      type: 'manual'
+    });
+
+    res.json({ 
+      success: true, 
+      message: 'Product quantity updated successfully' 
+    });
+  } catch (error) {
+    console.error('Error updating quantity:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Internal Server Error' 
+    });
+  }
+};

@@ -593,9 +593,124 @@ module.exports = {
         allowNull: true,
       },
     });
+
+    // create table inventory logs
+    await queryInterface.createTable('inventorylogs', {
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      product_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      quantity: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
+      note: {
+        type: Sequelize.STRING(200),
+        allowNull: true,
+      },
+      type: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
+      },
+      createdby: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      }
+    });
+
+    // Add purchase table
+    await queryInterface.createTable('purchase', {
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false
+      },
+      createdby: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      updatedby: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      vendor: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      totalAmount: {
+        type: Sequelize.FLOAT,
+        allowNull: true
+      },
+      totalPayment: {
+        type: Sequelize.FLOAT,
+        allowNull: true
+      },
+      invoicenum: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false
+      }
+    });
+
+    // Add purchasedproducts table
+    await queryInterface.createTable('purchasedproducts', {
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false
+      },
+      purchase: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      product: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      quantity: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      totalAmount: {
+        type: Sequelize.FLOAT,
+        allowNull: true
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false
+      }
+    });
   },
 
   down: async (queryInterface) => {
+    await queryInterface.dropTable('purchasedproducts');
+    await queryInterface.dropTable('purchase');
     await queryInterface.dropTable('cashclosing');
     await queryInterface.dropTable('inventorylog');
     await queryInterface.dropTable('user');

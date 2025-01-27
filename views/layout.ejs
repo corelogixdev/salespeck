@@ -95,7 +95,7 @@
                                             <a href="/products" class="nav-link">Products List</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="/inventory/logs" class="nav-link disabled">Inventory Logs</a>
+                                            <a href="/inventorylogs" class="nav-link">Inventory Logs</a>
                                         </li>
                                     </ul>
                                 </div>
@@ -146,7 +146,10 @@
                                             <a href="/accounting/balance-sheet" class="nav-link disabled">Balance Sheet</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="/accounting/purchases" class="nav-link disabled">Purchases</a>
+                                            <a href="/accounting/purchase" class="nav-link">Purchases List</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/accounting/purchase/form" target="_blank" class="nav-link">New Purchase</a>
                                         </li>
                                         <li class="nav-item">
                                             <a href="/accounting/expenses" class="nav-link disabled">Expenses</a>
@@ -161,7 +164,7 @@
                                             <a href="/accounting/cash-closing-report" class="nav-link disabled">Cash Closing Report</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="/accounting/taxes/index" class="nav-link">Taxes</a>
+                                            <a href="/accounting/taxes" class="nav-link">Taxes</a>
                                         </li>
                                     </ul>
                                 </div>
@@ -640,10 +643,21 @@
     <script src="/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="/assets/libs/feather-icons/feather.min.js"></script>
     <script src="/assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
+    <script src="/assets/js/moment.min.js"></script>
     <script src="/assets/js/plugins.js"></script>
     <% if (typeof hidenav==='undefined' || hidenav !==true) { %>
         <script src="/assets/js/app.js"></script>
     <% } %>
     <script src="/assets/libs/apexcharts/apexcharts.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            setTimeout(() => {
+                $('.format-date').each(function() {
+                    var date = $(this).text();
+                    $(this).text(moment(date).format('DD MMM YYYY'));
+                });    
+            });
+        });
+    </script>
 </body>
 </html>
