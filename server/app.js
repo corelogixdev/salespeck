@@ -62,8 +62,6 @@ app.use('/settings', routes.settingRoutes);
 app.use('/sales', routes.saleRoutes);
 app.use('/accounting', routes.accountingRoutes);
 
-// const loadTestSeeder = require('../seeders/loadTest.seeder.js');
-// loadTestSeeder();
 // app.get('/*', (req, res) => {
 //   res.redirect('/');
 // });
