@@ -8,5 +8,6 @@ router.post("/save", controller.save);
 router.post("/search", controller.search);
 router.get("/form", controller.form);
 router.post("/productsget", controller.productsget);
+router.get('/search-vendors', controller.searchVendors);
 
 module.exports = router;

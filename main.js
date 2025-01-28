@@ -1,8 +1,8 @@
 const path = require('path');
 const fs = require('fs');
-const http = require('http');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+require('./server/app'); // DON'T REMOVE THIS. THIS LINKS TO THE EXPRESS APP
 const { autoUpdater } = require('electron-updater');
 const config = require('./config.js'); // Link to the Express app
 const logi = require('./utils/logi.js');
@@ -44,7 +44,7 @@ function createWindow() {
   ipcMain.on('close-app', () => {
     win.close();
   });
-
+  return win;
 }
 
 // Listen for IPC messages from the renderer process
@@ -63,21 +63,29 @@ ipcMain.on('switch-server', async (event, serverIp) => {
   try {
     // Store the new IP in config or env
     process.env.SERVER_IP = serverIp;
-    
-    // Close existing window
-    BrowserWindow.getAllWindows().forEach(window => {
+    logi('Switching server to:', serverIp);
+
+    // Get all existing windows
+    const existingWindows = BrowserWindow.getAllWindows();
+
+    // Create new window first
+    let win = createWindow();
+
+    // Wait a moment for the new window to be ready
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // Close existing windows
+    existingWindows.forEach(window => {
       window.close();
     });
 
-    // Wait a moment for cleanup
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    win.focus();
 
-    // Create new window with new server
-    createWindow();
-
-    // Optional: Notify the new window when it's ready
+    // Optional: Notify about successful switch
     event.reply('server-switched', { status: 'success' });
+    logi('Server switched to:', serverIp);
   } catch (error) {
+    logi('Error switching server:', error.message);
     event.reply('server-switched', { 
       status: 'error', 
       message: error.message 

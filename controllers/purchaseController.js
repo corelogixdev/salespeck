@@ -239,3 +239,22 @@ exports.productsget = async (req, res) => {
   });
   res.json(data);
 };
+
+exports.searchVendors = async (req, res) => {
+  try {
+    const { search } = req.query;
+    const vendors = await db.user.findAll({
+      where: {
+        role: 'user',
+        name: {
+          [Op.like]: `%${search}%`
+        }
+      },
+      attributes: ['id', 'name', 'phone'],
+      limit: 10
+    });
+    res.json(vendors);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};

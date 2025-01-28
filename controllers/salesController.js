@@ -170,6 +170,9 @@ var moment = require("moment");
 const { findLike } = require("../utils/searchquery");
 exports.saleview = async (req, res) => {
   const { id } = req.params;
+  if(!id) {
+    return res.status(400).send({ status: "error", message: "Invalid sale ID" });
+  }
   const sale = await db.sale.findOne({
     where: {
       id: parseInt(id),
@@ -247,4 +250,23 @@ exports.productsget = async (req, res) => {
     },
   });
   res.json(data);
+};
+
+exports.searchCustomers = async (req, res) => {
+  try {
+    const { search } = req.query;
+    const customers = await db.user.findAll({
+      where: {
+        role: 'customer',
+        name: {
+          [Op.like]: `%${search}%`
+        }
+      },
+      attributes: ['id', 'name', 'phone'],
+      limit: 10
+    });
+    res.json(customers);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 };

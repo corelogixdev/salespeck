@@ -20,7 +20,8 @@ exports.index = async (req, res) => {
 
     const data = await db.product.findAll({
       where: whereClause,
-      order: [['id', 'DESC']]
+      order: [['id', 'DESC']],
+      limit: 10
     });
 
     res.render('products/index', { 

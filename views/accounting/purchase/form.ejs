@@ -26,11 +26,8 @@
                     <div class="pt-3">
                         <div class="mb-3">
                             <label for="vendor" class="form-label text-muted text-uppercase fw-semibold">Vendor</label>
-                            <select id="vendor" class="form-select">
+                            <select id="vendor" class="form-select select2" data-placeholder="Select Vendor">
                                 <option value="">Select Vendor</option>
-                                <% vendors.forEach(vendor => { %>
-                                    <option value="<%= vendor.id %>"><%= vendor.name %></option>
-                                <% }); %>
                             </select>
                         </div>
 
@@ -112,6 +109,30 @@
 }
 #search-results {
     box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+}
+.select2-dropdown-custom {
+    max-height: 200px;
+    overflow-y: auto;
+}
+.select2-container--bootstrap-5 .select2-selection {
+    min-height: 38px;
+    /* border: 1px solid var(--vz-input-border); */
+    /* background-color: var(--vz-input-bg); */
+}
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    color: var(--vz-body-color);
+    line-height: 36px;
+}
+.select2-container--bootstrap-5 .select2-dropdown {
+    background-color: var(--vz-card-bg);
+    border-color: var(--vz-border-color);
+}
+.select2-container--bootstrap-5 .select2-results__option {
+    padding: 8px 12px;
+    color: var(--vz-body-color);
+}
+.select2-container--bootstrap-5 .select2-results__option--highlighted {
+    background-color: var(--vz-primary);
 }
 </style>
 
@@ -470,4 +491,32 @@
             }
         });
     });
-    </script>
+    $(document).ready(function() {
+        $('#vendor').select2({
+            theme: 'bootstrap-5',
+            dropdownParent: $('#vendor').parent(),
+            ajax: {
+                url: '/accounting/purchase/search-vendors',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        search: params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.map(vendor => ({
+                            id: vendor.id,
+                            text: `${vendor.name} (${vendor.phone || 'No phone'})`
+                        }))
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 1,
+            placeholder: 'Search vendor...',
+            dropdownCssClass: 'select2-dropdown-custom',
+        });
+    });
+</script>

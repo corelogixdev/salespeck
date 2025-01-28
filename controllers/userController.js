@@ -27,7 +27,6 @@ exports.index = async (req, res) => {
   const role = req.query.role || 'user'; // Default role to 'user' if not provided;
   let searchdata = req.query.search || '';
   searchdata = searchdata.trim();
-  let page = req.query.page || 1;
   const data = await db.user.findAll({
     where: {
       role: role,
@@ -37,29 +36,9 @@ exports.index = async (req, res) => {
         { name: { [Op.like]: `%${searchdata}%` } }
       ]
     },
-    limit: PER_PAGE,
-    offset: (page - 1) * PER_PAGE,
+    limit: 10,
   });
-  let total = await db.user.count({
-    where: {
-      role: role,
-      [Op.or]: [
-        { username: { [Op.like]: `%${searchdata}%` } },
-        { phone: { [Op.like]: `%${searchdata}%` } },
-        { name: { [Op.like]: `%${searchdata}%` } }
-      ]
-    }
-  });
-  let paginator = {
-    page: page * 1, // Convert string to number
-    per_page: PER_PAGE,
-    total: total,
-    start: (page - 1) * PER_PAGE + 1,
-    end: Math.min(page * PER_PAGE, total),
-    total_pages: Math.ceil(total / PER_PAGE),
-    page_range: getPageRange(page * 1, Math.ceil(total / PER_PAGE))
-  }
-  res.render('users/index', { title: role === 'user' ? 'Users' : 'Customers', data, role, searchdata, paginator });
+  res.render('users/index', { title: role === 'user' ? 'Users' : 'Customers', data, role, searchdata });
 };
 
 exports.form = async (req, res) => {

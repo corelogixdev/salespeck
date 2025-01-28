@@ -229,13 +229,13 @@ const registerpost = async (req, res) => {
   const { username, password, firstName, lastName, email } = req.body;
   
   // First check if user exists in local database
-  const existingUser = await db.user.findOne({ where: { email } });
-  if (existingUser) {
-    req.session.errors = {
-      email: "User already exists. Please login.",
-    };
-    return res.redirect("/login");
-  }
+  // const existingUser = await db.user.findOne({ where: { email } });
+  // if (existingUser) {
+  //   req.session.errors = {
+  //     email: "User already exists. Please login.",
+  //   };
+  //   return res.redirect("/login");
+  // }
 
   // let registered = await registerOnWeb(req.body);
   // if (registered["status"] === "failed") {
@@ -255,6 +255,7 @@ const registerpost = async (req, res) => {
   // }
 
   try {
+    logi("Creating user in local database...");
     const hashedPassword = encrypt.encrypt(password);
     let user = await db.user.create({
       name: firstName + " " + lastName,
@@ -266,10 +267,6 @@ const registerpost = async (req, res) => {
     logi("BranchManager user created successfully!");
     await db.userpermissions.create({ user_id: user.id, permission_id: 777 });
     logi("BranchManager user permissions set successfully");
-    req.session.message = {
-      type: "success",
-      text: "BranchManager user created successfully!",
-    };
     res.redirect("/login");
   } catch (e) {
     logi("Error:");
@@ -329,6 +326,7 @@ const inventorylogs = async (req, res) => {
     req.session.message = {
       type: "error",
       text: "An error occurred while fetching inventory logs.",
+      searchParams: {},
     };
     res.redirect("/dashboard");
   }
@@ -450,6 +448,7 @@ const inventorylogsById = async (req, res) => {
       logs,
       title: `Inventory Logs - ${logs[0]?.Product?.name || "Product"}`,
       hidenav: true,
+      searchParams: {},
     });
   } catch (error) {
     console.error("Error fetching inventory logs:", error);
