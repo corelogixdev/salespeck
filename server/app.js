@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const session = require('cookie-session');
 const path = require('path');
+const cors = require('cors');
 const logi = require('../utils/logi');
 const expressLayouts = require('express-ejs-layouts');
 const config = require('../config.js'); // Link to the Express app
@@ -11,7 +12,15 @@ const { permissions } = require('../middleware/populatePermissions.js');
 const app = express();
 const runMigrationsAndSeeders = require('../utils/runMigrationsAndSeeders.js');
 
+// CORS Configuration
+const corsOptions = {
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
 // Middleware
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -41,6 +50,10 @@ app.use(
 app.use(sessionDataMiddleware);
 app.use(permissions);
 
+// API Server verification endpoint
+app.get('/api/verify-server', (req, res) => {
+  res.status(200).json({ status: "success", message: 'Server is running' });
+});
 // Routes
 app.use('/', routes.mainRoutes);
 app.use('/products', routes.productRoutes);
@@ -48,6 +61,8 @@ app.use('/users', routes.userRoutes);
 app.use('/settings', routes.settingRoutes);
 app.use('/sales', routes.saleRoutes);
 app.use('/accounting', routes.accountingRoutes);
+
+
 // app.get('/*', (req, res) => {
 //   res.redirect('/');
 // });

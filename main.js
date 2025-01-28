@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const http = require('http');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const { autoUpdater } = require('electron-updater');
@@ -38,7 +39,8 @@ function createWindow() {
 
   //to open dev tools
   //win.webContents.openDevTools();
-  win.loadURL('http://localhost:'+config.port); // Serve Express on localhost:3000
+  const serverUrl = process.env.SERVER_IP || 'localhost:' + config.port;
+  win.loadURL(`http://${serverUrl}`); // Serve Express on localhost:3000
   ipcMain.on('close-app', () => {
     win.close();
   });
@@ -55,6 +57,32 @@ ipcMain.on('perform-action', (event, arg) => {
     app.quit();
   }
   event.reply('action-response', 'Action completed successfully!');
+});
+
+ipcMain.on('switch-server', async (event, serverIp) => {
+  try {
+    // Store the new IP in config or env
+    process.env.SERVER_IP = serverIp;
+    
+    // Close existing window
+    BrowserWindow.getAllWindows().forEach(window => {
+      window.close();
+    });
+
+    // Wait a moment for cleanup
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Create new window with new server
+    createWindow();
+
+    // Optional: Notify the new window when it's ready
+    event.reply('server-switched', { status: 'success' });
+  } catch (error) {
+    event.reply('server-switched', { 
+      status: 'error', 
+      message: error.message 
+    });
+  }
 });
 
 app.whenReady().then(() => {

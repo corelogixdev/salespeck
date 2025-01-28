@@ -66,6 +66,7 @@
   "author": "Atta Rasul",
   "dependencies": {
     "cookie-session": "^2.1.0",
+    "cors": "^2.8.5",
     "cross-spawn": "^7.0.3",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",

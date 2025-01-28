@@ -16,7 +16,9 @@ const index = (req, res) => {
 const dashboard = async (req, res) => {
   try {
     // Fetch company settings
-    const settings = await db.softwaresetting.findOne({ where: { name: "company" } });
+    const settings = await db.softwaresetting.findOne({
+      where: { name: "company" },
+    });
     const company = JSON.parse(settings?.value || "{}");
 
     // Define start and end of today's date
@@ -24,21 +26,27 @@ const dashboard = async (req, res) => {
     const todayEndDate = moment().endOf("day").toDate();
 
     // Fetch today's sales amount
-    const todaysSalesAmount = (await db.soldproducts.sum("price", {
-      where: { createdAt: { [Op.between]: [todayStartDate, todayEndDate] } },
-    })) || 0;
+    const todaysSalesAmount =
+      (await db.soldproducts.sum("price", {
+        where: { createdAt: { [Op.between]: [todayStartDate, todayEndDate] } },
+      })) || 0;
 
     // Fetch today's and yesterday's sales
-    const salesComparison = await db.sequelize.query(`
+    const salesComparison = await db.sequelize.query(
+      `
       SELECT
         (SELECT SUM(price) FROM soldproducts WHERE createdAt BETWEEN date('now', '-1 day') AND date('now', '-1 day', '+1 day')) as yesterday,
         (SELECT SUM(price) FROM soldproducts WHERE createdAt BETWEEN date('now') AND date('now', '+1 day')) as today
       `,
       { type: db.sequelize.QueryTypes.SELECT }
     );
-    const { yesterday: yesterdaySales = 0, today: todaySales = 0 } = salesComparison[0];
-    const salesPercentageChange = calculatePercentageChange(yesterdaySales, todaySales).toFixed(2);
-    const salesArrowDirection = todaySales >= yesterdaySales ? 'up' : 'down';
+    const { yesterday: yesterdaySales = 0, today: todaySales = 0 } =
+      salesComparison[0];
+    const salesPercentageChange = calculatePercentageChange(
+      yesterdaySales,
+      todaySales
+    ).toFixed(2);
+    const salesArrowDirection = todaySales >= yesterdaySales ? "up" : "down";
 
     // Fetch today's customer count
     const todayCustomersCount = await db.user.count({
@@ -62,14 +70,19 @@ const dashboard = async (req, res) => {
     });
 
     // Calculate percentage change for customers
-    const customerPercentageChange = calculatePercentageChange(yesterdayCustomersCount, todayCustomersCount).toFixed(2);
-    const customerArrowDirection = todayCustomersCount >= yesterdayCustomersCount ? 'up' : 'down';
+    const customerPercentageChange = calculatePercentageChange(
+      yesterdayCustomersCount,
+      todayCustomersCount
+    ).toFixed(2);
+    const customerArrowDirection =
+      todayCustomersCount >= yesterdayCustomersCount ? "up" : "down";
 
     // Fetch total sales count
     const totalSalesCount = await db.sale.count();
 
     // Fetch top 5 sold products with sold quantities
-    const topFiveSoldProductsWithSoldQuantity = await db.sequelize.query(`
+    const topFiveSoldProductsWithSoldQuantity = await db.sequelize.query(
+      `
       SELECT 
         strftime('%m', s.createdAt) as month,
         p.name as product_name,
@@ -84,7 +97,8 @@ const dashboard = async (req, res) => {
     );
 
     // Fetch sales count by month
-    const salesCountByMonth = await db.sequelize.query(`
+    const salesCountByMonth = await db.sequelize.query(
+      `
       SELECT strftime('%m', createdAt) as month, COUNT(*) as total FROM sale GROUP BY month
       `,
       { type: db.sequelize.QueryTypes.SELECT }
@@ -105,15 +119,18 @@ const dashboard = async (req, res) => {
     });
   } catch (error) {
     logi("Error:", error);
-    req.session.message = { type: "error", text: "An error occurred. Please try again." };
+    req.session.message = {
+      type: "error",
+      text: "An error occurred. Please try again.",
+    };
     res.redirect("/login");
   }
 };
 
 // Helper function to calculate percentage change
-function calculatePercentageChange(previous=0, current) {
-  if(previous === null ) previous = 0;
-  if(current === null ) current = 0;
+function calculatePercentageChange(previous = 0, current) {
+  if (previous === null) previous = 0;
+  if (current === null) current = 0;
   if (previous > 0) {
     return ((current - previous) / previous) * 100;
   } else if (previous === 0 && current > 0) {
@@ -128,25 +145,15 @@ function calculatePercentageChange(previous=0, current) {
   return 0;
 }
 const loginGet = async (req, res) => {
-  const BranchManagerExists = await db.user.findOne({ where: { role: "branchmanager" } });
-  if (!BranchManagerExists) {
-    return res.redirect("/register");
-  }  
-  res.render("login", { hidenav: true ,
-    errors:{
-      username: req.session.message?.type === "error" ? "Invalid username or password" : "",
-      password: req.session.message?.type === "error" ? "Invalid username or password" : "",
-    }
-  });
+  res.render("login", { hidenav: true, errors: req.session?.errors || {} });
 };
 
 const loginPost = async (req, res) => {
   logi("Login request received");
-  const { username, password } = req.body;
-  logi("Username:", username);
+  const { email, password } = req.body;
   logi("Password received:", password);
   try {
-    const user = await db.user.findOne({ where: { username } });
+    const user = await db.user.findOne({ where: { email } });
     if (user && encrypt.compare(user.password, password)) {
       logi("User found:", user.name);
       logi("Login successful");
@@ -155,13 +162,19 @@ const loginPost = async (req, res) => {
       req.session.message = { type: "success", text: "Login successful!" };
       res.redirect("/dashboard");
     } else {
-      logi("Login failed");
-      res.render("login", {
-        hidenav: true,
-        errors: {
-          password: "Invalid password",
-        },
-      });
+      if (!user) {
+        logi("User was not found. Redirecting to login...");
+        req.session.errors = {
+          email: "User not found. Please register.",
+        };
+      } else {
+        logi("Password incorrect. Redirecting to login...");
+        req.session.errors = {
+          email: "",
+          password: "Password incorrect.",
+        };
+      }
+      res.redirect("/login");
     }
   } catch (e) {
     logi("Error:");
@@ -174,35 +187,101 @@ const logout = (req, res) => {
 };
 
 const registerget = (req, res) => {
-  res.render("register", { hidenav: true, errors:{
-    username: '',
-  }});
+  res.render("register", {
+    hidenav: true,
+    errors: {
+      username: "",
+    },
+  });
 };
 
+function registerOnWeb(data) {
+  return new Promise((resolve, reject) => {
+    let account_key = "123456";
+    const options = {
+      method: "POST",
+      url: config.webUrl + "/api/register",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: data.username,
+        password: data.password,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        account_key: account_key,
+      }),
+    };
+    fetch(options.url, options)
+      .then((response) => response.json())
+      .then((result) => {
+        resolve(result);
+      });
+  });
+}
 
 const registerpost = async (req, res) => {
   logi("Register request received");
   logi("Data:", req.body);
-  const { username, password, firstName, lastName } = req.body;
-  // TODO: REGISTER user on the web app
-  // TEST: res.redirect("/login");
-  logi("Register request received");
-  logi("Data:", req.body);
+  const { username, password, firstName, lastName, email } = req.body;
+  
+  // First check if user exists in local database
+  const existingUser = await db.user.findOne({ where: { email } });
+  if (existingUser) {
+    req.session.errors = {
+      email: "User already exists. Please login.",
+    };
+    return res.redirect("/login");
+  }
+
+  // let registered = await registerOnWeb(req.body);
+  // if (registered["status"] === "failed") {
+  //   logi("Register failed due to: ", registered["message"]);
+  //   return res.render("register", {
+  //     hidenav: true,
+  //     errors: {
+  //       email: registered["message"],
+  //     },
+  //   });
+  // } else if (registered["status"] === "exists") {
+  //   logi("User was already registered, Redirecting to login.");
+  //   req.session.errors = {
+  //     email: "User already exists. Please login.",
+  //   };
+  //   return res.redirect("/login");
+  // }
+
   try {
     const hashedPassword = encrypt.encrypt(password);
-    let user = await db.user.create({ name: firstName +" "+ lastName, username, password: hashedPassword, role: "branchmanager" });
+    let user = await db.user.create({
+      name: firstName + " " + lastName,
+      username,
+      email: email,
+      password: hashedPassword,
+      role: "branchmanager",
+    });
     logi("BranchManager user created successfully!");
-    await db.userpermissions.create({user_id: user.id, permission_id: 777});
+    await db.userpermissions.create({ user_id: user.id, permission_id: 777 });
     logi("BranchManager user permissions set successfully");
-    req.session.message = { type: "success", text: "BranchManager user created successfully!" };
+    req.session.message = {
+      type: "success",
+      text: "BranchManager user created successfully!",
+    };
     res.redirect("/login");
   } catch (e) {
     logi("Error:");
     logi(e);
-    req.session.message = { type: "error", text: "An error occurred. Please try again." };
+    req.session.message = {
+      type: "error",
+      text: "An error occurred. Please try again.",
+    };
     res.redirect("/register");
   }
-}
+};
+
 const exportDb = async (req, res) => {
   try {
     let file = config.storage;
@@ -211,7 +290,7 @@ const exportDb = async (req, res) => {
     logi("Error:", error);
     res.json({ error: "An error occurred. Please try again" });
   }
-}
+};
 
 const inventorylogs = async (req, res) => {
   try {
@@ -220,36 +299,36 @@ const inventorylogs = async (req, res) => {
         {
           model: db.product,
           as: "Product",
-          attributes: ["id", "name"]
+          attributes: ["id", "name"],
         },
         {
           model: db.user,
           as: "User",
-          attributes: ["id", "name"]
-        }
+          attributes: ["id", "name"],
+        },
       ],
-      order: [["createdAt", "DESC"]]
+      order: [["createdAt", "DESC"]],
     });
 
     if (!logs) logs = [];
-    logs = logs.map(log => {
+    logs = logs.map((log) => {
       const plainLog = log.get({ plain: true });
       return {
         ...plainLog,
-        Product: plainLog.Product || { name: 'Unknown Product' },
-        User: plainLog.User || { name: 'Unknown User' }
+        Product: plainLog.Product || { name: "Unknown Product" },
+        User: plainLog.User || { name: "Unknown User" },
       };
     });
 
-    res.render("inventorylogs", { 
+    res.render("inventorylogs", {
       logs,
-      searchParams: {} 
+      searchParams: {},
     });
   } catch (error) {
     console.error("Error fetching inventory logs:", error);
-    req.session.message = { 
-      type: "error", 
-      text: "An error occurred while fetching inventory logs." 
+    req.session.message = {
+      type: "error",
+      text: "An error occurred while fetching inventory logs.",
     };
     res.redirect("/dashboard");
   }
@@ -265,24 +344,26 @@ const searchInventoryLogs = async (req, res) => {
         model: db.product,
         as: "Product",
         attributes: ["id", "name"],
-        where: {}
+        where: {},
       },
       {
         model: db.user,
         as: "User",
         attributes: ["id", "name"],
-        where: {}
-      }
+        where: {},
+      },
     ];
 
     if (dateRange) {
-      const [startDate, endDate] = dateRange.split(' to ').map(date => date.trim());
+      const [startDate, endDate] = dateRange
+        .split(" to ")
+        .map((date) => date.trim());
       if (startDate && endDate) {
         whereClause.createdAt = {
           [Op.between]: [
-            moment(startDate).startOf('day').toDate(),
-            moment(endDate).endOf('day').toDate()
-          ]
+            moment(startDate).startOf("day").toDate(),
+            moment(endDate).endOf("day").toDate(),
+          ],
         };
       }
     }
@@ -302,28 +383,28 @@ const searchInventoryLogs = async (req, res) => {
     let logs = await db.inventorylogs.findAll({
       where: whereClause,
       include: includeOptions,
-      order: [["createdAt", "DESC"]]
+      order: [["createdAt", "DESC"]],
     });
 
     if (!logs) logs = [];
-    logs = logs.map(log => {
+    logs = logs.map((log) => {
       const plainLog = log.get({ plain: true });
       return {
         ...plainLog,
-        Product: plainLog.Product || { name: 'Unknown Product' },
-        User: plainLog.User || { name: 'Unknown User' }
+        Product: plainLog.Product || { name: "Unknown Product" },
+        User: plainLog.User || { name: "Unknown User" },
       };
     });
 
-    res.render("inventorylogs", { 
+    res.render("inventorylogs", {
       logs,
-      searchParams: req.body
+      searchParams: req.body,
     });
   } catch (error) {
     console.error("Error searching inventory logs:", error);
-    req.session.message = { 
-      type: "error", 
-      text: "An error occurred while searching inventory logs." 
+    req.session.message = {
+      type: "error",
+      text: "An error occurred while searching inventory logs.",
     };
     res.redirect("/inventorylogs");
   }
@@ -334,7 +415,7 @@ const inventorylogsById = async (req, res) => {
     const productId = req.params.id;
     let logs = await db.inventorylogs.findAll({
       where: {
-        product_id: productId
+        product_id: productId,
       },
       include: [
         {
@@ -356,28 +437,47 @@ const inventorylogsById = async (req, res) => {
     }
 
     // Add error handling for missing associations
-    logs = logs.map(log => {
+    logs = logs.map((log) => {
       const plainLog = log.get({ plain: true });
       return {
         ...plainLog,
-        Product: plainLog.Product || { name: 'Unknown Product' },
-        User: plainLog.User || { name: 'Unknown User' }
+        Product: plainLog.Product || { name: "Unknown Product" },
+        User: plainLog.User || { name: "Unknown User" },
       };
     });
 
-    res.render("inventorylogs", { 
+    res.render("inventorylogs", {
       logs,
-      title: `Inventory Logs - ${logs[0]?.Product?.name || 'Product'}`,
-      hidenav: true
+      title: `Inventory Logs - ${logs[0]?.Product?.name || "Product"}`,
+      hidenav: true,
     });
   } catch (error) {
     console.error("Error fetching inventory logs:", error);
-    req.session.message = { 
-      type: "error", 
-      text: "An error occurred while fetching inventory logs." 
+    req.session.message = {
+      type: "error",
+      text: "An error occurred while fetching inventory logs.",
     };
     res.redirect("/dashboard");
   }
 };
 
-module.exports = { index, dashboard, loginGet, loginPost, logout, registerget,registerpost , exportDb , inventorylogs, searchInventoryLogs, inventorylogsById };
+const switchServer = async (req, res) => {
+    res.render('switch-server', {
+        title: 'Switch Server'
+    });
+};
+
+module.exports = {
+  index,
+  dashboard,
+  loginGet,
+  loginPost,
+  logout,
+  registerget,
+  registerpost,
+  exportDb,
+  inventorylogs,
+  searchInventoryLogs,
+  inventorylogsById,
+  switchServer,
+};
