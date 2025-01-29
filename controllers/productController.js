@@ -73,7 +73,7 @@ exports.save = async (req, res) => {
     return res.status(400).json({ success: false, message: 'Product with this name already exists' });
   }
   const barcode = await db.product.findOne({ where: { barcode: body.barcode } });
-  if (barcode && barcode.id != id) {
+  if (barcode && barcode.id != id && body.barcode.trim()) {
     return res.status(400).json({ success: false, message: 'Product with this barcode already exists' });
   }
   let data = {
