@@ -8,7 +8,7 @@ const config = {
   "production": {
     "env": "production",
     "port": 3000,
-    "webUrl": "http://localhost:5000",
+    "webUrl": "https://openmenu.live",
   }
 }
 
