@@ -159,6 +159,7 @@
         if (row) {
             row.remove();
             updateTotalBill();
+            ErrorString = '';
         }
     }
     function updateTotalBill() {
@@ -172,13 +173,14 @@
         total = total - (total * discountpercentage / 100);
         totalBillAmount.textContent = `Rs. ${parseInt(total)}`;
         UpdateChangePrice();
-    }
+    }   
+    let previousEntry;
     function addProduct(product) {
+        previousEntry = product;
         if(product.quantity <= 0){
             toastr.warning('Product quantity is not available');
             return;
         }
-        debugger;
         let discountedPrice = product.saleprice - (product.saleprice * product.discount / 100);
         discountedPrice = Math.round(discountedPrice);
 
@@ -233,10 +235,6 @@
         changeEl.textContent = `Rs. ${Math.round(change)}`;
     }
     function sale(){
-        if(ErrorString){
-            toastr.warning(ErrorString);
-            return;
-        }
         const customer = customerDropdown.value || null;
         const ledger = ledgerCheckbox.checked;
         const discountpercentage = parseInt(document.getElementById('discountpercentage').value);
@@ -321,7 +319,6 @@
         allProducts = products;
         return products;
     }
-    let previousEntry;
     async function searchProductByBarcode(barcode){
         if(!barcode){
             return addProduct(previousEntry);
@@ -329,7 +326,6 @@
         const products = await getProducts({ barcode });
         if(products.length > 0){
             addProduct(products[0]);
-            previousEntry = products[0];
             productSearch.value = '';
         }else{
             toastr.warning('No product found.');
@@ -377,24 +373,27 @@
             }
         });
         productSearch.addEventListener('keydown', async (event) => {
-            if(searchBarcode.checked && event.key === 'Enter'){
-                event.preventDefault();
-                await searchProductByBarcode(productSearch.value);
-                return;
-            }
             const searchResults = document.getElementById('search-results');
-            if (!searchResults.classList.contains('d-none')) {
-                if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+            if(event.key === 'Enter'){
+                if(searchBarcode.checked){
                     event.preventDefault();
-                }
-                if (event.key === 'Enter') {
-                    debugger;
+                    await searchProductByBarcode(productSearch.value);
+                    return;
+                }else{
                     let _selectedProduct = allProducts.find(p => p.id === parseInt(selectedProduct));
                     if (_selectedProduct) {
                         addProduct(_selectedProduct);
-                        productSearch.value = '';
-                        searchResults.classList.add('d-none');
+                    }else{
+                        if(previousEntry)
+                        addProduct(previousEntry);
                     }
+                    productSearch.value = '';
+                    searchResults.classList.add('d-none');
+                }
+            }
+            if (!searchResults.classList.contains('d-none')) {
+                if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+                    event.preventDefault();
                 }
                 const productResults = searchResults.querySelectorAll('.search-result-product');
                 if (productResults.length > 0) {
@@ -551,7 +550,7 @@
                     return {
                         results: data.map(customer => ({
                             id: customer.id,
-                            text: `${customer.name} (${customer.phone || 'No phone'})`
+                            text: `${customer.firstname} ${customer.lastname} (${customer.phone || 'No phone'})`
                         }))
                     };
                 },

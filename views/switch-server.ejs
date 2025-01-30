@@ -12,7 +12,7 @@
                                class="form-control" 
                                id="serverIp" 
                                name="serverIp" 
-                               placeholder="Enter IP address (e.g. 192.168.1.100:3000)"
+                               placeholder="Enter IP address (e.g. 192.168.1.100)"
                                required>
                         <div class="form-text">Enter the IP address and port of the server you want to connect to.</div>
                     </div>
@@ -28,6 +28,7 @@
 </div>
 
 <script>
+let port = '<%= port %>';
 document.getElementById('switchForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -41,7 +42,7 @@ document.getElementById('switchForm').addEventListener('submit', async function(
 
     try {
         // First verify the server is running
-        const verifyResponse = await fetch(`http://${serverIp}:3000/api/verify-server`);
+        const verifyResponse = await fetch(`http://${serverIp}:${port}/api/verify-server`);
         if (!verifyResponse.ok) {
             throw new Error('Server not found or not responding');
         }
@@ -51,7 +52,13 @@ document.getElementById('switchForm').addEventListener('submit', async function(
             // If verification successful, trigger the switch
             // remove the trailing slash
             serverIp = serverIp.replace(/\/$/, '');
-            window.electron.send('switch-server', serverIp + ':3000');
+            if(serverIp === window.location.hostname) {
+                toastr.info('You are already connected to this server');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                return;
+            }
+            window.electron.send('switch-server', serverIp + ':' + port);
         } else {
             throw new Error(result.message || 'Invalid server response');
         }

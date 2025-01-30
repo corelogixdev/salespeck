@@ -164,7 +164,10 @@
         totalBillAmount.textContent = `Rs. ${parseInt(total)}`;
         UpdateChangePrice();
     }
+
+    let previousEntry;
     function addProduct(product) {
+        previousEntry = product;
         const existingRow = document.getElementById(`product-row-${product.id}`);
         if (existingRow) {
             const quantityElement = existingRow.querySelector('td:nth-child(3)').querySelector('.editable-input');
@@ -287,18 +290,18 @@
         allProducts = products;
         return products;
     }
-    let previousEntry;
     async function searchProductByBarcode(barcode){
-        if(!barcode){
+        if(!barcode && previousEntry){
             return addProduct(previousEntry);
         }
-        const products = await getProducts({ barcode });
-        if(products.length > 0){
-            addProduct(products[0]);
-            previousEntry = products[0];
-            productSearch.value = '';
-        }else{
-            toastr.warning('No product found with this barcode');
+        if(barcode){
+            const products = await getProducts({ barcode });
+            if(products.length > 0){
+                addProduct(products[0]);
+                productSearch.value = '';
+            }else{
+                toastr.warning('No product found with this barcode');
+            }
         }
     }
     function postSaveInput(input){
@@ -343,23 +346,27 @@
             }
         });
         productSearch.addEventListener('keydown', async (event) => {
-            if(searchBarcode.checked && event.key === 'Enter'){
-                event.preventDefault();
-                await searchProductByBarcode(productSearch.value);
-                return;
-            }
             const searchResults = document.getElementById('search-results');
-            if (!searchResults.classList.contains('d-none')) {
-                if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+            if(event.key === 'Enter'){
+                if(searchBarcode.checked){
                     event.preventDefault();
-                }
-                if (event.key === 'Enter') {
+                    await searchProductByBarcode(productSearch.value);
+                    return;
+                }else{
                     let _selectedProduct = allProducts.find(p => p.id === parseInt(selectedProduct));
                     if (_selectedProduct) {
                         addProduct(_selectedProduct);
-                        productSearch.value = '';
-                        searchResults.classList.add('d-none');
+                    }else{
+                        if(previousEntry)
+                        addProduct(previousEntry);
                     }
+                    productSearch.value = '';
+                    searchResults.classList.add('d-none');
+                }
+            }
+            if (!searchResults.classList.contains('d-none')) {
+                if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+                    event.preventDefault();
                 }
                 const productResults = searchResults.querySelectorAll('.search-result-product');
                 if (productResults.length > 0) {
@@ -508,7 +515,7 @@
                     return {
                         results: data.map(vendor => ({
                             id: vendor.id,
-                            text: `${vendor.name} (${vendor.phone || 'No phone'})`
+                            text: `${vendor.firstname} ${vendor.lastname} (${vendor.phone || 'No phone'})`
                         }))
                     };
                 },

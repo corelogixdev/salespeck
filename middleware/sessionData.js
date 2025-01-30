@@ -17,7 +17,7 @@ module.exports = async (req, res, next) => {
         if (!userData) {
             userData = await User.findOne({
                 where: { id: req.session.user_id },
-                attributes: ['id', 'name', 'username', 'role'],
+                attributes: ['id', 'firstname', 'lastname', 'username', 'role'],
                 raw: true
             });
 

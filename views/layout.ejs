@@ -16,9 +16,9 @@
     <script src="/assets/js/jquery.min.js"></script>
     <script src="/assets/js/jquery-confirm.min.js"></script>
     <script src="/assets/js/theme-manager.js"></script>
+    <script src="/assets/js/select2.min.js"></script>
     <script src="/assets/libs/flatpickr/flatpickr.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link rel="stylesheet" href="/assets//css/select2.min.css">
 </head>
 <style>
     .logo img {
@@ -84,57 +84,76 @@
                                     <i class="las la-tachometer-alt"></i> <span>Dashboard</span>
                                 </a>
                             </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link menu-link" href="#sidebarStock" data-bs-toggle="collapse" role="button">
-                                    <i class="las la-box"></i> <span>Stock</span>
-                                </a>
-                                <div class="collapse menu-dropdown" id="sidebarStock">
-                                    <ul class="nav nav-sm flex-column">
-                                        <li class="nav-item">
-                                            <a href="/products/form" class="nav-link">New Products</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="/products" class="nav-link">Products List</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="/inventorylogs" class="nav-link">Inventory Logs</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link menu-link" href="#sidebarParties" data-bs-toggle="collapse" role="button">
-                                    <i class="las la-users"></i> <span>Parties</span>
-                                </a>
-                                <div class="collapse menu-dropdown" id="sidebarParties">
-                                    <ul class="nav nav-sm flex-column">
-                                        <li class="nav-item">
-                                            <a href="/users?role=customer" class="nav-link">Customers</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="/users?role=user" class="nav-link">Vendors</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link menu-link" href="#sidebarSales" data-bs-toggle="collapse" role="button">
-                                    <i class="las la-shopping-cart"></i> <span>Sales</span>
-                                </a>
-                                <div class="collapse menu-dropdown" id="sidebarSales">
-                                    <ul class="nav nav-sm flex-column">
-                                        <li class="nav-item">
-                                            <a href="/sales" class="nav-link">POS Sales</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="/sales/form" target="_blank" class="nav-link">New Sale</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="/sales/returns" class="nav-link disabled">Returns</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
+                            <% if (permissions.productsList || permissions.productCreate) { %>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link menu-link" href="#sidebarStock" data-bs-toggle="collapse" role="button">
+                                        <i class="las la-box"></i> <span>Stock</span>
+                                    </a>
+                                    <div class="collapse menu-dropdown" id="sidebarStock">
+                                        <ul class="nav nav-sm flex-column">
+                                            <% if (permissions.productsCreate) { %>
+                                                <li class="nav-item">
+                                                    <a href="/products/form" target="_blank" class="nav-link">New Product</a>
+                                                </li>
+                                            <% } %>
+                                            <% if (permissions.productsList) { %>
+                                                <li class="nav-item">
+                                                    <a href="/products" class="nav-link">Products List</a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a href="/inventorylogs" class="nav-link">Inventory Logs</a>
+                                                </li>
+                                            <% } %>
+                                        </ul>
+                                    </div>
+                                </li>
+                            <% } %>
+                            <% if (permissions.customersList || permissions.usersList) { %>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link menu-link" href="#sidebarParties" data-bs-toggle="collapse" role="button">
+                                        <i class="las la-users"></i> <span>Parties</span>
+                                    </a>
+                                    <div class="collapse menu-dropdown" id="sidebarParties">
+                                        <ul class="nav nav-sm flex-column">
+                                            <% if (permissions.customersList) { %>
+                                             
+                                                <li class="nav-item">
+                                                    <a href="/users?role=customer" class="nav-link">Customers</a>
+                                                </li>
+                                            <% } %>
+                                            <% if (permissions.usersList) { %> 
+                                                <li class="nav-item">
+                                                    <a href="/users?role=user" class="nav-link">Vendors</a>
+                                                </li>
+                                            <% } %>
+                                        </ul>
+                                    </div>
+                                </li>
+                            <% } %>
+                            <% if (permissions.salesList || permissions.salesList || permissions.salesCreate) { %>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link menu-link" href="#sidebarSales" data-bs-toggle="collapse" role="button">
+                                        <i class="las la-shopping-cart"></i> <span>Sales</span>
+                                    </a>
+                                    <div class="collapse menu-dropdown" id="sidebarSales">
+                                        <ul class="nav nav-sm flex-column">
+                                            <% if (permissions.salesList) { %>
+                                                <li class="nav-item">
+                                                    <a href="/sales" class="nav-link">POS Sales</a>
+                                                </li>
+                                            <% } %>
+                                            <% if (permissions.salesCreate) { %>
+                                                <li class="nav-item">
+                                                    <a href="/sales/form" target="_blank" class="nav-link">New Sale</a>
+                                                </li>
+                                            <% } %>
+                                            <li class="nav-item">
+                                                <a href="/sales/returns" class="nav-link disabled">Returns</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                            <% } %>
                             <li class="nav-item dropdown">
                                 <a class="nav-link menu-link" href="#sidebarAccounting" data-bs-toggle="collapse" role="button">
                                     <i class="las la-calculator"></i> <span>Accounting</span>
@@ -147,12 +166,16 @@
                                         <li class="nav-item">
                                             <a href="/accounting/balance-sheet" class="nav-link disabled">Balance Sheet</a>
                                         </li>
-                                        <li class="nav-item">
-                                            <a href="/accounting/purchase" class="nav-link">Purchases List</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="/accounting/purchase/form" target="_blank" class="nav-link">New Purchase</a>
-                                        </li>
+                                        <% if (permissions.purchasesList) { %>
+                                            <li class="nav-item">
+                                                <a href="/accounting/purchase" class="nav-link">Purchases List</a>
+                                            </li>
+                                        <% } %>
+                                        <% if (permissions.purchasesCreate) { %>
+                                            <li class="nav-item">
+                                                <a href="/accounting/purchase/form" target="_blank" class="nav-link">New Purchase</a>
+                                            </li>
+                                        <% } %>
                                         <li class="nav-item">
                                             <a href="/accounting/expenses" class="nav-link disabled">Expenses</a>
                                         </li>
@@ -165,9 +188,11 @@
                                         <li class="nav-item">
                                             <a href="/accounting/cash-closing-report" class="nav-link disabled">Cash Closing Report</a>
                                         </li>
+                                        <% if (permissions.taxesList || permissions.taxesView) { %>
                                         <li class="nav-item">
                                             <a href="/accounting/taxes" class="nav-link">Taxes</a>
                                         </li>
+                                        <% } %>
                                     </ul>
                                 </div>
                             </li>
@@ -197,9 +222,11 @@
                                 </a>
                                 <div class="collapse menu-dropdown" id="sidebarOthers">
                                     <ul class="nav nav-sm flex-column">
-                                        <li class="nav-item">
-                                            <a href="/settings" class="nav-link">Settings</a>
-                                        </li>
+                                        <% if (permissions.settings) { %> 
+                                            <li class="nav-item">
+                                                <a href="/settings" class="nav-link">Settings</a>
+                                            </li>
+                                        <% } %>
                                         <li class="nav-item">
                                             <a href="/export-db" class="nav-link">Export DB</a>
                                         </li>
@@ -218,12 +245,6 @@
                         </ul>
                     </div>
                     <div class="d-flex align-items-center">
-                        <!-- <div class="ms-1 header-item d-none d-sm-flex">
-                            <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"
-                                data-toggle="fullscreen">
-                                <i class='bx bx-fullscreen fs-22'></i>
-                            </button>
-                        </div> -->
 
                         <div class="ms-1 header-item d-none d-sm-flex">
                             <button type="button" id="themeToggleBtn"
@@ -646,6 +667,7 @@
       </script>
     <script src="/assets/libs/simplebar/simplebar.min.js"></script>
     <script src="/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+</html>
     <script src="/assets/libs/feather-icons/feather.min.js"></script>
     <script src="/assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
     <script src="/assets/js/moment.min.js"></script>

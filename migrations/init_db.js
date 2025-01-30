@@ -226,11 +226,23 @@ module.exports = {
         type: Sequelize.STRING(200),
         allowNull: true,
       },
+      account_key: {
+        type: Sequelize.STRING(200),
+        allowNull: true,
+      },
       email: {
         type: Sequelize.STRING(50),
         allowNull: true,
       },
-      name: {
+      // name: {
+      //   type: DataTypes.STRING(20),
+      //   allowNull: true,
+      // },
+      firstname: {
+        type: Sequelize.STRING(20),
+        allowNull: true,
+      },
+      lastname: {
         type: Sequelize.STRING(20),
         allowNull: true,
       },

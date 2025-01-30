@@ -1,16 +1,4 @@
-<!DOCTYPE html>
-<html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - OpenMenu</title>
-    <link rel="icon" href="/assets/images/icon.png" type="image/x-icon">
-    <link href="/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-    <link href="/assets/css/app.min.css" rel="stylesheet" type="text/css" />
-    <link href="/assets/css/custom.min.css" rel="stylesheet" type="text/css" />
-</head>
-<body class="auth-bg">
+<div class="auth-bg">
     <div class="auth-page-wrapper">
         <div class="container">
             <div class="row justify-content-center">
@@ -31,6 +19,7 @@
                                                    class="form-control pe-5 <%= locals.errors?.email ? 'is-invalid' : '' %>" 
                                                    id="email" 
                                                    name="email" 
+                                                   value="ranamuaviya127@gmail.com"
                                                    placeholder="Enter email" 
                                                    required>
                                             <% if (locals.errors?.email) { %>
@@ -43,6 +32,7 @@
                                         <label class="form-label" for="password">Password</label>
                                         <div class="position-relative auth-pass-inputgroup">
                                             <input type="password" 
+                                                    value="emir@123"
                                                    class="form-control pe-5 <%= locals.errors?.password ? 'is-invalid' : '' %>" 
                                                    id="password"
                                                    name="password" 
@@ -106,5 +96,4 @@
             }
         }
     </script>
-</body>
-</html>
+</div>

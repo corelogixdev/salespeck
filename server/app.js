@@ -10,6 +10,7 @@ const sessionDataMiddleware = require('../middleware/sessionData');
 const routes = require('../routes');
 const { permissions } = require('../middleware/populatePermissions.js');
 const app = express();
+const socket = require('../utils/socket');
 const runMigrationsAndSeeders = require('../utils/runMigrationsAndSeeders.js');
 
 // CORS Configuration
@@ -67,8 +68,8 @@ app.use('/accounting', routes.accountingRoutes);
 // });
 
 runMigrationsAndSeeders(); // Uncomment to run migrations and seeders
-
-app.listen(3000, () => {
+app.listen(config.port, () => {
   logi('Express server listening on http://localhost:' + config.port);
 });
+
 module.exports = app;

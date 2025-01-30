@@ -6,6 +6,7 @@ require('./server/app'); // DON'T REMOVE THIS. THIS LINKS TO THE EXPRESS APP
 const { autoUpdater } = require('electron-updater');
 const config = require('./config.js'); // Link to the Express app
 const logi = require('./utils/logi.js');
+const { checkInternetConnection } = require('./utils/networkUtils.js');
 
 app.setAppLogsPath();
 //log starting app and date time to log file
@@ -23,11 +24,12 @@ process.env.npm_package_version = packageJson.version;
 // require('electron-reload')(__dirname, {
 //   electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
 // });
+
+let mainWindow = null;
 function createWindow() {
-  const win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 900,
-    //start max
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false, // Disable Node.js integration in renderer process
@@ -37,15 +39,36 @@ function createWindow() {
     autoHideMenuBar: true,
   });
 
+  // Handle new window creation (like _blank targets)
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    return {
+      action: 'allow',
+      overrideBrowserWindowOptions: {
+        autoHideMenuBar: true,
+        webPreferences: {
+          preload: path.join(__dirname, 'preload.js'),
+          nodeIntegration: false,
+          contextIsolation: true,
+        }
+      }
+    }
+  });
+
+  // Monitor online status
+  mainWindow.webContents.on('did-finish-load', () => {
+    checkInternetConnection();
+  });
+
   //to open dev tools
   //win.webContents.openDevTools();
   const serverUrl = process.env.SERVER_IP || 'localhost:' + config.port;
-  win.loadURL(`http://${serverUrl}`); // Serve Express on localhost:3000
+  mainWindow.loadURL(`http://${serverUrl}`); // Serve Express on localhost:3000
   ipcMain.on('close-app', () => {
-    win.close();
+    mainWindow.close();
   });
-  return win;
+  return mainWindow;
 }
+
 
 // Listen for IPC messages from the renderer process
 ipcMain.on('perform-action', (event, arg) => {
@@ -61,35 +84,18 @@ ipcMain.on('perform-action', (event, arg) => {
 
 ipcMain.on('switch-server', async (event, serverIp) => {
   try {
-    // Store the new IP in config or env
     process.env.SERVER_IP = serverIp;
     logi('Switching server to:', serverIp);
-
-    // Get all existing windows
     const existingWindows = BrowserWindow.getAllWindows();
-
-    // Create new window first
     let win = createWindow();
-
-    // Wait a moment for the new window to be ready
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    // Close existing windows
+    // await new Promise(resolve => setTimeout(resolve, 1500));
     existingWindows.forEach(window => {
       window.close();
     });
-
     win.focus();
-
-    // Optional: Notify about successful switch
-    event.reply('server-switched', { status: 'success' });
     logi('Server switched to:', serverIp);
   } catch (error) {
     logi('Error switching server:', error.message);
-    event.reply('server-switched', { 
-      status: 'error', 
-      message: error.message 
-    });
   }
 });
 

@@ -18,6 +18,7 @@ if(config.env === 'production') {
       ? path.join(os.homedir(), 'Library', 'Application Support') 
       : path.join(os.homedir(), '.config'));
   const dbFilePath = path.join(appDataPath, 'openmenu', 'database.sqlite');
+  config.storage = dbFilePath;
   dbConfig.storage = dbFilePath;
 }
 let sequelize;

@@ -8,17 +8,17 @@ exports.index = async (req, res) => {
       {
         model: db.user,
         as: "Customer",
-        attributes: ["id", "name"],
+        attributes: ["id", "firstname", "lastname", "phone", "address"],
       },
       {
         model: db.user,
         as: "DeliveryUser",
-        attributes: ["id", "name"],
+        attributes: ["id", "firstname", "lastname", "phone", "address"],
       },
       {
         model: db.user,
         as: "User",
-        attributes: ["id", "name"],
+        attributes: ["id", "firstname", "lastname", "phone", "address"],
       },
       {
         model: db.soldproducts,
@@ -39,9 +39,10 @@ exports.index = async (req, res) => {
   try {
     if (customer) {
       queryOptions.include[0].where = {
-        name: {
-          [Op.like]: `%${customer}%`,
-        },
+        [Op.or]: [
+          { firstname: { [Op.like]: `%${customer}%` } },
+          { lastname: { [Op.like]: `%${customer}%` } },
+        ],
       };
     }
 
@@ -80,85 +81,116 @@ exports.form = async (req, res) => {
     where: {
       role: "customer",
     },
-    attributes: ["id", "name"],
+    attributes: ["id", "firstname", "lastname", "phone"],
   });
   res.render("sales/form", { customers, hidenav: true });
 };
 
 exports.save = async (req, res) => {
-  const { customer, products, discountpercentage, totalPayment, totalPrice } =
-    req.body;
+  const { customer, products, discountpercentage, totalPayment, totalPrice } = req.body;
   if (!products || products.length === 0) {
-    return res
-      .status(400)
-      .send({ status: "error", message: "Please add products to the sale" });
+    return res.status(400).send({ status: "error", message: "Please add products to the sale" });
   }
   if (totalPayment < 0) {
-    return res
-      .status(400)
-      .send({ status: "error", message: "Invalid total payment" });
+    return res.status(400).send({ status: "error", message: "Invalid total payment" });
   }
-  const { user } = res.locals;
-  const randomInvoice = Math.floor(Math.random() * 1000000);
+
+  const transaction = await db.sequelize.transaction();
+
   try {
+    // 1. First fetch all products and validate quantities in one pass
+    const allProductIds = products.map(product => product.productId);
+    const allProducts = await db.product.findAll({
+      where: { id: allProductIds },
+      transaction
+    });
+
+    // Validate all products before making any changes
+    const saleProductsData = [];
+    const inventoryUpdates = [];
+    const inventoryLogs = [];
+
+    for (const orderProduct of products) {
+      const dbProduct = allProducts.find(p => p.id === Number.parseInt(orderProduct.productId));
+      if (!dbProduct) {
+        await transaction.rollback();
+        return res.status(400).send({ 
+          status: "error", 
+          message: `Product with ID ${orderProduct.productId} not found` 
+        });
+      }
+      if (orderProduct.quantity > dbProduct.quantity) {
+        await transaction.rollback();
+        return res.status(400).send({ 
+          status: "error", 
+          message: `Insufficient stock for ${dbProduct.name}. Available: ${dbProduct.quantity}, Requested: ${orderProduct.quantity}` 
+        });
+      }
+
+      // Prepare data for bulk operations
+      saleProductsData.push({
+        product: dbProduct.id,
+        quantity: orderProduct.quantity,
+        price: orderProduct.price
+      });
+
+      inventoryUpdates.push({
+        id: dbProduct.id,
+        quantity: dbProduct.quantity - orderProduct.quantity
+      });
+    }
+
+    // 2. Create sale record
+    const { user } = res.locals;
     const sale = await db.sale.create({
       user: user.id,
-      customer: customer ? customer : null,
+      customer: customer || null,
       discountpercentage,
-      totalpayment: totalPayment, // The amount user paid
-      totalprice: totalPrice, // The total price of all products
-      invoicenum: "INV-" + randomInvoice,
-      createdby: user.id,
+      totalpayment: totalPayment,
+      totalprice: totalPrice,
+      invoicenum: "INV-" + Math.floor(Math.random() * 1000000),
+      createdby: user.id
+    }, { transaction });
+
+    // 3. Create all related records in bulk
+    const soldProducts = saleProductsData.map(product => ({
+      ...product,
+      sale: sale.id
+    }));
+
+    await db.soldproducts.bulkCreate(soldProducts, { transaction });
+
+    // 4. Update product quantities in bulk
+    await Promise.all(inventoryUpdates.map(update => 
+      db.product.update(
+        { quantity: update.quantity },
+        { where: { id: update.id }, transaction }
+      )
+    ));
+
+    // 5. Create inventory logs in bulk
+    await db.inventorylogs.bulkCreate(
+      soldProducts.map(product => ({
+        product_id: product.product,
+        quantity: -product.quantity,
+        note: "Sold",
+        createdby: user.id,
+        type: "sale"
+      })),
+      { transaction }
+    );
+
+    await transaction.commit();
+
+    res.send({
+      status: "success",
+      message: "Sale created successfully",
+      saleId: sale.id
     });
-    if (sale) {
-      let allProductIds = products.map((product) => product.productId);
-      let allProducts = await db.product.findAll({
-        where: {
-          id: allProductIds,
-        },
-      });
-      const saleProductsData = allProducts.map((product) => {
-        let p = products.find(
-          (p) => Number.parseInt(p.productId) === product.id
-        );
-        return {
-          sale: sale.id,
-          product: product.id,
-          quantity: p.quantity,
-          price: p.price,
-        };
-      });
-      let result = await db.soldproducts.bulkCreate(saleProductsData);
-      if (result) {
-        for (let i = 0; i < allProducts.length; i++) {
-          const product = allProducts[i];
-          const productData = products.find(
-            (p) => Number.parseInt(p.productId) === product.id
-          );
 
-          // Update product quantity
-          product.quantity = product.quantity - productData.quantity;
-          await product.save();
-
-          // Create inventory log entry for the sale
-          await db.inventorylogs.create({
-            product_id: product.id,
-            quantity: -productData.quantity, // Negative quantity for sales
-            note: "Sold",
-            createdby: user.id,
-            type: "sale",
-          });
-        }
-      }
-      res.send({
-        status: "success",
-        message: "Sale created successfully",
-        saleId: sale.id,
-      });
-    } else {
-      res.status(500).send("Internal Server Error");
-    }
   } catch (error) {
+    await transaction.rollback();
+    console.error("Sale creation error:", error);
     res.status(500).send({ status: "error", message: "Internal Server Error" });
   }
 };
@@ -181,17 +213,17 @@ exports.saleview = async (req, res) => {
       {
         model: db.user,
         as: "Customer",
-        attributes: ["id", "name", "phone", "address"],
+        attributes: ["id", "firstname", "lastname", "phone", "address"],
       },
       {
         model: db.user,
         as: "DeliveryUser",
-        attributes: ["id", "name", "phone", "address"],
+        attributes: ["id", "firstname", "lastname", "phone", "address"],
       },
       {
         model: db.user,
         as: "User",
-        attributes: ["id", "name", "phone", "address"],
+        attributes: ["id", "firstname", "lastname", "phone", "address"],
       },
       {
         model: db.soldproducts,
@@ -258,11 +290,12 @@ exports.searchCustomers = async (req, res) => {
     const customers = await db.user.findAll({
       where: {
         role: 'customer',
-        name: {
-          [Op.like]: `%${search}%`
-        }
+        [Op.or]: [
+          { firstname: { [Op.like]: `%${search}%` } },
+          { lastname: { [Op.like]: `%${search}%` } },
+          { phone: { [Op.like]: `%${search}%` } }
+        ]
       },
-      attributes: ['id', 'name', 'phone'],
       limit: 10
     });
     res.json(customers);

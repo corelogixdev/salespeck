@@ -108,7 +108,7 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                <% const userName = log.User ? log.User.name : 'Unknown User' %>
+                                                <% const userName = log.User ? log.User.firstname+ ' ' + log.User.lastname : 'Unknown User' %>
                                                 <span class="limited-text" title="<%= userName %>">
                                                     <%= userName.length > 15 ? userName.substring(0, 15) + '...' : userName %>
                                                 </span>

@@ -33,7 +33,8 @@ exports.index = async (req, res) => {
       [Op.or]: [
         { username: { [Op.like]: `%${searchdata}%` } },
         { phone: { [Op.like]: `%${searchdata}%` } },
-        { name: { [Op.like]: `%${searchdata}%` } }
+        { firstname: { [Op.like]: `%${searchdata}%` } },
+        { lastname: { [Op.like]: `%${searchdata}%` } }
       ]
     },
     limit: 10,
@@ -80,23 +81,23 @@ exports.form = async (req, res) => {
 };
 
 exports.save = async (req, res) => {
-  var { id, name, phone, username, role,password,address, permissions } = req.body;
+  var { id, firstname,lastname, email,  phone, username, role,password,address, permissions } = req.body;
   let allPermissions = await db.permissions.findAll();
   var password = password;
-  var createdby = res.locals.user.id;
+  var createdby = req.session.user.id;
   if (password) {
     password = encrypt.encrypt(password);
   }
   try {
     // check if username is duplicate
-    let user = await db.user.findOne({ where: { username } });
+    let user = await db.user.findOne({ where: { email } });
     if(user && user.id != id) {
-      return res.status(400).json({ success: false, message: 'Username already exists' });
+      return res.status(400).json({ success: false, message: 'User with this email already exists' });
     }
     if (id) {
-      await db.user.update({ name, phone, username, role, password, address, createdby}, { where: { id } });
+      await db.user.update({ firstname,lastname, email, phone, username, role, password, address, createdby}, { where: { id } });
     } else {
-      let res = await db.user.create({ name, phone, username, role, password, address, createdby});
+      let res = await db.user.create({ firstname,lastname, email, phone, username, role, password, address, createdby});
       id = res.id;
     }
     if(role == 'user'){
@@ -106,7 +107,7 @@ exports.save = async (req, res) => {
         await db.userpermissions.create({ user_id: id, permission_id: permissionId });
       });
     }
-    res.json({ success: true, message: 'User saved successfully' });
+    res.json({ success: true, message: 'User saved successfully'});
   } catch (error) {
     res.status(500).json({ success: false, message: 'Internal Server Error' });
   }

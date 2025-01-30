@@ -70,7 +70,7 @@
               <% data.forEach(obj => { %>
                 <tr>
                   <td class="fw-medium"><%= obj.id %></td>
-                  <td><%= obj.name %></td>
+                  <td><%= obj.firstname %> <%= obj.lastname %></td>
                   <td><%= obj.phone %></td>
                   <% if (role !== 'customer') { %>
                     <td><%= obj.username %></td>

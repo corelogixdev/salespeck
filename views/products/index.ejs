@@ -12,50 +12,53 @@
       <div class="card-body">
         <div class="live-preview">
           <!-- Search Form -->
-          <form id="searchForm" method="POST" action="/products" class="row g-3 mb-4">
-            <div class="col-xxl-3 col-sm-4">
-              <div class="search-box">
-                <input type="text" 
-                       class="form-control search" 
-                       name="name"
-                       placeholder="Search by product name..."
-                       value="<%= searchParams?.name || '' %>">
-                <i class="ri-shopping-basket-2-line search-icon"></i>
+           <% if (permissions.productsSearch) { %>
+            <form id="searchForm" method="POST" action="/products" class="row g-3 mb-4">
+              <div class="col-xxl-3 col-sm-4">
+                <div class="search-box">
+                  <input type="text" 
+                         class="form-control search" 
+                         name="name"
+                         placeholder="Search by product name..."
+                         value="<%= searchParams?.name || '' %>">
+                  <i class="ri-shopping-basket-2-line search-icon"></i>
+                </div>
               </div>
-            </div>
-            <div class="col-xxl-3 col-sm-3">
-              <div class="search-box">
-                <input type="text" 
-                       class="form-control search" 
-                       name="barcode"
-                       placeholder="Search by barcode..."
-                       value="<%= searchParams?.barcode || '' %>">
-                <i class="ri-barcode-line search-icon"></i>
+              <div class="col-xxl-3 col-sm-3">
+                <div class="search-box">
+                  <input type="text" 
+                         class="form-control search" 
+                         name="barcode"
+                         placeholder="Search by barcode..."
+                         value="<%= searchParams?.barcode || '' %>">
+                  <i class="ri-barcode-line search-icon"></i>
+                </div>
               </div>
-            </div>
-            <div class="col-xxl-3 col-sm-3">
-              <div class="search-box">
-                <input type="text" 
-                       class="form-control search" 
-                       name="category"
-                       placeholder="Search by category..."
-                       value="<%= searchParams?.category || '' %>">
-                <i class="ri-list-check-2 search-icon"></i>
+              <div class="col-xxl-3 col-sm-3">
+                <div class="search-box">
+                  <input type="text" 
+                         class="form-control search" 
+                         name="category"
+                         placeholder="Search by category..."
+                         value="<%= searchParams?.category || '' %>">
+                  <i class="ri-list-check-2 search-icon"></i>
+                </div>
               </div>
-            </div>
-            <div class="col-xxl-2 col-sm-2 d-flex align-items-center justify-content-end">
-              <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-sm btn-primary">
-                  <i class="ri-search-line me-1 align-bottom"></i> Search
-                </button>
-                <% if (searchParams?.name || searchParams?.barcode || searchParams?.category) { %>
-                  <a href="/products" class="btn btn-sm btn-danger">
-                    <i class="ri-close-line align-bottom me-1"></i> Clear
-                  </a>
-                <% } %>
+              <div class="col-xxl-2 col-sm-2 d-flex align-items-center justify-content-end">
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-sm btn-primary">
+                    <i class="ri-search-line me-1 align-bottom"></i> Search
+                  </button>
+                  <% if (searchParams?.name || searchParams?.barcode || searchParams?.category) { %>
+                    <a href="/products" class="btn btn-sm btn-danger">
+                      <i class="ri-close-line align-bottom me-1"></i> Clear
+                    </a>
+                  <% } %>
+                </div>
               </div>
-            </div>
-          </form>
+            </form>
+           <% } %>
+        
 
           <!-- Table -->
           <div class="table-responsive">
@@ -138,7 +141,7 @@
                                               </a>
                                           </li>
                                       <% } %>
-                                      <% if (permissions.productsView) { %>
+                                      <% if (permissions.productsDelete) { %>
                                           <li>
                                               <a class="dropdown-item d-flex align-items-center" 
                                                  href="javascript:void(0);" 

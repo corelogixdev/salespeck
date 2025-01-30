@@ -1,7 +1,12 @@
 const db = require("../models");
 let permissions = null;
+let userid = null;
 exports.permissions = async (req, res, next) => {
   if (req.session.user_id) {
+    if(userid !== req.session.user_id){
+      permissions = null;
+      userid = req.session.user_id;
+    }
     if (permissions === null || JSON.stringify(req.session.permissions) === "{}") {
       let allPermissions = await db.permissions.findAll();
 

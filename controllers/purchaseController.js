@@ -19,7 +19,6 @@ exports.purchaseview = async (req, res) => {
       {
         model: db.user,
         as: "Vendor",
-        attributes: ["id", "name", "phone", "address"],
       },
       {
         model: db.purchasedproducts,
@@ -55,7 +54,6 @@ exports.purchaseDetails = async (req, res) => {
       {
         model: db.user,
         as: "Vendor",
-        attributes: ["id", "name", "phone", "address"],
       },
       {
         model: db.purchasedproducts,
@@ -153,7 +151,6 @@ exports.search = async (req, res) => {
         {
           model: db.user,
           as: "Vendor",
-          attributes: ["id", "name", "phone", "address"],
         },
         {
           model: db.purchasedproducts,
@@ -171,9 +168,10 @@ exports.search = async (req, res) => {
     // Vendor name search
     if (vendor) {
       queryOptions.include[0].where = {
-        name: {
-          [Op.like]: `%${vendor}%`,
-        },
+        [Op.or]: [
+          { firstname: { [Op.like]: `%${vendor}%` } },
+          { lastname: { [Op.like]: `%${vendor}%` } },
+        ],
       };
     }
 
@@ -216,7 +214,6 @@ exports.form = async (_, res) => {
     where: {
       role: "user",
     },
-    attributes: ["id", "name"],
   });
   res.render("accounting/purchase/form", {
     title: "Save Purchase",
@@ -246,11 +243,11 @@ exports.searchVendors = async (req, res) => {
     const vendors = await db.user.findAll({
       where: {
         role: 'user',
-        name: {
-          [Op.like]: `%${search}%`
-        }
+        [Op.or]: [
+          { firstname: { [Op.like]: `%${search}%` } },
+          { lastname: { [Op.like]: `%${search}%` } },
+        ]
       },
-      attributes: ['id', 'name', 'phone'],
       limit: 10
     });
     res.json(vendors);

@@ -127,6 +127,25 @@ module.exports = {
       { id: 33, name: 'settings.view', description: 'setting view' },
       { id: 34, name: 'settings.list', description: 'setting list' },
       { id: 35, name: 'settings.search', description: 'setting search' },
+
+      // purchases
+      { id: 36, name: 'purchases', description: 'purchase' },
+      { id: 37, name: 'purchases.create', description: 'purchase create' },
+      { id: 38, name: 'purchases.update', description: 'purchase update' },
+      { id: 39, name: 'purchases.delete', description: 'purchase delete' },
+      { id: 40, name: 'purchases.view', description: 'purchase view' },
+      { id: 41, name: 'purchases.list', description: 'purchase list' },
+      { id: 42, name: 'purchases.search', description: 'purchase search' },
+
+      // taxes
+      { id: 43, name: 'taxes', description: 'tax' },
+      { id: 44, name: 'taxes.create', description: 'tax create' },
+      { id: 45, name: 'taxes.update', description: 'tax update' },
+      { id: 46, name: 'taxes.delete', description: 'tax delete' },
+      { id: 47, name: 'taxes.view', description: 'tax view' },
+      { id: 48, name: 'taxes.list', description: 'tax list' },
+      { id: 49, name: 'taxes.search', description: 'tax search' },
+      
     ];
 
     for (const permission of _permissions) {

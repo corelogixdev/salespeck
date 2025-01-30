@@ -5,6 +5,7 @@ const logi = require("../utils/logi");
 const { Op } = require("sequelize");
 const config = require("../config");
 
+
 const index = (req, res) => {
   if (!req.session.user_id) {
     return res.redirect("/login");
@@ -12,101 +13,91 @@ const index = (req, res) => {
     res.redirect("/dashboard");
   }
 };
-
-const dashboard = async (req, res) => {
+async function getDashboardStats(){
   try {
-    // Fetch company settings
-    const settings = await db.softwaresetting.findOne({
-      where: { name: "company" },
-    });
-    const company = JSON.parse(settings?.value || "{}");
-
-    // Define start and end of today's date
-    const todayStartDate = moment().startOf("day").toDate();
-    const todayEndDate = moment().endOf("day").toDate();
-
-    // Fetch today's sales amount
-    const todaysSalesAmount =
-      (await db.soldproducts.sum("price", {
-        where: { createdAt: { [Op.between]: [todayStartDate, todayEndDate] } },
-      })) || 0;
-
-    // Fetch today's and yesterday's sales
-    const salesComparison = await db.sequelize.query(
-      `
-      SELECT
-        (SELECT SUM(price) FROM soldproducts WHERE createdAt BETWEEN date('now', '-1 day') AND date('now', '-1 day', '+1 day')) as yesterday,
-        (SELECT SUM(price) FROM soldproducts WHERE createdAt BETWEEN date('now') AND date('now', '+1 day')) as today
-      `,
-      { type: db.sequelize.QueryTypes.SELECT }
-    );
-    const { yesterday: yesterdaySales = 0, today: todaySales = 0 } =
-      salesComparison[0];
-    const salesPercentageChange = calculatePercentageChange(
-      yesterdaySales,
-      todaySales
-    ).toFixed(2);
-    const salesArrowDirection = todaySales >= yesterdaySales ? "up" : "down";
-
-    // Fetch today's customer count
-    const todayCustomersCount = await db.user.count({
-      where: {
-        role: "customer",
-        createdAt: { [Op.between]: [todayStartDate, todayEndDate] },
-      },
-    });
-
-    // Fetch yesterday's customer count
-    const yesterdayCustomersCount = await db.user.count({
-      where: {
-        role: "customer",
-        createdAt: {
-          [Op.between]: [
-            moment().subtract(1, "day").startOf("day").toDate(),
-            moment().subtract(1, "day").endOf("day").toDate(),
-          ],
+      // Define start and end of today's date
+      const todayStartDate = moment().startOf("day").toDate();
+      const todayEndDate = moment().endOf("day").toDate();
+  
+      // Fetch today's sales amount
+      const todaysSalesAmount =
+        (await db.soldproducts.sum("price", {
+          where: { createdAt: { [Op.between]: [todayStartDate, todayEndDate] } },
+        })) || 0;
+  
+      // Fetch today's and yesterday's sales
+      const salesComparison = await db.sequelize.query(
+        `
+        SELECT
+          (SELECT SUM(price) FROM soldproducts WHERE createdAt BETWEEN date('now', '-1 day') AND date('now', '-1 day', '+1 day')) as yesterday,
+          (SELECT SUM(price) FROM soldproducts WHERE createdAt BETWEEN date('now') AND date('now', '+1 day')) as today
+        `,
+        { type: db.sequelize.QueryTypes.SELECT }
+      );
+      const { yesterday: yesterdaySales = 0, today: todaySales = 0 } =
+        salesComparison[0];
+      const salesPercentageChange = calculatePercentageChange(
+        yesterdaySales,
+        todaySales
+      ).toFixed(2);
+      const salesArrowDirection = todaySales >= yesterdaySales ? "up" : "down";
+  
+      // Fetch today's customer count
+      const todayCustomersCount = await db.user.count({
+        where: {
+          role: "customer",
+          createdAt: { [Op.between]: [todayStartDate, todayEndDate] },
         },
-      },
-    });
-
-    // Calculate percentage change for customers
-    const customerPercentageChange = calculatePercentageChange(
-      yesterdayCustomersCount,
-      todayCustomersCount
-    ).toFixed(2);
-    const customerArrowDirection =
-      todayCustomersCount >= yesterdayCustomersCount ? "up" : "down";
-
-    // Fetch total sales count
-    const totalSalesCount = await db.sale.count();
-
-    // Fetch top 5 sold products with sold quantities
-    const topFiveSoldProductsWithSoldQuantity = await db.sequelize.query(
-      `
-      SELECT 
-        strftime('%m', s.createdAt) as month,
-        p.name as product_name,
-        SUM(s.quantity) as total_quantity
-      FROM soldproducts s
-      JOIN product p ON s.product = p.id
-      GROUP BY month, p.name
-      ORDER BY total_quantity DESC
-      LIMIT 5
-      `,
-      { type: db.sequelize.QueryTypes.SELECT }
-    );
-
-    // Fetch sales count by month
-    const salesCountByMonth = await db.sequelize.query(
-      `
-      SELECT strftime('%m', createdAt) as month, COUNT(*) as total FROM sale GROUP BY month
-      `,
-      { type: db.sequelize.QueryTypes.SELECT }
-    );
-
-    // Render dashboard
-    res.render("dashboard", {
-      company,
+      });
+  
+      // Fetch yesterday's customer count
+      const yesterdayCustomersCount = await db.user.count({
+        where: {
+          role: "customer",
+          createdAt: {
+            [Op.between]: [
+              moment().subtract(1, "day").startOf("day").toDate(),
+              moment().subtract(1, "day").endOf("day").toDate(),
+            ],
+          },
+        },
+      });
+  
+      // Calculate percentage change for customers
+      const customerPercentageChange = calculatePercentageChange(
+        yesterdayCustomersCount,
+        todayCustomersCount
+      ).toFixed(2);
+      const customerArrowDirection =
+        todayCustomersCount >= yesterdayCustomersCount ? "up" : "down";
+  
+      // Fetch total sales count
+      const totalSalesCount = await db.sale.count();
+  
+      // Fetch top 5 sold products with sold quantities
+      const topFiveSoldProductsWithSoldQuantity = await db.sequelize.query(
+        `
+        SELECT 
+          strftime('%m', s.createdAt) as month,
+          p.name as product_name,
+          SUM(s.quantity) as total_quantity
+        FROM soldproducts s
+        JOIN product p ON s.product = p.id
+        GROUP BY month, p.name
+        ORDER BY total_quantity DESC
+        LIMIT 5
+        `,
+        { type: db.sequelize.QueryTypes.SELECT }
+      );
+  
+      // Fetch sales count by month
+      const salesCountByMonth = await db.sequelize.query(
+        `
+        SELECT strftime('%m', createdAt) as month, COUNT(*) as total FROM sale GROUP BY month
+        `,
+        { type: db.sequelize.QueryTypes.SELECT }
+      );
+    return {
       todayCustomersCount,
       customerPercentageChange,
       customerArrowDirection,
@@ -116,6 +107,28 @@ const dashboard = async (req, res) => {
       todaysSalesAmount,
       salesPercentageChange,
       salesArrowDirection,
+    }
+  } catch (error) {
+    logi("Error:", error);
+    return {};
+  }
+}
+const dashboard = async (req, res) => {
+  try {
+    // Fetch company settings
+    const settings = await db.softwaresetting.findOne({
+      where: { name: "company" },
+    });
+    const company = JSON.parse(settings?.value || "{}");
+    let data = await getDashboardStats();
+
+    const user = await db.user.findOne({ where: { id: req.session.user_id } });
+
+    // Render dashboard
+    res.render("dashboard", {
+      company,
+      ...data,
+      user,
     });
   } catch (error) {
     logi("Error:", error);
@@ -145,6 +158,11 @@ function calculatePercentageChange(previous = 0, current) {
   return 0;
 }
 const loginGet = async (req, res) => {
+  let user = await db.user.findOne({ where: { role: "branchmanager" } });
+  if (!user) {
+    logi("User was not found in local database. Redirecting to login...");
+    return res.redirect("/register");
+  }
   res.render("login", { hidenav: true, errors: req.session?.errors || {} });
 };
 
@@ -155,12 +173,12 @@ const loginPost = async (req, res) => {
   try {
     const user = await db.user.findOne({ where: { email } });
     if (user && encrypt.compare(user.password, password)) {
-      logi("User found:", user.name);
+      logi("User found:", user.firstname);
       logi("Login successful");
       req.session.user_id = user.id;
       req.session.user = user;
       req.session.message = { type: "success", text: "Login successful!" };
-      res.redirect("/dashboard");
+      res.redirect("/");
     } else {
       if (!user) {
         logi("User was not found. Redirecting to login...");
@@ -195,72 +213,43 @@ const registerget = (req, res) => {
   });
 };
 
-function registerOnWeb(data) {
-  return new Promise((resolve, reject) => {
-    let account_key = "123456";
-    const options = {
-      method: "POST",
-      url: config.webUrl + "/api/register",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: data.username,
-        password: data.password,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        phone: data.phone,
-        address: data.address,
-        account_key: account_key,
-      }),
-    };
-    fetch(options.url, options)
-      .then((response) => response.json())
-      .then((result) => {
-        resolve(result);
-      });
-  });
+async function registerOnWeb(data) {
+  let account_key = Math.random().toString(36).substring(2, 15); 
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      username: data.username,
+      password: data.password,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      phone: data.phone,
+      address: data.address,
+      account_key: account_key,
+    }),
+  };
+
+  // Fetch call
+  let req = await fetch(config.webUrl + "/api/register", options);
+  let res = await req.json();
+  return res;
 }
+
 
 const registerpost = async (req, res) => {
   logi("Register request received");
   logi("Data:", req.body);
-  const { username, password, firstName, lastName, email } = req.body;
-  
-  // First check if user exists in local database
-  // const existingUser = await db.user.findOne({ where: { email } });
-  // if (existingUser) {
-  //   req.session.errors = {
-  //     email: "User already exists. Please login.",
-  //   };
-  //   return res.redirect("/login");
-  // }
-
-  // let registered = await registerOnWeb(req.body);
-  // if (registered["status"] === "failed") {
-  //   logi("Register failed due to: ", registered["message"]);
-  //   return res.render("register", {
-  //     hidenav: true,
-  //     errors: {
-  //       email: registered["message"],
-  //     },
-  //   });
-  // } else if (registered["status"] === "exists") {
-  //   logi("User was already registered, Redirecting to login.");
-  //   req.session.errors = {
-  //     email: "User already exists. Please login.",
-  //   };
-  //   return res.redirect("/login");
-  // }
 
   try {
     logi("Creating user in local database...");
-    const hashedPassword = encrypt.encrypt(password);
+    const hashedPassword = encrypt.encrypt(req.body.password);
     let user = await db.user.create({
-      name: firstName + " " + lastName,
-      username,
-      email: email,
+      ...req.body,
+      firstname: req.body.firstName,
+      lastname: req.body.lastName,
       password: hashedPassword,
       role: "branchmanager",
     });
@@ -282,7 +271,9 @@ const registerpost = async (req, res) => {
 const exportDb = async (req, res) => {
   try {
     let file = config.storage;
-    res.download(file);
+    if(file){
+      res.download(file);
+    }
   } catch (error) {
     logi("Error:", error);
     res.json({ error: "An error occurred. Please try again" });
@@ -301,7 +292,7 @@ const inventorylogs = async (req, res) => {
         {
           model: db.user,
           as: "User",
-          attributes: ["id", "name"],
+          attributes: ["id", "firstname", "lastname"],
         },
       ],
       order: [["createdAt", "DESC"]],
@@ -313,7 +304,7 @@ const inventorylogs = async (req, res) => {
       return {
         ...plainLog,
         Product: plainLog.Product || { name: "Unknown Product" },
-        User: plainLog.User || { name: "Unknown User" },
+        User: plainLog.User || { firstname: "Unknown User", lastname: "" },
       };
     });
 
@@ -424,7 +415,7 @@ const inventorylogsById = async (req, res) => {
         {
           model: db.user,
           as: "User",
-          attributes: ["id", "name"],
+          attributes: ["id", "firstname" , "lastname"],
         },
       ],
       order: [["createdAt", "DESC"]],
@@ -462,7 +453,8 @@ const inventorylogsById = async (req, res) => {
 
 const switchServer = async (req, res) => {
     res.render('switch-server', {
-        title: 'Switch Server'
+        title: 'Switch Server',
+        port: config.port,
     });
 };
 
@@ -479,4 +471,6 @@ module.exports = {
   searchInventoryLogs,
   inventorylogsById,
   switchServer,
+  registerOnWeb,
+  getDashboardStats
 };

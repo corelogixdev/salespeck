@@ -13,53 +13,55 @@
       <div class="card-body">
         <div class="live-preview">
           <!-- Search Form -->
-          <form id="search-form" method="POST" action="/sales" class="row g-3 mb-4">
-            <div class="col-xxl-3 col-sm-4">
-              <div class="search-box">
-                <input type="text" 
-                       class="form-control search flatpickr-range"
-                       data-provider="flatpickr" 
-                       data-range="true"
-                       data-date-format="Y-m-d"
-                       name="daterange" 
-                       placeholder="Filter by date range..."
-                       value="<%= searchquery?.daterange || '' %>">
-                <i class="ri-calendar-2-line search-icon"></i>
+           <% if (permissions.salesSearch) { %>
+            <form id="search-form" method="POST" action="/sales" class="row g-3 mb-4">
+              <div class="col-xxl-3 col-sm-4">
+                <div class="search-box">
+                  <input type="text" 
+                        class="form-control search flatpickr-range"
+                        data-provider="flatpickr" 
+                        data-range="true"
+                        data-date-format="Y-m-d"
+                        name="daterange" 
+                        placeholder="Filter by date range..."
+                        value="<%= searchquery?.daterange || '' %>">
+                  <i class="ri-calendar-2-line search-icon"></i>
+                </div>
               </div>
-            </div>
-            <div class="col-xxl-3 col-sm-3">
-              <div class="search-box">
-                <input type="text" 
-                       class="form-control search" 
-                       name="customer"
-                       placeholder="Search by customer..."
-                       value="<%= searchquery?.customer || '' %>">
-                <i class="ri-user-line search-icon"></i>
+              <div class="col-xxl-3 col-sm-3">
+                <div class="search-box">
+                  <input type="text" 
+                        class="form-control search" 
+                        name="customer"
+                        placeholder="Search by customer..."
+                        value="<%= searchquery?.customer || '' %>">
+                  <i class="ri-user-line search-icon"></i>
+                </div>
               </div>
-            </div>
-            <div class="col-xxl-3 col-sm-3">
-              <div class="search-box">
-                <input type="number" 
-                       class="form-control search" 
-                       name="productId"
-                       placeholder="Search by product ID..."
-                       value="<%= searchquery?.productId || '' %>">
-                <i class="ri-shopping-basket-2-line search-icon"></i>
+              <div class="col-xxl-3 col-sm-3">
+                <div class="search-box">
+                  <input type="number" 
+                        class="form-control search" 
+                        name="productId"
+                        placeholder="Search by product ID..."
+                        value="<%= searchquery?.productId || '' %>">
+                  <i class="ri-shopping-basket-2-line search-icon"></i>
+                </div>
               </div>
-            </div>
-            <div class="col-xxl-2 col-sm-2 d-flex align-items-center justify-content-end">
-              <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-sm btn-primary">
-                  <i class="ri-search-line me-1 align-bottom"></i> Search
-                </button>
-                <% if (searchquery?.daterange || searchquery?.customer || searchquery?.productId) { %>
-                  <button type="button" id="reset" class="btn btn-sm btn-danger">
-                    <i class="ri-close-line align-bottom me-1"></i> Clear
+              <div class="col-xxl-2 col-sm-2 d-flex align-items-center justify-content-end">
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-sm btn-primary">
+                    <i class="ri-search-line me-1 align-bottom"></i> Search
                   </button>
-                <% } %>
+                  <% if (searchquery?.daterange || searchquery?.customer || searchquery?.productId) { %>
+                    <button type="button" id="reset" class="btn btn-sm btn-danger">
+                      <i class="ri-close-line align-bottom me-1"></i> Clear
+                    </button>
+                  <% } %>
+                </div>
               </div>
-            </div>
-          </form>
+            </form>
+          <% } %>
 
           <!-- Table -->
           <div class="table-responsive">
