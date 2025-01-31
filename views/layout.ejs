@@ -84,7 +84,7 @@
                                     <i class="las la-tachometer-alt"></i> <span>Dashboard</span>
                                 </a>
                             </li>
-                            <% if (permissions.productsList || permissions.productCreate) { %>
+                            <% if (permissions.productsList || permissions.productCreate || permissions.purchasesCreate) { %>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link menu-link" href="#sidebarStock" data-bs-toggle="collapse" role="button">
                                         <i class="las la-box"></i> <span>Stock</span>
@@ -94,6 +94,11 @@
                                             <% if (permissions.productsCreate) { %>
                                                 <li class="nav-item">
                                                     <a href="/products/form" target="_blank" class="nav-link">New Product</a>
+                                                </li>
+                                            <% } %>
+                                            <% if (permissions.purchasesCreate) { %>
+                                                <li class="nav-item">
+                                                    <a href="/accounting/purchase/form" target="_blank" class="nav-link">New Purchase</a>
                                                 </li>
                                             <% } %>
                                             <% if (permissions.productsList) { %>
@@ -169,11 +174,6 @@
                                         <% if (permissions.purchasesList) { %>
                                             <li class="nav-item">
                                                 <a href="/accounting/purchase" class="nav-link">Purchases List</a>
-                                            </li>
-                                        <% } %>
-                                        <% if (permissions.purchasesCreate) { %>
-                                            <li class="nav-item">
-                                                <a href="/accounting/purchase/form" target="_blank" class="nav-link">New Purchase</a>
                                             </li>
                                         <% } %>
                                         <li class="nav-item">

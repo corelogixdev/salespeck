@@ -108,7 +108,7 @@ exports.save = async (req, res) => {
           purchase: purchase.id,
           product: product.productId,
           quantity: product.quantity,
-          totalAmount: totalAmount,
+          totalAmount: product.price,
         });
 
         if (purchasedProduct) {

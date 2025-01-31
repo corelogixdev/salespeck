@@ -189,9 +189,9 @@
             <input type="text" class="editable-input" value="${newQuantity}" readonly>
         </td>
         <td>
-            <input type="text" class="editable-input" value="${product.saleprice}" readonly>
+            <input type="text" class="editable-input" value="${product.purchaseprice}" readonly>
         </td>
-        <td class="total-price">${product.saleprice}</td>
+        <td class="total-price">${product.purchaseprice}</td>
         <td>
           <button class="btn btn-danger btn-sm" onclick="removeProduct('${product.id}')">
             <i class="bx bx-trash"></i>
@@ -424,7 +424,7 @@
                 productElement.style.cursor = 'pointer';
                 productElement.innerHTML = `
                     <span>${product.name}</span>
-                    <span>Rs. ${product.saleprice}</span>
+                    <span>Rs. ${product.purchaseprice}</span>
                     `;
                 productElement.addEventListener('click', () => {
                     addProduct(product);

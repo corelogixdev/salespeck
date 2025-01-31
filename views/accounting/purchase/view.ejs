@@ -99,9 +99,9 @@
                                         <td class="text-center">
                                             <span class="fw-medium"><%= product.Product.name %></span>
                                         </td>
-                                        <td class="code">Rs.<%= product.Product.saleprice %></td>
+                                        <td class="code">Rs.<%= product.totalAmount %></td>
                                         <td class="code"><%= product.quantity %></td>
-                                        <td class="text-end code">Rs.<%= (product.quantity * product.Product.saleprice || 0).toFixed(2) %></td>
+                                        <td class="text-end code">Rs.<%= (product.quantity * product.totalAmount || 0).toFixed(2) %></td>
                                     </tr>
                                     <% }); %>
                                 </tbody>
