@@ -4,11 +4,13 @@ const config = {
     "env": "development",
     "port": 3000,
     "webUrl": "http://localhost:5000",
+    "webSocketUrl": "ws://localhost:5000",
   },
   "production": {
     "env": "production",
     "port": 3000,
     "webUrl": "https://openmenu.live",
+    "webSocketUrl": "wss://openmenu.live",
   }
 }
 

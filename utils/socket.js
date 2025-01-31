@@ -41,7 +41,7 @@ function connect(onConnect=null) {
   return new Promise((resolve, reject) => {
     if (!socketInstance) {
       socketInstance = wrapSocketWithLogging(
-        io(config.webUrl, {
+        io(config.webSocketUrl, {
           reconnection: true,
           reconnectionDelay: getReconnectDelay(),
           reconnectionDelayMax: 10000,
