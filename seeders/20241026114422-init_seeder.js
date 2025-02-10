@@ -72,7 +72,12 @@ module.exports = {
     ];
 
     for (const setting of softwareSettings) {
-      await softwaresetting.upsert(setting);
+      // await softwaresetting.upsert(setting);
+      // run only when record not exist
+      const record = await softwaresetting.findByPk(setting.id);
+      if (!record) {
+        await softwaresetting.upsert(setting);
+      }
     }
 
     const dumyproducts = [

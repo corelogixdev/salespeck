@@ -108,7 +108,6 @@ exports.save = async (req, res) => {
     // Validate all products before making any changes
     const saleProductsData = [];
     const inventoryUpdates = [];
-    const inventoryLogs = [];
 
     for (const orderProduct of products) {
       const dbProduct = allProducts.find(p => p.id === Number.parseInt(orderProduct.productId));

@@ -34,7 +34,29 @@
         <div class="col-lg-6">
           <div class="form-group">
             <label for="category" class="form-label">Category:</label>
-            <input type="text" class="form-control" id="category" name="category" value="<%= product ? product.category : '' %>">
+            <select class="form-select" id="category" name="category">
+              <option value="">Select Category</option>
+              <% categories.forEach(category => { %>
+                <option value="<%= category.id %>" 
+                  <%= product?.category == category.id ? 'selected' : '' %>>
+                  <%= category.name %>
+                </option>
+              <% }); %>
+            </select>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="form-group">
+            <label for="brand" class="form-label">Brand:</label>
+            <select class="form-select" id="brand" name="brand">
+              <option value="">Select Brand</option>
+              <% brands.forEach(brand => { %>
+                <option value="<%= brand.id %>" 
+                  <%= product?.brand == brand.id ? 'selected' : '' %>>
+                  <%= brand.name %>
+                </option>
+              <% }); %>
+            </select>
           </div>
         </div>
         <div class="col-lg-6">
@@ -94,6 +116,8 @@
 </div>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
+    // Remove Select2 initialization
+
     document.querySelector('form').addEventListener('submit', async (event) => {
       event.preventDefault();
       document.querySelectorAll('input').forEach(input => {

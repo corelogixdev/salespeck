@@ -110,9 +110,9 @@
                             <tr>
                                 <td><%= index + 1 %></td>
                                 <td><%= product.Product.name %></td>
-                                <td>Rs.<%= product.Product.saleprice %></td>
+                                <td>Rs.<%= product.totalAmount %></td>
                                 <td><%= product.quantity %></td>
-                                <td class="text-end">Rs.<%= (product.quantity * product.Product.saleprice).toFixed(2) %></td>
+                                <td class="text-end">Rs.<%= (product.quantity * product.totalAmount).toFixed(2) %></td>
                             </tr>
                             <% }); %>
                         </tbody>

@@ -351,65 +351,65 @@ module.exports = {
       onUpdate: 'cascade',
     });
 
-    await queryInterface.addConstraint('financetransaction', {
-      fields: ['fk_user_createdby_in_financetransaction'],
-      type: 'foreign key',
-      name: 'fk_user_createdby_in_financetransaction',
-      references: {
-        table: 'user',
-        field: 'id',
-      },
-      onDelete: 'set null',
-      onUpdate: 'cascade',
-    });
+    // await queryInterface.addConstraint('financetransaction', {
+    //   fields: ['fk_user_createdby_in_financetransaction'],
+    //   type: 'foreign key',
+    //   name: 'fk_user_createdby_in_financetransaction',
+    //   references: {
+    //     table: 'user',
+    //     field: 'id',
+    //   },
+    //   onDelete: 'set null',
+    //   onUpdate: 'cascade',
+    // });
 
-    await queryInterface.addConstraint('financetransaction', {
-      fields: ['fk_user_targetto_in_financetransaction'],
-      type: 'foreign key',
-      name: 'fk_user_targetto_in_financetransaction',
-      references: {
-        table: 'user',
-        field: 'id',
-      },
-      onDelete: 'set null',
-      onUpdate: 'cascade',
-    });
+    // await queryInterface.addConstraint('financetransaction', {
+    //   fields: ['fk_user_targetto_in_financetransaction'],
+    //   type: 'foreign key',
+    //   name: 'fk_user_targetto_in_financetransaction',
+    //   references: {
+    //     table: 'user',
+    //     field: 'id',
+    //   },
+    //   onDelete: 'set null',
+    //   onUpdate: 'cascade',
+    // });
 
-    await queryInterface.addConstraint('financetransaction', {
-      fields: ['fk_financeaccount_in_financetransaction'],
-      type: 'foreign key',
-      name: 'fk_financeaccount_in_financetransaction',
-      references: {
-        table: 'financeaccount',
-        field: 'id',
-      },
-      onDelete: 'set null',
-      onUpdate: 'cascade',
-    });
+    // await queryInterface.addConstraint('financetransaction', {
+    //   fields: ['fk_financeaccount_in_financetransaction'],
+    //   type: 'foreign key',
+    //   name: 'fk_financeaccount_in_financetransaction',
+    //   references: {
+    //     table: 'financeaccount',
+    //     field: 'id',
+    //   },
+    //   onDelete: 'set null',
+    //   onUpdate: 'cascade',
+    // });
 
-    await queryInterface.addConstraint('productsub', {
-      fields: ['fk_product_main_in_productsub'],
-      type: 'foreign key',
-      name: 'fk_product_main_in_productsub',
-      references: {
-        table: 'product',
-        field: 'id',
-      },
-      onDelete: 'set null',
-      onUpdate: 'cascade',
-    });
+    // await queryInterface.addConstraint('productsub', {
+    //   fields: ['fk_product_main_in_productsub'],
+    //   type: 'foreign key',
+    //   name: 'fk_product_main_in_productsub',
+    //   references: {
+    //     table: 'product',
+    //     field: 'id',
+    //   },
+    //   onDelete: 'set null',
+    //   onUpdate: 'cascade',
+    // });
 
-    await queryInterface.addConstraint('productsub', {
-      fields: ['fk_product_sub_in_productsub'],
-      type: 'foreign key',
-      name: 'fk_product_sub_in_productsub',
-      references: {
-        table: 'product',
-        field: 'id',
-      },
-      onDelete: 'set null',
-      onUpdate: 'cascade',
-    });
+    // await queryInterface.addConstraint('productsub', {
+    //   fields: ['fk_product_sub_in_productsub'],
+    //   type: 'foreign key',
+    //   name: 'fk_product_sub_in_productsub',
+    //   references: {
+    //     table: 'product',
+    //     field: 'id',
+    //   },
+    //   onDelete: 'set null',
+    //   onUpdate: 'cascade',
+    // });
 
     await queryInterface.addConstraint('productsalepurchase', {
       fields: ['fk_product_in_productsalepurchase'],

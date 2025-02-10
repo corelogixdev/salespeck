@@ -133,10 +133,12 @@
                                         <th class="text-end code p-1">Rs.<%= (sale.totalprice - (sale.totalprice * sale.discountpercentage / 100)).toFixed(2) %></th>
                                     </tr>
                                     <% if(parseFloat(sale.balance)) { %>
-                                    <tr>
-                                        <th class="p-1">Balance</th>
-                                        <th class="text-end code p-1">Rs.<%= sale.balance %></th>
-                                    </tr>
+                                        <tr>
+                                            <th class="p-1">
+                                                <%= parseFloat(sale.balance) < 0 ? 'Balance' : 'Change' %>
+                                            </th>
+                                            <th class="text-end code p-1">Rs.<%= Math.abs(sale.balance).toFixed(2) %></th>
+                                        </tr>
                                     <% } %>
                                 </tbody>
                             </table>

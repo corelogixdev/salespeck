@@ -51,6 +51,10 @@ app.use(
 app.use(sessionDataMiddleware);
 app.use(permissions);
 
+// Add these route imports
+const brandRoutes = require('../routes/brandRoutes');
+const categoryRoutes = require('../routes/categoryRoutes');
+
 // API Server verification endpoint
 app.get('/api/verify-server', (req, res) => {
   res.status(200).json({ status: "success", message: 'Server is running' });
@@ -62,6 +66,10 @@ app.use('/users', routes.userRoutes);
 app.use('/settings', routes.settingRoutes);
 app.use('/sales', routes.saleRoutes);
 app.use('/accounting', routes.accountingRoutes);
+
+// Add these routes
+app.use('/brands', brandRoutes);
+app.use('/categories', categoryRoutes);
 
 // app.get('/*', (req, res) => {
 //   res.redirect('/');

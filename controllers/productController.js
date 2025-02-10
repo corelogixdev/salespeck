@@ -51,15 +51,37 @@ exports.get = async (req, res) => {
 }
 
 exports.form = async (req, res) => {
-  try{
-    let taxes = await db.taxes.findAll();
+  try {
+    const taxes = await db.taxes.findAll();
+    const brands = await db.brand.findAll({
+      where: { status: true },
+      order: [['name', 'ASC']]
+    });
+    const categories = await db.category.findAll({
+      where: { status: true },
+      order: [['name', 'ASC']]
+    });
+    
     const productId = req.query.id;
     let data = null;
     if (productId) {
-      data = await db.product.findByPk(productId);
+      data = await db.product.findByPk(productId, {
+        include: [
+          { model: db.brand, as: 'Brand' },
+          { model: db.category, as: 'Category' }
+        ]
+      });
     }
-    res.render('products/form', { title: data ? 'Edit product' : 'Create product', product:data, taxes });
+    
+    res.render('products/form', { 
+      title: data ? 'Edit product' : 'Create product', 
+      product: data, 
+      taxes,
+      brands,
+      categories 
+    });
   } catch (error) {
+    console.error('Error loading form data:', error);
     res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 };
@@ -68,37 +90,43 @@ exports.save = async (req, res) => {
   var body = req.body;
   let id = body.id;
   
-  const product = await db.product.findOne({ where: { name: body.name } });
-  if (product && product.id != id) {
-    return res.status(400).json({ success: false, message: 'Product with this name already exists' });
-  }
-  const barcode = await db.product.findOne({ where: { barcode: body.barcode } });
-  if (barcode && barcode.id != id && body.barcode.trim()) {
-    return res.status(400).json({ success: false, message: 'Product with this barcode already exists' });
-  }
-  let data = {
-    barcode: body.barcode,
-    category: body.category,
-    carrycost: body.carrycost * 1,
-    discount: body.discount * 1,
-    name: body.name,
-    purchaseprice: body.purchaseprice * 1,
-    purchaseactive: body.purchaseactive === 'on',
-    quantity: body.quantity * 1,
-    saleprice: body.saleprice * 1,
-    saleactive: body.saleactive === 'on',
-    createdby: req.session.user.id,
-    taxid: body.taxid ? body.taxid : null
-   }
   try {
+    const product = await db.product.findOne({ where: { name: body.name } });
+    if (product && product.id != id) {
+      return res.status(400).json({ success: false, message: 'Product with this name already exists' });
+    }
+    const barcode = await db.product.findOne({ where: { barcode: body.barcode } });
+    if (barcode && barcode.id != id && body.barcode.trim()) {
+      return res.status(400).json({ success: false, message: 'Product with this barcode already exists' });
+    }
+    let data = {
+      barcode: body.barcode,
+      brand_id: body.brand_id,
+      category_id: body.category_id,
+      carrycost: body.carrycost * 1,
+      discount: body.discount * 1,
+      name: body.name,
+      purchaseprice: body.purchaseprice * 1,
+      purchaseactive: body.purchaseactive === 'on',
+      quantity: body.quantity * 1,
+      saleprice: body.saleprice * 1,
+      saleactive: body.saleactive === 'on',
+      createdby: req.session.user.id,
+      taxid: body.taxid ? body.taxid : null,
+      brand: body.brand,
+      category: body.category
+    }
+
     if (id) {
       delete data.quantity;
       await db.product.update(data, { where: { id } });
     } else {
-      await db.product.create( data );
+      await db.product.create(data);
     }
-    res.send({ success: true, message: 'Product saved successfully'});
+    
+    res.send({ success: true, message: 'Product saved successfully' });
   } catch (error) {
+    console.error('Error saving product:', error);
     res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 };
