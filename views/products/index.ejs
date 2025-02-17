@@ -118,10 +118,18 @@
                                       <% if (permissions.productsUpdate) { %>
                                           <li>
                                               <a class="dropdown-item d-flex align-items-center" 
-                                                 href="/products/quantity/form/<%= product.id %>" 
+                                                 href="/products/quantity/form/<%= product.id %>?type=increase" 
                                                  target="_blank">
                                                   <i class="ri-add-circle-line me-2 align-middle text-primary"></i>
-                                                  Update Quantity
+                                                  Increase Quantity
+                                              </a>
+                                          </li>
+                                          <li>
+                                              <a class="dropdown-item d-flex align-items-center" 
+                                                 href="/products/quantity/form/<%= product.id %>?type=reduce" 
+                                                 target="_blank">
+                                                  <i class="ri-subtract-line me-2 align-middle text-danger"></i>
+                                                  Reduce Quantity
                                               </a>
                                           </li>
                                           <li>

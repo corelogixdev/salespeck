@@ -69,12 +69,12 @@
                         <table class="table table-striped table-nowrap align-middle mb-0">
                             <thead class="table-light" style="position: sticky; top: 0;">
                                 <tr>
-                                    <th scope="col">#</th>
                                     <th scope="col">ID</th>
                                     <th scope="col">Name</th>
                                     <th scope="col">Qty</th>
                                     <th scope="col">Price</th>
                                     <th scope="col">Total</th>
+                                    <th scope="col">Expiry Date</th>
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
@@ -135,11 +135,8 @@
 .select2-container--bootstrap-5 .select2-results__option--highlighted {
     background-color: var(--vz-primary);
 }
-.product-name-cell {
-    max-width: 100px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.expiry-date {
+    min-width: 130px;
 }
 </style>
 
@@ -159,14 +156,13 @@
         if (row) {
             row.remove();
             updateTotalBill();
-            updateSerialNumbers();
         }
     }
     function updateTotalBill() {
         let total = 0;
         let rows = document.querySelectorAll('#selected-products tr');
         rows.forEach(row => {
-            const price = parseFloat(row.querySelector('.product-total').textContent);
+            const price = parseFloat(row.querySelector('.total-price').textContent);
             total += price;
         });
         totalBillAmount.textContent = `Rs. ${parseInt(total)}`;
@@ -180,41 +176,40 @@
         if (existingRow) {
             const quantityElement = existingRow.querySelector('.product-quantity .editable-input');
             const priceElement = existingRow.querySelector('.product-price .editable-input');
-            const totalElement = existingRow.querySelector('.product-total');
+            const totalElement = existingRow.querySelector('.total-price');
             const quantity = parseInt(quantityElement.value);
             quantityElement.value = quantity + 1;
             totalElement.textContent = Math.round((quantity + 1) * parseFloat(priceElement.value));
             updateTotalBill();
             return;
         }
+
         let newQuantity = 1;
         const row = document.createElement('tr');
         row.id = `product-row-${product.id}`;
-        const currentIndex = selectedProductsTable.querySelectorAll('tr').length + 1;
         row.innerHTML = `
-        <td class="product-serial">${currentIndex}</td>
-        <td class="product-id">${product.id}</td>
-        <td class="product-name">
-            <div class="product-name-cell" title="${product.name}">
-                ${product.name}
-            </div>
-        </td>
-        <td class="product-quantity">
-            <input type="text" class="editable-input" value="${newQuantity}" readonly>
-        </td>
-        <td class="product-price">
-            <input type="text" class="editable-input" value="${product.purchaseprice}" readonly>
-        </td>
-        <td class="product-total">${product.purchaseprice}</td>
-        <td class="product-action">
-          <button class="btn btn-danger btn-sm" onclick="removeProduct('${product.id}')">
-            <i class="bx bx-trash"></i>
-          </button>
-        </td>
-      `;
+            <td class="product-id">${product.id}</td>
+            <td class="product-name">${product.name}</td>
+            <td class="product-quantity">
+                <input type="text" class="editable-input" value="${newQuantity}" readonly>
+            </td>
+            <td class="product-price">
+                <input type="text" class="editable-input" value="${product.purchaseprice}" readonly>
+            </td>
+            <td class="total-price">${product.purchaseprice}</td>
+            <td class="expiry-date-cell">
+                <input type="date" class="form-control form-control-sm expiry-date" min="${new Date().toISOString().split('T')[0]}">
+            </td>
+            <td class="product-action">
+                <button class="btn btn-danger btn-sm" onclick="removeProduct('${product.id}')">
+                    <i class="bx bx-trash"></i>
+                </button>
+            </td>
+        `;
         selectedProductsTable.appendChild(row);
         updateTotalBill();
     }
+
     function UpdateChangePrice(){
         const totalBill = parseFloat(totalBillAmount.textContent.split(' ')[1]);
         const totalPrice = parseFloat(totalPayment.value) || 0;
@@ -238,16 +233,25 @@
             const productId = row.querySelector('.product-id').textContent;
             const quantity = parseInt(row.querySelector('.product-quantity .editable-input').value);
             const price = parseFloat(row.querySelector('.product-price .editable-input').value);
-            products.push({ productId, quantity , price });
+            const expiryDate = row.querySelector('.expiry-date').value || null;
+            products.push({ productId, quantity , price, expiryDate });
         });
         if(products.length === 0){
             toastr.warning('Please select products');
             return;
         }
-        const totalPaymentVal = parseFloat(totalPayment.value);
+        const totalPaymentVal = parseFloat(totalPayment.value) || 0;
         
         const totalPrice = parseFloat(totalBillAmount.textContent.split(' ')[1]);
 
+        if(totalPaymentVal < totalPrice && !ledger){
+            toastr.warning('Please check the ledger option or pay the full amount');
+            return;
+        }
+        if(totalPaymentVal < totalPrice && !vendor){
+            toastr.warning('Please select a vendor or pay the full amount');
+            return;
+        }
         fetch('/accounting/purchase/save', {
             method: 'POST',
             headers: {
@@ -353,13 +357,6 @@
         input.focus();
     }
 
-    function updateSerialNumbers() {
-        const rows = selectedProductsTable.querySelectorAll('tr');
-        rows.forEach((row, index) => {
-            row.querySelector('.product-serial').textContent = index + 1;
-        });
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('click', (event) => {
             if (!event.target.closest('#search-product-sales-page-search-seaction')) {
@@ -444,9 +441,7 @@
                 productElement.id = `product-${product.id}`;
                 productElement.style.cursor = 'pointer';
                 productElement.innerHTML = `
-                    <div>
-                        <div class="product-name-cell" title="${product.name}">${product.name}</div>
-                    </div>
+                    <span>${product.name}</span>
                     <span>Rs. ${product.purchaseprice}</span>
                     `;
                 productElement.addEventListener('click', () => {
@@ -479,15 +474,14 @@
             }
             const target = event.target;
             if(target.tagName === 'TD'){
-                const row = target.closest('tr');
-                if (target.classList.contains('product-quantity')) {
+                if (target.cellIndex === 2) {
                     let quantityElement = target.querySelector('.editable-input');
                     if(!quantityElement){
                         return;
                     }
                     const quantity = Math.round(quantityElement.value);
-                    const priceElement = row.querySelector('.product-price .editable-input');
-                    const totalElement = row.querySelector('.product-total');
+                    const priceElement = target.nextElementSibling.querySelector('.editable-input');
+                    const totalElement = target.nextElementSibling.nextElementSibling.nextElementSibling;
                     const price = parseFloat(priceElement.value);
                     createEdiableInput( 
                         (event, input) => UpdateProductQuantity(event, input, quantityElement , price, totalElement), 
@@ -495,11 +489,11 @@
                         target
                     );
                 }
-                else if (target.classList.contains('product-price')) {
+                else if (target.cellIndex === 3) {
                     let priceElement = target.querySelector('.editable-input');
                     const price = parseFloat(priceElement.value);
-                    const quantityElement = row.querySelector('.product-quantity .editable-input');
-                    const totalElement = row.querySelector('.product-total');
+                    const quantityElement = target.previousElementSibling.querySelector('.editable-input');
+                    const totalElement = target.nextElementSibling.nextElementSibling;
                     createEdiableInput( 
                         (event, input) => {
                             if (event.key === 'Enter') {
@@ -515,6 +509,71 @@
                             }
                         },
                         price, 
+                        target
+                    );
+                }
+            }
+        });
+        selectedProductsTable.addEventListener('click', (event) => {
+            function UpdateProductQuantity(event, input, quantityElement, price, totalElement) {
+                if (event.key === 'Enter') {
+                    const newQuantity = parseInt(input.value);
+                    const row = input.closest('tr');
+                    let productId = row.querySelector('.product-id').textContent;
+                    let productTotalQuantity = allProducts.find(p => p.id === parseInt(productId)).quantity;
+                    
+                    if (newQuantity <= 0) {
+                        input.style.borderBottomColor = 'red';
+                        ErrorString = "Please enter valid quantity";
+                        toastr.warning('Quantity should be greater than 0');
+                        return false;
+                    }
+                    ErrorString = '';
+                    quantityElement.textContent = newQuantity;
+                    totalElement.textContent = Math.round(newQuantity * price);
+                    updateTotalBill();
+                }
+            }
+        
+            const target = event.target;
+            if (target.tagName === 'TD') {
+                const row = target.closest('tr');
+                if (target.classList.contains('product-quantity')) {
+                    let quantityElement = target.querySelector('.editable-input');
+                    if (!quantityElement) return;
+        
+                    const quantity = Math.round(quantityElement.value);
+                    const priceElement = row.querySelector('.product-price .editable-input');
+                    const totalElement = row.querySelector('.total-price');
+                    const price = parseFloat(priceElement.value);
+        
+                    createEdiableInput(
+                        (event, input) => UpdateProductQuantity(event, input, quantityElement, price, totalElement),
+                        quantity,
+                        target
+                    );
+                }
+                else if (target.classList.contains('product-price')) {
+                    let priceElement = target.querySelector('.editable-input');
+                    const price = parseFloat(priceElement.value);
+                    const quantityElement = row.querySelector('.product-quantity .editable-input');
+                    const totalElement = row.querySelector('.total-price');
+        
+                    createEdiableInput(
+                        (event, input) => {
+                            if (event.key === 'Enter') {
+                                const newPrice = parseInt(input.value);
+                                if (newPrice <= 0) {
+                                    input.style.borderBottomColor = 'red';
+                                    toastr.warning('Price should be greater than 0');
+                                    return false;
+                                }
+                                priceElement.value = newPrice;
+                                totalElement.textContent = parseInt(parseInt(quantityElement.value) * newPrice);
+                                updateTotalBill();
+                            }
+                        },
+                        price,
                         target
                     );
                 }

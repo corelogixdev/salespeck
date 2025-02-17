@@ -198,11 +198,13 @@
 
         const existingRow = document.getElementById(`product-row-${product.id}`);
         if (existingRow) {
-            const quantityElement = existingRow.querySelector('td:nth-child(3)').querySelector('.editable-input');
-            const priceElement = existingRow.querySelector('td:nth-child(4)').querySelector('.editable-input');
-            const totalElement = existingRow.querySelector('td:nth-child(5)');
+            checkIfProductIsExpired(existingRow, product);
+            const quantityElement = existingRow.querySelector('.product-quantity').querySelector('.editable-input');
+            const priceElement = existingRow.querySelector('.product-price').querySelector('.editable-input');
+            const totalElement = existingRow.querySelector('.product-total');
+
             const quantity = parseInt(quantityElement.value);
-            if (product.quantity < quantity) {
+            if (product.quantity < quantity + 1) {
                 ErrorString = "Please enter valid quantity";
                 toastr.warning('Product quantity is not available');
                 return;
@@ -210,6 +212,10 @@
             quantityElement.value = quantity + 1;
 
             totalElement.textContent = Math.round((quantity + 1) * parseFloat(priceElement.value));
+            
+            // Check expired status after quantity update
+            checkIfProductIsExpired(existingRow, product);
+            
             updateTotalBill();
             return;
         }
@@ -240,6 +246,10 @@
         </td>
       `;
         selectedProductsTable.appendChild(row);
+        
+        // Add check after creating new row
+        checkIfProductIsExpired(row, product);
+        
         updateTotalBill();
     }
     function updateSerialNumbers() {
@@ -352,6 +362,7 @@
         });
         const products = await response.json();
         allProducts = products;
+        console.log(products);
         return products;
     }
     async function searchProductByBarcode(barcode){
@@ -399,6 +410,26 @@
             }
         });
         input.focus();
+    }
+    
+    function checkIfProductIsExpired(row, product){
+        let quantity = parseInt(row.querySelector('.product-quantity .editable-input').value);
+        let isExpired = false;
+        
+        if (product.expired > 0) {
+            const nonExpiredStock = product.quantity - product.expired;
+            isExpired = quantity >= nonExpiredStock;
+        }
+
+        if (isExpired) {
+            row.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
+            row.setAttribute('data-expired', 'true');
+        } else {
+            row.style.backgroundColor = '';
+            row.setAttribute('data-expired', 'false');
+        }
+        
+        return isExpired;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -505,23 +536,30 @@
         selectedProductsTable.addEventListener('click', (event) => {
             function UpdateProductQuantity(event, input, quantityElement , price, totalElement){
                 if (event.key === 'Enter') {
-                    const newQuantity = parseInt(input.value);
                     const row = input.closest('tr');
-                    let productTotalQuantity = allProducts.find(p => p.id === parseInt(row.querySelector('.product-id').textContent)).quantity;
+                    const productId = row.querySelector('.product-id').textContent;
+                    const product = allProducts.find(p => p.id === parseInt(productId));
+                    const newQuantity = parseInt(input.value);
+                    
                     if (newQuantity <= 0) {
                         input.style.borderBottomColor = 'red';
                         ErrorString = "Please enter valid quantity";
                         toastr.warning('Quantity should be greater than 0');
                         return false;
-                    }else if(newQuantity > productTotalQuantity){
+                    } else if(newQuantity > product.quantity) {
                         input.style.borderBottomColor = 'red';
                         ErrorString = "Please enter valid quantity";
                         toastr.warning('Product quantity is not available');
                         return false;
                     }
+                    
                     ErrorString = '';
                     quantityElement.textContent = newQuantity;
                     totalElement.textContent = Math.round(newQuantity * price);
+                    
+                    // Check expired status after quantity update
+                    checkIfProductIsExpired(row, product);
+                    
                     updateTotalBill();
                 }
             }

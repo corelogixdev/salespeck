@@ -11,24 +11,34 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="form-label">Product Name</label>
-                            <input type="text" class="form-control" value="<%= product.name %>" readonly>
+                            <input type="text" class="form-control disabled" value="<%= product.name %>" disabled>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Current Quantity</label>
-                            <input type="text" class="form-control" value="<%= product.quantity %>" readonly>
+                            <input type="text" class="form-control disabled" value="<%= product.quantity %>" disabled>
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label">Quantity * 
-                                <small class="text-muted">(Enter positive number to add quantity and negative number to reduce quantity)</small>
+                            <label class="form-label">Quantity to 
+                                <% if (type === "decrease") { %>
+                                    Decrease
+                                <% } else { %>
+                                    Increase
+                                <% } %>*
                             </label>
-                            <input type="number" name="quantity" class="form-control" min="<%= -1 * product.quantity %>" required>
+                            <input type="number" name="quantity" class="form-control" min="<%= -1 * product.quantity %>" onkeyup="quantitychanged(event)" required>
+                        </div>
+                        <div class="col-md-6" id="expirydate">
+                            <label class="form-label">Expiry Date</label>
+                            <input type="date" name="expirydate" class="form-control" min="<%= new Date().toISOString().split('T')[0] %>">
                         </div>
                         <div class="col-md-12 mt-3">
                             <label class="form-label">Note *</label>
-                            <textarea name="note" class="form-control" required rows="3" placeholder="Enter reason for quantity addition"></textarea>
+                            <textarea name="note" class="form-control" required rows="3"
+                            placeholder="Enter a note for this quantity change"
+                            ></textarea>
                         </div>
                     </div>
 
@@ -44,6 +54,14 @@
 <script>
 document.getElementById('quantityForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+    let type = '<%= type %>';
+    let quantityElement = document.querySelector('input[name="quantity"]');
+    let quantity = parseInt(quantityElement.value);
+    if(type === 'decrease' &&  quantity > 0) {
+        quantityElement.value = quantity * -1;
+    }else if(type === 'increase' && quantity < 0) {
+        quantityElement.value = quantity * -1;
+    }
     try {
         const response = await fetch(this.action, {
             method: 'POST',

@@ -111,6 +111,16 @@ exports.save = async (req, res) => {
           totalAmount: product.price,
         });
 
+        // save the purchased batch
+        if (product.expiryDate) {
+          await db.productbatches.create({
+            product: product.productId,
+            quantity: product.quantity,
+            expirydate: product.expiryDate,
+            quantity: product.quantity,
+          });
+        }
+
         if (purchasedProduct) {
           await db.product.update(
             {
@@ -239,7 +249,8 @@ exports.productsget = async (req, res) => {
 
 exports.searchVendors = async (req, res) => {
   try {
-    const { search } = req.query;
+    let { search } = req.query;
+    search = search.trim();
     const vendors = await db.user.findAll({
       where: {
         role: 'user',

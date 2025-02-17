@@ -161,6 +161,8 @@ exports.search = async (req, res) => {
 exports.quantityForm = async (req, res) => {
   try {
     const productId = req.params.id;
+    // get type from search params 
+    let type = req.query.type;
     const product = await db.product.findByPk(productId);
     if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found' });
@@ -168,7 +170,8 @@ exports.quantityForm = async (req, res) => {
     res.render('products/quantity-form', { 
       title: 'Add Product Quantity', 
       product,
-      hidenav: true 
+      hidenav: true,
+      type
     });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Internal Server Error' });
@@ -176,9 +179,9 @@ exports.quantityForm = async (req, res) => {
 };
 
 exports.saveQuantity = async (req, res) => {
-  let { id, quantity, note } = req.body;
+  let { id, quantity, note, expirydate } = req.body;
   
-  if (!quantity) {
+  if (!quantity || isNaN(quantity)) {
     return res.status(400).json({ 
       success: false, 
       message: 'Please enter a valid quantity' 
@@ -191,6 +194,7 @@ exports.saveQuantity = async (req, res) => {
 
   try {
     const product = await db.product.findByPk(id);
+    quantity = quantity * 1;
     if (!product) {
       return res.status(404).json({ 
         success: false, 
@@ -211,6 +215,32 @@ exports.saveQuantity = async (req, res) => {
       createdby: req.session.user.id,
       type: 'manual'
     });
+    // create or update productbatches
+    if (quantity > 0) {
+      await db.productbatches.create({
+        product: id,
+        quantity: quantity,
+        expirydate: expirydate
+      });
+    }else{
+      let batches = await db.productbatches.findAll({
+        where: { product: id },
+        order: [['createdAt', 'ASC']]
+      });
+      let iteration=0,reducedQuantity=0, absquantity = Math.abs(quantity);
+      while(reducedQuantity !== absquantity && iteration < batches.length){
+        let batch = batches[iteration];
+        if(batch.quantity > absquantity){
+          batch.quantity -= absquantity;
+          reducedQuantity += absquantity;
+          await batch.save();
+        }else{
+          reducedQuantity += batch.quantity;
+          await batch.destroy();
+        }
+        iteration++;
+      }
+    }
 
     res.json({ 
       success: true, 

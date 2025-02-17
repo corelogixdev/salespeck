@@ -108,6 +108,7 @@ exports.save = async (req, res) => {
     // Validate all products before making any changes
     const saleProductsData = [];
     const inventoryUpdates = [];
+    const { user } = res.locals;
 
     for (const orderProduct of products) {
       const dbProduct = allProducts.find(p => p.id === Number.parseInt(orderProduct.productId));
@@ -137,10 +138,42 @@ exports.save = async (req, res) => {
         id: dbProduct.id,
         quantity: dbProduct.quantity - orderProduct.quantity
       });
+      
+      let batches = await db.productbatches.findAll({
+        where: { product: orderProduct.productId },
+        order: [["createdAt", "ASC"]],
+        transaction
+      });
+
+      let reducedQuantity = 0;
+      let iteration = 0;
+      while (reducedQuantity!==orderProduct.quantity && iteration < batches.length) {
+        let batch = batches[iteration];
+        if(batch.quantity > orderProduct.quantity - reducedQuantity){
+          await db.productbatches.update(
+            { quantity: db.sequelize.literal(`quantity - ${orderProduct.quantity - reducedQuantity}`) },
+            {
+              where: {
+                id: batch.id,
+              },
+              transaction
+            }
+          );
+          reducedQuantity = orderProduct.quantity;
+        } else {
+          await db.productbatches.destroy({
+            where: {
+              id: batch.id,
+            },
+            transaction
+          });
+          reducedQuantity += batch.quantity;
+        }
+        iteration++;
+      }
     }
 
     // 2. Create sale record
-    const { user } = res.locals;
     const sale = await db.sale.create({
       user: user.id,
       customer: customer || null,
@@ -273,19 +306,41 @@ exports.productsget = async (req, res) => {
   if (req.body.barcode) {
     search = { ...search, barcode: req.body.barcode };
   }
-  const data = await db.product.findAll({
+  let data = await db.product.findAll({
     where: {
       ...search,
       quantity: { [Op.gt]: 0 },
       saleactive: true,
     },
+    // include the related batch
+    include: [
+      {
+        model: db.productbatches,
+        as: "Batch",
+        attributes: ["id", "expirydate", "quantity", "createdAt"],
+      },
+    ],
   });
-  res.json(data);
+  let today = new Date();
+  today.setHours(0, 0, 0, 0);
+  // get the plain object of data
+  data = JSON.parse(JSON.stringify(data));
+  let datanew = data.map((product) => {
+    let expired = product.Batch.reduce(
+      (count, batch) =>
+        new Date(batch.expirydate) < today ? count + batch.quantity : count,
+      0
+    );
+    delete product.Batch;
+    return { ...product, expired };
+  });
+  res.json(datanew);
 };
 
 exports.searchCustomers = async (req, res) => {
   try {
-    const { search } = req.query;
+    let { search } = req.query;
+    search = search.trim();
     const customers = await db.user.findAll({
       where: {
         role: 'customer',

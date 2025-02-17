@@ -722,6 +722,36 @@ module.exports = {
         allowNull: false
       }
     });
+
+    // create productbatches table
+    await queryInterface.createTable('productbatches', {
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false
+      },
+      product: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      expirydate: {
+        type: Sequelize.DATE,
+        allowNull: true
+      },
+      quantity: {
+        type: Sequelize.FLOAT,
+        allowNull: true
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false
+      }
+    });
   },
 
   down: async (queryInterface) => {
@@ -736,5 +766,11 @@ module.exports = {
     await queryInterface.dropTable('product');
     await queryInterface.dropTable('financetransaction');
     await queryInterface.dropTable('financeaccount');
+    await queryInterface.dropTable('soldproducts');
+    await queryInterface.dropTable('sale');
+    await queryInterface.dropTable('permissions');
+    await queryInterface.dropTable('userpermissions');
+    await queryInterface.dropTable('inventorylogs');
+    await queryInterface.dropTable('productbatches');
   },
 };
