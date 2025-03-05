@@ -24,6 +24,14 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      }
     });
 
 
@@ -68,6 +76,14 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      }
     });
 
     // Create product table
@@ -142,6 +158,14 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      }
     });
 
     // Create productsub table
@@ -164,6 +188,14 @@ module.exports = {
         type: Sequelize.FLOAT,
         allowNull: true,
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      }
     });
 
     // Create productsalepurchase table
@@ -194,6 +226,14 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      }
     });
 
     // Create softwaresetting table
@@ -212,6 +252,14 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: true,
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      }
     });
 
     // Create user table
@@ -275,6 +323,14 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      }
     });
 
     // Create inventorylog table
@@ -302,6 +358,14 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      }
     });
 
     // Create cashclosing table
@@ -336,6 +400,14 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      }
     });
 
     // Add foreign keys and indexes
@@ -458,7 +530,7 @@ module.exports = {
       onDelete: 'set null',
       onUpdate: 'cascade',
     });
-    
+
     // create soldproducts table
     await queryInterface.createTable('soldproducts', {
       id: {
@@ -470,6 +542,14 @@ module.exports = {
       sale: Sequelize.INTEGER,
       product: Sequelize.INTEGER,
       quantity: Sequelize.INTEGER,
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      }
     });
 
     // create sale table
@@ -515,6 +595,14 @@ module.exports = {
         type: Sequelize.STRING(50),
         allowNull: true,
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      }
     });
 
     // Add foreign keys and indexes
@@ -592,6 +680,14 @@ module.exports = {
         type: Sequelize.STRING(200),
         allowNull: true,
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      }
     });
 
     await queryInterface.createTable('userpermissions', {
@@ -608,6 +704,14 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      }
     });
 
     // create table inventory logs
@@ -639,11 +743,11 @@ module.exports = {
       },
       createdAt: {
         type: Sequelize.DATE,
-        allowNull: false,
+        allowNull: true,
       },
       updatedAt: {
         type: Sequelize.DATE,
-        allowNull: false,
+        allowNull: true,
       }
     });
 
