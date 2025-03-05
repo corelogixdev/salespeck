@@ -12,8 +12,8 @@
     "postbuild": "rimraf dist/win-unpacked",
     "upload": "node build/upload.js",
     "migrate": "sequelize db:migrate",
-    "seed":"sequelize db:seed --seed 20241026114422-init_seeder",
-    "seed:demo": "sequelize db:seed --seed 20250305-demo-data"
+    "seed":"sequelize db:seed:all",
+    "seed:demo": "sequelize db:seed --seed 'demo/20250226114422-demo-data.js'"
   },
   "build": {
     "appId": "io.openmenu.app",

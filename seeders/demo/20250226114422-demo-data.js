@@ -1,9 +1,9 @@
 'use strict';
 
-const encrypt = require('../utils/encrypt');
+const encrypt = require('../../utils/encrypt');
 
 // import user model
-const db = require('../models');
+const db = require('../../models');
 const User = db.user;
 
 /** @type {import('sequelize-cli').Migration} */
