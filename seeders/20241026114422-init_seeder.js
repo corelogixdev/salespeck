@@ -79,14 +79,7 @@ module.exports = {
         await softwaresetting.upsert(setting);
       }
     }
-
-    const dumyproducts = [
-      { id: 1, name: 'test product 1', purchaseprice: 90, saleprice: 100, barcode: '111', saleactive: true,purchaseactive: true,quantity: 10 },
-      { id: 2, name: 'test product 2', purchaseprice: 180, saleprice: 200, barcode: '222', saleactive: true,purchaseactive: true,quantity: 5 },
-    ]
-    for (const productobj of dumyproducts) {
-      await product.upsert(productobj);
-    }
+    
     // permissions
     let _permissions =  [
       { id: 777, name: 'all', description: 'all' },

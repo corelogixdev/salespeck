@@ -11,7 +11,9 @@
     "build": "electron-builder",
     "postbuild": "rimraf dist/win-unpacked",
     "upload": "node build/upload.js",
-    "migrate": "sequelize db:migrate && sequelize db:seed:all"
+    "migrate": "sequelize db:migrate",
+    "seed":"sequelize db:seed --seed 20241026114422-init_seeder",
+    "seed:demo": "sequelize db:seed --seed 20250305-demo-data"
   },
   "build": {
     "appId": "io.openmenu.app",
