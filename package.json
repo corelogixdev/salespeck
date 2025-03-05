@@ -10,7 +10,8 @@
     "dev": "nodemon --exec \"electron .\"",
     "build": "electron-builder",
     "postbuild": "rimraf dist/win-unpacked",
-    "upload": "node build/upload.js"
+    "upload": "node build/upload.js",
+    "migrate": "sequelize db:migrate && sequelize db:seed:all"
   },
   "build": {
     "appId": "io.openmenu.app",

@@ -25,10 +25,10 @@ module.exports = (sequelize, DataTypes) => {
     updatedby: {
       type: DataTypes.INTEGER,
       allowNull: true,
-    }
+    },
   }, {
     tableName: 'category',
-    timestamps: true
+    timestamps: true,
   });
 
   Category.associate = function(models) {

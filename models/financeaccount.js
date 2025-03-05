@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     tableName: 'financeaccount',
-    timestamps: false,
+    timestamps: true,
   });
 
   FinanceAccount.associate = function(models) {
