@@ -495,6 +495,8 @@ module.exports = {
       sale: Sequelize.INTEGER,
       product: Sequelize.INTEGER,
       quantity: Sequelize.INTEGER,
+      price: Sequelize.FLOAT,
+      total: Sequelize.FLOAT,
       createdAt: {
         type: Sequelize.DATE,
         allowNull: true,
