@@ -38,6 +38,14 @@ module.exports = {
           key: 'id'
         }
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false
+      }
     });
 
     // Create brand table
@@ -75,6 +83,14 @@ module.exports = {
           key: 'id'
         }
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false
+      }
     });
   },
 

@@ -333,41 +333,6 @@ module.exports = {
       }
     });
 
-    // Create inventorylog table
-    await queryInterface.createTable('inventorylog', {
-      id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        primaryKey: true,
-        autoIncrement: true,
-      },
-      date: {
-        type: Sequelize.DATE,
-        allowNull: true,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-      },
-      note: {
-        type: Sequelize.STRING(200),
-        allowNull: true,
-      },
-      quantity: {
-        type: Sequelize.FLOAT,
-        allowNull: true,
-      },
-      fk_product_in_inventorylog: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-      },
-      createdAt: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      },
-      updatedAt: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      }
-    });
-
     // Create cashclosing table
     await queryInterface.createTable('cashclosing', {
       id: {
@@ -501,18 +466,6 @@ module.exports = {
       name: 'fk_financetransaction_in_productsalepurchase',
       references: {
         table: 'financetransaction',
-        field: 'id',
-      },
-      onDelete: 'set null',
-      onUpdate: 'cascade',
-    });
-
-    await queryInterface.addConstraint('inventorylog', {
-      fields: ['fk_product_in_inventorylog'],
-      type: 'foreign key',
-      name: 'fk_product_in_inventorylog',
-      references: {
-        table: 'product',
         field: 'id',
       },
       onDelete: 'set null',
@@ -862,7 +815,6 @@ module.exports = {
     await queryInterface.dropTable('purchasedproducts');
     await queryInterface.dropTable('purchase');
     await queryInterface.dropTable('cashclosing');
-    await queryInterface.dropTable('inventorylog');
     await queryInterface.dropTable('user');
     await queryInterface.dropTable('softwaresetting');
     await queryInterface.dropTable('productsalepurchase');
