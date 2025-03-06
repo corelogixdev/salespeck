@@ -52,20 +52,16 @@ exports.get = async (req, res) => {
 
 exports.form = async (req, res) => {
   try {
-    console.log('Fetching taxes, brands, and categories...');
     const taxes = await db.taxes.findAll();
-    console.log('Taxes:', taxes);
     const brands = await db.brand.findAll({
       where: { status: true },
       order: [['name', 'ASC']]
     });
-    console.log('Brands:', brands);
     const categories = await db.category.findAll({
       where: { status: true },
       order: [['name', 'ASC']]
     });
-    console.log('Categories:', categories);
-    
+
     const productId = req.query.id;
     let data = null;
     if (productId) {
@@ -76,7 +72,6 @@ exports.form = async (req, res) => {
         ]
       });
     }
-    console.log('Product:', data);
     
     res.render('products/form', { 
       title: data ? 'Edit product' : 'Create product', 
@@ -86,7 +81,6 @@ exports.form = async (req, res) => {
       categories 
     });
   } catch (error) {
-    console.error('Error loading form data:', error);
     res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 };

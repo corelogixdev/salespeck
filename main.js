@@ -72,7 +72,6 @@ function createWindow() {
 
 // Listen for IPC messages from the renderer process
 ipcMain.on('perform-action', (event, arg) => {
-  //console.log('Action received from frontend:', arg);
   // Here you can execute any logic or code you want in the main process
   // For example, you might want to send a response back
   if(arg.message === 'close-app') {

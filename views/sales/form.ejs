@@ -295,13 +295,12 @@
             toastr.warning('Please enter valid discount percentage');
             return;
         }
-
-        // check if user paid less
-        if(totalPaymentVal < totalPrice && !ledger){
+        const priceWithDiscount = Math.round(priceWithoutDiscount - (priceWithoutDiscount * discountpercentage / 100));
+        if(totalPaymentVal < priceWithDiscount && !ledger){
             toastr.warning('Please check the ledger option or pay the full amount');
             return;
         }
-        if(totalPaymentVal < totalPrice && !customer){
+        if(totalPaymentVal < priceWithDiscount && !customer){
             toastr.warning('Please select a customer or pay the full amount');
             return;
         }
@@ -314,7 +313,6 @@
             body: JSON.stringify({ customer, discountpercentage, totalPrice, ledger, products, totalPayment: totalPaymentVal }),
         }).then(async response => {
             let data = await response.json();
-            console.log(data)
             if (response.ok) {
                 $.alert({
                     title: 'Success!',
@@ -362,7 +360,6 @@
         });
         const products = await response.json();
         allProducts = products;
-        console.log(products);
         return products;
     }
     async function searchProductByBarcode(barcode){
