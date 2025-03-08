@@ -1,46 +1,51 @@
 'use strict';
 
 const encrypt = require('../utils/encrypt');
-
-// import user model
 const db = require('../models');
 const User = db.user;
 
-/** @type {import('sequelize-cli').Migration} */
-module.exports = {
-  up: async (queryInterface, Sequelize) => {
-    // upsert test user
-
-    const existing = await User.findOne({ where: { username
-    : 'test' } });
-    if (!existing) {
-      await User.create({
+async function seedDemoData() {
+  try {
+    console.log('Starting to seed demo data...');
+    
+    // Upsert test user
+    console.log('Creating or updating test user...');
+    var user = await User.findOne({ where: { username: 'test' } });
+    if (!user) {
+      user = await User.create({
         firstname: 'Test',
         lastname: 'User',
         username: 'test',
-        email:'test@test.com',
+        email: 'test@test.com',
         password: encrypt.encrypt('test'),
         role: 'branchmanager',
         createdAt: new Date(),
         updatedAt: new Date()
       });
-    }else{
+      console.log('Test user created');
+    } else {
       //update
       await User.update({
         firstname: 'Test',
         lastname: 'User',
         username: 'test',
-        email:'test@test.com',
+        email: 'test@test.com',
         password: encrypt.encrypt('test'),
         role: 'branchmanager',
         updatedAt: new Date()
-      },{
+      }, {
         where: { username: 'test' }
       });
+      console.log('Test user updated');
     }
 
+    // Create user permissions
+    await db.userpermissions.destroy({ where: { user_id: user.id } });
+    await db.userpermissions.create({ user_id: user.id, permission_id: 777 });
+    console.log('User permissions set');
 
     // Insert some products
+    console.log('Checking and creating demo products...');
     const products = [
       {
         name: 'Milk 1L',
@@ -119,24 +124,46 @@ module.exports = {
       }
     ];
     
+    let productsCreated = 0;
     for (const product of products) {
       const existingProduct = await db.product.findOne({
         where: { barcode: product.barcode }
       });
 
       if (existingProduct) {
+        console.log(`Product with barcode ${product.barcode} already exists, skipping`);
         continue;
       }
-      await queryInterface.bulkInsert('product', [{
+      
+      await db.product.create({
         ...product,
         createdAt: new Date(),
         updatedAt: new Date()
-      }], {});
+      });
+      productsCreated++;
     }
-  },
-
-  down: async (queryInterface, Sequelize) => {
-    await queryInterface.bulkDelete('product', null, {});
-    await queryInterface.bulkDelete('user', { username: 'test' }, {});
+    
+    console.log(`Created ${productsCreated} new products`);
+    console.log('Demo data seeding completed successfully!');
+    
+  } catch (error) {
+    console.error('Error seeding demo data:', error);
+    throw error;
   }
-};
+}
+
+// Execute if this script is run directly
+if (require.main === module) {
+  seedDemoData()
+    .then(() => {
+      console.log('Demo data seeding completed. You can now exit the process.');
+      process.exit(0);
+    })
+    .catch(err => {
+      console.error('Failed to seed demo data:', err);
+      process.exit(1);
+    });
+} else {
+  // Export for use as a module
+  module.exports = seedDemoData;
+}

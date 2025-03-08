@@ -13,7 +13,7 @@
     "upload": "node build/upload.js",
     "migrate": "sequelize db:migrate",
     "seed":"sequelize db:seed:all",
-    "seed:demo": "sequelize db:seed --seed 'demo/20250226114422-demo-data.js'"
+    "seed:demo": "node scripts/seed-demo-data.js"
   },
   "build": {
     "appId": "io.openmenu.app",
