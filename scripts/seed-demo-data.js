@@ -6,10 +6,6 @@ const User = db.user;
 
 async function seedDemoData() {
   try {
-    console.log('Starting to seed demo data...');
-    
-    // Upsert test user
-    console.log('Creating or updating test user...');
     var user = await User.findOne({ where: { username: 'test' } });
     if (!user) {
       user = await User.create({
@@ -22,7 +18,6 @@ async function seedDemoData() {
         createdAt: new Date(),
         updatedAt: new Date()
       });
-      console.log('Test user created');
     } else {
       //update
       await User.update({
@@ -36,16 +31,11 @@ async function seedDemoData() {
       }, {
         where: { username: 'test' }
       });
-      console.log('Test user updated');
     }
 
     // Create user permissions
     await db.userpermissions.destroy({ where: { user_id: user.id } });
     await db.userpermissions.create({ user_id: user.id, permission_id: 777 });
-    console.log('User permissions set');
-
-    // Insert some products
-    console.log('Checking and creating demo products...');
     const products = [
       {
         name: 'Milk 1L',
@@ -131,7 +121,6 @@ async function seedDemoData() {
       });
 
       if (existingProduct) {
-        console.log(`Product with barcode ${product.barcode} already exists, skipping`);
         continue;
       }
       
@@ -142,10 +131,6 @@ async function seedDemoData() {
       });
       productsCreated++;
     }
-    
-    console.log(`Created ${productsCreated} new products`);
-    console.log('Demo data seeding completed successfully!');
-    
   } catch (error) {
     console.error('Error seeding demo data:', error);
     throw error;
@@ -156,7 +141,6 @@ async function seedDemoData() {
 if (require.main === module) {
   seedDemoData()
     .then(() => {
-      console.log('Demo data seeding completed. You can now exit the process.');
       process.exit(0);
     })
     .catch(err => {

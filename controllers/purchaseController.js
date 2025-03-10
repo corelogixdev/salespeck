@@ -42,6 +42,7 @@ exports.purchaseview = async (req, res) => {
     title: "Purchase Details",
     purchase,
     companySettings: JSON.parse(companySettings?.value),
+    layout:false
   });
 };
 

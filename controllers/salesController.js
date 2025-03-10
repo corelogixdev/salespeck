@@ -131,7 +131,7 @@ exports.save = async (req, res) => {
       saleProductsData.push({
         product: dbProduct.id,
         quantity: orderProduct.quantity,
-        price: orderProduct.price
+        price: orderProduct.price * orderProduct.quantity
       });
 
       inventoryUpdates.push({
@@ -288,7 +288,6 @@ exports.saleview = async (req, res) => {
   result.balance = balance.toFixed(2);
   result.change = change.toFixed(2);
 
-  result.createdAt = moment(result.createdAt).format("MMMM Do YYYY");
   let companySettings = await db.softwaresetting.findOne({
     where: {
       name: "company",
@@ -298,6 +297,7 @@ exports.saleview = async (req, res) => {
     sale: result,
     companySettings: JSON.parse(companySettings.value),
     hidenav: true,
+    layout: false
   });
 };
 exports.productsget = async (req, res) => {

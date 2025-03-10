@@ -193,6 +193,16 @@
                                             <a href="/accounting/taxes" class="nav-link">Taxes</a>
                                         </li>
                                         <% } %>
+                                        <% if (permissions.brandsList || permissions.brandsView) { %>
+                                        <li class="nav-item">
+                                            <a href="/brands" class="nav-link">Brands</a>
+                                        </li>
+                                        <% } %>
+                                        <% if (permissions.categoriesList || permissions.categoriesView) { %>
+                                        <li class="nav-item">
+                                            <a href="/categories" class="nav-link">Categories</a>
+                                        </li>
+                                        <% } %>
                                     </ul>
                                 </div>
                             </li>

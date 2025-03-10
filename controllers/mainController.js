@@ -122,7 +122,6 @@ const dashboard = async (req, res) => {
     const company = JSON.parse(settings?.value || "{}");
     let data = await getDashboardStats();
 
-    console.log(data);
     const user = await db.user.findOne({ where: { id: req.session.user_id } });
 
     // Render dashboard

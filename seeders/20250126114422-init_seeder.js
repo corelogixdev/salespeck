@@ -144,6 +144,25 @@ module.exports = {
       { id: 48, name: 'taxes.list', description: 'tax list' },
       { id: 49, name: 'taxes.search', description: 'tax search' },
       
+      // categoreis
+      { id: 50, name: 'categories', description: 'category' },
+      { id: 51, name: 'categories.create', description: 'category create' },
+      { id: 52, name: 'categories.update', description: 'category update' },
+      { id: 53, name: 'categories.delete', description: 'category delete' },
+      { id: 54, name: 'categories.view', description: 'category view' },
+      { id: 55, name: 'categories.list', description: 'category list' },
+      { id: 56, name: 'categories.search', description: 'category search' },
+
+      // brands
+
+      { id: 57, name: 'brands', description: 'brand' },
+      { id: 58, name: 'brands.create', description: 'brand create' },
+      { id: 59, name: 'brands.update', description: 'brand update' },
+      { id: 60, name: 'brands.delete', description: 'brand delete' },
+      { id: 61, name: 'brands.view', description: 'brand view' },
+      { id: 62, name: 'brands.list', description: 'brand list' },
+      { id: 63, name: 'brands.search', description: 'brand search' },
+
     ];
 
     for (const permission of _permissions) {
