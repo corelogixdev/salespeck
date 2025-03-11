@@ -92,7 +92,9 @@
                         <%= products %>
                     </td>
                     <td><%= sale.discountpercentage %>%</td>
-                    <td>Rs.<%= parseFloat(sale.totalprice).toFixed(2) %></td>
+                    
+                    <td>Rs.<%= (parseFloat(sale.totalprice) - (parseFloat(sale.totalprice) * (sale.discountpercentage / 100))).toFixed(2) %></td>
+
                     <td class="date"><%= sale.createdAt %></td>
                     <td style="text-align: end;">
                         <a href="/sales/<%= sale.id %>" 

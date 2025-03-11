@@ -21,11 +21,12 @@ async function getDashboardStats(){
 
       let todaysSalesAmount = await db.sequelize.query(
         `
-        SELECT SUM(price*quantity) as total FROM soldproducts WHERE createdAt BETWEEN date('now') AND date('now', '+1 day')
+        SELECT SUM(totalprice - (totalprice * discountpercentage / 100)) as total FROM sale WHERE DATE(createdAt) = DATE('now')
         `,
         { type: db.sequelize.QueryTypes.SELECT }
       );
       todaysSalesAmount = todaysSalesAmount[0]?.total || 0;
+      if(todaysSalesAmount > 0) todaysSalesAmount.toFixed(2);
       // Fetch today's and yesterday's sales
       const salesComparison = await db.sequelize.query(
         `
