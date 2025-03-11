@@ -18,19 +18,20 @@ async function getDashboardStats(){
       // Define start and end of today's date
       const todayStartDate = moment().startOf("day").toDate();
       const todayEndDate = moment().endOf("day").toDate();
-  
-      // Fetch today's sales amount
-      const todaysSalesAmount =
-        (await db.soldproducts.sum("price", {
-          where: { createdAt: { [Op.between]: [todayStartDate, todayEndDate] } },
-        })) || 0;
-  
+
+      let todaysSalesAmount = await db.sequelize.query(
+        `
+        SELECT SUM(price*quantity) as total FROM soldproducts WHERE createdAt BETWEEN date('now') AND date('now', '+1 day')
+        `,
+        { type: db.sequelize.QueryTypes.SELECT }
+      );
+      todaysSalesAmount = todaysSalesAmount[0]?.total || 0;
       // Fetch today's and yesterday's sales
       const salesComparison = await db.sequelize.query(
         `
         SELECT
-          (SELECT SUM(price) FROM soldproducts WHERE createdAt BETWEEN date('now', '-1 day') AND date('now', '-1 day', '+1 day')) as yesterday,
-          (SELECT SUM(price) FROM soldproducts WHERE createdAt BETWEEN date('now') AND date('now', '+1 day')) as today
+          (SELECT SUM(price*quantity) FROM soldproducts WHERE createdAt BETWEEN date('now', '-1 day') AND date('now', '-1 day', '+1 day')) as yesterday,
+          (SELECT SUM(price*quantity) FROM soldproducts WHERE createdAt BETWEEN date('now') AND date('now', '+1 day')) as today
         `,
         { type: db.sequelize.QueryTypes.SELECT }
       );

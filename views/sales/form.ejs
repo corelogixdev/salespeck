@@ -180,13 +180,13 @@
     function updateTotalBill() {
         let total = 0;
         let rows = document.querySelectorAll('#selected-products tr');
-        let discountpercentage = parseInt(document.getElementById('discountpercentage').value || 0);
+        let discountpercentage = parseFloat(document.getElementById('discountpercentage').value || 0);
         rows.forEach(row => {
             const price = parseFloat(row.querySelector('.product-total').textContent);
             total += price;
         });
         total = total - (total * discountpercentage / 100);
-        totalBillAmount.textContent = `Rs. ${parseInt(total)}`;
+        totalBillAmount.textContent = `Rs. ${parseFloat(total)}`;
         UpdateChangePrice();
     }   
     let previousEntry;
@@ -197,7 +197,6 @@
             return;
         }
         let discountedPrice = product.saleprice - (product.saleprice * product.discount / 100);
-        discountedPrice = Math.round(discountedPrice);
 
         const existingRow = document.getElementById(`product-row-${product.id}`);
         if (existingRow) {
@@ -270,12 +269,12 @@
             changeEl.textContent = 'Rs. 0.00';
             return;
         }
-        changeEl.textContent = `Rs. ${Math.round(change)}`;
+        changeEl.textContent = `Rs. ${change.toFixed(2)}`;
     }
     function sale(){
         const customer = customerDropdown.value || null;
         const ledger = ledgerCheckbox.checked;
-        const discountpercentage = parseInt(document.getElementById('discountpercentage').value);
+        const discountpercentage = parseFloat(document.getElementById('discountpercentage').value);
         const products = [];
         document.querySelectorAll('#selected-products tr').forEach(row => {
             const productId = row.querySelector('td:nth-child(2)').textContent;
@@ -290,7 +289,7 @@
         const totalPaymentVal = parseFloat(totalPayment.value) || 0;
         const priceWithoutDiscount = products.reduce((acc, product) => acc + (product.quantity * product.price), 0);
         
-        const totalPrice = Math.round(priceWithoutDiscount);
+        const totalPrice = priceWithoutDiscount;
 
         // check if discount percent is valid
 
@@ -298,7 +297,7 @@
             toastr.warning('Please enter valid discount percentage');
             return;
         }
-        const priceWithDiscount = Math.round(priceWithoutDiscount - (priceWithoutDiscount * discountpercentage / 100));
+        const priceWithDiscount = priceWithoutDiscount - (priceWithoutDiscount * discountpercentage / 100);
         if(totalPaymentVal < priceWithDiscount && !ledger){
             toastr.warning('Please check the ledger option or pay the full amount');
             return;
@@ -384,8 +383,12 @@
         input.onblur = null;
         input.onkeyup = null;
     }
-    function createEdiableInput(onSave, value, target){
+    function createEdiableInput(onSave, value, target, inputtype){
         const input = target.querySelector('.editable-input') || document.createElement('input');
+        let prevInputType = input.getAttribute('type');
+        if(prevInputType !== inputtype){
+            input.setAttribute('type', inputtype);
+        }
         input.classList.add('editable-input');
         input.style.borderBottom = '1px solid #000';
         input.style.pointerEvents = 'all';
@@ -404,11 +407,6 @@
                 postSaveInput(input);
             }
         };
-        input.addEventListener('keypress', (event) => {
-            if (event.key < '0' || event.key > '9') {
-                event.preventDefault();
-            }
-        });
         input.focus();
     }
     
@@ -526,7 +524,8 @@
                     addProduct(product);
                     productSearch.value = '';
                     searchResults.classList.add('d-none');
-                    // Add this line to focus back on search box
+                    selectedProduct = null; // se the selected product to null in case user hase selected a product and then clicked on search result
+
                     productSearch.focus();
                 });
                 searchResults.appendChild(productElement);
@@ -542,6 +541,7 @@
                     const productId = row.querySelector('.product-id').textContent;
                     const product = allProducts.find(p => p.id === parseInt(productId));
                     const newQuantity = parseInt(input.value);
+                    input.value = newQuantity;
                     
                     if (newQuantity <= 0) {
                         input.style.borderBottomColor = 'red';
@@ -573,14 +573,15 @@
                     if(!quantityElement){
                         return;
                     }
-                    const quantity = Math.round(quantityElement.value);
+                    const quantity = parseInt(quantityElement.value);
                     const priceElement = row.querySelector('.product-price .editable-input');
                     const totalElement = row.querySelector('.product-total');
                     const price = parseFloat(priceElement.value);
                     createEdiableInput( 
                         (event, input) => UpdateProductQuantity(event, input, quantityElement , price, totalElement), 
                         quantity, 
-                        target
+                        target,
+                        'number'
                     );
                 }
                 else if (target.classList.contains('product-price')) {
@@ -591,19 +592,20 @@
                     createEdiableInput( 
                         (event, input) => {
                             if (event.key === 'Enter') {
-                                const newPrice = parseInt(input.value);
+                                const newPrice = parseFloat(input.value);
                                 if (newPrice <= 0) {
                                     input.style.borderBottomColor = 'red';
                                     toastr.warning('Price should be greater than 0');
                                     return false;
                                 }
                                 priceElement.value = newPrice;
-                                totalElement.textContent = parseInt((parseInt(quantityElement.value) * newPrice))
+                                totalElement.textContent = parseFloat((parseInt(quantityElement.value) * newPrice))
                                 updateTotalBill();
                             }
                         },
                         price, 
-                        target
+                        target,
+                        'number'
                     );
                 }
             }

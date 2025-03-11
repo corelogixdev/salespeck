@@ -174,7 +174,7 @@
             const price = parseFloat(row.querySelector('.total-price').textContent);
             total += price;
         });
-        totalBillAmount.textContent = `Rs. ${parseInt(total)}`;
+        totalBillAmount.textContent = `Rs. ${parseFloat(total)}`;
         UpdateChangePrice();
     }
 
@@ -192,7 +192,7 @@
             updateTotalBill();
             return;
         }
-
+    
         let newQuantity = 1;
         const row = document.createElement('tr');
         row.id = `product-row-${product.id}`;
@@ -200,10 +200,10 @@
             <td class="product-id">${product.id}</td>
             <td class="product-name" title="${product.name}">${product.name}</td>
             <td class="product-quantity">
-                <input type="text" class="editable-input" value="${newQuantity}" readonly>
+                <input type="number" class="editable-input" value="${newQuantity}" readonly>
             </td>
             <td class="product-price">
-                <input type="text" class="editable-input" value="${product.purchaseprice}" readonly>
+                <input type="number" class="editable-input" value="${product.purchaseprice}" readonly>
             </td>
             <td class="total-price">${product.purchaseprice}</td>
             <td class="expiry-date-cell">
@@ -228,7 +228,7 @@
             changeEl.textContent = 'Rs. 0.00';
             return;
         }
-        changeEl.textContent = `Rs. ${Math.round(change)}`;
+        changeEl.textContent = `Rs. ${parseFloat(change)}`;
     }
     function purchase(){
         if(ErrorString){
@@ -358,11 +358,11 @@
                 postSaveInput(input);
             }
         };
-        input.addEventListener('keypress', (event) => {
-            if (event.key < '0' || event.key > '9') {
-                event.preventDefault();
-            }
-        });
+        // input.addEventListener('keypress', (event) => {
+            // if (event.key < '0' || event.key > '9') {
+            //     event.preventDefault();
+            // }
+        // });
         input.focus();
     }
 
@@ -457,7 +457,8 @@
                     addProduct(product);
                     productSearch.value = '';
                     searchResults.classList.add('d-none');
-                    // Add this line to focus back on search box
+                    selectedProduct = null; // se the selected product to null in case user hase selected a product and then clicked on search result
+                    
                     productSearch.focus();
                 });
                 searchResults.appendChild(productElement);
@@ -508,14 +509,14 @@
                     createEdiableInput( 
                         (event, input) => {
                             if (event.key === 'Enter') {
-                                const newPrice = parseInt(input.value);
+                                const newPrice = parseFloat(input.value);
                                 if (newPrice <= 0) {
                                     input.style.borderBottomColor = 'red';
                                     toastr.warning('Price should be greater than 0');
                                     return false;
                                 }
                                 priceElement.value = newPrice;
-                                totalElement.textContent = parseInt((parseInt(quantityElement.value) * newPrice))
+                                totalElement.textContent = parseFloat((parseFloat(quantityElement.value) * newPrice))
                                 updateTotalBill();
                             }
                         },
@@ -529,6 +530,7 @@
             function UpdateProductQuantity(event, input, quantityElement, price, totalElement) {
                 if (event.key === 'Enter') {
                     const newQuantity = parseInt(input.value);
+                    input.value = newQuantity;
                     const row = input.closest('tr');
                     let productId = row.querySelector('.product-id').textContent;
                     let productTotalQuantity = allProducts.find(p => p.id === parseInt(productId)).quantity;
@@ -573,14 +575,14 @@
                     createEdiableInput(
                         (event, input) => {
                             if (event.key === 'Enter') {
-                                const newPrice = parseInt(input.value);
+                                const newPrice = parseFloat(input.value);
                                 if (newPrice <= 0) {
                                     input.style.borderBottomColor = 'red';
                                     toastr.warning('Price should be greater than 0');
                                     return false;
                                 }
                                 priceElement.value = newPrice;
-                                totalElement.textContent = parseInt(parseInt(quantityElement.value) * newPrice);
+                                totalElement.textContent = parseFloat(parseFloat(quantityElement.value) * newPrice);
                                 updateTotalBill();
                             }
                         },

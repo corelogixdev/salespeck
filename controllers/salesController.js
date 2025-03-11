@@ -150,7 +150,7 @@ exports.save = async (req, res) => {
       saleProductsData.push({
         product: dbProduct.id,
         quantity: orderProduct.quantity,
-        price: orderProduct.price * orderProduct.quantity
+        price: orderProduct.price
       });
 
       inventoryUpdates.push({

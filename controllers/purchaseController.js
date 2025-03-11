@@ -57,7 +57,7 @@ exports.purchaseview = async (req, res) => {
       },
     ],
   });
-  purchase.balance = purchase.totalAmount - purchase.totalPayment;
+  purchase.balance = purchase.totalPayment - purchase.totalAmount;
   let companySettings = await db.softwaresetting.findOne({
     where: {
       name: "company",
