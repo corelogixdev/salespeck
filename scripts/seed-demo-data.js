@@ -36,78 +36,123 @@ async function seedDemoData() {
     // Create user permissions
     await db.userpermissions.destroy({ where: { user_id: user.id } });
     await db.userpermissions.create({ user_id: user.id, permission_id: 777 });
+
+    // Create vendors
+    const vendors = [
+      {
+        firstname: 'Vendor',
+        lastname: 'One',
+        username: 'vendor1',
+        email: 'vendor1@example.com',
+        password: encrypt.encrypt('vendor1'),
+        role: 'vendor',
+        phone: '555-0001',
+        address: '123 Supplier Street, Vendor City',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        firstname: 'Vendor',
+        lastname: 'Two',
+        username: 'vendor2',
+        email: 'vendor2@example.com',
+        password: encrypt.encrypt('vendor2'),
+        role: 'vendor',
+        phone: '555-0002',
+        address: '456 Provider Road, Vendor Town',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ];
+
+    for (const vendor of vendors) {
+      const existingVendor = await User.findOne({ where: { username: vendor.username } });
+      if (!existingVendor) {
+        await User.create(vendor);
+      } else {
+        await User.update(vendor, { where: { username: vendor.username } });
+      }
+    }
+
+    // Create customers
+    const customers = [
+      {
+        firstname: 'Customer',
+        lastname: 'One',
+        username: 'customer1',
+        email: 'customer1@example.com',
+        password: encrypt.encrypt('customer1'),
+        role: 'customer',
+        phone: '555-1001',
+        address: '789 Buyer Avenue, Customer City',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        firstname: 'Customer',
+        lastname: 'Two',
+        username: 'customer2',
+        email: 'customer2@example.com',
+        password: encrypt.encrypt('customer2'),
+        role: 'customer',
+        phone: '555-1002',
+        address: '101 Shopper Lane, Customer Town',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ];
+
+    for (const customer of customers) {
+      const existingCustomer = await User.findOne({ where: { username: customer.username } });
+      if (!existingCustomer) {
+        await User.create(customer);
+      } else {
+        await User.update(customer, { where: { username: customer.username } });
+      }
+    }
+
     const products = [
       {
-        name: 'Milk 1L',
-        barcode: '5901234123457',
-        carrycost: 0.5,
+        name: 'a',
+        barcode: 'a',
+        carrycost: 0,
         discount: 0,
         ispurchaseable: true,
-        issaleable: true,
-        purchaseprice: 0.8,
+        issaleable: false,
+        purchaseprice: 1,
         purchaseactive: true,
-        quantity: 50,
-        saleprice: 1.2,
+        quantity: 0,
+        saleprice: 0,
+        saleactive: false,
+        createdby: 1,
+        updatedby: 1,
+      },
+      {
+        name: 'b',
+        barcode: 'b',
+        carrycost: 0,
+        discount: 0,
+        ispurchaseable: false,
+        issaleable: true,
+        purchaseprice: 0,
+        purchaseactive: false,
+        quantity: 0,
+        saleprice: 2,
         saleactive: true,
         createdby: 1,
         updatedby: 1,
       },
       {
-        name: 'Bread 500g',
-        barcode: '5901234123458',
-        carrycost: 0.3,
+        name: 'c',
+        barcode: 'c',
+        carrycost: 0,
         discount: 0,
         ispurchaseable: true,
         issaleable: true,
-        purchaseprice: 0.6,
+        purchaseprice: 3,
         purchaseactive: true,
-        quantity: 30,
-        saleprice: 1.0,
-        saleactive: true,
-        createdby: 1,
-        updatedby: 1,
-      },
-      {
-        name: 'Coca-Cola 330ml',
-        barcode: '5901234123459',
-        carrycost: 0.2,
-        discount: 0,
-        ispurchaseable: true,
-        issaleable: true,
-        purchaseprice: 0.4,
-        purchaseactive: true,
-        quantity: 100,
-        saleprice: 0.8,
-        saleactive: true,
-        createdby: 1,
-        updatedby: 1,
-      },
-      {
-        name: 'Apple',
-        barcode: '5901234123460',
-        carrycost: 0.1,
-        discount: 0,
-        ispurchaseable: true,
-        issaleable: true,
-        purchaseprice: 0.2,
-        purchaseactive: true,
-        quantity: 200,
-        saleprice: 0.3,
-        saleactive: true,
-        createdby: 1,
-        updatedby: 1,
-      },
-      {
-        name: 'Chicken Breast 500g',
-        barcode: '5901234123461',
-        carrycost: 0.8,
-        discount: 0,
-        ispurchaseable: true,
-        issaleable: true,
-        purchaseprice: 2.5,
-        purchaseactive: true,
-        quantity: 20,
-        saleprice: 4.0,
+        quantity: 0,
+        saleprice: 4,
         saleactive: true,
         createdby: 1,
         updatedby: 1,
@@ -131,6 +176,9 @@ async function seedDemoData() {
       });
       productsCreated++;
     }
+    
+    console.log('Demo data seeded successfully');
+    
   } catch (error) {
     console.error('Error seeding demo data:', error);
     throw error;
