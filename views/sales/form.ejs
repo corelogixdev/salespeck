@@ -361,7 +361,8 @@
             body: JSON.stringify(body),
         });
         const products = await response.json();
-        allProducts = products;
+        // allProducts = products;
+        setAllProducts(products);
         return products;
     }
     async function searchProductByBarcode(barcode){
@@ -375,6 +376,15 @@
         }else{
             toastr.warning('No product found.');
         }
+    }
+    function setAllProducts(product){
+        if(allProducts.find(p => p.id === product.id) || product.quantity <= 0 || !product){
+            return;
+        }
+        if(Array.isArray(product))
+            allProducts.push(...product);
+        else
+        allProducts.push(product);
     }
     function postSaveInput(input){
         input.style.borderBottom = '1px solid transparent';
@@ -502,7 +512,8 @@
                 document.getElementById('search-results').classList.add('d-none');
                 return;
             }
-            allProducts = products;
+            // allProducts = products;
+            setAllProducts(products);
             const searchResults = document.getElementById('search-results');
             searchResults.classList.remove('d-none');
             searchResults.innerHTML = '';

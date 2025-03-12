@@ -305,6 +305,15 @@
             }
         });
     }
+    function setAllProducts(product){
+        if(allProducts.find(p => p.id === product.id) || product.quantity <= 0 || !product){
+            return;
+        }
+        if(Array.isArray(product))
+            allProducts.push(...product);
+        else
+        allProducts.push(product);
+    }
     async function getProducts(body){
         const response = await fetch('/accounting/purchase/productsget', {
             method: 'POST',
@@ -314,7 +323,8 @@
             body: JSON.stringify(body),
         });
         const products = await response.json();
-        allProducts = products;
+        // allProducts = products;
+        setAllProducts(products);
         return products;
     }
     async function searchProductByBarcode(barcode){
@@ -438,7 +448,8 @@
                 document.getElementById('search-results').classList.add('d-none');
                 return;
             }
-            allProducts = products;
+            // allProducts = products;
+            setAllProducts(products);
             const searchResults = document.getElementById('search-results');
             searchResults.classList.remove('d-none');
             searchResults.innerHTML = '';
@@ -529,6 +540,7 @@
         selectedProductsTable.addEventListener('click', (event) => {
             function UpdateProductQuantity(event, input, quantityElement, price, totalElement) {
                 if (event.key === 'Enter') {
+                    debugger;
                     const newQuantity = parseInt(input.value);
                     input.value = newQuantity;
                     const row = input.closest('tr');
