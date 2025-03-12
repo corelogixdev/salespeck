@@ -1,7 +1,13 @@
 const { Op, where } = require("sequelize");
 var db = require("../models");
+var moment = require("moment");
+const { findLike } = require("../utils/searchquery");
+const { getPagination, getPagingData } = require('../utils/pagination');
+
 exports.index = async (req, res) => {
   let { customer, daterange, productId } = req.body;
+  const page = parseInt(req.query.page) || parseInt(req.body.page) || 1;
+  const { limit, offset } = getPagination(page, 10);
 
   let queryOptions = {
     include: [
@@ -33,7 +39,8 @@ exports.index = async (req, res) => {
       },
     ],
     order: [["createdAt", "DESC"]],
-    limit: 10,
+    limit,
+    offset
   };
 
   try {
@@ -64,11 +71,23 @@ exports.index = async (req, res) => {
       };
     }
 
+    const { count } = await db.sale.findAndCountAll({
+      ...queryOptions,
+      limit: undefined,
+      offset: undefined,
+      distinct: true,
+      col: 'id'
+    });
+    
     const sales = await db.sale.findAll(queryOptions);
+    
+    const pagination = getPagingData(count, page, limit);
+
     res.render("sales/index", {
       sales,
       title: "Sales Report",
       searchquery: req.body,
+      pagination
     });
   } catch (error) {
     console.error("Error fetching sales:", error);
@@ -230,8 +249,6 @@ exports.save = async (req, res) => {
 // Remove or comment out the existing search function since it's now merged
 // exports.search = async (req, res) => { ... }
 
-var moment = require("moment");
-const { findLike } = require("../utils/searchquery");
 exports.saleview = async (req, res) => {
   const { id } = req.params;
   if(!id) {

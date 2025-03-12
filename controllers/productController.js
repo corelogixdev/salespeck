@@ -1,13 +1,13 @@
 const { Op } = require('sequelize');
 const db = require('../models');
 const { findLike } = require('../utils/searchquery');
+const { getPagination, getPagingData } = require('../utils/pagination');
 
 exports.index = async (req, res) => {
   try {
     const { name, barcode, category } = req.body;
     let whereClause = {};
 
-    // Build search criteria
     if (name) {
       whereClause.name = { [Op.like]: `%${name}%` };
     }
@@ -17,17 +17,24 @@ exports.index = async (req, res) => {
     if (category) {
       whereClause.category = { [Op.like]: `%${category}%` };
     }
+    
+    const page = parseInt(req.query.page) || parseInt(req.body.page) || 1;
+    const { limit, offset } = getPagination(page, 10);
 
-    const data = await db.product.findAll({
+    const { count, rows: data } = await db.product.findAndCountAll({
       where: whereClause,
       order: [['id', 'DESC']],
-      limit: 10
+      limit,
+      offset
     });
+    
+    const pagination = getPagingData(count, page, limit);
 
     res.render('products/index', { 
       title: "Products", 
       data,
-      searchParams: req.body 
+      searchParams: req.body,
+      pagination
     });
   } catch (error) {
     console.error('Error fetching products:', error);

@@ -1,15 +1,40 @@
 const db = require("../models");
 const { Op } = require("sequelize");
 const moment = require("moment");
+const { getPagination, getPagingData } = require('../utils/pagination');
 
-exports.index = async (_, res) => {
-  let purchases = await db.purchase.findAll({});
-  res.render("accounting/purchase/index", {
-    title: "Purchases",
-    purchases,
-    searchquery: {},
-  });
+exports.index = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const { limit, offset } = getPagination(page, 10);
+  
+  try {
+    const { count, rows: purchases } = await db.purchase.findAndCountAll({
+      include: [
+        {
+          model: db.user,
+          as: "Vendor",
+          attributes: ["firstname", "lastname"]
+        }
+      ],
+      order: [["createdAt", "DESC"]],
+      limit,
+      offset
+    });
+    
+    const pagination = getPagingData(count, page, limit);
+    
+    res.render("accounting/purchase/index", {
+      title: "Purchases",
+      purchases,
+      searchquery: {},
+      pagination
+    });
+  } catch (error) {
+    console.error("Error fetching purchases:", error);
+    res.status(500).send("Internal Server Error");
+  }
 };
+
 exports.purchaseview = async (req, res) => {
   let purchase = await db.purchase.findOne({
     where: {
@@ -153,9 +178,13 @@ exports.save = async (req, res) => {
 
 exports.search = async (req, res) => {
   let { vendor, daterange, invoicenum } = req.body;
-  vendor = vendor.trim();
-  daterange = daterange.trim();
-  invoicenum = invoicenum.trim();
+  vendor = vendor ? vendor.trim() : '';
+  daterange = daterange ? daterange.trim() : '';
+  invoicenum = invoicenum ? invoicenum.trim() : '';
+  
+  const page = parseInt(req.query.page) || parseInt(req.body.page) || 1;
+  const { limit, offset } = getPagination(page, 10);
+  
   try {
     let queryOptions = {
       include: [
@@ -174,9 +203,11 @@ exports.search = async (req, res) => {
           ],
         },
       ],
+      limit,
+      offset,
+      order: [["createdAt", "DESC"]]
     };
 
-    // Vendor name search
     if (vendor) {
       queryOptions.include[0].where = {
         [Op.or]: [
@@ -186,7 +217,6 @@ exports.search = async (req, res) => {
       };
     }
 
-    // Date range search
     if (daterange) {
       let [start, end] = daterange.split(" to ");
       start = moment(new Date(start)).startOf("day").toDate();
@@ -199,7 +229,6 @@ exports.search = async (req, res) => {
       };
     }
 
-    // Invoice number search
     if (invoicenum) {
       queryOptions.where = {
         ...queryOptions.where,
@@ -209,11 +238,23 @@ exports.search = async (req, res) => {
       };
     }
 
+    const { count } = await db.purchase.findAndCountAll({
+      ...queryOptions,
+      limit: undefined,
+      offset: undefined,
+      distinct: true,
+      col: 'id'
+    });
+    
     const purchases = await db.purchase.findAll(queryOptions);
+    
+    const pagination = getPagingData(count, page, limit);
+
     res.render("accounting/purchase/index", {
       title: "Purchases",
       purchases,
       searchquery: req.body,
+      pagination
     });
   } catch (error) {
     res.status(500).send({ status: "error", message: "Internal Server Error" });

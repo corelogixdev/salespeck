@@ -1,45 +1,43 @@
 const { Op } = require('sequelize');
 const db = require('../models');
 const encrypt = require('../utils/encrypt');
+const { getPagination, getPagingData } = require('../utils/pagination');
 
-const PER_PAGE = 100;
-function getPageRange(currentPage, totalPages) {
-  let startPage, endPage;
-  if (totalPages <= 3) {
-      startPage = 1;
-      endPage = totalPages;
-  } else {
-      if (currentPage === 1) {
-          startPage = 1;
-          endPage = 3;
-      } else if (currentPage === totalPages) {
-          startPage = totalPages - 2;
-          endPage = totalPages;
-      } else {
-          startPage = currentPage - 1;
-          endPage = currentPage + 1;
-      }
-  }
-  return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
-}
+const PER_PAGE = 10;
 
 exports.index = async (req, res) => {
-  const role = req.query.role || 'user'; // Default role to 'user' if not provided;
+  const role = req.query.role || 'user';
   let searchdata = req.query.search || '';
   searchdata = searchdata.trim();
-  const data = await db.user.findAll({
-    where: {
-      role: role,
-      [Op.or]: [
-        { username: { [Op.like]: `%${searchdata}%` } },
-        { phone: { [Op.like]: `%${searchdata}%` } },
-        { firstname: { [Op.like]: `%${searchdata}%` } },
-        { lastname: { [Op.like]: `%${searchdata}%` } }
-      ]
-    },
-    limit: 10,
+  
+  const page = parseInt(req.query.page) || 1;
+  const { limit, offset } = getPagination(page, PER_PAGE);
+  
+  const whereClause = {
+    role: role,
+    [Op.or]: [
+      { username: { [Op.like]: `%${searchdata}%` } },
+      { phone: { [Op.like]: `%${searchdata}%` } },
+      { firstname: { [Op.like]: `%${searchdata}%` } },
+      { lastname: { [Op.like]: `%${searchdata}%` } }
+    ]
+  };
+  
+  const { count, rows: data } = await db.user.findAndCountAll({
+    where: whereClause,
+    limit,
+    offset
   });
-  res.render('users/index', { title: role === 'user' ? 'Users' : 'Customers', data, role, searchdata });
+  
+  const pagination = getPagingData(count, page, limit);
+  
+  res.render('users/index', { 
+    title: role === 'user' ? 'Users' : 'Customers', 
+    data, 
+    role, 
+    searchdata,
+    pagination
+  });
 };
 
 exports.form = async (req, res) => {
