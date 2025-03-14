@@ -21,28 +21,30 @@ function deleteOldLogs(logDir) {
 
 // Receive a message like console.log, can call it with comma-separated values
 function log(...message) {
-  if (config.env === 'production') {
-    try {
-      const logDir = app.getPath('userData');
-      const logFilePath = path.join(logDir, `logs-${new Date().toISOString().split('T')[0]}.txt`);
-      const timestamp = new Date().toISOString();
-      // Message may be object
-      if (message.length === 1 && typeof message[0] === 'object') {
-        message = [JSON.stringify(message[0], null, 2)];
+  if (process.env.logging == true) {
+    if (process.env.logger === 'file') {
+      try {
+        const logDir = app.getPath('userData');
+        const logFilePath = path.join(logDir, `logs-${new Date().toISOString().split('T')[0]}.txt`);
+        const timestamp = new Date().toISOString();
+        // Message may be object
+        if (message.length === 1 && typeof message[0] === 'object') {
+          message = [JSON.stringify(message[0], null, 2)];
+        }
+        const messages = message.join(' ');
+        const logMessage = `${timestamp} - ${messages}\n`;
+
+        // Append log to file
+        fs.appendFileSync(logFilePath, logMessage);
+
+        // Delete old log files
+        deleteOldLogs(logDir);
+      } catch (e) {
+        console.log(message.join(' '));
       }
-      const messages = message.join(' ');
-      const logMessage = `${timestamp} - ${messages}\n`;
-
-      // Append log to file
-      fs.appendFileSync(logFilePath, logMessage);
-
-      // Delete old log files
-      deleteOldLogs(logDir);
-    } catch (e) {
+    } else {
       console.log(message.join(' '));
     }
-  } else {
-    console.log(message.join(' '));
   }
 }
 
