@@ -23,6 +23,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
+      source: {
+        type: Sequelize.STRING(20),
+        allowNull: true,
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: true,
@@ -76,6 +80,10 @@ module.exports = {
       },
       fk_financeaccount_in_financetransaction: {
         type: Sequelize.STRING,
+        allowNull: true,
+      },
+      source: {
+        type: Sequelize.STRING(20),
         allowNull: true,
       },
       createdAt: {
@@ -159,6 +167,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
+      source: {
+        type: Sequelize.STRING(20),
+        allowNull: true,
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: true,
@@ -186,6 +198,10 @@ module.exports = {
       },
       quantity: {
         type: Sequelize.FLOAT,
+        allowNull: true,
+      },
+      source: {
+        type: Sequelize.STRING(20),
         allowNull: true,
       },
       createdAt: {
@@ -225,6 +241,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
+      source: {
+        type: Sequelize.STRING(20),
+        allowNull: true,
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: true,
@@ -248,6 +268,10 @@ module.exports = {
       },
       value: {
         type: Sequelize.TEXT,
+        allowNull: true,
+      },
+      source: {
+        type: Sequelize.STRING(20),
         allowNull: true,
       },
       createdAt: {
@@ -320,6 +344,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
+      source: {
+        type: Sequelize.STRING(20),
+        allowNull: true,
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: true,
@@ -359,6 +387,10 @@ module.exports = {
       },
       fk_user_in_cashclosing: {
         type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      source: {
+        type: Sequelize.STRING(20),
         allowNull: true,
       },
       createdAt: {
@@ -492,6 +524,10 @@ module.exports = {
       quantity: Sequelize.INTEGER,
       price: Sequelize.FLOAT,
       total: Sequelize.FLOAT,
+      source: {
+        type: Sequelize.STRING(20),
+        allowNull: true,
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: true,
@@ -544,6 +580,10 @@ module.exports = {
         type: Sequelize.STRING(50),
         allowNull: true,
       },
+      source: {
+        type: Sequelize.STRING(20),
+        allowNull: true,
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: true,
@@ -553,67 +593,6 @@ module.exports = {
         allowNull: true,
       }
     });
-
-    // // Add foreign keys and indexes
-    // await queryInterface.addConstraint('soldproducts', {
-    //   fields: ['sale'],
-    //   type: 'foreign key',
-    //   name: 'soldproducts_sale_fk',
-    //   references: {
-    //     table: 'sale',
-    //     field: 'id',
-    //   },
-    //   onDelete: 'cascade',
-    //   onUpdate: 'cascade',
-    // });
-
-    // await queryInterface.addConstraint('soldproducts', {
-    //   fields: ['product'],
-    //   type: 'foreign key',
-    //   name: 'soldproducts_product_fk',
-    //   references: {
-    //     table: 'product',
-    //     field: 'id',
-    //   },
-    //   onDelete: 'cascade',
-    //   onUpdate: 'cascade',
-    // });
-
-    // await queryInterface.addConstraint('sale', {
-    //   fields: ['user'],
-    //   type: 'foreign key',
-    //   name: 'sale_user_fk',
-    //   references: {
-    //     table: 'user',
-    //     field: 'id',
-    //   },
-    //   onDelete: 'cascade',
-    //   onUpdate: 'cascade',
-    // });
-
-    // await queryInterface.addConstraint('sale', {
-    //   fields: ['customer'],
-    //   type: 'foreign key',
-    //   name: 'sale_customer_fk',
-    //   references: {
-    //     table: 'user',
-    //     field: 'id',
-    //   },
-    //   onDelete: 'cascade',
-    //   onUpdate: 'cascade',
-    // });
-
-    // await queryInterface.addConstraint('sale', {
-    //   fields: ['deliveryuser'],
-    //   type: 'foreign key',
-    //   name: 'sale_deliveryuser_fk',
-    //   references: {
-    //     table: 'user',
-    //     field: 'id',
-    //   },
-    //   onDelete: 'cascade',
-    //   onUpdate: 'cascade',
-    // });
 
     await queryInterface.createTable('permissions', {
       id: {
@@ -626,6 +605,10 @@ module.exports = {
       },
       description: {
         type: Sequelize.STRING(200),
+        allowNull: true,
+      },
+      source: {
+        type: Sequelize.STRING(20),
         allowNull: true,
       },
       createdAt: {
@@ -649,6 +632,10 @@ module.exports = {
       },
       permission_id: {
         type: Sequelize.STRING(32),
+        allowNull: true,
+      },
+      source: {
+        type: Sequelize.STRING(20),
         allowNull: true,
       },
       createdAt: {
@@ -685,6 +672,10 @@ module.exports = {
       },
       createdby: {
         type: Sequelize.STRING(32),
+        allowNull: true,
+      },
+      source: {
+        type: Sequelize.STRING(20),
         allowNull: true,
       },
       createdAt: {
@@ -728,6 +719,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       },
+      source: {
+        type: Sequelize.STRING(20),
+        allowNull: true,
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false
@@ -761,6 +756,10 @@ module.exports = {
         type: Sequelize.FLOAT,
         allowNull: true
       },
+      source: {
+        type: Sequelize.STRING(20),
+        allowNull: true,
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false
@@ -789,6 +788,10 @@ module.exports = {
       quantity: {
         type: Sequelize.FLOAT,
         allowNull: true
+      },
+      source: {
+        type: Sequelize.STRING(20),
+        allowNull: true,
       },
       createdAt: {
         type: Sequelize.DATE,

@@ -29,6 +29,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(200),
       allowNull: true,
     },
+    source: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+    },
     fk_user_targetto_in_financetransaction: {
       type: DataTypes.STRING,
       allowNull: true,

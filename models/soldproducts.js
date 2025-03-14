@@ -14,6 +14,10 @@ module.exports = (sequelize, DataTypes) => {
       product: DataTypes.STRING,
       quantity: DataTypes.INTEGER,
       price: DataTypes.FLOAT,
+      source: {
+        type: DataTypes.STRING(20),
+        allowNull: true,
+      },
     },
     {
       timestamps: true,

@@ -16,6 +16,10 @@ module.exports = (sequelize, DataTypes) => {
       totalAmount: DataTypes.FLOAT,
       totalPayment: DataTypes.FLOAT,
       invoicenum: DataTypes.STRING,
+      source: {
+        type: DataTypes.STRING(20),
+        allowNull: true,
+      },
     },
     {
       timestamps: true,

@@ -37,6 +37,10 @@ module.exports = {
           key: 'id'
         }
       },
+      source: {
+        type: Sequelize.STRING(20),
+        allowNull: true,
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false
@@ -80,6 +84,10 @@ module.exports = {
           model: 'user',
           key: 'id'
         }
+      },
+      source: {
+        type: Sequelize.STRING(20),
+        allowNull: true,
       },
       createdAt: {
         type: Sequelize.DATE,

@@ -27,7 +27,11 @@ module.exports = (sequelize, DataTypes) => {
     updatedby: {
       type: DataTypes.STRING,
       allowNull: true,
-    }
+    },
+    source: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+    },
   }, {
     tableName: 'brand',
     timestamps: true,

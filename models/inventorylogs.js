@@ -37,6 +37,10 @@ module.exports = (sequelize, DataTypes) => {
       vendor: {
         type: DataTypes.STRING,
         allowNull: true,
+      },
+      source: {
+        type: DataTypes.STRING(20),
+        allowNull: true,
       }
     },
     {

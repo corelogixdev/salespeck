@@ -12,6 +12,10 @@ module.exports = (sequelize, DataTypes) => {
       },
       name: DataTypes.STRING,
       percentage: DataTypes.FLOAT,
+      source: {
+        type: DataTypes.STRING(20),
+        allowNull: true,
+      },
     },
     {
       timestamps: true,
