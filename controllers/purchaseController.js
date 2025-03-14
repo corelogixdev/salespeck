@@ -113,17 +113,22 @@ exports.save = async (req, res) => {
     const {
       totalPayment = 0,
       totalPrice: totalAmount = 0,
-      vendor = null,
+      vendor = null, // Vendor is explicitly allowed to be null
     } = data;
     let user = req.session.user.id;
     const randomInvoice = Math.floor(Math.random() * 1000000);
-    // Save purchase
+    
+    // Source for tracking where the record was created
+    const source = 'desktop';
+    
+    // Save purchase with vendor as optional
     let purchase = await db.purchase.create({
       createdby: user,
-      vendor,
+      vendor,      // Can be null or undefined
       totalAmount,
       totalPayment,
       invoicenum: "INV-" + randomInvoice,
+      source,
     });
 
     if (purchase) {
@@ -135,6 +140,7 @@ exports.save = async (req, res) => {
           product: product.productId,
           quantity: product.quantity,
           totalAmount: product.price,
+          source,
         });
 
         // save the purchased batch
@@ -143,7 +149,7 @@ exports.save = async (req, res) => {
             product: product.productId,
             quantity: product.quantity,
             expirydate: product.expiryDate,
-            quantity: product.quantity,
+            source,
           });
         }
 
@@ -162,9 +168,11 @@ exports.save = async (req, res) => {
           await db.inventorylogs.create({
             product_id: product.productId,
             quantity: product.quantity,
-            note: "Purchased",
+            note: vendor ? "Purchased from vendor" : "Purchased",
             createdby: user,
             type: "purchase",
+            vendor,  // Can be null
+            source,
           });
         }
       }
@@ -264,12 +272,13 @@ exports.search = async (req, res) => {
 exports.form = async (_, res) => {
   let vendors = await db.user.findAll({
     where: {
-      role: "user",
+      role: "vendor",
     },
   });
   res.render("accounting/purchase/form", {
     title: "Save Purchase",
     vendors,
+    vendorRequired: false,  // Add this flag to inform the view that vendor is not required
     hidenav: true,
   });
 };
@@ -295,7 +304,7 @@ exports.searchVendors = async (req, res) => {
     search = search.trim();
     const vendors = await db.user.findAll({
       where: {
-        role: 'user',
+        role: 'vendor', // Changed from "user" to "vendor"
         [Op.or]: [
           { firstname: { [Op.like]: `%${search}%` } },
           { lastname: { [Op.like]: `%${search}%` } },
