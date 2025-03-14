@@ -1,20 +1,21 @@
 "use strict";
+const { generateId } = require('../utils/idGenerator');
 
 module.exports = (sequelize, DataTypes) => {
   const SiteSmediaWappInterface = sequelize.define(
     "SiteSmediaWappInterface",
     {
       id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING(32),
         primaryKey: true,
-        autoIncrement: true,
+        defaultValue: () => generateId(32)
       },
       site_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING(32),
         allowNull: true,
       },
       wapp_cellno_id: {
-        type: DataTypes.STRING(255),
+        type: DataTypes.STRING,
         allowNull: true,
       },
       wapp_waba_id: {
@@ -50,6 +51,13 @@ module.exports = (sequelize, DataTypes) => {
       tableName: "site_smedia_wapp_interfaces",
       timestamps: true, // Automatically handle `created_at` and `updated_at`
       underscored: true, // Use snake_case for database column names
+      hooks: {
+        beforeCreate: (wappInterface) => {
+          if (!wappInterface.id) {
+            wappInterface.id = generateId(32);
+          }
+        }
+      }
     }
   );
 

@@ -7,10 +7,9 @@ module.exports = {
     console.log('Creating tables...');
     await queryInterface.createTable('financeaccount', {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: false,
         primaryKey: true,
-        autoIncrement: true,
       },
       name: {
         type: Sequelize.STRING(30),
@@ -38,10 +37,9 @@ module.exports = {
     // Create financetransaction table
     await queryInterface.createTable('financetransaction', {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: false,
         primaryKey: true,
-        autoIncrement: true,
       },
       name: {
         type: Sequelize.STRING(60),
@@ -64,16 +62,20 @@ module.exports = {
         type: Sequelize.STRING(200),
         allowNull: true,
       },
-      fk_user_createdby_in_financetransaction: {
-        type: Sequelize.INTEGER,
+      createdby: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      updatedby: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
       fk_user_targetto_in_financetransaction: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: true,
       },
       fk_financeaccount_in_financetransaction: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: true,
       },
       createdAt: {
@@ -89,10 +91,9 @@ module.exports = {
     // Create product table
     await queryInterface.createTable('product', {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: false,
         primaryKey: true,
-        autoIncrement: true,
       },
       barcode: {
         type: Sequelize.STRING(100),
@@ -171,10 +172,9 @@ module.exports = {
     // Create productsub table
     await queryInterface.createTable('productsub', {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: false,
         primaryKey: true,
-        autoIncrement: true,
       },
       fk_product_main_in_productsub: {
         type: Sequelize.INTEGER,
@@ -201,10 +201,9 @@ module.exports = {
     // Create productsalepurchase table
     await queryInterface.createTable('productsalepurchase', {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: false,
         primaryKey: true,
-        autoIncrement: true,
       },
       price: {
         type: Sequelize.FLOAT,
@@ -239,10 +238,9 @@ module.exports = {
     // Create softwaresetting table
     await queryInterface.createTable('softwaresetting', {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: false,
         primaryKey: true,
-        autoIncrement: true,
       },
       name: {
         type: Sequelize.STRING(50),
@@ -265,10 +263,9 @@ module.exports = {
     // Create user table
     await queryInterface.createTable('user', {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: false,
         primaryKey: true,
-        autoIncrement: true,
       },
       address: {
         type: Sequelize.STRING(200),
@@ -336,10 +333,9 @@ module.exports = {
     // Create cashclosing table
     await queryInterface.createTable('cashclosing', {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: false,
         primaryKey: true,
-        autoIncrement: true,
       },
       closingbalance: {
         type: Sequelize.FLOAT,
@@ -488,12 +484,11 @@ module.exports = {
     await queryInterface.createTable('soldproducts', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING(32)
       },
-      sale: Sequelize.INTEGER,
-      product: Sequelize.INTEGER,
+      sale: Sequelize.STRING(32),
+      product: Sequelize.STRING(32),
       quantity: Sequelize.INTEGER,
       price: Sequelize.FLOAT,
       total: Sequelize.FLOAT,
@@ -510,9 +505,8 @@ module.exports = {
     // create sale table
     await queryInterface.createTable('sale', {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         primaryKey: true,
-        autoIncrement: true,
       },
       user: {
         type: Sequelize.STRING(50),
@@ -623,9 +617,8 @@ module.exports = {
 
     await queryInterface.createTable('permissions', {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         primaryKey: true,
-        autoIncrement: true,
       },
       name: {
         type: Sequelize.STRING(100),
@@ -647,16 +640,15 @@ module.exports = {
 
     await queryInterface.createTable('userpermissions', {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         primaryKey: true,
-        autoIncrement: true,
       },
       user_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: true,
       },
       permission_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: true,
       },
       createdAt: {
@@ -672,12 +664,11 @@ module.exports = {
     // create table inventory logs
     await queryInterface.createTable('inventorylogs', {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         primaryKey: true,
-        autoIncrement: true,
       },
       product_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: true,
       },
       quantity: {
@@ -693,7 +684,7 @@ module.exports = {
         allowNull: true,
       },
       createdby: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: true,
       },
       createdAt: {
@@ -709,21 +700,20 @@ module.exports = {
     // Add purchase table
     await queryInterface.createTable('purchase', {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         primaryKey: true,
-        autoIncrement: true,
         allowNull: false
       },
       createdby: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: true
       },
       updatedby: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: true
       },
       vendor: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: true
       },
       totalAmount: {
@@ -751,17 +741,16 @@ module.exports = {
     // Add purchasedproducts table
     await queryInterface.createTable('purchasedproducts', {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         primaryKey: true,
-        autoIncrement: true,
         allowNull: false
       },
       purchase: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: true
       },
       product: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: true
       },
       quantity: {
@@ -785,13 +774,12 @@ module.exports = {
     // create productbatches table
     await queryInterface.createTable('productbatches', {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         primaryKey: true,
-        autoIncrement: true,
         allowNull: false
       },
       product: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: true
       },
       expirydate: {

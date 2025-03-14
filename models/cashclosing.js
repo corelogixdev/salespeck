@@ -1,10 +1,12 @@
 'use strict';
+const { generateId } = require('../utils/idGenerator');
+
 module.exports = (sequelize, DataTypes) => {
   const CashClosing = sequelize.define('cashclosing', {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(32),
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: () => generateId(32)
     },
     closingbalance: {
       type: DataTypes.FLOAT,
@@ -27,12 +29,19 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
     },
     fk_user_in_cashclosing: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: true,
     },
   }, {
     tableName: 'cashclosing',
     timestamps: true,
+    hooks: {
+      beforeCreate: (cashClosing) => {
+        if (!cashClosing.id) {
+          cashClosing.id = generateId(32);
+        }
+      }
+    }
   });
 
   CashClosing.associate = function(models) {

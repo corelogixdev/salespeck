@@ -1,20 +1,21 @@
 "use strict";
+const { generateId } = require('../utils/idGenerator');
 
 module.exports = (sequelize, DataTypes) => {
   const WappConversation = sequelize.define(
     "WappConversation",
     {
       id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING(32),
         primaryKey: true,
-        autoIncrement: true,
+        defaultValue: () => generateId(32)
       },
       site_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING(32),
         allowNull: true,
       },
       client_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING(32),
         allowNull: true,
       },
       client_name: {
@@ -48,8 +49,15 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       tableName: "wapp_conversations",
-      timestamps: true, // This enables automatic handling of `created_at` and `updated_at`
-      underscored: true, // Maps snake_case column names in the database
+      timestamps: true,
+      underscored: true,
+      hooks: {
+        beforeCreate: (wappConversation) => {
+          if (!wappConversation.id) {
+            wappConversation.id = generateId(32);
+          }
+        }
+      }
     }
   );
 

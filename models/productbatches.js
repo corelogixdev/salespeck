@@ -1,15 +1,17 @@
 "use strict";
+const { generateId } = require('../utils/idGenerator');
+
 module.exports = (sequelize, DataTypes) => {
   const ProductBatches = sequelize.define(
     "productbatches",
     {
       id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING(32),
         primaryKey: true,
-        autoIncrement: true,
+        defaultValue: () => generateId(32)
       },
       product: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: true,
       },
       expirydate: {
@@ -24,6 +26,13 @@ module.exports = (sequelize, DataTypes) => {
     {
       tableName: "productbatces",
       timestamps: true,
+      hooks: {
+        beforeCreate: (productBatch) => {
+          if (!productBatch.id) {
+            productBatch.id = generateId(32);
+          }
+        }
+      }
     }
   );
   ProductBatches.associate = function (models) {

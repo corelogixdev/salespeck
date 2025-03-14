@@ -1,15 +1,17 @@
 "use strict";
+const { generateId } = require('../utils/idGenerator');
+
 module.exports = (sequelize, DataTypes) => {
   const InventoryLogs = sequelize.define(
     "inventorylogs",
     {
       id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING(32),
         primaryKey: true,
-        autoIncrement: true,
+        defaultValue: () => generateId(32)
       },
       product_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
       },
       quantity: {
@@ -21,11 +23,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
       createdby: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
       },
       updatedby: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: true,
       },
       type: {
@@ -33,13 +35,20 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       vendor: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: true,
       }
     },
     {
       tableName: "inventorylogs",
       timestamps: true,
+      hooks: {
+        beforeCreate: (inventoryLog) => {
+          if (!inventoryLog.id) {
+            inventoryLog.id = generateId(32);
+          }
+        }
+      }
     }
   );
 

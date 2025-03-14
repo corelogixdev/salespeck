@@ -1,17 +1,19 @@
 'use strict';
+const { generateId } = require('../utils/idGenerator');
+
 module.exports = (sequelize, DataTypes) => {
   const Product = sequelize.define('product', {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(32),
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: () => generateId(32)
     },
     barcode: {
       type: DataTypes.STRING(100),
       allowNull: true,
     },
     brand: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: true,
     },
     carrycost: {
@@ -19,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
     },
     category: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: true,
     },
     discount: {
@@ -59,21 +61,29 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
     },
     taxid: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: true,
     },
     createdby: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: true,
     },
     updatedby: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: true,
     },
   }, {
     tableName: 'product',
     timestamps: false,
+    hooks: {
+      beforeCreate: (product) => {
+        if (!product.id) {
+          product.id = generateId(32);
+        }
+      }
+    }
   });
+  
   Product.associate = function (models) {
     Product.belongsTo(models.taxes, { foreignKey: 'taxid', as: 'Tax' });
     Product.belongsTo(models.user, { foreignKey: 'createdby', as: 'CreatedBy' });
@@ -92,5 +102,6 @@ module.exports = (sequelize, DataTypes) => {
       as: 'Category'
     });
   };
+  
   return Product;
 };

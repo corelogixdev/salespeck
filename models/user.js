@@ -1,10 +1,12 @@
 'use strict';
+const { generateId } = require('../utils/idGenerator');
+
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('user', {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(32),
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: () => generateId(32)
     },
     address: {
       type: DataTypes.STRING(200),
@@ -18,10 +20,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(50),
       allowNull: true,
     },
-    // name: {
-    //   type: DataTypes.STRING(20),
-    //   allowNull: true,
-    // },
     firstname: {
       type: DataTypes.STRING(20),
       allowNull: true,
@@ -52,16 +50,23 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 'user',
     },
     createdby: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: true,
     },
     updatedby: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: true,
     },
   }, {
     tableName: 'user',
     timestamps: true,
+    hooks: {
+      beforeCreate: (user) => {
+        if (!user.id) {
+          user.id = generateId(32);
+        }
+      }
+    }
   });
 
   return User;

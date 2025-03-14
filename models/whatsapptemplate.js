@@ -1,16 +1,17 @@
 "use strict";
+const { generateId } = require('../utils/idGenerator');
 
 module.exports = (sequelize, DataTypes) => {
   const whatsapptemplate = sequelize.define(
     "whatsapptemplate",
     {
       id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING(32),
         primaryKey: true,
-        autoIncrement: true,
+        defaultValue: () => generateId(32)
       },
       site_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING(32),
         allowNull: true,
       },
       meta_wapp_template_id: {
@@ -22,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
       type: {
-        type: DataTypes.STRING(255),
+        type: DataTypes.STRING,
         allowNull: true,
       },
       category: {
@@ -56,8 +57,15 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       tableName: "wapp_templates",
-      timestamps: true, // Enables Sequelize's automatic handling of `created_at` and `updated_at`
-      underscored: true, // Ensures Sequelize maps snake_case column names
+      timestamps: true,
+      underscored: true,
+      hooks: {
+        beforeCreate: (wappTemplate) => {
+          if (!wappTemplate.id) {
+            wappTemplate.id = generateId(32);
+          }
+        }
+      }
     }
   );
 

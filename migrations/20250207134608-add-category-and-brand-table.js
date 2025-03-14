@@ -6,9 +6,8 @@ module.exports = {
     // Create category table
     await queryInterface.createTable('category', {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         primaryKey: true,
-        autoIncrement: true,
       },
       name: {
         type: Sequelize.STRING(100),
@@ -23,7 +22,7 @@ module.exports = {
         defaultValue: true,
       },
       createdby: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: true,
         references: {
           model: 'user',
@@ -31,7 +30,7 @@ module.exports = {
         }
       },
       updatedby: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: true,
         references: {
           model: 'user',
@@ -51,9 +50,8 @@ module.exports = {
     // Create brand table
     await queryInterface.createTable('brand', {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         primaryKey: true,
-        autoIncrement: true,
       },
       name: {
         type: Sequelize.STRING(100),
@@ -68,7 +66,7 @@ module.exports = {
         defaultValue: true,
       },
       createdby: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: true,
         references: {
           model: 'user',
@@ -76,7 +74,7 @@ module.exports = {
         }
       },
       updatedby: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(32),
         allowNull: true,
         references: {
           model: 'user',

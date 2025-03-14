@@ -1,10 +1,12 @@
 'use strict';
+const { generateId } = require('../utils/idGenerator');
+
 module.exports = (sequelize, DataTypes) => {
   const ProductSalePurchase = sequelize.define('productsalepurchase', {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(32),
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: () => generateId(32)
     },
     price: {
       type: DataTypes.FLOAT,
@@ -19,16 +21,23 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
     },
     fk_product_in_productsalepurchase: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: true,
     },
     fk_financetransaction_in_productsalepurchase: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: true,
     },
   }, {
     tableName: 'productsalepurchase',
     timestamps: true,
+    hooks: {
+      beforeCreate: (productSalePurchase) => {
+        if (!productSalePurchase.id) {
+          productSalePurchase.id = generateId(32);
+        }
+      }
+    }
   });
 
   ProductSalePurchase.associate = function(models) {

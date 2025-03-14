@@ -1,10 +1,12 @@
 'use strict';
+const { generateId } = require('../utils/idGenerator');
+
 module.exports = (sequelize, DataTypes) => {
   const Category = sequelize.define('category', {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(32),
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: () => generateId(32)
     },
     name: {
       type: DataTypes.STRING(100),
@@ -19,16 +21,23 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: true,
     },
     createdby: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: true,
     },
     updatedby: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: true,
     },
   }, {
     tableName: 'category',
     timestamps: true,
+    hooks: {
+      beforeCreate: (category) => {
+        if (!category.id) {
+          category.id = generateId(32);
+        }
+      }
+    }
   });
 
   Category.associate = function(models) {

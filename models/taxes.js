@@ -1,13 +1,14 @@
 "use strict";
+const { generateId } = require('../utils/idGenerator');
+
 module.exports = (sequelize, DataTypes) => {
   const Taxes = sequelize.define(
     "taxes",
     {
       id: {
-        allowNull: false,
-        autoIncrement: true,
+        type: DataTypes.STRING(32),
         primaryKey: true,
-        type: DataTypes.INTEGER,
+        defaultValue: () => generateId(32)
       },
       name: DataTypes.STRING,
       percentage: DataTypes.FLOAT,
@@ -15,6 +16,13 @@ module.exports = (sequelize, DataTypes) => {
     {
       timestamps: true,
       tablename: "taxes",
+      hooks: {
+        beforeCreate: (tax) => {
+          if (!tax.id) {
+            tax.id = generateId(32);
+          }
+        }
+      }
     }
   );
   Taxes.associate = function (models) {
