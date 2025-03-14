@@ -26,6 +26,7 @@ module.exports = {
       source: {
         type: Sequelize.STRING(20),
         allowNull: true,
+        defaultValue: 'desktop'
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -85,6 +86,7 @@ module.exports = {
       source: {
         type: Sequelize.STRING(20),
         allowNull: true,
+        defaultValue: 'desktop'
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -170,6 +172,7 @@ module.exports = {
       source: {
         type: Sequelize.STRING(20),
         allowNull: true,
+        defaultValue: 'desktop'
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -203,6 +206,7 @@ module.exports = {
       source: {
         type: Sequelize.STRING(20),
         allowNull: true,
+        defaultValue: 'desktop'
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -244,6 +248,7 @@ module.exports = {
       source: {
         type: Sequelize.STRING(20),
         allowNull: true,
+        defaultValue: 'desktop'
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -273,6 +278,7 @@ module.exports = {
       source: {
         type: Sequelize.STRING(20),
         allowNull: true,
+        defaultValue: 'desktop'
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -347,6 +353,7 @@ module.exports = {
       source: {
         type: Sequelize.STRING(20),
         allowNull: true,
+        defaultValue: 'desktop'
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -392,6 +399,7 @@ module.exports = {
       source: {
         type: Sequelize.STRING(20),
         allowNull: true,
+        defaultValue: 'desktop'
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -527,6 +535,7 @@ module.exports = {
       source: {
         type: Sequelize.STRING(20),
         allowNull: true,
+        defaultValue: 'desktop'
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -583,6 +592,7 @@ module.exports = {
       source: {
         type: Sequelize.STRING(20),
         allowNull: true,
+        defaultValue: 'desktop'
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -610,6 +620,7 @@ module.exports = {
       source: {
         type: Sequelize.STRING(20),
         allowNull: true,
+        defaultValue: 'desktop'
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -637,6 +648,7 @@ module.exports = {
       source: {
         type: Sequelize.STRING(20),
         allowNull: true,
+        defaultValue: 'desktop'
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -677,6 +689,7 @@ module.exports = {
       source: {
         type: Sequelize.STRING(20),
         allowNull: true,
+        defaultValue: 'desktop'
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -722,6 +735,7 @@ module.exports = {
       source: {
         type: Sequelize.STRING(20),
         allowNull: true,
+        defaultValue: 'desktop'
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -759,6 +773,7 @@ module.exports = {
       source: {
         type: Sequelize.STRING(20),
         allowNull: true,
+        defaultValue: 'desktop'
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -792,6 +807,7 @@ module.exports = {
       source: {
         type: Sequelize.STRING(20),
         allowNull: true,
+        defaultValue: 'desktop'
       },
       createdAt: {
         type: Sequelize.DATE,

@@ -31,6 +31,7 @@ module.exports = (sequelize, DataTypes) => {
     source: {
       type: DataTypes.STRING(20),
       allowNull: true,
+      defaultValue: 'desktop'
     },
   }, {
     tableName: 'category',
