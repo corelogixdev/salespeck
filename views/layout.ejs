@@ -131,6 +131,11 @@
                                                     <a href="/users?role=user" class="nav-link">Vendors</a>
                                                 </li>
                                             <% } %>
+                                            <% if (permissions.vendorList) { %> 
+                                                <li class="nav-item">
+                                                    <a href="users?role=vendor" class="nav-link">Vendors</a>
+                                                </li>
+                                            <% } %>
                                         </ul>
                                     </div>
                                 </li>
