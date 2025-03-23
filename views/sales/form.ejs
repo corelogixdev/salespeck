@@ -186,7 +186,7 @@
             total += price;
         });
         total = total - (total * discountpercentage / 100);
-        totalBillAmount.textContent = `Rs. ${parseFloat(total)}`;
+        totalBillAmount.textContent = `Rs. ${parseFloat(total).toFixed(2)}`;
         UpdateChangePrice();
     }   
     let previousEntry;

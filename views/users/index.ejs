@@ -1,10 +1,12 @@
 <div class="card">
   <div class="card-header align-items-center d-flex">
-    <h4 class="card-title mb-0 flex-grow-1"><%= role === 'user' ? 'Users' : 'Customers' %> List</h4>
+    <h4 class="card-title mb-0 flex-grow-1"><%= role === 'user' ? 'Users' : (role === 'vendor' ? 'Vendors' : 'Customers') %> List</h4>
     <div class="d-flex gap-2">
-      <% if ((role == 'user' && permissions.usersCreate) || (role == 'customer' && permissions.customersCreate)) { %>
+      <% if ((role == 'user' && permissions.usersCreate) || 
+            (role == 'vendor' && permissions.vendorsCreate) || 
+            (role == 'customer' && permissions.customersCreate)) { %>
         <a href="/users/form?role=<%= role %>" class="btn btn-primary btn-sm" target="_blank">
-          <i class="ri-add-line align-bottom me-1"></i> Create New <%= role === 'user' ? 'Vendor' : 'Customer' %>
+          <i class="ri-add-line align-bottom me-1"></i> Create New <%= role === 'user' ? 'User' : (role === 'vendor' ? 'Vendor' : 'Customer') %>
         </a>
       <% } %>
       <button onclick="window.location.reload()" class="btn btn-soft-success btn-sm" title="Refresh">
@@ -15,7 +17,9 @@
 
   <div class="card-body">
     <div class="live-preview">
-      <% if ((role == 'user' && permissions.usersSearch) || (role == 'customer' && permissions.customersSearch)) { %> 
+      <% if ((role == 'user' && permissions.usersSearch) || 
+            (role == 'vendor' && permissions.vendorsSearch) ||
+            (role == 'customer' && permissions.customersSearch)) { %> 
         <form action="/users" method="GET" class="row g-2 mb-4 justify-content-end">
           <div class="col-sm-3">
             <div class="search-box">
@@ -49,11 +53,12 @@
               <th scope="col">ID</th>
               <th scope="col">Name</th>
               <th scope="col">Phone</th>
-              <% if (role !== 'customer') { %>
+              <% if (role === 'user') { %>
                 <th scope="col">Username</th>
                 <th scope="col">Role</th>
               <% } %>
               <% if ((role == 'user' && (permissions.usersUpdate || permissions.usersDelete)) || 
+                    (role == 'vendor' && (permissions.vendorsUpdate || permissions.vendorsDelete)) ||
                     (role == 'customer' && (permissions.customersUpdate || permissions.customersDelete))) { %>
                 <th scope="col" style="text-align: end;">Actions</th>
               <% } %>
@@ -62,7 +67,7 @@
           <tbody>
             <% if (!data || data.length === 0) { %>
               <tr>
-                <td colspan="<%= role !== 'customer' ? 6 : 4 %>" class="text-center">
+                <td colspan="<%= role === 'user' ? 6 : 4 %>" class="text-center">
                   <i class="ri-error-warning-line align-middle me-1"></i> No data found
                 </td>
               </tr>
@@ -72,14 +77,16 @@
                   <td class="fw-medium"><%= obj.id %></td>
                   <td><%= obj.firstname %> <%= obj.lastname %></td>
                   <td><%= obj.phone %></td>
-                  <% if (role !== 'customer') { %>
+                  <% if (role === 'user') { %>
                     <td><%= obj.username %></td>
                     <td><span class="badge bg-primary"><%= obj.role %></span></td>
                   <% } %>
                   <% if ((role == 'user' && (permissions.usersUpdate || permissions.usersDelete)) || 
+                        (role == 'vendor' && (permissions.vendorsUpdate || permissions.vendorsDelete)) ||
                         (role == 'customer' && (permissions.customersUpdate || permissions.customersDelete))) { %>
                     <td style="text-align: end;">
                       <% if ((role == 'user' && permissions.usersUpdate) || 
+                            (role == 'vendor' && permissions.vendorsUpdate) ||
                             (role == 'customer' && permissions.customersUpdate)) { %>
                         <a href="/users/form?id=<%= obj.id %>&role=<%= obj.role %>" 
                             class="btn btn-soft-warning btn-sm <%= obj.role == 'branchmanager' ? 'custom_disabled' : '' %>" 
@@ -88,6 +95,7 @@
                         </a>
                       <% } %>
                       <% if ((role == 'user' && permissions.usersDelete) || 
+                            (role == 'vendor' && permissions.vendorsDelete) ||
                             (role == 'customer' && permissions.customersDelete)) { %>
                         <button type="button" 
                                 onclick="deleteRecord('<%= obj.id %>')"

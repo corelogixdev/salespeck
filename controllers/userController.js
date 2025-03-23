@@ -137,7 +137,7 @@ exports.save = async (req, res) => {
     }
     
     // Only standard users get permissions, not customers or vendors
-    if(role == 'user'){
+    if(role === 'user'){
       await db.userpermissions.destroy({ where: { user_id: id } });
       Object.keys(permissions).forEach(async permission => {
         let permissionId = allPermissions.find(p => p.name === permission).id;

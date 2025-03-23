@@ -130,7 +130,7 @@ exports.save = async (req, res) => {
     const { user } = res.locals;
 
     for (const orderProduct of products) {
-      const dbProduct = allProducts.find(p => p.id === Number.parseInt(orderProduct.productId));
+      const dbProduct = allProducts.find(p => p.id === orderProduct.productId);
       if (!dbProduct) {
         await transaction.rollback();
         return res.status(400).send({ 

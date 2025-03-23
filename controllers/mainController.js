@@ -256,7 +256,11 @@ const registerpost = async (req, res) => {
       role: "branchmanager",
     });
     logi("BranchManager user created successfully!");
-    await db.userpermissions.create({ user_id: user.id, permission_id: 777 });
+    // await db.userpermissions.create({ user_id: user.id, permission_id: 777 });
+    // get the premission with the name "all"
+    let permission = await db.permissions.findOne({ where: { name: "all" } });
+    // create a user permission with the user id and the permission id
+    await db.userpermissions.create({ user_id: user.id, permission_id: permission.id });
     logi("BranchManager user permissions set successfully");
     res.redirect("/login");
   } catch (e) {
