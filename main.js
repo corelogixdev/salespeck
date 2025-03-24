@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+require('dotenv').config();
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 require('./server/app'); // DON'T REMOVE THIS. THIS LINKS TO THE EXPRESS APP
 const { autoUpdater } = require('electron-updater');

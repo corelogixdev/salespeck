@@ -15,11 +15,11 @@ module.exports = (sequelize, DataTypes) => {
     type: {
       type: DataTypes.STRING(50),
       allowNull: true,
-    },
-    fk_parent_in_financeaccount: {
+    }, // asset, liability, equity, income, expense
+    parent: {
       type: DataTypes.STRING,
       allowNull: true,
-    },
+    }, // parent account
     createdby: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -30,6 +30,14 @@ module.exports = (sequelize, DataTypes) => {
     },
     source: {
       type: DataTypes.STRING(20),
+      allowNull: true,
+    },
+    value: {
+      type: DataTypes.NUMERIC,
+      allowNull: true,
+    },
+    isDefault: {
+      type: DataTypes.BOOLEAN,
       allowNull: true,
     },
   }, {
@@ -45,7 +53,7 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   FinanceAccount.associate = function(models) {
-    FinanceAccount.belongsTo(models.financeaccount, { foreignKey: 'fk_parent_in_financeaccount', as: 'parent' });
+    FinanceAccount.belongsTo(models.financeaccount, { foreignKey: 'parent' }); // as: 'parent'
   };
 
   return FinanceAccount;
