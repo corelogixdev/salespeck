@@ -85,7 +85,8 @@ function copyBuildFiles() {
   
   const filesToCopy = [
     { src: 'openmenu.exe', dest: 'openmenu.exe' },
-    { src: 'latest.yml', dest: 'latest.yml' }
+    { src: 'latest.yml', dest: 'latest.yml' },
+    { src: 'latest.yml', dest: 'dev-app-update.yml' } // For development mode
   ];
   
   let copied = 0;
@@ -116,11 +117,27 @@ function startServer() {
   logStep('5', `Starting local update server on port ${PORT}...`);
   
   const server = http.createServer((req, res) => {
-    let filePath = path.join(UPDATE_DIR, req.url === '/' ? 'latest.yml' : req.url);
+    // Parse URL and remove query parameters (e.g., ?noCache=xxx)
+    let requestedPath = req.url.split('?')[0]; // Remove query string
+    
+    // Handle root path
+    if (requestedPath === '/' || requestedPath === '') {
+      requestedPath = '/latest.yml';
+    }
+    
+    // Remove leading slash for path.join
+    const cleanPath = requestedPath.startsWith('/') ? requestedPath.substring(1) : requestedPath;
+    let filePath = path.join(UPDATE_DIR, cleanPath);
     
     // Security: prevent directory traversal
     filePath = path.normalize(filePath);
-    if (!filePath.startsWith(UPDATE_DIR)) {
+    const normalizedUpdateDir = path.normalize(UPDATE_DIR);
+    
+    // Use resolve to ensure consistent path comparison on Windows
+    const resolvedFilePath = path.resolve(filePath);
+    const resolvedUpdateDir = path.resolve(normalizedUpdateDir);
+    
+    if (!resolvedFilePath.startsWith(resolvedUpdateDir)) {
       res.writeHead(403);
       res.end('Forbidden');
       return;

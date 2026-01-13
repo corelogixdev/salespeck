@@ -1,164 +1,103 @@
-# Quick Start Guide
+# Local Update Testing Guide
 
-## 🚀 One-Command Testing
+## 🚀 Quick Testing Workflow
 
-### Test Updates Locally (Simplified)
+### Step-by-Step Process
 
-**Terminal 1 - Start Update Server:**
+**1. Update Version in package.json**
+```bash
+# Edit package.json and change version (e.g., from 1.0.10 to 1.0.11)
+# Or use: node zothers/test-update.js 1.0.11
+```
+
+**2. Build and Start Update Server**
 ```bash
 npm run test:update
 ```
 This will:
-- ✅ Build your app
-- ✅ Copy files to local server  
-- ✅ Start update server on port 8000
+- Build the app with the new version
+- Copy files to local update server
+- Start server on port 8000
 - ⚠️ **Keep this terminal running!**
 
-**Terminal 2 - Run Your App:**
+**3. Revert package.json Version**
 ```bash
-# Option A: Development mode
-npm run dev
-
-# Option B: Or install the built app
-npm run build
-# Then install dist/openmenu.exe
+# Manually revert package.json version back to the older version (e.g., 1.0.10)
+# Or use git: git checkout package.json
 ```
 
-**Important:** The update server (Terminal 1) must stay running while you test!
-
-### Complete Testing Workflow
-
-#### 1. First Time Setup
+**4. Run App with Older Version**
 ```bash
-# Install dependencies
-npm install
-
-# Run the app in development
-npm run dev
+npm run start:electron
 ```
+The app will:
+- Start with the older version from package.json
+- Check for updates from the local server
+- Detect the newer version and prompt for update!
 
-#### 2. Build & Test Updates
+---
 
-**Step 1:** Temporarily modify `main.js` (line ~111)
-```javascript
-// Change from:
-url: `https://gitlab.com/api/v4/projects/${projectId}/packages/generic/openmenu/release`
+## 📋 Complete Example
 
-// To:
-url: "http://localhost:8000"
-```
-
-**Step 2:** Start update server (Terminal 1 - Keep running!)
+**Terminal 1 - Update Server:**
 ```bash
+# 1. Change version in package.json to 1.0.11
+# 2. Build and start server
 npm run test:update
+# Server is now running on port 8000 with version 1.0.11
 ```
 
-**Step 3:** Run your app (Terminal 2)
+**Terminal 2 - Test App:**
 ```bash
-# Option A: Development mode
-npm run dev
-
-# Option B: Build and install
-npm run build
-# Then install dist/openmenu.exe
-```
-
-**Step 4:** Test an update (in Terminal 1, press Ctrl+C to stop, then:)
-```bash
-# Update version and rebuild
-node zothers/test-update.js 1.0.8
-# Server restarts automatically
-```
-The running app will detect the new version!
-
-**Step 5:** Revert `main.js` back to GitLab URL after testing
-
----
-
-## 📦 Build for Production
-
-```bash
-# Update version in package.json first
-npm run build
-npm run upload
+# 1. Revert package.json version back to 1.0.10
+# 2. Run app with older version
+npm run start:electron
+# App will detect update from 1.0.10 → 1.0.11!
 ```
 
 ---
 
-## 🎯 Common Commands
+## ⚙️ Configuration
+
+**For Local Testing:**
+- Update `main.js` line ~102 to use: `const updateUrl = "http://localhost:8000";`
+
+**For Production:**
+- Use: `const updateUrl = config.update_url;` (from .settings file)
+
+---
+
+## 🎯 Commands Reference
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Run app in development mode |
+| `npm run start:electron` | Run app without nodemon (for testing) |
+| `npm run dev` | Run app in development mode (with nodemon) |
 | `npm run build` | Build installer |
-| `npm run test:update` | Build + start local update server (keep running!) |
-| `npm run upload` | Upload to GitLab |
-| `node test-update.js 1.0.8` | Build with version update + restart server |
-
-## 🔄 Typical Testing Workflow
-
-### Option A: With Installed App (Recommended for Update Testing)
-
-**Step 1:** Build and install the app first
-```bash
-npm run build
-# Install dist/openmenu.exe
-```
-
-**Step 2:** Start update server
-```bash
-npm run test:update  # Keep this running
-```
-
-**Step 3:** Run the installed app
-- Launch the installed app from Start Menu or desktop
-- It will check the update server for updates
-
-**Step 4:** Test an update
-- In the update server terminal, press Ctrl+C
-- Run: `node test-update.js 1.0.8` (with new version)
-- Server restarts with new version
-- The installed app will detect and prompt for update!
-
-### Option B: With Dev Mode
-
-**Terminal 1:**
-```bash
-npm run test:update  # Starts update server, keep it running
-```
-
-**Terminal 2:**
-```bash
-npm run dev  # Run your app to test updates
-```
-
-When you want to test an update, in Terminal 1:
-- Press Ctrl+C to stop
-- Run: `node test-update.js 1.0.8`
-- Server restarts with new version
-- Your app (Terminal 2) will detect the update!
+| `npm run test:update` | Build + start local update server |
+| `npm run upload` | Upload to GitLab (production) |
 
 ---
 
 ## ⚠️ Important Notes
 
-1. **For local testing:** Use `http://localhost:8000` in `main.js`
-2. **For production:** Use GitLab URL in `main.js`
-3. **Update logs:** Check `%APPDATA%\openmenu\logs\main.log`
-4. **Version format:** Use semantic versioning (1.0.7 → 1.0.8)
+1. **Update Server Must Stay Running** - Keep Terminal 1 running while testing
+2. **Version Must Be Higher** - New version must be greater than current version
+3. **Revert package.json** - Always revert to older version before testing
+4. **Local Testing Only** - Remember to change `main.js` back for production
 
 ---
 
 ## 🐛 Troubleshooting
 
+**Update not detected?**
+- Verify version in `package.json` is lower than version on server
+- Check `main.js` uses `http://localhost:8000` for testing
+- Ensure update server is running
+
 **Port already in use?**
 - Stop other servers on port 8000
-- Or change PORT in `test-update.js`
-
-**Update not detected?**
-- Check version is higher than installed version
-- Verify `latest.yml` exists in `local-update-server/`
-- Check `main.js` uses correct URL
+- Or change PORT in `zothers/test-update.js`
 
 **Build fails?**
 - Run `npm install` first

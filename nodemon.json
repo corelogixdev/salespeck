@@ -1,0 +1,21 @@
+{
+  "ignore": [
+    "zothers/**/*",
+    "zothers/**",
+    "node_modules/**/*",
+    "dist/**/*",
+    ".settings",
+    "*.log"
+  ],
+  "watch": [
+    "*.js",
+    "controllers/**/*.js",
+    "models/**/*.js",
+    "routes/**/*.js",
+    "server/**/*.js",
+    "utils/**/*.js",
+    "middleware/**/*.js",
+    "views/**/*.ejs"
+  ],
+  "ext": "js,ejs,json"
+}

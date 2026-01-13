@@ -110,6 +110,23 @@ app.whenReady().then(() => {
   autoUpdater.autoInstallOnAppQuit = false;
   autoUpdater.logger = require('electron-log');
   autoUpdater.logger.transports.file.level = 'debug';
+  
+  // Suppress 404 errors in electron-log
+  const originalError = autoUpdater.logger.error;
+  autoUpdater.logger.error = function(...args) {
+    const message = args.join(' ');
+    // Don't log 404 errors - they're expected when update server is not available
+    if (message.includes('404') || message.includes('Not Found')) {
+      return;
+    }
+    return originalError.apply(this, args);
+  };
+  
+  // Enable update checking in development mode (for testing)
+  // This allows testing updates even when app is not packed
+  if (!app.isPackaged) {
+    autoUpdater.forceDevUpdateConfig = true;
+  }
 
   const updaterConfig = {
     provider: 'generic',
@@ -128,7 +145,24 @@ app.whenReady().then(() => {
   autoUpdater.setFeedURL(updaterConfig);
   logi(`Current version: ${packageJson.version}`);
   logi(`Update URL: ${updateUrl}`);
-  autoUpdater.checkForUpdatesAndNotify();
+  
+  // Check for updates - errors will be handled by the error event handler
+  // Wrap in promise catch to prevent unhandled rejections
+  try {
+    const updateCheck = autoUpdater.checkForUpdatesAndNotify();
+    if (updateCheck && typeof updateCheck.catch === 'function') {
+      updateCheck.catch((error) => {
+        // Error is already logged by the error event handler
+        // This just prevents unhandled promise rejection warnings
+        // Suppress 404 errors as they're expected when server is not available
+        if (!error.message || (!error.message.includes('404') && !error.message.includes('Not Found'))) {
+          logi('Update check promise rejected:', error.message || error);
+        }
+      });
+    }
+  } catch (error) {
+    logi('Failed to initiate update check:', error.message);
+  }
 });
 
 app.on('window-all-closed', () => {
@@ -136,11 +170,19 @@ app.on('window-all-closed', () => {
 });
 
 autoUpdater.on('error', (error) => {
+  // Suppress 404 errors - they're expected when update server is not running
+  if (error.message && (error.message.includes('404') || error.message.includes('Not Found'))) {
+    // Silently ignore - update server might not be running
+    return;
+  }
+  
   logi('Error in auto-updater:', error);
-  if (error.message.includes('EPERM')) {
+  if (error.message && error.message.includes('EPERM')) {
     logi('Permission error: Please ensure the application has write permissions to the specified directory.');
-  } else if (error.message.includes('ENOENT')) {
+  } else if (error.message && error.message.includes('ENOENT')) {
     logi('File not found error: Please check the file paths and ensure the files exist.');
+  } else {
+    logi('Update check failed:', error.message || error);
   }
 });
 
