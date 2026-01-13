@@ -6,7 +6,6 @@ require('./server/app'); // DON'T REMOVE THIS. THIS LINKS TO THE EXPRESS APP
 const { autoUpdater } = require('electron-updater');
 const config = require('./config.js'); // Link to the Express app
 const logi = require('./utils/logi.js');
-const { checkInternetConnection } = require('./utils/networkUtils.js');
 
 app.setAppLogsPath();
 //log starting app and date time to log file
@@ -54,10 +53,6 @@ function createWindow() {
     }
   });
 
-  // Monitor online status
-  mainWindow.webContents.on('did-finish-load', () => {
-    checkInternetConnection();
-  });
 
   //to open dev tools
   //win.webContents.openDevTools();

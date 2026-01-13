@@ -5,18 +5,6 @@
         <h4 class="card-title mb-0 flex-grow-1">Create <%= role==='user' ? 'User' : (role==='vendor' ? 'Vendor' : 'Customer') %></h4>
       </div>
       <div class="card-body">
-        <% if (role == 'user') { %> 
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general-tab-pane"
-              type="button" role="tab" aria-controls="general-tab-pane" aria-selected="true">General</button>
-          </li>
-            <li class="nav-item" role="presentation">
-              <button class="nav-link" id="permissions-tab" data-bs-toggle="tab" data-bs-target="#permissions-tab-pane"
-              type="button" role="tab" aria-controls="permissions-tab-pane" aria-selected="false">Permissions</button>
-            </li>
-          </ul>
-          <% } %>
         <div class="tab-content">
           <div class="tab-pane fade show active" id="general-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
             <form id="form">
@@ -106,53 +94,6 @@
               </div>
             </form>
           </div>
-          <% if (role == 'user') { %>   
-              <div class="tab-pane fade" id="permissions-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-                <form id="permissions-form" onsubmit="event.preventDefault();">
-                    <div class="permissions-container container mt-4">
-                        <% Object.entries(groupedPermissions).forEach(([category, actions]) => { %>
-                          <div class="card mb-3 shadow-sm">
-                            <div class="card-header bg-secondary text-white">
-                              <h5 class="mb-0">
-                                <label class="form-check-label d-flex align-items-center text-capitalize">
-                                  <input
-                                    type="checkbox"
-                                    class="form-check-input me-2 category-checkbox"
-                                    data-category="<%= category %>"
-                                    <%= actions.slice(1,actions.length).every(action => action.checked) ? 'checked' : '' %>
-                                  />
-                                  <%= category.charAt(0).toUpperCase() + category.slice(1) %>
-                                </label>
-                              </h5>
-                            </div>
-                            <div class="card-body">
-                              <div class="row g-3">
-                                <% actions.forEach(({ action, description, checked }) => { %>
-                                  <% if (action) { %>
-                                    <div class="col-md-4 col-sm-6">
-                                      <label class="form-check-label text-capitalize">
-                                        <input
-                                          type="checkbox"
-                                          class="form-check-input action-checkbox"
-                                          data-category="<%= category %>"
-                                          value="<%= category + '.' + action %>"
-                                          <%= checked ? 'checked' : '' %>
-                                        />
-                                        <span class="ms-2">
-                                          <%= action %>
-                                        </span>
-                                      </label>
-                                    </div>
-                                  <% } %>
-                                <% }); %>
-                              </div>
-                            </div>
-                          </div>
-                        <% }); %>
-                    </div>
-                </form>
-              </div>
-          <% } %>
         </div>
       </div>
     </div>
@@ -172,15 +113,6 @@
       }
       const formData = new FormData(event.target);
       const data = Object.fromEntries(formData.entries());
-      
-      if (data.role === 'user') {
-        let checkedPermissions = document.querySelectorAll('.action-checkbox:checked');
-        let permissions = {};
-        checkedPermissions.forEach((checkbox) => {
-          permissions[checkbox.value] = true;
-        });
-        data.permissions = permissions;
-      }
       
       try {
         const response = await fetch('/users/save', {
@@ -235,38 +167,6 @@
 </script>
 
 <script>
-  document.querySelectorAll('.category-checkbox').forEach((categoryCheckbox) => {
-    categoryCheckbox.addEventListener('change', function () {
-      const category = this.dataset.category;
-      const subCheckboxes = document.querySelectorAll(
-        `.action-checkbox[data-category="${category}"]`
-      );
-      subCheckboxes.forEach((checkbox) => {
-        checkbox.checked = this.checked;
-      });
-    });
-  });
-
-  document.querySelectorAll(".action-checkbox").forEach((subCheckbox) => {
-    subCheckbox.addEventListener("change", (event) => {
-      const category = event.target.dataset.category;
-      const categoryCheckbox = document.querySelector(
-        `.category-checkbox[data-category="${category}"]`
-      );
-      const allSubCheckboxes = document.querySelectorAll(
-        `.action-checkbox[data-category="${category}"]`
-      );
-      const allChecked = Array.from(allSubCheckboxes).every(
-        (sub) => sub.checked
-      );
-      categoryCheckbox.checked = allChecked;
-    });
-  });
-
-  function savePermissions(){
-
-  }
-
   // Add this to your existing scripts section
   function togglePassword(element) {
     const passwordInput = document.getElementById('password');

@@ -604,62 +604,6 @@ module.exports = {
       }
     });
 
-    await queryInterface.createTable('permissions', {
-      id: {
-        type: Sequelize.STRING(32),
-        primaryKey: true,
-      },
-      name: {
-        type: Sequelize.STRING(100),
-        allowNull: true,
-      },
-      description: {
-        type: Sequelize.STRING(200),
-        allowNull: true,
-      },
-      source: {
-        type: Sequelize.STRING(20),
-        allowNull: true,
-        defaultValue: 'desktop'
-      },
-      createdAt: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      },
-      updatedAt: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      }
-    });
-
-    await queryInterface.createTable('userpermissions', {
-      id: {
-        type: Sequelize.STRING(32),
-        primaryKey: true,
-      },
-      user_id: {
-        type: Sequelize.STRING(32),
-        allowNull: true,
-      },
-      permission_id: {
-        type: Sequelize.STRING(32),
-        allowNull: true,
-      },
-      source: {
-        type: Sequelize.STRING(20),
-        allowNull: true,
-        defaultValue: 'desktop'
-      },
-      createdAt: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      },
-      updatedAt: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      }
-    });
-
     // create table inventory logs
     await queryInterface.createTable('inventorylogs', {
       id: {
@@ -833,8 +777,6 @@ module.exports = {
     await queryInterface.dropTable('financeaccount');
     await queryInterface.dropTable('soldproducts');
     await queryInterface.dropTable('sale');
-    await queryInterface.dropTable('permissions');
-    await queryInterface.dropTable('userpermissions');
     await queryInterface.dropTable('inventorylogs');
     await queryInterface.dropTable('productbatches');
   },

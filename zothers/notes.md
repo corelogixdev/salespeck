@@ -1,7 +1,7 @@
 #install location will be
 C:\Users\IT LAND\AppData\Local\Programs\openmenu (contain the software files and db)
 C:\Users\IT LAND\AppData\Local\openmenu-updater (will contain the updater)
-C:\Users\IT LAND\AppData\Roaming\openmenu (userData folter, App folter contain the logs and other cache files)
+C:\Users\IT LAND\AppData\Roaming\openmenu (userData folder, App folder contain the logs and other cache files)
 
 
 #Deploy the package

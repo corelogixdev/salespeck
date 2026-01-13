@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
-      tableName: "productbatces",
+      tableName: "productbatches",
       timestamps: true,
       hooks: {
         beforeCreate: (productBatch) => {

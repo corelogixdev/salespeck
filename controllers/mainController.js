@@ -170,10 +170,10 @@ const loginGet = async (req, res) => {
 
 const loginPost = async (req, res) => {
   logi("Login request received");
-  const { email, password } = req.body;
+  const { username, password } = req.body;
   logi("Password received:", password);
   try {
-    const user = await db.user.findOne({ where: { email } });
+    const user = await db.user.findOne({ where: { username } });
     if (user && encrypt.compare(user.password, password)) {
       logi("User found:", user.firstname);
       logi("Login successful");
@@ -185,12 +185,12 @@ const loginPost = async (req, res) => {
       if (!user) {
         logi("User was not found. Redirecting to login...");
         req.session.errors = {
-          email: "User not found. Please register.",
+          username: "User not found. Please register.",
         };
       } else {
         logi("Password incorrect. Redirecting to login...");
         req.session.errors = {
-          email: "",
+          username: "",
           password: "Password incorrect.",
         };
       }
@@ -215,32 +215,6 @@ const registerget = (req, res) => {
   });
 };
 
-async function registerOnWeb(data) {
-  let account_key = Math.random().toString(36).substring(2, 15); 
-  const options = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      username: data.username,
-      password: data.password,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      email: data.email,
-      phone: data.phone,
-      address: data.address,
-      account_key: account_key,
-    }),
-  };
-
-  // Fetch call
-  let req = await fetch(config.webUrl + "/api/register", options);
-  let res = await req.json();
-  return res;
-}
-
-
 const registerpost = async (req, res) => {
   logi("Register request received");
   logi("Data:", req.body);
@@ -256,12 +230,7 @@ const registerpost = async (req, res) => {
       role: "branchmanager",
     });
     logi("BranchManager user created successfully!");
-    // await db.userpermissions.create({ user_id: user.id, permission_id: 777 });
-    // get the premission with the name "all"
-    let permission = await db.permissions.findOne({ where: { name: "all" } });
-    // create a user permission with the user id and the permission id
-    await db.userpermissions.create({ user_id: user.id, permission_id: permission.id });
-    logi("BranchManager user permissions set successfully");
+    req.session.message = { type: "success", text: "Registration successful! Please login." };
     res.redirect("/login");
   } catch (e) {
     logi("Error:");
@@ -477,6 +446,5 @@ module.exports = {
   searchInventoryLogs,
   inventorylogsById,
   switchServer,
-  registerOnWeb,
   getDashboardStats
 };

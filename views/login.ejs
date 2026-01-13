@@ -13,16 +13,16 @@
                             <div class="p-2">
                                 <form action="/login" method="post">
                                     <div class="mb-3">
-                                        <label for="email" class="form-label">Email</label>
+                                        <label for="username" class="form-label">Username</label>
                                         <div class="position-relative auth-pass-inputgroup">
-                                            <input type="email" 
-                                                   class="form-control pe-5 <%= locals.errors?.email ? 'is-invalid' : '' %>" 
-                                                   id="email" 
-                                                   name="email" 
-                                                   placeholder="Enter email" 
+                                            <input type="text" 
+                                                   class="form-control pe-5 <%= locals.errors?.username ? 'is-invalid' : '' %>" 
+                                                   id="username" 
+                                                   name="username" 
+                                                   placeholder="Enter username" 
                                                    required>
-                                            <% if (locals.errors?.email) { %>
-                                                <div class="invalid-feedback"><%= errors.email %></div>
+                                            <% if (locals.errors?.username) { %>
+                                                <div class="invalid-feedback"><%= errors.username %></div>
                                             <% } %>
                                         </div>
                                     </div>

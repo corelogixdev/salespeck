@@ -32,6 +32,53 @@ module.exports = async (req, res, next) => {
         res.locals.isAuthenticated = true;
         res.locals.user = userData;
         res.locals.user_id = userData.id;
+        
+        // Set dummy permissions object - all features accessible (no permission checks)
+        res.locals.permissions = {
+            productsList: true,
+            productsCreate: true,
+            productsUpdate: true,
+            productsDelete: true,
+            productsView: true,
+            productsSearch: true,
+            salesList: true,
+            salesCreate: true,
+            salesUpdate: true,
+            salesDelete: true,
+            salesView: true,
+            salesSearch: true,
+            usersList: true,
+            usersCreate: true,
+            usersUpdate: true,
+            usersDelete: true,
+            usersView: true,
+            usersSearch: true,
+            customersList: true,
+            customersCreate: true,
+            customersUpdate: true,
+            customersDelete: true,
+            customersView: true,
+            customersSearch: true,
+            vendorsList: true,
+            vendorsCreate: true,
+            vendorsUpdate: true,
+            vendorsDelete: true,
+            vendorsView: true,
+            vendorsSearch: true,
+            settings: true,
+            purchasesList: true,
+            purchasesCreate: true,
+            purchasesUpdate: true,
+            purchasesDelete: true,
+            purchasesView: true,
+            purchasesSearch: true,
+            taxesList: true,
+            taxesView: true,
+            brandsList: true,
+            brandsView: true,
+            categoriesList: true,
+            categoriesView: true
+        };
 
         if (req.session.message) {
             res.locals.message = req.session.message;

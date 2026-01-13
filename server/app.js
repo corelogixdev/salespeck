@@ -8,9 +8,7 @@ const expressLayouts = require('express-ejs-layouts');
 const config = require('../config.js'); // Link to the Express app
 const sessionDataMiddleware = require('../middleware/sessionData');
 const routes = require('../routes');
-const { permissions } = require('../middleware/populatePermissions.js');
 const app = express();
-const socket = require('../utils/socket');
 const runMigrationsAndSeeders = require('../utils/runMigrationsAndSeeders.js');
 
 // CORS Configuration
@@ -49,7 +47,6 @@ app.use(
   })
 );
 app.use(sessionDataMiddleware);
-app.use(permissions);
 
 // Add these route imports
 const brandRoutes = require('../routes/brandRoutes');

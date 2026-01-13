@@ -33,17 +33,7 @@ async function seedDemoData() {
       });
     }
 
-    // Create user permissions
-    await db.userpermissions.destroy({ where: { user_id: user.id } });
-    //find permission 'all'
-    const allPermission = await db.permissions.findOne({ where: { name: 'all' } });
-    if (allPermission) {
-      await db.userpermissions.create({
-        user_id: user.id,
-        permission_id: allPermission.id,
-        source: 'desktop'
-      });
-    }
+    // Permissions removed - all users have full access
 
     // Create vendors
     const vendors = [

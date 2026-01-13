@@ -7,8 +7,6 @@ const config = {
     "serving_type": 'web', //web, desktop
     "env": "development",
     "port": 3000,
-    "webUrl": "http://localhost:5000",
-    "webSocketUrl": "ws://localhost:5000",
     'logging': true,
     'logger': 'console',
     'CI_PROJECT_ID': CI_PROJECT_ID,
@@ -19,8 +17,6 @@ const config = {
     "serving_type": 'desktop', //web, desktop
     "env": "production",
     "port": 3000,
-    "webUrl": "https://openmenu.live",
-    "webSocketUrl": "wss://openmenu.live",
     'logging': true,
     'logger': 'file',
     'CI_PROJECT_ID': CI_PROJECT_ID,
