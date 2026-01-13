@@ -16,8 +16,9 @@ const fs = require('fs');
 const path = require('path');
 const http = require('http');
 
+const PROJECT_ROOT = path.join(__dirname, '..');
 const UPDATE_DIR = path.join(__dirname, 'local-update-server');
-const DIST_DIR = path.join(__dirname, 'dist');
+const DIST_DIR = path.join(PROJECT_ROOT, 'dist');
 const PORT = 8000;
 
 // Colors for console output
@@ -44,7 +45,7 @@ function updateVersion(newVersion) {
   
   logStep('1', `Updating version to ${newVersion}...`);
   try {
-    const packageJsonPath = path.join(__dirname, 'package.json');
+    const packageJsonPath = path.join(PROJECT_ROOT, 'package.json');
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
     const oldVersion = packageJson.version;
     packageJson.version = newVersion;
@@ -60,7 +61,7 @@ function updateVersion(newVersion) {
 function buildApp() {
   logStep('2', 'Building the application...');
   try {
-    execSync('npm run build', { stdio: 'inherit', cwd: __dirname });
+    execSync('npm run build', { stdio: 'inherit', cwd: PROJECT_ROOT });
     log('✓ Build completed successfully!', 'green');
   } catch (error) {
     log('✗ Build failed!', 'red');
@@ -188,7 +189,7 @@ function startServer() {
 
 // Show instructions
 function showInstructions() {
-  const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8'));
+  const packageJson = JSON.parse(fs.readFileSync(path.join(PROJECT_ROOT, 'package.json'), 'utf8'));
   const currentVersion = packageJson.version;
   
   log('\n' + '='.repeat(60), 'blue');

@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
+const os = require('os');
 
 // Default runtime settings (for .settings file)
 const DEFAULT_SETTINGS = [
@@ -15,8 +16,30 @@ const DEFAULT_SETTINGS = [
   { key: 'env', value: 'production' }
 ];
 
-const appPath = __dirname;
-const settingsPath = path.join(appPath, '.settings');
+// Determine the path for .settings file
+// In packaged Electron apps, __dirname points to app.asar which is read-only
+// So we need to use a writable location outside app.asar
+function getSettingsPath() {
+  // Check if we're in a packaged Electron app (app.asar exists in path)
+  if (__dirname.includes('app.asar')) {
+    // Use userData directory (same logic as models/index.js for database)
+    let appDataPath = process.env.APPDATA || 
+      (process.platform === 'darwin' 
+        ? path.join(os.homedir(), 'Library', 'Application Support') 
+        : path.join(os.homedir(), '.config'));
+    const settingsDir = path.join(appDataPath, 'openmenu');
+    // Ensure directory exists
+    if (!fs.existsSync(settingsDir)) {
+      fs.mkdirSync(settingsDir, { recursive: true });
+    }
+    return path.join(settingsDir, '.settings');
+  } else {
+    // Development mode - use __dirname
+    return path.join(__dirname, '.settings');
+  }
+}
+
+const settingsPath = getSettingsPath();
 
 // Load or create .settings file (runtime settings)
 function loadSettings() {

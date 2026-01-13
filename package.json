@@ -10,9 +10,9 @@
     "build": "electron-builder",
     "postbuild": "rimraf dist/win-unpacked",
     "upload": "node build/upload.js",
-    "test:update": "node test-update.js",
+    "test:update": "node zothers/test-update.js",
     "migrate": "sequelize db:migrate",
-    "seed":"sequelize db:seed:all",
+    "seed": "sequelize db:seed:all",
     "seed:demo": "node scripts/seed-demo-data.js"
   },
   "build": {
@@ -34,7 +34,7 @@
       "server/**/*",
       "utils/**/*",
       "views/**/*",
-      "config.js",
+      "installEnv.js",
       "main.js",
       "preload.js",
       ".env"

@@ -66,7 +66,7 @@ npm run build
 **Step 4:** Test an update (in Terminal 1, press Ctrl+C to stop, then:)
 ```bash
 # Update version and rebuild
-node test-update.js 1.0.8
+node zothers/test-update.js 1.0.8
 # Server restarts automatically
 ```
 The running app will detect the new version!
