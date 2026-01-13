@@ -3,7 +3,7 @@ const encrypt = require("../utils/encrypt");
 const moment = require("moment");
 const logi = require("../utils/logi");
 const { Op } = require("sequelize");
-const config = require("../config");
+const config = require("../installEnv");
 
 
 const index = (req, res) => {

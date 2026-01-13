@@ -5,14 +5,15 @@ const path = require('path');
 const Sequelize = require('sequelize');
 const process = require('process');
 const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || 'development';
+const config = require('../installEnv');
+const env = config.env || 'production';
 exports.env = env;
-const config = require('../config');
 const dbConfig = require('../config/config.json')[env];
 exports.config = dbConfig;
 
 const db = {};
 if(config.env === 'production') {
+  const os = require('os');
   let appDataPath = process.env.APPDATA || 
   (process.platform === 'darwin' 
       ? path.join(os.homedir(), 'Library', 'Application Support') 

@@ -59,6 +59,12 @@ module.exports = {
           fontSize: 'fontSize',
         }
       )},
+      { id: generateId(32), name: 'api', value: JSON.stringify({
+        update_url: 'https://gitlab.com/api/v4/projects/62990895/packages/generic/openmenu/release',
+        CI_PROJECT_ID: 62990895,
+        install_date: new Date().toISOString(),
+        install_type: 'desktop'
+      })},
     ];
 
     for (const setting of softwareSettings) {

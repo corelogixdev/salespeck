@@ -4,7 +4,7 @@ require('dotenv').config();
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 require('./server/app'); // DON'T REMOVE THIS. THIS LINKS TO THE EXPRESS APP
 const { autoUpdater } = require('electron-updater');
-const config = require('./config.js'); // Link to the Express app
+const config = require('./installEnv.js'); // Link to the Express app
 const logi = require('./utils/logi.js');
 
 app.setAppLogsPath();
@@ -56,7 +56,7 @@ function createWindow() {
 
   //to open dev tools
   //win.webContents.openDevTools();
-  const serverUrl = process.env.SERVER_IP || 'localhost:' + config.port;
+  const serverUrl = `${config.SERVER_IP || 'localhost'}:${config.port || 3000}`;
   mainWindow.loadURL(`http://${serverUrl}`); // Serve Express on localhost:3000
   ipcMain.on('close-app', () => {
     mainWindow.close();
@@ -78,7 +78,8 @@ ipcMain.on('perform-action', (event, arg) => {
 
 ipcMain.on('switch-server', async (event, serverIp) => {
   try {
-    process.env.SERVER_IP = serverIp;
+    // Update SERVER_IP in .settings file
+    config.updateSetting('SERVER_IP', serverIp);
     logi('Switching server to:', serverIp);
     const existingWindows = BrowserWindow.getAllWindows();
     let win = createWindow();
@@ -95,25 +96,37 @@ ipcMain.on('switch-server', async (event, serverIp) => {
 
 app.whenReady().then(() => {
   createWindow();
-  const projectId = process.env.CI_PROJECT_ID;
-
-  if (!projectId) {
-    logi('Error: CI_PROJECT_ID is not defined in the environment variables.');
+  
+  // Get update URL from .settings file (runtime config)
+  const updateUrl = config.update_url;
+  
+  if (!updateUrl) {
+    logi('Warning: Update URL not configured. Auto-updates disabled.');
     return;
   }
+
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = false;
   autoUpdater.logger = require('electron-log');
   autoUpdater.logger.transports.file.level = 'debug';
 
-  autoUpdater.setFeedURL({
+  const updaterConfig = {
     provider: 'generic',
-    url: `https://gitlab.com/api/v4/projects/${projectId}/packages/generic/openmenu/release`,
-    requestHeaders: {
+    url: updateUrl
+  };
+
+  // Only add token if provided in process.env (from .env if developer created it)
+  // installEnv.js never touches .env, but if dotenv.config() was called elsewhere,
+  // we can use it here
+  if (process.env.GITLAB_TOKEN) {
+    updaterConfig.requestHeaders = {
       'PRIVATE-TOKEN': process.env.GITLAB_TOKEN
-    }
-  });
+    };
+  }
+
+  autoUpdater.setFeedURL(updaterConfig);
   logi(`Current version: ${packageJson.version}`);
+  logi(`Update URL: ${updateUrl}`);
   autoUpdater.checkForUpdatesAndNotify();
 });
 

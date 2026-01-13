@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { app } = require('electron');
-var config = require('../config.js');
+var config = require('../installEnv.js');
 
 // Function to delete old log files
 function deleteOldLogs(logDir) {
@@ -21,8 +21,8 @@ function deleteOldLogs(logDir) {
 
 // Receive a message like console.log, can call it with comma-separated values
 function log(...message) {
-  if (process.env.logging == true) {
-    if (process.env.logger === 'file') {
+  if (config.logging === true || config.logging === 'true') {
+    if (config.logger === 'file') {
       try {
         const logDir = app.getPath('userData');
         const logFilePath = path.join(logDir, `logs-${new Date().toISOString().split('T')[0]}.txt`);

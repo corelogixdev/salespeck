@@ -14,7 +14,7 @@
                                name="serverIp" 
                                placeholder="Enter IP address (e.g. 192.168.1.100)"
                                required>
-                        <div class="form-text">Enter the IP address and port of the server you want to connect to.</div>
+                        <div class="form-text">Enter the IP address or hostname of the server you want to connect to. Port will use the current port setting (<%= port %>).</div>
                     </div>
                     <div class="text-end">
                         <button type="submit" class="btn btn-primary">
@@ -58,7 +58,7 @@ document.getElementById('switchForm').addEventListener('submit', async function(
                 btn.innerHTML = originalText;
                 return;
             }
-            window.electron.send('switch-server', serverIp + ':' + port);
+            window.electron.send('switch-server', serverIp);
         } else {
             throw new Error(result.message || 'Invalid server response');
         }
