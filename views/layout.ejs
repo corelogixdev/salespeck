@@ -2,7 +2,7 @@
 <html data-layout="horizontal" data-topbar="light" data-sidebar="dark" data-sidebar-size="sm-hover" data-sidebar-image="none" data-preloader="disable">
 <head>
     <meta charset="utf-8" />
-    <title>OpenMenu</title>
+    <title>OpenMenu v<%= typeof appVersion !== 'undefined' ? appVersion : '1.0.0' %></title>
     <link rel="icon" href="/assets/images/icon.png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -70,7 +70,7 @@
                         </div>
                     </div>
                     <a href="/" style="display: block; min-width: fit-content;" class="fs-2 me-2">
-                        Open Menu <span class="text-muted" style="font-size: 0.75rem; font-weight: normal;">v<%= typeof appVersion !== 'undefined' ? appVersion : '1.0.0' %></span>
+                        Open Menu
                     </a>
                     <div id="scrollbar" class="navbar-menu" style="width: 100%;position: static;box-shadow: none;margin-top: 0; background-color: transparent;">
                         <div id="two-column-menu">
