@@ -154,9 +154,12 @@ app.whenReady().then(() => {
       updateCheck.catch((error) => {
         // Error is already logged by the error event handler
         // This just prevents unhandled promise rejection warnings
-        // Suppress 404 errors as they're expected when server is not available
-        if (!error.message || (!error.message.includes('404') && !error.message.includes('Not Found'))) {
-          logi('Update check promise rejected:', error.message || error);
+        // Suppress 404 and dev-app-update.yml errors as they're expected
+        const errorMsg = error.message || '';
+        if (!errorMsg.includes('404') && 
+            !errorMsg.includes('Not Found') && 
+            !(errorMsg.includes('dev-app-update.yml') && errorMsg.includes('ENOENT'))) {
+          logi('Update check promise rejected:', errorMsg || error);
         }
       });
     }
@@ -173,6 +176,12 @@ autoUpdater.on('error', (error) => {
   // Suppress 404 errors - they're expected when update server is not running
   if (error.message && (error.message.includes('404') || error.message.includes('Not Found'))) {
     // Silently ignore - update server might not be running
+    return;
+  }
+  
+  // Suppress dev-app-update.yml errors in development - file will be served by update server
+  if (error.message && error.message.includes('dev-app-update.yml') && error.message.includes('ENOENT')) {
+    // Silently ignore - this is expected, the file is served by the update server
     return;
   }
   

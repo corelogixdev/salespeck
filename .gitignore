@@ -65,3 +65,4 @@ db/database.sqlite
 # electron-builder
 dist/
 /zothers/local-update-server
+dev-app-update.yml

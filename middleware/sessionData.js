@@ -1,11 +1,29 @@
 const { user: User } = require('../models');
 const SimpleCache = require('../utils/cache');
+const fs = require('fs');
+const path = require('path');
 
 const userCache = new SimpleCache();
+
+// Get app version from package.json
+function getAppVersion() {
+    try {
+        const packageJsonPath = path.join(__dirname, '..', 'package.json');
+        const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+        return packageJson.version || '1.0.0';
+    } catch (error) {
+        return '1.0.0';
+    }
+}
+
+// Get app version (cached)
+const appVersion = getAppVersion();
+
 module.exports = async (req, res, next) => {
     try {
         res.locals.isAuthenticated = false;
         res.locals.user = null;
+        res.locals.appVersion = appVersion;
 
         if (!req.session?.user_id) {
             return next();

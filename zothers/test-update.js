@@ -104,6 +104,14 @@ function copyBuildFiles() {
     }
   });
   
+  // Also copy dev-app-update.yml to project root for development mode
+  const latestYmlPath = path.join(UPDATE_DIR, 'latest.yml');
+  const rootDevUpdatePath = path.join(PROJECT_ROOT, 'dev-app-update.yml');
+  if (fs.existsSync(latestYmlPath)) {
+    fs.copyFileSync(latestYmlPath, rootDevUpdatePath);
+    log(`✓ Copied dev-app-update.yml to project root`, 'green');
+  }
+  
   if (copied === 0) {
     log('✗ No files copied! Build might have failed.', 'red');
     process.exit(1);
