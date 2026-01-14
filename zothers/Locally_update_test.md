@@ -7,7 +7,7 @@
 **1. Update Version in package.json**
 ```bash
 # Edit package.json and change version (e.g., from 1.0.10 to 1.0.11)
-# Or use: node zothers/test-update.js 1.0.11
+# Or use: node test-update.js 1.0.11
 ```
 
 **2. Build and Start Update Server**
@@ -60,10 +60,14 @@ npm run start:electron
 ## ⚙️ Configuration
 
 **For Local Testing:**
-- Update `main.js` line ~102 to use: `const updateUrl = "http://localhost:8000";`
+- In `main.js` around line 100 temporarily change:
+  - From: `const updateUrl = config.update_url;`
+  - To:   `const updateUrl = "http://localhost:8000";`
 
 **For Production:**
-- Use: `const updateUrl = config.update_url;` (from .settings file)
+- After testing, change it back:
+  - From: `const updateUrl = "http://localhost:8000";`
+  - To:   `const updateUrl = config.update_url;`
 
 ---
 
@@ -102,3 +106,15 @@ npm run start:electron
 **Build fails?**
 - Run `npm install` first
 - Check Node.js version compatibility
+
+---
+
+## 💡 Summary Flow You Described
+
+1. Change version in `package.json` to **next version** (e.g., 1.0.7 → 1.0.8)
+2. Temporarily set `updateUrl` in `main.js` to `"http://localhost:8000"`
+3. Run `npm run test:update` (build + start local server)
+4. Change `package.json` version **back** to the old version
+5. Run `npm run start:electron` with the older version
+6. App detects update from local server and offers to update
+7. After testing, revert `main.js` back to use `config.update_url`

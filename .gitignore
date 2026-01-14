@@ -66,3 +66,5 @@ db/database.sqlite
 dist/
 /zothers/local-update-server
 dev-app-update.yml
+openmenu.exe
+latest.yml
