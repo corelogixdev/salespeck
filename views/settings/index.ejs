@@ -2,46 +2,163 @@
     <div class="card-body">
         <h5 class="card-title">Settings</h5>
         <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <% Object.keys(settings).forEach((setting, index) => { %>
-                <li class="nav-item" role="presentation">
-                    <button
-                        class="nav-link <%= (typeof currenttab !== 'undefined' && currenttab === setting) || (typeof currenttab === 'undefined' && index === 0) ? 'active' : '' %>"
-                        id="<%= setting %>-tab" data-bs-toggle="tab" data-bs-target="#<%= setting %>" type="button"
-                        role="tab" aria-controls="<%= setting %>"
-                        aria-selected="<%= (typeof currenttab !== 'undefined' && currenttab === setting) || (typeof currenttab === 'undefined' && index === 0) ? 'true' : 'false' %>">
-                        <%= setting.charAt(0).toUpperCase() + setting.slice(1) %>
-                    </button>
-                </li>
-            <% }) %>
+            <li class="nav-item" role="presentation">
+                <button
+                    class="nav-link <%= (typeof currenttab !== 'undefined' && currenttab === 'env') || (typeof currenttab === 'undefined') ? 'active' : '' %>"
+                    id="env-tab" data-bs-toggle="tab" data-bs-target="#env" type="button"
+                    role="tab" aria-controls="env"
+                    aria-selected="<%= (typeof currenttab !== 'undefined' && currenttab === 'env') || (typeof currenttab === 'undefined') ? 'true' : 'false' %>">
+                    Environment Settings (.settings)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button
+                    class="nav-link <%= (typeof currenttab !== 'undefined' && currenttab === 'db') ? 'active' : '' %>"
+                    id="db-tab" data-bs-toggle="tab" data-bs-target="#db" type="button"
+                    role="tab" aria-controls="db"
+                    aria-selected="<%= (typeof currenttab !== 'undefined' && currenttab === 'db') ? 'true' : 'false' %>">
+                    Application Settings (Database)
+                </button>
+            </li>
         </ul>
 
         <div class="tab-content" id="myTabContent">
-            <% Object.keys(settings).forEach((setting, index) => { %>
-                <div class="tab-pane fade <%= (typeof currenttab !== 'undefined' && currenttab === setting) || (typeof currenttab === 'undefined' && index === 0) ? 'show active' : '' %>"
-                    id="<%= setting %>" role="tabpanel" aria-labelledby="<%= setting %>-tab">
-                    <form action="/settings/save?name=<%= setting %>" method="POST" class="p-2 card mt-3">
-                        <div class="row">
-                            <% Object.keys(settings[setting]).forEach(key => { %>
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <label class="form-label" for="<%= setting %>-<%= key %>">
-                                            <%= key.charAt(0).toUpperCase() + key.slice(1) %>:
-                                        </label>
-                                        <% if (typeof settings[setting][key] === 'boolean') { %>
-                                            <input type="checkbox" class="form-check-input" id="<%= setting %>-<%= key %>" name="<%= key %>" <%= settings[setting][key] ? 'checked' : '' %>>
-                                        <% } else { %>
-                                            <input type="text" class="form-control" id="<%= setting %>-<%= key %>" name="<%= key %>" value="<%= settings[setting][key] %>">
-                                        <% } %>
-                                    </div>
+            <!-- Environment Settings Tab (.settings file) -->
+            <div class="tab-pane fade <%= (typeof currenttab !== 'undefined' && currenttab === 'env') || (typeof currenttab === 'undefined') ? 'show active' : '' %>"
+                id="env" role="tabpanel" aria-labelledby="env-tab">
+                <form action="/settings/save?type=env" method="POST" class="p-2 card mt-3">
+                    <h6 class="mb-3">Update URL & API Settings</h6>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-label" for="update_url">Update URL:</label>
+                                <input type="text" class="form-control" id="update_url" name="update_url" value="<%= envSettings.update_url %>">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-label" for="CI_PROJECT_ID">CI Project ID:</label>
+                                <input type="number" class="form-control" id="CI_PROJECT_ID" name="CI_PROJECT_ID" value="<%= envSettings.CI_PROJECT_ID %>">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-label" for="install_date">Install Date:</label>
+                                <input type="text" class="form-control" id="install_date" name="install_date" value="<%= envSettings.install_date %>" readonly>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-label" for="install_type">Install Type:</label>
+                                <input type="text" class="form-control" id="install_type" name="install_type" value="<%= envSettings.install_type %>">
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+                    <h6 class="mb-3">Server Settings</h6>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-label" for="SERVER_IP">Server IP:</label>
+                                <input type="text" class="form-control" id="SERVER_IP" name="SERVER_IP" value="<%= envSettings.SERVER_IP %>">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-label" for="port">Port:</label>
+                                <input type="number" class="form-control" id="port" name="port" value="<%= envSettings.port %>">
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+                    <h6 class="mb-3">Logging Settings</h6>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-label" for="logging">Logging:</label>
+                                <input type="checkbox" class="form-check-input" id="logging" name="logging" <%= envSettings.logging ? 'checked' : '' %>>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-label" for="logger">Logger:</label>
+                                <input type="text" class="form-control" id="logger" name="logger" value="<%= envSettings.logger %>">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-label" for="env">Environment:</label>
+                                <select class="form-control" id="env" name="env">
+                                    <option value="development" <%= envSettings.env === 'development' ? 'selected' : '' %>>Development</option>
+                                    <option value="production" <%= envSettings.env === 'production' ? 'selected' : '' %>>Production</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+                    <h6 class="mb-3">Printer Settings</h6>
+                    <div class="row">
+                        <% Object.keys(envSettings.printer).forEach(key => { %>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-label" for="printer-<%= key %>">
+                                        <%= key.charAt(0).toUpperCase() + key.slice(1) %>:
+                                    </label>
+                                    <input type="text" class="form-control" id="printer-<%= key %>" name="printer[<%= key %>]" value="<%= envSettings.printer[key] %>">
                                 </div>
-                            <% }) %>
+                            </div>
+                        <% }) %>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary mt-3">Save Environment Settings</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Database Settings Tab -->
+            <div class="tab-pane fade <%= (typeof currenttab !== 'undefined' && currenttab === 'db') ? 'show active' : '' %>"
+                id="db" role="tabpanel" aria-labelledby="db-tab">
+                <% if (Object.keys(dbSettings).length === 0) { %>
+                    <div class="alert alert-info mt-3">
+                        No database settings found.
+                    </div>
+                <% } else { %>
+                    <% Object.keys(dbSettings).forEach((setting, index) => { %>
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h6 class="mb-0"><%= setting.charAt(0).toUpperCase() + setting.slice(1) %></h6>
+                            </div>
+                            <div class="card-body">
+                                <form action="/settings/save?type=db&name=<%= setting %>" method="POST">
+                                    <div class="row">
+                                        <% Object.keys(dbSettings[setting]).forEach(key => { %>
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="<%= setting %>-<%= key %>">
+                                                        <%= key.charAt(0).toUpperCase() + key.slice(1) %>:
+                                                    </label>
+                                                    <% if (typeof dbSettings[setting][key] === 'boolean') { %>
+                                                        <input type="checkbox" class="form-check-input" id="<%= setting %>-<%= key %>" name="<%= key %>" <%= dbSettings[setting][key] ? 'checked' : '' %>>
+                                                    <% } else { %>
+                                                        <input type="text" class="form-control" id="<%= setting %>-<%= key %>" name="<%= key %>" value="<%= dbSettings[setting][key] %>">
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        <% }) %>
+                                    </div>
+                                    <div class="text-end">
+                                        <button type="submit" class="btn btn-primary mt-3">Save <%= setting.charAt(0).toUpperCase() + setting.slice(1) %></button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
-                        <div class="text-end">
-                            <button type="submit" class="btn btn-primary mt-3">Save</button>
-                        </div>
-                    </form>
-                </div>
-            <% }) %>
+                    <% }) %>
+                <% } %>
+            </div>
         </div>
     </div>
 </div>

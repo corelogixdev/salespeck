@@ -13,7 +13,14 @@ const DEFAULT_SETTINGS = [
   { key: 'port', value: 3000 },
   { key: 'logging', value: true },
   { key: 'logger', value: 'file' },
-  { key: 'env', value: 'development' }
+  { key: 'env', value: 'development' },
+  { key: 'printer', value: JSON.stringify({
+    printer: 'printer',
+    paper: 'paper',
+    width: 'width',
+    height: 'height',
+    fontSize: 'fontSize'
+  })}
 ];
 
 // Determine the path for .settings file
@@ -104,7 +111,14 @@ const config = {
   install_type: runtimeSettings.install_type || 'desktop',
   update_url: runtimeSettings.update_url,
   CI_PROJECT_ID: parseInt(runtimeSettings.CI_PROJECT_ID) || 62990895,
-  SERVER_IP: runtimeSettings.SERVER_IP || 'localhost'
+  SERVER_IP: runtimeSettings.SERVER_IP || 'localhost',
+  printer: runtimeSettings.printer ? (typeof runtimeSettings.printer === 'string' ? JSON.parse(runtimeSettings.printer) : runtimeSettings.printer) : {
+    printer: 'printer',
+    paper: 'paper',
+    width: 'width',
+    height: 'height',
+    fontSize: 'fontSize'
+  }
 };
 
 // Export function to update settings (for settings page)
@@ -121,7 +135,9 @@ config.updateSetting = function(key, value) {
   }
   
   // Update the setting
-  settings[key] = value;
+  // If value is an object, stringify it for storage
+  const valueToStore = typeof value === 'object' && value !== null ? JSON.stringify(value) : value;
+  settings[key] = valueToStore;
   
   // Write back to file
   let settingsContent = '';
@@ -141,7 +157,16 @@ config.updateSetting = function(key, value) {
   fs.writeFileSync(settingsPath, settingsContent);
   
   // Update runtime config
-  this[key] = value;
+  // Parse JSON strings back to objects for config
+  if (key === 'printer' && typeof valueToStore === 'string') {
+    try {
+      this[key] = JSON.parse(valueToStore);
+    } catch (e) {
+      this[key] = valueToStore;
+    }
+  } else {
+    this[key] = value;
+  }
   
   console.log(`Updated setting: ${key} = ${value}`);
 };

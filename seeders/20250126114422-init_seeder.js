@@ -68,7 +68,7 @@ module.exports = {
       }
     }
 
-    // software settings
+    // software settings (only company - printer and api are in .settings file)
     const softwareSettings = [
       { id: generateId(32), name: 'company', value: JSON.stringify({
         name: 'Company Name',
@@ -76,21 +76,6 @@ module.exports = {
         phone: 'Company Phone',
         email: 'Company Email' }
       )},
-      { id: generateId(32), name: 'printer', value: JSON.stringify(
-        {
-          printer: 'printer',
-          paper: 'paper',
-          width: 'width',
-          height: 'height',
-          fontSize: 'fontSize',
-        }
-      )},
-      { id: generateId(32), name: 'api', value: JSON.stringify({
-        update_url: 'https://gitlab.com/api/v4/projects/62990895/packages/generic/openmenu/release',
-        CI_PROJECT_ID: 62990895,
-        install_date: new Date().toISOString(),
-        install_type: 'desktop'
-      })},
     ];
 
     for (const setting of softwareSettings) {
