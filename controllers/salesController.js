@@ -250,72 +250,97 @@ exports.save = async (req, res) => {
 // exports.search = async (req, res) => { ... }
 
 exports.saleview = async (req, res) => {
-  const { id } = req.params;
-  if(!id) {
-    return res.status(400).send({ status: "error", message: "Invalid sale ID" });
+  try {
+    const { id } = req.params;
+    if(!id) {
+      return res.status(400).send({ status: "error", message: "Invalid sale ID" });
+    }
+    
+    // Sale ID is STRING(32), not integer - don't use parseInt
+    const sale = await db.sale.findOne({
+      where: {
+        id: id, // Use string ID directly
+      },
+      include: [
+        {
+          model: db.user,
+          as: "Customer",
+          attributes: ["id", "firstname", "lastname", "phone", "address"],
+          required: false, // Left join in case customer is null
+        },
+        {
+          model: db.user,
+          as: "DeliveryUser",
+          attributes: ["id", "firstname", "lastname", "phone", "address"],
+          required: false, // Left join in case delivery user is null
+        },
+        {
+          model: db.user,
+          as: "User",
+          attributes: ["id", "firstname", "lastname", "phone", "address"],
+          required: false, // Left join in case user is null
+        },
+        {
+          model: db.soldproducts,
+          as: "SoldPoducts",
+          required: false,
+          include: [
+            {
+              model: db.product,
+              as: "Product",
+              required: false,
+            },
+          ],
+        },
+      ],
+    });
+    
+    if (!sale) {
+      return res.status(404).send({ status: "error", message: "Sale not found" });
+    }
+    
+    let result = JSON.parse(JSON.stringify(sale));
+    result.totalprice = parseFloat(result.totalprice || 0).toFixed(2);
+    result.totalpayment = parseFloat(result.totalpayment || 0).toFixed(2);
+
+    let totalPrice = parseFloat(result.totalprice || 0);
+    let discount = parseFloat(result.discountpercentage || 0);
+    let priceAfterDiscount = totalPrice - totalPrice * (discount / 100);
+
+    let userPaid = parseFloat(result.totalpayment || 0);
+
+    let change = userPaid - priceAfterDiscount;
+    let balance = userPaid - priceAfterDiscount;
+
+    result.balance = balance.toFixed(2);
+    result.change = change.toFixed(2);
+
+    let companySettings = await db.softwaresetting.findOne({
+      where: {
+        name: "company",
+      },
+    });
+    
+    if (!companySettings) {
+      // Default company settings if not found
+      companySettings = { value: JSON.stringify({
+        name: 'Company Name',
+        address: 'Company Address',
+        phone: 'Company Phone',
+        email: 'Company Email'
+      })};
+    }
+    
+    res.render("sales/saleview", {
+      sale: result,
+      companySettings: JSON.parse(companySettings.value),
+      hidenav: true,
+      layout: false
+    });
+  } catch (error) {
+    console.error("Error in saleview:", error);
+    res.status(500).send({ status: "error", message: "Internal Server Error" });
   }
-  const sale = await db.sale.findOne({
-    where: {
-      id: parseInt(id),
-    },
-    include: [
-      {
-        model: db.user,
-        as: "Customer",
-        attributes: ["id", "firstname", "lastname", "phone", "address"],
-      },
-      {
-        model: db.user,
-        as: "DeliveryUser",
-        attributes: ["id", "firstname", "lastname", "phone", "address"],
-      },
-      {
-        model: db.user,
-        as: "User",
-        attributes: ["id", "firstname", "lastname", "phone", "address"],
-      },
-      {
-        model: db.soldproducts,
-        as: "SoldPoducts",
-        include: [
-          {
-            model: db.product,
-            as: "Product",
-          },
-        ],
-      },
-    ],
-  });
-  let result = JSON.parse(JSON.stringify(sale));
-  result.totalprice = parseFloat(result.totalprice).toFixed(2);
-  result.totalpayment = parseFloat(result.totalpayment).toFixed(2);
-
-  let totalPrice = result.totalprice;
-  let discount = result.discountpercentage;
-  let priceAfterDiscount = totalPrice - totalPrice * (discount / 100);
-
-  let userPaid = parseFloat(result.totalpayment);
-
-  let change = userPaid - priceAfterDiscount;
-  // if(change < 0) change = 0;
-
-  let balance = userPaid - priceAfterDiscount; // 10
-  // if(balance < 0) balance = 0;
-
-  result.balance = balance.toFixed(2);
-  result.change = change.toFixed(2);
-
-  let companySettings = await db.softwaresetting.findOne({
-    where: {
-      name: "company",
-    },
-  });
-  res.render("sales/saleview", {
-    sale: result,
-    companySettings: JSON.parse(companySettings.value),
-    hidenav: true,
-    layout: false
-  });
 };
 exports.productsget = async (req, res) => {
   let body = req.body;
