@@ -40,31 +40,22 @@ module.exports = {
 
     // Use queryInterface to insert directly, avoiding model schema validation issues
     for (const account of financeAccounts) {
-      // Check if account already exists
-      const [existing] = await queryInterface.sequelize.query(
-        `SELECT id FROM financeaccount WHERE id = :id`,
+      // Check if account already exists by name (more reliable than ID since IDs are generated)
+      const existing = await queryInterface.sequelize.query(
+        `SELECT id FROM financeaccount WHERE LOWER(TRIM(name)) = LOWER(TRIM(:name)) AND LOWER(TRIM(type)) = LOWER(TRIM(:type))`,
         {
-          replacements: { id: account.id },
+          replacements: { name: account.name, type: account.type },
           type: queryInterface.sequelize.QueryTypes.SELECT
         }
       );
       
-      if (existing && existing.length > 0) {
-        // Update existing
-        await queryInterface.sequelize.query(
-          `UPDATE financeaccount SET name = :name, type = :type, fk_parent_in_financeaccount = :fk_parent_in_financeaccount WHERE id = :id`,
-          {
-            replacements: {
-              id: account.id,
-              name: account.name,
-              type: account.type,
-              fk_parent_in_financeaccount: account.fk_parent_in_financeaccount
-            }
-          }
-        );
+      if (existing && Array.isArray(existing) && existing.length > 0) {
+        // Skip if already exists
+        console.log(`Skipping financeaccount ${account.name} (${account.type}) - already exists`);
       } else {
         // Insert new
         await queryInterface.bulkInsert('financeaccount', [account]);
+        console.log(`Created financeaccount ${account.name} (${account.type})`);
       }
     }
 
@@ -79,10 +70,18 @@ module.exports = {
     ];
 
     for (const setting of softwareSettings) {
-      // run only when record not exist
-      const record = await softwaresetting.findByPk(setting.id);
-      if (!record) {
-        await softwaresetting.upsert(setting);
+      // Check if setting already exists by name (more reliable than ID)
+      const existing = await softwaresetting.findOne({
+        where: { name: setting.name }
+      });
+      
+      if (existing) {
+        // Skip if already exists
+        console.log(`Skipping software setting ${setting.name} - already exists`);
+      } else {
+        // Insert new
+        await softwaresetting.create(setting);
+        console.log(`Created software setting ${setting.name}`);
       }
     }
   },
