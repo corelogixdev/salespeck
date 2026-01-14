@@ -4,9 +4,10 @@
             <div class="card h-100">
                 <div class="card-body d-flex flex-column justify-content-between">
                     <div class="mb-4" id="search-product-sales-page-search-seaction" style="position: relative;">
-                        <label for="product-search" class="form-label text-muted text-uppercase fw-semibold">Search Product</label>
+                        <label for="product-search" class="form-label text-muted text-uppercase fw-semibold">Search
+                            Product</label>
                         <div class="input-group">
-                            <input type="text" class="form-control" id="product-search" 
+                            <input type="text" class="form-control" id="product-search"
                                 placeholder="Enter product name or barcode">
                             <div class="input-group-text">
                                 <div class="form-check mb-0">
@@ -18,14 +19,15 @@
                         <small class="text-warning">
                             Out of stock or products with inactive sales won’t appear in search results.
                         </small>
-                        <div id="search-results" class="shadow-lg rounded p-3 d-none" 
+                        <div id="search-results" class="shadow-lg rounded p-3 d-none"
                             style="position: absolute; width: 100%; z-index: 9999;">
                         </div>
                     </div>
 
                     <div class="pt-3">
                         <div class="mb-3">
-                            <label for="customer" class="form-label text-muted text-uppercase fw-semibold">Customer</label>
+                            <label for="customer"
+                                class="form-label text-muted text-uppercase fw-semibold">Customer</label>
                             <select id="customer" class="form-select select2" data-placeholder="Select Customer">
                                 <option value="">Select Customer</option>
                             </select>
@@ -38,12 +40,14 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label for="discountpercentage" class="form-label text-muted text-uppercase fw-semibold">Discount %</label>
+                                <label for="discountpercentage"
+                                    class="form-label text-muted text-uppercase fw-semibold">Discount %</label>
                                 <input type="number" class="form-control" id="discountpercentage" value="0">
                             </div>
 
                             <div class="col-md-6">
-                                <label for="total-payment" class="form-label text-muted text-uppercase fw-semibold">Payment</label>
+                                <label for="total-payment"
+                                    class="form-label text-muted text-uppercase fw-semibold">Payment</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control" id="total-payment">
                                     <div class="input-group-text">
@@ -76,7 +80,7 @@
                             <thead class="table-light" style="position: sticky; top: 0;">
                                 <tr>
                                     <th scope="col">#</th>
-                                    <th scope="col">ID</th>
+                                    <th scope="col">Barcode</th>
                                     <th scope="col">Name</th>
                                     <th scope="col">Qty</th>
                                     <th scope="col">Price</th>
@@ -99,61 +103,72 @@
 </div>
 
 <style>
-.search-result-product {
-    transition: all 0.2s;
-    color: var(--vz-body-color);
-}
-.search-result-product:hover {
-    background-color: var(--vz-light);
-}
-.editable-input {
-    outline: none;
-    width: 50px;
-    border: none;
-    background-color: transparent;
-    border-bottom: 1px solid transparent;
-    pointer-events: none;
-    text-align: center;
-}
-#search-results {
-    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-    background-color: var(--vz-card-bg); 
-    border: 1px solid var(--vz-border-color);
-}
-.select2-dropdown-custom {
-    max-height: 200px;
-    overflow-y: auto;
-}
-.select2-container--bootstrap-5 .select2-selection {
-    min-height: 38px;
-    /* border: 1px solid var(--vz-input-border); */
-    /* background-color: var(--vz-input-bg); */
-}
-.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
-    color: var(--vz-body-color);
-    line-height: 36px;
-}
-.select2-container--bootstrap-5 .select2-dropdown {
-    background-color: var(--vz-card-bg);
-    border-color: var(--vz-border-color);
-}
-.select2-container--bootstrap-5 .select2-results__option {
-    padding: 8px 12px;
-    color: var(--vz-body-color);
-}
-.select2-container--bootstrap-5 .select2-results__option--highlighted {
-    background-color: var(--vz-primary);
-}
-.product-name small {
-    font-size: 0.75rem;
-    opacity: 0.7;
-}
-.product-name-cell {
-    max-width: 100px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
+    .search-result-product {
+        transition: all 0.2s;
+        color: var(--vz-body-color);
+    }
+
+    .search-result-product:hover {
+        background-color: var(--vz-light);
+    }
+
+    .editable-input {
+        outline: none;
+        width: 50px;
+        border: none;
+        background-color: transparent;
+        border-bottom: 1px solid transparent;
+        pointer-events: none;
+        text-align: center;
+    }
+
+    #search-results {
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        background-color: var(--vz-card-bg);
+        border: 1px solid var(--vz-border-color);
+    }
+
+    .select2-dropdown-custom {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection {
+        min-height: 38px;
+        /* border: 1px solid var(--vz-input-border); */
+        /* background-color: var(--vz-input-bg); */
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        color: var(--vz-body-color);
+        line-height: 36px;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown {
+        background-color: var(--vz-card-bg);
+        border-color: var(--vz-border-color);
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option {
+        padding: 8px 12px;
+        color: var(--vz-body-color);
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option--highlighted {
+        background-color: var(--vz-primary);
+    }
+
+    .product-name small {
+        font-size: 0.75rem;
+        opacity: 0.7;
+    }
+
+    .product-name-cell {
+        max-width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 </style>
 
 <script>
@@ -188,11 +203,11 @@
         total = total - (total * discountpercentage / 100);
         totalBillAmount.textContent = `Rs. ${parseFloat(total).toFixed(2)}`;
         UpdateChangePrice();
-    }   
+    }
     let previousEntry;
     function addProduct(product) {
         previousEntry = product;
-        if(product.quantity <= 0){
+        if (product.quantity <= 0) {
             toastr.warning('Product quantity is not available');
             return;
         }
@@ -214,10 +229,10 @@
             quantityElement.value = quantity + 1;
 
             totalElement.textContent = Math.round((quantity + 1) * parseFloat(priceElement.value));
-            
+
             // Check expired status after quantity update
             checkIfProductIsExpired(existingRow, product);
-            
+
             updateTotalBill();
             return;
         }
@@ -227,7 +242,7 @@
         row.id = `product-row-${product.id}`;
         row.innerHTML = `
         <td class="product-serial">${currentIndex}</td>
-        <td class="product-id">${product.id}</td>
+        <td class="product-barcode">${product.barcode}</td>
         <td class="product-name">
             <div class="product-name-cell" title="${product.name}">
                 ${product.name}
@@ -248,10 +263,10 @@
         </td>
       `;
         selectedProductsTable.appendChild(row);
-        
+
         // Add check after creating new row
         checkIfProductIsExpired(row, product);
-        
+
         updateTotalBill();
     }
     function updateSerialNumbers() {
@@ -260,7 +275,7 @@
             row.querySelector('.product-serial').textContent = index + 1;
         });
     }
-    function UpdateChangePrice(){
+    function UpdateChangePrice() {
         const totalBill = parseFloat(totalBillAmount.textContent.split(' ')[1]);
         const totalPrice = parseFloat(totalPayment.value) || 0;
         const change = totalPrice - totalBill;
@@ -271,38 +286,38 @@
         }
         changeEl.textContent = `Rs. ${change.toFixed(2)}`;
     }
-    function sale(){
+    function sale() {
         const customer = customerDropdown.value || null;
         const ledger = ledgerCheckbox.checked;
         const discountpercentage = parseFloat(document.getElementById('discountpercentage').value);
         const products = [];
         document.querySelectorAll('#selected-products tr').forEach(row => {
-            const productId = row.querySelector('td:nth-child(2)').textContent;
+            const productId = row.id.split('-')[2]; // Extract ID from 'product-row-{id}'
             const quantity = parseInt(row.querySelector('td:nth-child(4)').querySelector('.editable-input').value);
             const price = parseFloat(row.querySelector('td:nth-child(5)').querySelector('.editable-input').value);
-            products.push({ productId, quantity , price });
+            products.push({ productId, quantity, price });
         });
-        if(products.length === 0){
+        if (products.length === 0) {
             toastr.warning('Please select products');
             return;
         }
         const totalPaymentVal = parseFloat(totalPayment.value) || 0;
         const priceWithoutDiscount = products.reduce((acc, product) => acc + (product.quantity * product.price), 0);
-        
+
         const totalPrice = priceWithoutDiscount;
 
         // check if discount percent is valid
 
-        if(discountpercentage < 0 || discountpercentage > 100){
+        if (discountpercentage < 0 || discountpercentage > 100) {
             toastr.warning('Please enter valid discount percentage');
             return;
         }
         const priceWithDiscount = priceWithoutDiscount - (priceWithoutDiscount * discountpercentage / 100);
-        if(totalPaymentVal < priceWithDiscount && !ledger){
+        if (totalPaymentVal < priceWithDiscount && !ledger) {
             toastr.warning('Please check the ledger option or pay the full amount');
             return;
         }
-        if(totalPaymentVal < priceWithDiscount && !customer){
+        if (totalPaymentVal < priceWithDiscount && !customer) {
             toastr.warning('Please select a customer or pay the full amount');
             return;
         }
@@ -328,7 +343,7 @@
                             text: 'Ok',
                             btnClass: 'btn-success',
                             action: function () {
-                                window.open('/sales/'+ data.saleId, '_blank');
+                                window.open('/sales/' + data.saleId, '_blank');
                                 window.location.reload();
                             }
                         }
@@ -352,7 +367,7 @@
             }
         });
     }
-    async function getProducts(body){
+    async function getProducts(body) {
         const response = await fetch('/sales/productsget', {
             method: 'POST',
             headers: {
@@ -365,38 +380,44 @@
         setAllProducts(products);
         return products;
     }
-    async function searchProductByBarcode(barcode){
-        if(!barcode){
+    async function searchProductByBarcode(barcode) {
+        if (!barcode) {
             return addProduct(previousEntry);
         }
         const products = await getProducts({ barcode });
-        if(products.length > 0){
+        if (products.length > 0) {
             addProduct(products[0]);
             productSearch.value = '';
-        }else{
+            // Focus back on search field for next scan
+            setTimeout(() => {
+                productSearch.focus();
+            }, 100);
+        } else {
             toastr.warning('No product found.');
+            productSearch.value = '';
+            productSearch.focus();
         }
     }
-    function setAllProducts(product){
-        if(allProducts.find(p => p.id === product.id) || product.quantity <= 0 || !product){
+    function setAllProducts(product) {
+        if (allProducts.find(p => p.id === product.id) || product.quantity <= 0 || !product) {
             return;
         }
-        if(Array.isArray(product))
+        if (Array.isArray(product))
             allProducts.push(...product);
         else
-        allProducts.push(product);
+            allProducts.push(product);
     }
-    function postSaveInput(input){
+    function postSaveInput(input) {
         input.style.borderBottom = '1px solid transparent';
         input.setAttribute('readonly', 'readonly');
         input.style.pointerEvents = 'none';
         input.onblur = null;
         input.onkeyup = null;
     }
-    function createEdiableInput(onSave, value, target, inputtype){
+    function createEdiableInput(onSave, value, target, inputtype) {
         const input = target.querySelector('.editable-input') || document.createElement('input');
         let prevInputType = input.getAttribute('type');
-        if(prevInputType !== inputtype){
+        if (prevInputType !== inputtype) {
             input.setAttribute('type', inputtype);
         }
         input.classList.add('editable-input');
@@ -406,24 +427,24 @@
         input.onkeyup = (event) => {
             if (event.key === 'Enter') {
                 let success = onSave(event, input);
-                if(success !== false){
+                if (success !== false) {
                     postSaveInput(input);
                 }
             }
         };
         input.onblur = () => {
-            let success = onSave({key: 'Enter'}, input);
-            if(success !== false){
+            let success = onSave({ key: 'Enter' }, input);
+            if (success !== false) {
                 postSaveInput(input);
             }
         };
         input.focus();
     }
-    
-    function checkIfProductIsExpired(row, product){
+
+    function checkIfProductIsExpired(row, product) {
         let quantity = parseInt(row.querySelector('.product-quantity .editable-input').value);
         let isExpired = false;
-        
+
         if (product.expired > 0) {
             const nonExpiredStock = product.quantity - product.expired;
             isExpired = quantity >= nonExpiredStock;
@@ -436,11 +457,35 @@
             row.style.backgroundColor = '';
             row.setAttribute('data-expired', 'false');
         }
-        
+
         return isExpired;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        // Update placeholder based on barcode checkbox
+        function updatePlaceholder() {
+            if (searchBarcode.checked) {
+                productSearch.placeholder = 'Scan or enter product barcode';
+            } else {
+                productSearch.placeholder = 'Enter product name';
+            }
+        }
+
+        // Initialize placeholder
+        updatePlaceholder();
+
+        // Listen for checkbox changes
+        searchBarcode.addEventListener('change', updatePlaceholder);
+
+        // Prevent window from losing focus
+        window.addEventListener('blur', (event) => {
+            // Refocus this window after a short delay
+            setTimeout(() => {
+                window.focus();
+                productSearch.focus();
+            }, 50);
+        });
+
         document.addEventListener('click', (event) => {
             if (!event.target.closest('#search-product-sales-page-search-seaction')) {
                 document.getElementById('search-results').classList.add('d-none');
@@ -448,21 +493,27 @@
         });
         productSearch.addEventListener('keydown', async (event) => {
             const searchResults = document.getElementById('search-results');
-            if(event.key === 'Enter'){
-                if(searchBarcode.checked){
-                    event.preventDefault();
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Always prevent default to avoid navigation
+                event.stopPropagation(); // Stop event from bubbling
+
+                if (searchBarcode.checked) {
                     await searchProductByBarcode(productSearch.value);
                     return;
-                }else{
+                } else {
                     let _selectedProduct = allProducts.find(p => p.id === parseInt(selectedProduct));
                     if (_selectedProduct) {
                         addProduct(_selectedProduct);
-                    }else{
-                        if(previousEntry)
-                        addProduct(previousEntry);
+                    } else {
+                        if (previousEntry)
+                            addProduct(previousEntry);
                     }
                     productSearch.value = '';
                     searchResults.classList.add('d-none');
+                    // Focus back on search field
+                    setTimeout(() => {
+                        productSearch.focus();
+                    }, 100);
                 }
             }
             if (!searchResults.classList.contains('d-none')) {
@@ -471,7 +522,7 @@
                 }
                 const productResults = searchResults.querySelectorAll('.search-result-product');
                 if (productResults.length > 0) {
-                    if(productResults.length === 1){
+                    if (productResults.length === 1) {
                         selectedProduct = productResults[0].id.split('-')[1];
                         productResults[0].style.backgroundColor = '#f8f9fa';
                     }
@@ -499,7 +550,7 @@
             }
         });
         productSearch.addEventListener('input', async () => {
-            if(searchBarcode.checked){
+            if (searchBarcode.checked) {
                 return;
             }
             const query = productSearch.value;
@@ -517,7 +568,7 @@
             const searchResults = document.getElementById('search-results');
             searchResults.classList.remove('d-none');
             searchResults.innerHTML = '';
-            
+
             let filteredProds = products.filter(product => product.name.toLowerCase().includes(query.toLowerCase()));
             filteredProds.forEach(product => {
                 const productElement = document.createElement('div');
@@ -546,51 +597,51 @@
             UpdateChangePrice();
         });
         selectedProductsTable.addEventListener('click', (event) => {
-            function UpdateProductQuantity(event, input, quantityElement , price, totalElement){
+            function UpdateProductQuantity(event, input, quantityElement, price, totalElement) {
                 if (event.key === 'Enter') {
                     const row = input.closest('tr');
-                    const productId = row.querySelector('.product-id').textContent;
+                    const productId = row.id.split('-')[2]; // Extract ID from 'product-row-{id}'
                     const product = allProducts.find(p => p.id === parseInt(productId));
                     const newQuantity = parseInt(input.value);
                     input.value = newQuantity;
-                    
+
                     if (newQuantity <= 0) {
                         input.style.borderBottomColor = 'red';
                         ErrorString = "Please enter valid quantity";
                         toastr.warning('Quantity should be greater than 0');
                         return false;
-                    } else if(newQuantity > product.quantity) {
+                    } else if (newQuantity > product.quantity) {
                         input.style.borderBottomColor = 'red';
                         ErrorString = "Please enter valid quantity";
                         toastr.warning('Product quantity is not available');
                         return false;
                     }
-                    
+
                     ErrorString = '';
                     quantityElement.textContent = newQuantity;
                     totalElement.textContent = Math.round(newQuantity * price);
-                    
+
                     // Check expired status after quantity update
                     checkIfProductIsExpired(row, product);
-                    
+
                     updateTotalBill();
                 }
             }
             const target = event.target;
-            if(target.tagName === 'TD'){
+            if (target.tagName === 'TD') {
                 const row = target.closest('tr');
                 if (target.classList.contains('product-quantity')) {
                     let quantityElement = target.querySelector('.editable-input');
-                    if(!quantityElement){
+                    if (!quantityElement) {
                         return;
                     }
                     const quantity = parseInt(quantityElement.value);
                     const priceElement = row.querySelector('.product-price .editable-input');
                     const totalElement = row.querySelector('.product-total');
                     const price = parseFloat(priceElement.value);
-                    createEdiableInput( 
-                        (event, input) => UpdateProductQuantity(event, input, quantityElement , price, totalElement), 
-                        quantity, 
+                    createEdiableInput(
+                        (event, input) => UpdateProductQuantity(event, input, quantityElement, price, totalElement),
+                        quantity,
                         target,
                         'number'
                     );
@@ -600,7 +651,7 @@
                     const price = parseFloat(priceElement.value);
                     const quantityElement = row.querySelector('.product-quantity .editable-input');
                     const totalElement = row.querySelector('.product-total');
-                    createEdiableInput( 
+                    createEdiableInput(
                         (event, input) => {
                             if (event.key === 'Enter') {
                                 const newPrice = parseFloat(input.value);
@@ -614,7 +665,7 @@
                                 updateTotalBill();
                             }
                         },
-                        price, 
+                        price,
                         target,
                         'number'
                     );
@@ -625,7 +676,7 @@
     discountpercentage.addEventListener('input', () => {
         updateTotalBill();
     });
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('#customer').select2({
             theme: 'bootstrap-5',
             dropdownParent: $('#customer').parent(),
@@ -633,12 +684,12 @@
                 url: '/sales/search-customers',
                 dataType: 'json',
                 delay: 250,
-                data: function(params) {
+                data: function (params) {
                     return {
                         search: params.term
                     };
                 },
-                processResults: function(data) {
+                processResults: function (data) {
                     return {
                         results: data.map(customer => ({
                             id: customer.id,
@@ -653,4 +704,4 @@
             dropdownCssClass: 'select2-dropdown-custom',
         });
     });
-    </script>
+</script>

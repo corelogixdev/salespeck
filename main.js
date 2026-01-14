@@ -40,17 +40,21 @@ function createWindow() {
 
   // Handle new window creation (like _blank targets)
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    return {
-      action: 'allow',
-      overrideBrowserWindowOptions: {
-        autoHideMenuBar: true,
-        webPreferences: {
-          preload: path.join(__dirname, 'preload.js'),
-          nodeIntegration: false,
-          contextIsolation: true,
-        }
+    // Create a new window
+    const newWindow = new BrowserWindow({
+      autoHideMenuBar: true,
+      webPreferences: {
+        preload: path.join(__dirname, 'preload.js'),
+        nodeIntegration: false,
+        contextIsolation: true,
       }
-    }
+    });
+
+    // Maximize the window after it's created
+    newWindow.maximize();
+    newWindow.loadURL(url);
+
+    return { action: 'deny' }; // Prevent default window creation since we created our own
   });
 
 
@@ -69,7 +73,7 @@ function createWindow() {
 ipcMain.on('perform-action', (event, arg) => {
   // Here you can execute any logic or code you want in the main process
   // For example, you might want to send a response back
-  if(arg.message === 'close-app') {
+  if (arg.message === 'close-app') {
     console.log('Closing the app...');
     app.quit();
   }
@@ -96,11 +100,11 @@ ipcMain.on('switch-server', async (event, serverIp) => {
 
 app.whenReady().then(() => {
   createWindow();
-  
+
   // Get update URL from .settings file (runtime config)
   //const updateUrl = config.update_url;
   const updateUrl = "http://localhost:8000"; //local update server
-  
+
   if (!updateUrl) {
     logi('Warning: Update URL not configured. Auto-updates disabled.');
     return;
@@ -110,10 +114,10 @@ app.whenReady().then(() => {
   autoUpdater.autoInstallOnAppQuit = false;
   autoUpdater.logger = require('electron-log');
   autoUpdater.logger.transports.file.level = 'debug';
-  
+
   // Suppress 404 errors in electron-log
   const originalError = autoUpdater.logger.error;
-  autoUpdater.logger.error = function(...args) {
+  autoUpdater.logger.error = function (...args) {
     const message = args.join(' ');
     // Don't log 404 errors - they're expected when update server is not available
     if (message.includes('404') || message.includes('Not Found')) {
@@ -121,7 +125,7 @@ app.whenReady().then(() => {
     }
     return originalError.apply(this, args);
   };
-  
+
   // Enable update checking in development mode (for testing)
   // This allows testing updates even when app is not packed
   if (!app.isPackaged) {
@@ -145,7 +149,7 @@ app.whenReady().then(() => {
   autoUpdater.setFeedURL(updaterConfig);
   logi(`Current version: ${packageJson.version}`);
   logi(`Update URL: ${updateUrl}`);
-  
+
   // Check for updates - errors will be handled by the error event handler
   // Wrap in promise catch to prevent unhandled rejections
   try {
@@ -156,9 +160,9 @@ app.whenReady().then(() => {
         // This just prevents unhandled promise rejection warnings
         // Suppress 404 and dev-app-update.yml errors as they're expected
         const errorMsg = error.message || '';
-        if (!errorMsg.includes('404') && 
-            !errorMsg.includes('Not Found') && 
-            !(errorMsg.includes('dev-app-update.yml') && errorMsg.includes('ENOENT'))) {
+        if (!errorMsg.includes('404') &&
+          !errorMsg.includes('Not Found') &&
+          !(errorMsg.includes('dev-app-update.yml') && errorMsg.includes('ENOENT'))) {
           logi('Update check promise rejected:', errorMsg || error);
         }
       });
@@ -178,13 +182,13 @@ autoUpdater.on('error', (error) => {
     // Silently ignore - update server might not be running
     return;
   }
-  
+
   // Suppress dev-app-update.yml errors in development - file will be served by update server
   if (error.message && error.message.includes('dev-app-update.yml') && error.message.includes('ENOENT')) {
     // Silently ignore - this is expected, the file is served by the update server
     return;
   }
-  
+
   logi('Error in auto-updater:', error);
   if (error.message && error.message.includes('EPERM')) {
     logi('Permission error: Please ensure the application has write permissions to the specified directory.');
@@ -249,10 +253,10 @@ autoUpdater.on('update-downloaded', (info) => {
 
         // delete all files from the directory
         fs.readdir(appDir, (err, files) => {
-          if(!err){
+          if (!err) {
             for (const file of files) {
               fs.unlink(path.join(appDir, file), err => {
-                if (err) {}
+                if (err) { }
               });
             }
           }
@@ -279,7 +283,7 @@ function deleteOldFiles(directory) {
   try {
     // Get all files in the directory
     const files = fs.readdirSync(directory);
-    
+
     // Loop through and remove each file
     files.forEach((file) => {
       const filePath = path.join(directory, file);
