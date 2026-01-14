@@ -1,6 +1,6 @@
 {
   "name": "openmenu",
-  "description": "OpenMenu for POS,Stock and Invoicing.",
+  "description": "OpenMenu for POS,Stocks and Invoicing.",
   "version": "1.0.7",
   "private": "true",
   "main": "main.js",

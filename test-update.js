@@ -40,16 +40,85 @@ function logStep(step, message) {
 }
 
 // Step 1: Update version if provided
+let originalPackageJsonContent = null;
+let originalMainJsContent = null;
+const PACKAGE_JSON_PATH = path.join(PROJECT_ROOT, 'package.json');
+const MAIN_JS_PATH = path.join(PROJECT_ROOT, 'main.js');
+
+function backupFilesOnce() {
+  if (originalPackageJsonContent === null) {
+    try {
+      originalPackageJsonContent = fs.readFileSync(PACKAGE_JSON_PATH, 'utf8');
+    } catch (e) {
+      // ignore, will fail later anyway if file truly missing
+    }
+  }
+  if (originalMainJsContent === null) {
+    try {
+      originalMainJsContent = fs.readFileSync(MAIN_JS_PATH, 'utf8');
+    } catch (e) {
+      // ignore
+    }
+  }
+}
+
+function restorePackageVersionOnly() {
+  try {
+    if (originalPackageJsonContent !== null) {
+      fs.writeFileSync(PACKAGE_JSON_PATH, originalPackageJsonContent);
+      log('✓ Restored package.json version to original (for local app)', 'green');
+    }
+  } catch (e) {
+    log(`⚠ Failed to restore original package.json: ${e.message}`, 'yellow');
+  }
+}
+
+function restoreFiles() {
+  try {
+    if (originalPackageJsonContent !== null) {
+      fs.writeFileSync(PACKAGE_JSON_PATH, originalPackageJsonContent);
+    }
+    if (originalMainJsContent !== null) {
+      fs.writeFileSync(MAIN_JS_PATH, originalMainJsContent);
+    }
+    log('✓ Restored package.json and main.js to original state', 'green');
+  } catch (e) {
+    log(`⚠ Failed to restore original files: ${e.message}`, 'yellow');
+  }
+}
+
+function enableLocalUpdateUrl() {
+  backupFilesOnce();
+  try {
+    let content = fs.readFileSync(MAIN_JS_PATH, 'utf8');
+    const configLine = '  const updateUrl = config.update_url;';
+    const localLineCommented = '  //const updateUrl = \"http://localhost:8000\"; //local update server';
+    const commentedConfigLine = '  //const updateUrl = config.update_url;';
+    const localLineActive = '  const updateUrl = \"http://localhost:8000\"; //local update server';
+
+    if (content.includes(configLine) && content.includes(localLineCommented)) {
+      content = content.replace(configLine, commentedConfigLine)
+                       .replace(localLineCommented, localLineActive);
+      fs.writeFileSync(MAIN_JS_PATH, content);
+      log('✓ Switched main.js updateUrl to local http://localhost:8000', 'green');
+    } else {
+      log('⚠ Could not find expected updateUrl lines in main.js. Please check main.js format.', 'yellow');
+    }
+  } catch (e) {
+    log(`⚠ Failed to modify main.js for local update URL: ${e.message}`, 'yellow');
+  }
+}
+
 function updateVersion(newVersion) {
   if (!newVersion) return;
 
   logStep('1', `Updating version to ${newVersion}...`);
   try {
-    const packageJsonPath = path.join(PROJECT_ROOT, 'package.json');
-    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+    backupFilesOnce();
+    const packageJson = JSON.parse(fs.readFileSync(PACKAGE_JSON_PATH, 'utf8'));
     const oldVersion = packageJson.version;
     packageJson.version = newVersion;
-    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
+    fs.writeFileSync(PACKAGE_JSON_PATH, JSON.stringify(packageJson, null, 2) + '\n');
     log(`✓ Version updated: ${oldVersion} → ${newVersion}`, 'green');
   } catch (error) {
     log(`✗ Failed to update version: ${error.message}`, 'red');
@@ -184,6 +253,7 @@ function startServer() {
     } else {
       log(`\n✗ Server error: ${err.message}`, 'red');
     }
+    restoreFiles();
     process.exit(1);
   });
 
@@ -197,6 +267,7 @@ function startServer() {
     log('\n\n👋 Shutting down server...', 'yellow');
     server.close(() => {
       log('✓ Server stopped.', 'green');
+      restoreFiles();
       process.exit(0);
     });
   });
@@ -250,13 +321,22 @@ function main() {
   log('='.repeat(60), 'blue');
 
   try {
+    // Backup files once so we can restore them later
+    backupFilesOnce();
+
     // Step 1: Update version if provided
     if (newVersion) {
       updateVersion(newVersion);
     }
 
+    // Also switch update URL in main.js to local server
+    enableLocalUpdateUrl();
+
     // Step 2: Build
     buildApp();
+
+    // After build, restore package.json version so local app runs as "old" version
+    restorePackageVersionOnly();
 
     // Step 3: Setup server directory
     setupUpdateServer();
@@ -269,6 +349,7 @@ function main() {
 
   } catch (error) {
     log(`\n✗ Error: ${error.message}`, 'red');
+    restoreFiles();
     process.exit(1);
   }
 }
