@@ -6,4 +6,4 @@ SERVER_IP=localhost
 port=3000
 logging=true
 logger=file
-env=production
+env=development

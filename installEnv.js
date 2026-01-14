@@ -13,7 +13,7 @@ const DEFAULT_SETTINGS = [
   { key: 'port', value: 3000 },
   { key: 'logging', value: true },
   { key: 'logger', value: 'file' },
-  { key: 'env', value: 'production' }
+  { key: 'env', value: 'development' }
 ];
 
 // Determine the path for .settings file
