@@ -9,37 +9,63 @@ module.exports = {
   async up(queryInterface, Sequelize) {
 
     const financeAccounts = [
-      { id: generateId(32), name: 'bank', type: 'asset', parent: null },
-      { id: generateId(32), name: 'cash', type: 'asset', parent: null },
-      { id: generateId(32), name: 'petty cash', type: 'asset', parent: null },
-      { id: generateId(32), name: 'undeposited fund', type: 'asset', parent: null },
-      { id: generateId(32), name: 'account receivable', type: 'asset', parent: null },
-      { id: generateId(32), name: 'fixed', type: 'asset', parent: null },
-      { id: generateId(32), name: 'current', type: 'asset', parent: null },
-      { id: generateId(32), name: 'other', type: 'asset', parent: null },
-      { id: generateId(32), name: 'inventory', type: 'asset', parent: null },
-      { id: generateId(32), name: 'notes payable', type: 'liabitity', parent: null },
-      { id: generateId(32), name: 'account payable', type: 'liabitity', parent: null },
-      { id: generateId(32), name: 'tax payable', type: 'liabitity', parent: null },
-      { id: generateId(32), name: 'salary payable', type: 'liabitity', parent: null },
-      { id: generateId(32), name: 'owner equity', type: 'equity', parent: null },
-      { id: generateId(32), name: 'share capital', type: 'equity', parent: null },
-      { id: generateId(32), name: 'pos sale', type: 'income', parent: null },
-      { id: generateId(32), name: 'sale', type: 'income', parent: null },
-      { id: generateId(32), name: 'service sale', type: 'income', parent: null },
-      { id: generateId(32), name: 'other', type: 'income', parent: null },
-      { id: generateId(32), name: 'inventory gain', type: 'income', parent: null },
-      { id: generateId(32), name: 'operating', type: 'expence', parent: null },
-      { id: generateId(32), name: 'salary', type: 'expence', parent: null },
-      { id: generateId(32), name: 'paid tax', type: 'expence', parent: null },
-      { id: generateId(32), name: 'cgs', type: 'expence', parent: null },
-      { id: generateId(32), name: 'discount', type: 'expence', parent: null },
-      { id: generateId(32), name: 'other', type: 'expence', parent: null },
-      { id: generateId(32), name: 'inventory loss', type: 'expence', parent: null }
+      { id: generateId(32), name: 'bank', type: 'asset', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'cash', type: 'asset', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'petty cash', type: 'asset', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'undeposited fund', type: 'asset', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'account receivable', type: 'asset', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'fixed', type: 'asset', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'current', type: 'asset', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'other', type: 'asset', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'inventory', type: 'asset', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'notes payable', type: 'liabitity', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'account payable', type: 'liabitity', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'tax payable', type: 'liabitity', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'salary payable', type: 'liabitity', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'owner equity', type: 'equity', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'share capital', type: 'equity', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'pos sale', type: 'income', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'sale', type: 'income', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'service sale', type: 'income', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'other', type: 'income', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'inventory gain', type: 'income', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'operating', type: 'expence', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'salary', type: 'expence', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'paid tax', type: 'expence', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'cgs', type: 'expence', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'discount', type: 'expence', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'other', type: 'expence', fk_parent_in_financeaccount: null },
+      { id: generateId(32), name: 'inventory loss', type: 'expence', fk_parent_in_financeaccount: null }
     ];
 
+    // Use queryInterface to insert directly, avoiding model schema validation issues
     for (const account of financeAccounts) {
-      await financeaccount.upsert(account);
+      // Check if account already exists
+      const [existing] = await queryInterface.sequelize.query(
+        `SELECT id FROM financeaccount WHERE id = :id`,
+        {
+          replacements: { id: account.id },
+          type: queryInterface.sequelize.QueryTypes.SELECT
+        }
+      );
+      
+      if (existing && existing.length > 0) {
+        // Update existing
+        await queryInterface.sequelize.query(
+          `UPDATE financeaccount SET name = :name, type = :type, fk_parent_in_financeaccount = :fk_parent_in_financeaccount WHERE id = :id`,
+          {
+            replacements: {
+              id: account.id,
+              name: account.name,
+              type: account.type,
+              fk_parent_in_financeaccount: account.fk_parent_in_financeaccount
+            }
+          }
+        );
+      } else {
+        // Insert new
+        await queryInterface.bulkInsert('financeaccount', [account]);
+      }
     }
 
     // software settings

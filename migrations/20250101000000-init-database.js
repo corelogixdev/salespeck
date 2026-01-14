@@ -3,8 +3,9 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    // Create financeaccount table
     console.log('Creating tables...');
+
+    // Create financeaccount table
     await queryInterface.createTable('financeaccount', {
       id: {
         type: Sequelize.STRING(32),
@@ -20,7 +21,23 @@ module.exports = {
         allowNull: true,
       },
       fk_parent_in_financeaccount: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      createdby: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      updatedby: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      value: {
+        type: Sequelize.NUMERIC,
+        allowNull: true,
+      },
+      isDefault: {
+        type: Sequelize.BOOLEAN,
         allowNull: true,
       },
       source: {
@@ -37,7 +54,6 @@ module.exports = {
         allowNull: true,
       }
     });
-
 
     // Create financetransaction table
     await queryInterface.createTable('financetransaction', {
@@ -95,6 +111,175 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: true,
+      }
+    });
+
+    // Create user table
+    await queryInterface.createTable('user', {
+      id: {
+        type: Sequelize.STRING(32),
+        allowNull: false,
+        primaryKey: true,
+      },
+      address: {
+        type: Sequelize.STRING(200),
+        allowNull: true,
+      },
+      account_key: {
+        type: Sequelize.STRING(200),
+        allowNull: true,
+      },
+      email: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
+      },
+      firstname: {
+        type: Sequelize.STRING(20),
+        allowNull: true,
+      },
+      lastname: {
+        type: Sequelize.STRING(20),
+        allowNull: true,
+      },
+      password: {
+        type: Sequelize.STRING(20),
+        allowNull: true,
+      },
+      username: {
+        type: Sequelize.STRING(20),
+        allowNull: true,
+      },
+      phone: {
+        type: Sequelize.STRING(30),
+        allowNull: true,
+      },
+      phone2: {
+        type: Sequelize.STRING(30),
+        allowNull: true,
+      },
+      role: {
+        type: Sequelize.STRING(20),
+        allowNull: true,
+        defaultValue: 'user',
+      },
+      createdby: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      updatedby: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      source: {
+        type: Sequelize.STRING(20),
+        allowNull: true,
+        defaultValue: 'desktop'
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      }
+    });
+
+    // Create category table
+    await queryInterface.createTable('category', {
+      id: {
+        type: Sequelize.STRING(32),
+        primaryKey: true,
+      },
+      name: {
+        type: Sequelize.STRING(100),
+        allowNull: false,
+      },
+      description: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
+      status: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
+      },
+      createdby: {
+        type: Sequelize.STRING(32),
+        allowNull: true,
+        references: {
+          model: 'user',
+          key: 'id'
+        }
+      },
+      updatedby: {
+        type: Sequelize.STRING(32),
+        allowNull: true,
+        references: {
+          model: 'user',
+          key: 'id'
+        }
+      },
+      source: {
+        type: Sequelize.STRING(20),
+        allowNull: true,
+        defaultValue: 'desktop'
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false
+      }
+    });
+
+    // Create brand table
+    await queryInterface.createTable('brand', {
+      id: {
+        type: Sequelize.STRING(32),
+        primaryKey: true,
+      },
+      name: {
+        type: Sequelize.STRING(100),
+        allowNull: false,
+      },
+      description: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
+      status: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
+      },
+      createdby: {
+        type: Sequelize.STRING(32),
+        allowNull: true,
+        references: {
+          model: 'user',
+          key: 'id'
+        }
+      },
+      updatedby: {
+        type: Sequelize.STRING(32),
+        allowNull: true,
+        references: {
+          model: 'user',
+          key: 'id'
+        }
+      },
+      source: {
+        type: Sequelize.STRING(20),
+        allowNull: true,
+        defaultValue: 'desktop'
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false
       }
     });
 
@@ -290,81 +475,6 @@ module.exports = {
       }
     });
 
-    // Create user table
-    await queryInterface.createTable('user', {
-      id: {
-        type: Sequelize.STRING(32),
-        allowNull: false,
-        primaryKey: true,
-      },
-      address: {
-        type: Sequelize.STRING(200),
-        allowNull: true,
-      },
-      account_key: {
-        type: Sequelize.STRING(200),
-        allowNull: true,
-      },
-      email: {
-        type: Sequelize.STRING(50),
-        allowNull: true,
-      },
-      // name: {
-      //   type: DataTypes.STRING(20),
-      //   allowNull: true,
-      // },
-      firstname: {
-        type: Sequelize.STRING(20),
-        allowNull: true,
-      },
-      lastname: {
-        type: Sequelize.STRING(20),
-        allowNull: true,
-      },
-      password: {
-        type: Sequelize.STRING(20),
-        allowNull: true,
-      },
-      username: {
-        type: Sequelize.STRING(20),
-        allowNull: true,
-      },
-      phone: {
-        type: Sequelize.STRING(30),
-        allowNull: true,
-      },
-      phone2: {
-        type: Sequelize.STRING(30),
-        allowNull: true,
-      },
-      role: {
-        type: Sequelize.STRING(20),
-        allowNull: true,
-        defaultValue: 'user',
-      },
-      createdby: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-      },
-      updatedby: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-      },
-      source: {
-        type: Sequelize.STRING(20),
-        allowNull: true,
-        defaultValue: 'desktop'
-      },
-      createdAt: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      },
-      updatedAt: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      }
-    });
-
     // Create cashclosing table
     await queryInterface.createTable('cashclosing', {
       id: {
@@ -411,116 +521,7 @@ module.exports = {
       }
     });
 
-    // Add foreign keys and indexes
-    await queryInterface.addConstraint('financeaccount', {
-      fields: ['fk_parent_in_financeaccount'],
-      type: 'foreign key',
-      name: 'fk_parent_in_financeaccount',
-      references: {
-        table: 'financeaccount',
-        field: 'id',
-      },
-      onDelete: 'set null',
-      onUpdate: 'cascade',
-    });
-
-    // await queryInterface.addConstraint('financetransaction', {
-    //   fields: ['fk_user_createdby_in_financetransaction'],
-    //   type: 'foreign key',
-    //   name: 'fk_user_createdby_in_financetransaction',
-    //   references: {
-    //     table: 'user',
-    //     field: 'id',
-    //   },
-    //   onDelete: 'set null',
-    //   onUpdate: 'cascade',
-    // });
-
-    // await queryInterface.addConstraint('financetransaction', {
-    //   fields: ['fk_user_targetto_in_financetransaction'],
-    //   type: 'foreign key',
-    //   name: 'fk_user_targetto_in_financetransaction',
-    //   references: {
-    //     table: 'user',
-    //     field: 'id',
-    //   },
-    //   onDelete: 'set null',
-    //   onUpdate: 'cascade',
-    // });
-
-    // await queryInterface.addConstraint('financetransaction', {
-    //   fields: ['fk_financeaccount_in_financetransaction'],
-    //   type: 'foreign key',
-    //   name: 'fk_financeaccount_in_financetransaction',
-    //   references: {
-    //     table: 'financeaccount',
-    //     field: 'id',
-    //   },
-    //   onDelete: 'set null',
-    //   onUpdate: 'cascade',
-    // });
-
-    // await queryInterface.addConstraint('productsub', {
-    //   fields: ['fk_product_main_in_productsub'],
-    //   type: 'foreign key',
-    //   name: 'fk_product_main_in_productsub',
-    //   references: {
-    //     table: 'product',
-    //     field: 'id',
-    //   },
-    //   onDelete: 'set null',
-    //   onUpdate: 'cascade',
-    // });
-
-    // await queryInterface.addConstraint('productsub', {
-    //   fields: ['fk_product_sub_in_productsub'],
-    //   type: 'foreign key',
-    //   name: 'fk_product_sub_in_productsub',
-    //   references: {
-    //     table: 'product',
-    //     field: 'id',
-    //   },
-    //   onDelete: 'set null',
-    //   onUpdate: 'cascade',
-    // });
-
-    await queryInterface.addConstraint('productsalepurchase', {
-      fields: ['fk_product_in_productsalepurchase'],
-      type: 'foreign key',
-      name: 'fk_product_in_productsalepurchase',
-      references: {
-        table: 'product',
-        field: 'id',
-      },
-      onDelete: 'set null',
-      onUpdate: 'cascade',
-    });
-
-    await queryInterface.addConstraint('productsalepurchase', {
-      fields: ['fk_financetransaction_in_productsalepurchase'],
-      type: 'foreign key',
-      name: 'fk_financetransaction_in_productsalepurchase',
-      references: {
-        table: 'financetransaction',
-        field: 'id',
-      },
-      onDelete: 'set null',
-      onUpdate: 'cascade',
-    });
-
-    await queryInterface.addConstraint('cashclosing', {
-      fields: ['fk_user_in_cashclosing'],
-      type: 'foreign key',
-      name: 'fk_user_in_cashclosing',
-      references: {
-        table: 'user',
-        field: 'id',
-      },
-      onDelete: 'set null',
-      onUpdate: 'cascade',
-    });
-
-    // create soldproducts table
+    // Create soldproducts table
     await queryInterface.createTable('soldproducts', {
       id: {
         allowNull: false,
@@ -547,7 +548,7 @@ module.exports = {
       }
     });
 
-    // create sale table
+    // Create sale table
     await queryInterface.createTable('sale', {
       id: {
         type: Sequelize.STRING(32),
@@ -604,7 +605,7 @@ module.exports = {
       }
     });
 
-    // create table inventory logs
+    // Create inventorylogs table
     await queryInterface.createTable('inventorylogs', {
       id: {
         type: Sequelize.STRING(32),
@@ -645,7 +646,7 @@ module.exports = {
       }
     });
 
-    // Add purchase table
+    // Create purchase table
     await queryInterface.createTable('purchase', {
       id: {
         type: Sequelize.STRING(32),
@@ -691,7 +692,7 @@ module.exports = {
       }
     });
 
-    // Add purchasedproducts table
+    // Create purchasedproducts table
     await queryInterface.createTable('purchasedproducts', {
       id: {
         type: Sequelize.STRING(32),
@@ -729,7 +730,7 @@ module.exports = {
       }
     });
 
-    // create productbatches table
+    // Create productbatches table
     await queryInterface.createTable('productbatches', {
       id: {
         type: Sequelize.STRING(32),
@@ -762,22 +763,74 @@ module.exports = {
         allowNull: false
       }
     });
+
+    // Add foreign keys and indexes
+    await queryInterface.addConstraint('financeaccount', {
+      fields: ['fk_parent_in_financeaccount'],
+      type: 'foreign key',
+      name: 'fk_parent_in_financeaccount',
+      references: {
+        table: 'financeaccount',
+        field: 'id',
+      },
+      onDelete: 'set null',
+      onUpdate: 'cascade',
+    });
+
+    await queryInterface.addConstraint('productsalepurchase', {
+      fields: ['fk_product_in_productsalepurchase'],
+      type: 'foreign key',
+      name: 'fk_product_in_productsalepurchase',
+      references: {
+        table: 'product',
+        field: 'id',
+      },
+      onDelete: 'set null',
+      onUpdate: 'cascade',
+    });
+
+    await queryInterface.addConstraint('productsalepurchase', {
+      fields: ['fk_financetransaction_in_productsalepurchase'],
+      type: 'foreign key',
+      name: 'fk_financetransaction_in_productsalepurchase',
+      references: {
+        table: 'financetransaction',
+        field: 'id',
+      },
+      onDelete: 'set null',
+      onUpdate: 'cascade',
+    });
+
+    await queryInterface.addConstraint('cashclosing', {
+      fields: ['fk_user_in_cashclosing'],
+      type: 'foreign key',
+      name: 'fk_user_in_cashclosing',
+      references: {
+        table: 'user',
+        field: 'id',
+      },
+      onDelete: 'set null',
+      onUpdate: 'cascade',
+    });
   },
 
   down: async (queryInterface) => {
+    // Drop tables in reverse order
+    await queryInterface.dropTable('productbatches');
     await queryInterface.dropTable('purchasedproducts');
     await queryInterface.dropTable('purchase');
+    await queryInterface.dropTable('inventorylogs');
+    await queryInterface.dropTable('sale');
+    await queryInterface.dropTable('soldproducts');
     await queryInterface.dropTable('cashclosing');
-    await queryInterface.dropTable('user');
     await queryInterface.dropTable('softwaresetting');
     await queryInterface.dropTable('productsalepurchase');
     await queryInterface.dropTable('productsub');
     await queryInterface.dropTable('product');
+    await queryInterface.dropTable('brand');
+    await queryInterface.dropTable('category');
+    await queryInterface.dropTable('user');
     await queryInterface.dropTable('financetransaction');
     await queryInterface.dropTable('financeaccount');
-    await queryInterface.dropTable('soldproducts');
-    await queryInterface.dropTable('sale');
-    await queryInterface.dropTable('inventorylogs');
-    await queryInterface.dropTable('productbatches');
   },
 };
