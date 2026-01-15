@@ -14,8 +14,7 @@
     "routes/**/*.js",
     "server/**/*.js",
     "utils/**/*.js",
-    "middleware/**/*.js",
-    "views/**/*.ejs"
+    "middleware/**/*.js"
   ],
-  "ext": "js,ejs,json"
+  "ext": "js,json"
 }

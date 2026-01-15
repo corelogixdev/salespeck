@@ -35,7 +35,7 @@ function createWindow() {
       contextIsolation: true, // Enable context isolation
     },
     // remove the menu bar
-    autoHideMenuBar: true,
+    //autoHideMenuBar: true,
   });
 
   // Handle new window creation (like _blank targets)
@@ -175,6 +175,21 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
+
+// In development, hot-reload renderer when EJS templates change
+if (!app.isPackaged) {
+  const viewsDir = path.join(__dirname, 'views');
+  try {
+    fs.watch(viewsDir, { recursive: true }, (eventType, filename) => {
+      if (!filename) return;
+      if (filename.endsWith('.ejs') && mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.reload();
+      }
+    });
+  } catch (err) {
+    logi('EJS hot-reload watcher error:', err.message);
+  }
+}
 
 autoUpdater.on('error', (error) => {
   // Suppress 404 errors - they're expected when update server is not running
