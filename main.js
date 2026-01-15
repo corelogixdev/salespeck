@@ -25,6 +25,7 @@ process.env.npm_package_version = packageJson.version;
 // });
 
 let mainWindow = null;
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
@@ -38,25 +39,13 @@ function createWindow() {
     //autoHideMenuBar: true,
   });
 
-  // Handle new window creation (like _blank targets)
+  // Handle new window creation (like _blank targets) - always reuse main window
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    // Create a new window
-    const newWindow = new BrowserWindow({
-      autoHideMenuBar: true,
-      webPreferences: {
-        preload: path.join(__dirname, 'preload.js'),
-        nodeIntegration: false,
-        contextIsolation: true,
-      }
-    });
-
-    // Maximize the window after it's created
-    newWindow.maximize();
-    newWindow.loadURL(url);
-
-    return { action: 'deny' }; // Prevent default window creation since we created our own
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.loadURL(url);
+    }
+    return { action: 'deny' }; // Prevent creation of additional BrowserWindows
   });
-
 
   //to open dev tools
   //win.webContents.openDevTools();

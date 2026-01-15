@@ -5,7 +5,7 @@
       <% if ((role == 'user' && permissions.usersCreate) || 
             (role == 'vendor' && permissions.vendorsCreate) || 
             (role == 'customer' && permissions.customersCreate)) { %>
-        <a href="/users/form?role=<%= role %>" class="btn btn-primary btn-sm" target="_blank">
+        <a href="/users/form?role=<%= role %>" class="btn btn-primary btn-sm">
           <i class="ri-add-line align-bottom me-1"></i> Create New <%= role === 'user' ? 'User' : (role === 'vendor' ? 'Vendor' : 'Customer') %>
         </a>
       <% } %>
@@ -89,8 +89,7 @@
                             (role == 'vendor' && permissions.vendorsUpdate) ||
                             (role == 'customer' && permissions.customersUpdate)) { %>
                         <a href="/users/form?id=<%= obj.id %>&role=<%= obj.role %>" 
-                            class="btn btn-soft-warning btn-sm <%= obj.role == 'branchmanager' ? 'custom_disabled' : '' %>" 
-                            target="_blank">
+                            class="btn btn-soft-warning btn-sm <%= obj.role == 'branchmanager' ? 'custom_disabled' : '' %>">
                           <i class="ri-pencil-fill align-middle"></i> Edit
                         </a>
                       <% } %>

@@ -120,30 +120,28 @@
                                       <% if (permissions.productsUpdate) { %>
                                         <li>
                                           <a class="dropdown-item d-flex align-items-center"
-                                            href="/products/quantity/form/<%= product.id %>?type=increase"
-                                            target="_blank">
+                                            href="/products/quantity/form/<%= product.id %>?type=increase">
                                             <i class="ri-add-circle-line me-2 align-middle text-primary"></i>
                                             Increase Quantity
                                           </a>
                                         </li>
                                         <li>
                                           <a class="dropdown-item d-flex align-items-center"
-                                            href="/products/quantity/form/<%= product.id %>?type=decrease"
-                                            target="_blank">
+                                            href="/products/quantity/form/<%= product.id %>?type=decrease">
                                             <i class="ri-subtract-line me-2 align-middle text-danger"></i>
                                             Reduce Quantity
                                           </a>
                                         </li>
                                         <li>
                                           <a class="dropdown-item d-flex align-items-center"
-                                            href="/inventorylogs/<%= product.id %>" target="_blank">
+                                            href="/inventorylogs/<%= product.id %>">
                                             <i class="ri-history-line me-2 align-middle text-info"></i>
                                             View Inventory Logs
                                           </a>
                                         </li>
                                         <li>
                                           <a class="dropdown-item d-flex align-items-center"
-                                            href="/products/form?id=<%= product.id %>" target="_blank">
+                                            href="/products/form?id=<%= product.id %>">
                                             <i class="ri-pencil-fill me-2 align-middle text-warning"></i>
                                             Edit Product
                                           </a>

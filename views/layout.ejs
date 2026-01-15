@@ -61,7 +61,6 @@
 </style>
 
 <body>
-    <% if (typeof hidenav==='undefined' || hidenav !==true) { %>
         <div id="layout-wrapper">
             <header id="page-topbar">
                 <div class="navbar-header">
@@ -89,6 +88,7 @@
                     <a href="/" style="display: block; min-width: fit-content;" class="fs-2 me-2">
                         Open Menu
                     </a>
+                    <% var permissions = typeof permissions !== 'undefined' ? permissions : {}; %>
                     <div id="scrollbar" class="navbar-menu"
                         style="width: 100%;position: static;box-shadow: none;margin-top: 0; background-color: transparent;">
                         <div id="two-column-menu">
@@ -113,14 +113,14 @@
                                         <ul class="nav nav-sm flex-column">
                                             <% if (permissions.productsCreate) { %>
                                                 <li class="nav-item">
-                                                    <a href="/products/form" target="_blank" class="nav-link">New
+                                                    <a href="/products/form" class="nav-link">New
                                                         Product</a>
                                                 </li>
                                                 <% } %>
                                                     <% if (permissions.purchasesCreate) { %>
                                                         <li class="nav-item">
-                                                            <a href="/accounting/purchase/form" target="_blank"
-                                                                class="nav-link">New Purchase</a>
+                                                        <a href="/accounting/purchase/form"
+                                                            class="nav-link">New Purchase</a>
                                                         </li>
                                                         <% } %>
                                                             <% if (permissions.productsList) { %>
@@ -184,9 +184,8 @@
                                                                 <% } %>
                                                                     <% if (permissions.salesCreate) { %>
                                                                         <li class="nav-item">
-                                                                            <a href="/sales/form" target="_blank"
-                                                                                class="nav-link"
-                                                                                onclick="setTimeout(() => { if(window.opener) { window.resizeTo(screen.availWidth, screen.availHeight); window.moveTo(0, 0); } }, 100);">New
+                                                                            <a href="/sales/form"
+                                                                                class="nav-link" id="new-sale-menu-link">New
                                                                                 Sale</a>
                                                                         </li>
                                                                         <% } %>
@@ -674,20 +673,11 @@
 
             <div class="vertical-overlay"></div>
         </div>
-        <% } %>
-            <% if (typeof hidenav==='undefined' || hidenav !==true) { %>
                 <div class="main-content">
                     <div class="page-content">
                         <%- body %>
                     </div>
                 </div>
-                <% } else { %>
-                    <div class="main-content">
-                        <div class="page-content" style="padding-top: 10px; padding-bottom: 10px;">
-                            <%- body %>
-                        </div>
-                    </div>
-                    <% } %>
                         <script src="/assets/js/toastr.min.js"></script>
                         <script>
                             toastr.options = {
@@ -725,6 +715,30 @@
                         $(this).text(moment(date).format('DD MMM YYYY'));
                     });
                 });
+
+                // Handle "New Sale" link - create tab if already on sales form page
+                const newSaleLink = document.getElementById('new-sale-menu-link');
+                if (newSaleLink) {
+                    newSaleLink.addEventListener('click', function(e) {
+                        // Check if we're already on the sales form page
+                        if (window.location.pathname === '/sales/form') {
+                            e.preventDefault();
+                            // Trigger new tab creation if the function exists
+                            if (typeof createNewTab === 'function') {
+                                createNewTab();
+                            } else {
+                                // If tabs aren't initialized yet, wait a bit
+                                setTimeout(() => {
+                                    const newTabBtn = document.getElementById('new-sale-tab-btn');
+                                    if (newTabBtn) {
+                                        newTabBtn.click();
+                                    }
+                                }, 100);
+                            }
+                        }
+                        // Otherwise, let the default navigation happen
+                    });
+                }
             });
         </script>
         </body>

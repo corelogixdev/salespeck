@@ -189,10 +189,10 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function viewPurchase(id) {
-    window.open(`/accounting/purchase/view/${id}`, '_blank');
+    window.location.href = `/accounting/purchase/view/${id}`;
 }
 function viewPurchaseDetails(id) {
-    window.open(`/accounting/purchase/details/${id}`, '_blank');
+    window.location.href = `/accounting/purchase/details/${id}`;
 }
 
 $('.date').each(function() {
