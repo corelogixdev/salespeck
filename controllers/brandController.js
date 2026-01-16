@@ -1,20 +1,49 @@
 const { Op } = require('sequelize');
 const db = require('../models');
+const { getPaginationMeta, buildSortClause, buildFilterClause, sanitizeFilters } = require('../utils/paginationHelper');
 
 exports.listBrands = async (req, res) => {
     try {
-        const brands = await db.brand.findAll({
-            order: [['name', 'ASC']]
+        const query = req.query;
+
+        // Pagination parameters
+        const page = parseInt(query.page) || 1;
+        const pageSize = parseInt(query.pageSize) || 10;
+
+        // Filter parameters
+        const allowedFilters = ['name_like', 'status'];
+        const filters = sanitizeFilters(query, allowedFilters);
+        const where = buildFilterClause(filters, Op);
+
+        // Sort parameters
+        const sortBy = query.sortBy || 'name';
+        const sortOrder = query.sortOrder || 'asc';
+        const order = buildSortClause(sortBy, sortOrder, 'name');
+
+        // Get total count and paginated data
+        const { count, rows } = await db.brand.findAndCountAll({
+            where,
+            order,
+            limit: pageSize,
+            offset: (page - 1) * pageSize
         });
-        res.render('products/brand/list', { 
+
+        // Generate pagination metadata
+        const pagination = getPaginationMeta(page, pageSize, count);
+
+        res.render('products/brand/list', {
             title: "Brands",
-            brands 
+            brands: rows,
+            pagination,
+            query,
+            sortBy,
+            sortOrder
         });
     } catch (error) {
         console.error('Error fetching brands:', error);
-        req.session.message = { 
-            type: "error", 
-            text: "An error occurred while fetching brands." 
+        req.session.message = {
+            type: "error",
+            text: "An error occurred while fetching brands."
         };
         res.redirect("/dashboard");
     }
@@ -23,16 +52,16 @@ exports.listBrands = async (req, res) => {
 exports.saveBrand = async (req, res) => {
     try {
         const { name, description } = req.body;
-        
+
         // Check if brand already exists
-        const existingBrand = await db.brand.findOne({ 
-            where: { name: name } 
+        const existingBrand = await db.brand.findOne({
+            where: { name: name }
         });
-        
+
         if (existingBrand) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Brand with this name already exists' 
+            return res.status(400).json({
+                success: false,
+                message: 'Brand with this name already exists'
             });
         }
 
@@ -43,16 +72,16 @@ exports.saveBrand = async (req, res) => {
             createdby: req.session.user.id
         });
 
-        res.status(200).json({ 
+        res.status(200).json({
             success: true,
             message: 'Brand created successfully',
-            brand: newBrand 
+            brand: newBrand
         });
     } catch (error) {
         console.error('Error creating brand:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Internal Server Error' 
+        res.status(500).json({
+            success: false,
+            message: 'Internal Server Error'
         });
     }
 };
@@ -64,9 +93,9 @@ exports.updateBrand = async (req, res) => {
         // Check if brand exists
         const brand = await db.brand.findByPk(id);
         if (!brand) {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'Brand not found' 
+            return res.status(404).json({
+                success: false,
+                message: 'Brand not found'
             });
         }
 
@@ -79,9 +108,9 @@ exports.updateBrand = async (req, res) => {
         });
 
         if (existingBrand) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Brand name already exists' 
+            return res.status(400).json({
+                success: false,
+                message: 'Brand name already exists'
             });
         }
 
@@ -94,15 +123,15 @@ exports.updateBrand = async (req, res) => {
             where: { id }
         });
 
-        res.status(200).json({ 
-            success: true, 
-            message: 'Brand updated successfully' 
+        res.status(200).json({
+            success: true,
+            message: 'Brand updated successfully'
         });
     } catch (error) {
         console.error('Error updating brand:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Internal Server Error' 
+        res.status(500).json({
+            success: false,
+            message: 'Internal Server Error'
         });
     }
 };
@@ -110,7 +139,7 @@ exports.updateBrand = async (req, res) => {
 exports.deleteBrand = async (req, res) => {
     try {
         const { id } = req.body;
-        
+
         // Check if brand is being used by any products
         const productsUsingBrand = await db.product.findOne({
             where: { brand: id }
@@ -130,15 +159,15 @@ exports.deleteBrand = async (req, res) => {
             where: { id }
         });
 
-        res.status(200).json({ 
-            success: true, 
-            message: 'Brand deleted successfully' 
+        res.status(200).json({
+            success: true,
+            message: 'Brand deleted successfully'
         });
     } catch (error) {
         console.error('Error deleting brand:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Internal Server Error' 
+        res.status(500).json({
+            success: false,
+            message: 'Internal Server Error'
         });
     }
 };
@@ -158,15 +187,15 @@ exports.searchBrands = async (req, res) => {
             order: [['name', 'ASC']]
         });
 
-        res.status(200).json({ 
-            success: true, 
-            data: brands 
+        res.status(200).json({
+            success: true,
+            data: brands
         });
     } catch (error) {
         console.error('Error searching brands:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Internal Server Error' 
+        res.status(500).json({
+            success: false,
+            message: 'Internal Server Error'
         });
     }
 };

@@ -62,6 +62,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       defaultValue: 'desktop'
     },
+    profile_image_url: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+      defaultValue: null
+    },
   }, {
     tableName: 'user',
     timestamps: true,

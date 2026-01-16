@@ -1,0 +1,216 @@
+<% /** * Reusable Pagination Component * * Usage: * <%- include('../components/partials/pagination', { * pagination: { *
+    currentPage: 1, * totalPages: 10, * pageSize: 10, * totalCount: 95, * startRecord: 1, * endRecord: 10 * }, *
+    baseUrl: '/brands' , * query: req.query * }) %>
+    */
+
+    // Helper function to build URL with query parameters
+    function buildPaginationUrl(page, pageSize) {
+    const params = new URLSearchParams(query || {});
+    params.set('page', page);
+    if (pageSize) params.set('pageSize', pageSize);
+    return `${baseUrl}?${params.toString()}`;
+    }
+
+    const pageSizeOptions = [10, 25, 50, 100];
+    const currentPageSize = pagination.pageSize || 10;
+    %>
+
+    <% if (pagination && pagination.totalCount> 0) { %>
+        <div class="pagination-wrapper">
+            <div class="pagination-container">
+                <!-- Records Info -->
+                <div class="pagination-info">
+                    <span class="text-muted">
+                        Showing <strong>
+                            <%= pagination.startRecord %>
+                        </strong> to
+                        <strong>
+                            <%= pagination.endRecord %>
+                        </strong> of
+                        <strong>
+                            <%= pagination.totalCount %>
+                        </strong> records
+                    </span>
+                </div>
+
+                <!-- Page Size Selector -->
+                <div class="page-size-selector">
+                    <label for="pageSize" class="me-2 text-muted">Show:</label>
+                    <select id="pageSize" class="form-select form-select-sm"
+                        onchange="(function() { const params = new URLSearchParams(window.location.search); params.set('page', 1); params.set('pageSize', this.value); window.location.href = '<%= baseUrl %>' + '?' + params.toString(); }).call(this)">
+                        <% pageSizeOptions.forEach(size=> { %>
+                            <option value="<%= size %>" <%=currentPageSize==size ? 'selected' : '' %>><%= size %>
+                            </option>
+                            <% }) %>
+                    </select>
+                </div>
+
+                <!-- Pagination Controls -->
+                <% if (pagination.totalPages> 1) { %>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination pagination-sm mb-0">
+                            <!-- First Page -->
+                            <li class="page-item <%= !pagination.hasPrevious ? 'disabled' : '' %>">
+                                <a class="page-link"
+                                    href="<%= pagination.hasPrevious ? buildPaginationUrl(1, currentPageSize) : '#' %>"
+                                    title="First">
+                                    <i class="ri-arrow-left-double-line"></i>
+                                </a>
+                            </li>
+
+                            <!-- Previous Page -->
+                            <li class="page-item <%= !pagination.hasPrevious ? 'disabled' : '' %>">
+                                <a class="page-link"
+                                    href="<%= pagination.hasPrevious ? buildPaginationUrl(pagination.currentPage - 1, currentPageSize) : '#' %>"
+                                    title="Previous">
+                                    <i class="ri-arrow-left-s-line"></i>
+                                </a>
+                            </li>
+
+                            <!-- Page Numbers -->
+                            <% const currentPage=pagination.currentPage; const totalPages=pagination.totalPages; let
+                                startPage=Math.max(1, currentPage - 2); let endPage=Math.min(totalPages, currentPage +
+                                2); // Adjust if near the start or end if (currentPage <=3) { endPage=Math.min(5,
+                                totalPages); } else if (currentPage>= totalPages - 2) {
+                                startPage = Math.max(1, totalPages - 4);
+                                }
+
+                                // Show first page and ellipsis if needed
+                                if (startPage > 1) { %>
+                                <li class="page-item">
+                                    <a class="page-link" href="<%- buildPaginationUrl(1, currentPageSize) %>">1</a>
+                                </li>
+                                <% if (startPage> 2) { %>
+                                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                                    <% } %>
+                                        <% } // Show page numbers for (let i=startPage; i <=endPage; i++) { if (i> 0 &&
+                                            i <= totalPages) { %>
+                                                <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                                    <a class="page-link"
+                                                        href="<%- buildPaginationUrl(i, currentPageSize) %>">
+                                                        <%= i %>
+                                                    </a>
+                                                </li>
+                                                <% } } // Show ellipsis and last page if needed if (endPage <
+                                                    totalPages) { %>
+                                                    <% if (endPage < totalPages - 1) { %>
+                                                        <li class="page-item disabled"><span
+                                                                class="page-link">...</span></li>
+                                                        <% } %>
+                                                            <li class="page-item">
+                                                                <a class="page-link"
+                                                                    href="<%- buildPaginationUrl(totalPages, currentPageSize) %>">
+                                                                    <%= totalPages %>
+                                                                </a>
+                                                            </li>
+                                                            <% } %>
+
+                                                                <!-- Next Page -->
+                                                                <li
+                                                                    class="page-item <%= !pagination.hasNext ? 'disabled' : '' %>">
+                                                                    <a class="page-link"
+                                                                        href="<%= pagination.hasNext ? buildPaginationUrl(pagination.currentPage + 1, currentPageSize) : '#' %>"
+                                                                        title="Next">
+                                                                        <i class="ri-arrow-right-s-line"></i>
+                                                                    </a>
+                                                                </li>
+
+                                                                <!-- Last Page -->
+                                                                <li
+                                                                    class="page-item <%= !pagination.hasNext ? 'disabled' : '' %>">
+                                                                    <a class="page-link"
+                                                                        href="<%= pagination.hasNext ? buildPaginationUrl(pagination.totalPages, currentPageSize) : '#' %>"
+                                                                        title="Last">
+                                                                        <i class="ri-arrow-right-double-line"></i>
+                                                                    </a>
+                                                                </li>
+                        </ul>
+                    </nav>
+                    <% } %>
+            </div>
+        </div>
+
+        <style>
+            .pagination-wrapper {
+                margin-top: 1.5rem;
+                padding-top: 1rem;
+                border-top: 1px solid var(--vz-border-color);
+            }
+
+            .pagination-container {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .pagination-info {
+                font-size: 0.875rem;
+            }
+
+            .page-size-selector {
+                display: flex;
+                align-items: center;
+            }
+
+            .page-size-selector select {
+                width: 80px;
+            }
+
+            .pagination .page-link {
+                color: var(--vz-body-color);
+                background-color: var(--vz-pagination-bg);
+                border-color: var(--vz-border-color);
+                padding: 0.375rem 0.75rem;
+                transition: all 0.2s ease;
+            }
+
+            .pagination .page-link:hover {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border-color: #667eea;
+                transform: translateY(-1px);
+            }
+
+            .pagination .page-item.active .page-link {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-color: #667eea;
+                color: white;
+                box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            }
+
+            .pagination .page-item.disabled .page-link {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            [data-layout-mode="dark"] .pagination .page-link:hover {
+                background: linear-gradient(135deg, #90caf9 0%, #ce93d8 100%);
+                border-color: #90caf9;
+            }
+
+            [data-layout-mode="dark"] .pagination .page-item.active .page-link {
+                background: linear-gradient(135deg, #90caf9 0%, #ce93d8 100%);
+                border-color: #90caf9;
+                box-shadow: 0 2px 8px rgba(144, 202, 249, 0.4);
+            }
+
+            @media (max-width: 768px) {
+                .pagination-container {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+
+                .pagination-info,
+                .page-size-selector {
+                    justify-content: center;
+                }
+
+                nav {
+                    display: flex;
+                    justify-content: center;
+                }
+            }
+        </style>
+        <% } %>

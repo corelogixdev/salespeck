@@ -1,0 +1,229 @@
+<% /** * Reusable Data Table Component * * Usage: * <%- include('../components/partials/data-table', { * columns: [ * {
+    key: 'name' , label: 'Name' , sortable: true }, * { key: 'description' , label: 'Description' , sortable: false }, *
+    { key: 'status' , label: 'Status' , type: 'badge' , sortable: true } * ], * data: brands, * actions: [ * {
+    label: 'Edit' , icon: 'ri-pencil-fill' , class: 'btn-warning' , onclick: 'editRecord' }, * { label: 'Delete' ,
+    icon: 'ri-delete-bin-fill' , class: 'btn-danger' , onclick: 'deleteRecord' } * ], * sortBy: req.query.sortBy, *
+    sortOrder: req.query.sortOrder, * baseUrl: '/brands' * }) %>
+    */
+
+    const currentSort = typeof sortBy !== 'undefined' ? sortBy : '';
+    const currentOrder = typeof sortOrder !== 'undefined' ? sortOrder : 'asc';
+
+    function getSortUrl(column) {
+    const params = new URLSearchParams(typeof query !== 'undefined' ? query : {});
+
+    if (currentSort === column && currentOrder === 'asc') {
+    params.set('sortOrder', 'desc');
+    } else {
+    params.set('sortOrder', 'asc');
+    }
+
+    params.set('sortBy', column);
+    params.delete('page'); // Reset to first page when sorting
+
+    return `${baseUrl}?${params.toString()}`;
+    }
+
+    function getSortIcon(column) {
+    if (currentSort !== column) return 'ri-arrow-up-down-line';
+    return currentOrder === 'asc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line';
+    }
+    %>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle mb-0 data-table">
+            <thead class="table-header">
+                <tr>
+                    <% columns.forEach(col=> { %>
+                        <th scope="col" class="<%= col.class || '' %>">
+                            <% if (col.sortable) { %>
+                                <a href="<%= getSortUrl(col.key) %>" class="sort-link">
+                                    <%= col.label %>
+                                        <i class="<%= getSortIcon(col.key) %> ms-1"></i>
+                                </a>
+                                <% } else { %>
+                                    <%= col.label %>
+                                        <% } %>
+                        </th>
+                        <% }) %>
+                            <% if (actions && actions.length> 0) { %>
+                                <th scope="col" class="text-end">Actions</th>
+                                <% } %>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (!data || data.length===0) { %>
+                    <tr>
+                        <td colspan="<%= columns.length + (actions && actions.length > 0 ? 1 : 0) %>"
+                            class="text-center py-4">
+                            <div class="empty-state">
+                                <i class="ri-inbox-line"></i>
+                                <p class="mb-0">No records found</p>
+                            </div>
+                        </td>
+                    </tr>
+                    <% } else { %>
+                        <% data.forEach(row=> { %>
+                            <tr>
+                                <% columns.forEach(col=> { %>
+                                    <td class="<%= col.tdClass || '' %>">
+                                        <% if (col.type==='badge' ) { %>
+                                            <% const value=row[col.key]; const badgeClass=col.badgeMap ?
+                                                col.badgeMap[value] || 'secondary' : (value ? 'success' : 'danger' );
+                                                const badgeText=col.textMap ? col.textMap[value] : (value ? 'Active'
+                                                : 'Inactive' ); %>
+                                                <span class="badge bg-<%= badgeClass %>">
+                                                    <%= badgeText %>
+                                                </span>
+                                                <% } else if (col.render) { %>
+                                                    <%- col.render(row) %>
+                                                        <% } else { %>
+                                                            <%= row[col.key] || '-' %>
+                                                                <% } %>
+                                    </td>
+                                    <% }) %>
+                                        <% if (actions && actions.length> 0) { %>
+                                            <td class="text-end">
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <% actions.forEach(action=> { %>
+                                                        <% const rowId=row.id || row[action.idKey || 'id' ]; %>
+                                                            <button type="button"
+                                                                class="btn <%= action.class %> action-btn"
+                                                                data-action="<%= action.onclick %>"
+                                                                data-row-id="<%= rowId %>" title="<%= action.label %>">
+                                                                <i class="<%= action.icon %>"></i>
+                                                            </button>
+                                                            <% }) %>
+                                                </div>
+                                            </td>
+                                            <% } %>
+                            </tr>
+                            <% }) %>
+                                <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <style>
+        .data-table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .table-header th {
+            border: none;
+            padding: 0.95rem 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .table-header th:first-child {
+            border-top-left-radius: 8px;
+        }
+
+        .table-header th:last-child {
+            border-top-right-radius: 8px;
+        }
+
+        .table-header .sort-link {
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .table-header .sort-link:hover {
+            opacity: 0.85;
+            text-decoration: underline;
+        }
+
+        .table-header .sort-link i {
+            font-size: 0.9rem;
+        }
+
+        .data-table tbody tr {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid var(--vz-border-color);
+        }
+
+        .data-table tbody tr:hover {
+            background-color: rgba(102, 126, 234, 0.05);
+            transform: scale(1.01);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .data-table tbody td {
+            padding: 0.85rem 1rem;
+            vertical-align: middle;
+        }
+
+        .empty-state {
+            padding: 2rem;
+            color: var(--vz-gray-600);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            opacity: 0.3;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .btn-group-sm>.btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        /* Dark Mode */
+        [data-layout-mode="dark"] .table-header {
+            background: linear-gradient(135deg, #1a237e 0%, #4a148c 100%);
+        }
+
+        [data-layout-mode="dark"] .data-table tbody tr:hover {
+            background-color: rgba(144, 202, 249, 0.08);
+        }
+
+        [data-layout-mode="dark"] .empty-state {
+            color: var(--vz-gray-400);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .table-responsive {
+                border-radius: 8px;
+                overflow-x: auto;
+            }
+
+            .data-table {
+                min-width: 700px;
+            }
+        }
+    </style>
+
+    <script>
+        // Attach click handlers to action buttons
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.action-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const actionName = this.getAttribute('data-action');
+                    const rowId = this.getAttribute('data-row-id');
+
+                    // Call the function if it exists in the global scope
+                    if (typeof window[actionName] === 'function') {
+                        window[actionName](rowId);
+                    } else {
+                        console.error('Function not found:', actionName);
+                    }
+                });
+            });
+        });
+    </script>

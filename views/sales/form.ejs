@@ -1,17 +1,17 @@
 <!-- Tab Bar -->
-<div class="card mb-3">
-    <div class="card-body p-2">
-        <ul class="nav nav-tabs nav-tabs-custom mb-0" id="sale-tabs" role="tablist">
+<div class="tab-bar-container">
+    <div class="tab-bar-content">
+        <ul class="nav nav-tabs nav-tabs-custom mb-0 border-0" id="sale-tabs" role="tablist">
             <!-- Tabs will be dynamically added here -->
         </ul>
-        <button class="btn btn-sm btn-primary mt-2" id="new-sale-tab-btn">
-            <i class="ri-add-line"></i> New Sale
+        <button class="btn btn-primary new-sale-btn" id="new-sale-tab-btn" title="New Sale">
+            <i class="ri-add-line"></i>
         </button>
     </div>
 </div>
 
 <!-- Tab Content Container -->
-<div id="sale-tab-content-container" style="height: 85vh; margin-top: -14px;">
+<div id="sale-tab-content-container" style="height: 85vh; margin-top: -7px;">
     <!-- Tab content will be dynamically added here -->
 </div>
 
@@ -89,9 +89,115 @@
         white-space: nowrap;
     }
 
+    /* Tab Bar Container */
+    .tab-bar-container {
+        background: #f8f9fa;
+        border-radius: 16px;
+        margin: 10px 0px 15px 0px;
+        padding: 6px 10px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        height: 40px;
+        display: flex;
+        align-items: center;
+    }
+
+    [data-layout-mode="dark"] .tab-bar-container {
+        background: #1e2327;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .tab-bar-content {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Circular New Sale Button */
+    .new-sale-btn {
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        min-height: 30px;
+        border-radius: 50%;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+
+    .new-sale-btn:hover {
+        transform: scale(1.1) translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+    }
+
+    .new-sale-btn i {
+        font-size: 18px;
+        color: white;
+    }
+
+    /* Tabs Container */
+    #sale-tabs {
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        height: 36px;
+        display: flex;
+        align-items: center;
+    }
+
+    #sale-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    #sale-tabs .nav-item {
+        flex-shrink: 0;
+        transform: skewX(-26deg);
+    }
+
+    #sale-tabs .nav-item:first-child {
+        margin-left: 8px;
+    }
+
     .nav-tabs .nav-link {
         position: relative;
-        padding-right: 30px;
+        padding: 6px 32px 6px 12px;
+        height: 26px;
+        display: flex;
+        align-items: center;
+        font-size: 0.8rem;
+        border-radius: 0px;
+        margin-right: 10px;
+        background: rgba(255, 255, 255, 0.6);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+    }
+
+    [data-layout-mode="dark"] .nav-tabs .nav-link {
+        background: rgba(42, 47, 52, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-tabs .nav-link.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+    }
+
+    .nav-tabs .nav-link:hover:not(.active) {
+        background: rgba(102, 126, 234, 0.1);
+        transform: translateY(-1px);
     }
 
     .tab-close-btn {
@@ -101,15 +207,237 @@
         transform: translateY(-50%);
         background: none;
         border: none;
-        font-size: 16px;
+        font-size: 14px;
         cursor: pointer;
         padding: 0 4px;
         opacity: 0.6;
+        color: inherit;
+        transition: all 0.2s ease;
     }
 
     .tab-close-btn:hover {
         opacity: 1;
-        color: var(--vz-danger);
+        color: #dc3545;
+        transform: translateY(-50%) scale(1.2);
+    }
+
+    .nav-link.active .tab-close-btn {
+        color: white;
+    }
+
+    .nav-link.active .tab-close-btn:hover {
+        color: #ffcccc;
+    }
+
+
+
+    /* Search Mode Toggle Button Styling */
+    .search-mode-toggle {
+        height: 38px;
+    }
+
+    .search-mode-toggle .btn {
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.375rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        border-width: 2px;
+        min-width: 80px;
+    }
+
+    .search-mode-toggle .btn:first-of-type {
+        border-top-left-radius: 12px;
+        border-bottom-left-radius: 12px;
+    }
+
+    .search-mode-toggle .btn:last-of-type {
+        border-top-right-radius: 12px;
+        border-bottom-right-radius: 12px;
+    }
+
+    .search-mode-toggle .btn-check:checked+.btn-outline-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: #667eea;
+        color: white;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    .search-mode-toggle .btn-check:checked+.btn-outline-secondary {
+        background: #6c757d;
+        border-color: #6c757d;
+        color: white;
+        box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+    }
+
+    .search-mode-toggle .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Compact Toggle Button (Inline with Label) */
+    .search-mode-toggle-compact {
+        height: 24px;
+    }
+
+    .search-mode-toggle-compact .btn {
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.2rem 0.6rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        border-width: 1.5px;
+        min-width: 60px;
+    }
+
+    .search-mode-toggle-compact .btn:first-of-type {
+        border-top-left-radius: 8px;
+        border-bottom-left-radius: 8px;
+    }
+
+    .search-mode-toggle-compact .btn:last-of-type {
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+
+    .search-mode-toggle-compact .btn-check:checked+.btn-outline-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: #667eea;
+        color: white;
+        box-shadow: 0 1px 4px rgba(102, 126, 234, 0.3);
+    }
+
+    .search-mode-toggle-compact .btn-check:checked+.btn-outline-secondary {
+        background: #6c757d;
+        border-color: #6c757d;
+        color: white;
+        box-shadow: 0 1px 4px rgba(108, 117, 125, 0.3);
+    }
+
+    .search-mode-toggle-compact .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Digital Clock Styling */
+    .digital-clock-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .digital-clock {
+        background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+        border-radius: 12px;
+        padding: 0.5rem 1rem;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        width: 100%;
+    }
+
+    [data-layout-mode="dark"] .digital-clock {
+        background: linear-gradient(135deg, #1a237e 0%, #4a148c 100%);
+        border: 1px solid rgba(102, 126, 234, 0.3);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .clock-time {
+        display: block;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #667eea;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 3px;
+        line-height: 1.2;
+    }
+
+    [data-layout-mode="dark"] .clock-time {
+        color: #90caf9;
+    }
+
+    .clock-date {
+        display: block;
+        font-size: 0.8rem;
+        color: #666;
+        margin-top: 0.15rem;
+        font-weight: 500;
+    }
+
+    [data-layout-mode="dark"] .clock-date {
+        color: #b39ddb;
+    }
+
+    /* Glowing Total Bill Styling */
+    .total-bill-section {
+        padding: 0.75rem;
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+        border: 2px solid rgba(102, 126, 234, 0.2);
+    }
+
+    [data-layout-mode="dark"] .total-bill-section {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        border: 2px solid rgba(102, 126, 234, 0.3);
+    }
+
+    .glowing-bill {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.6));
+        animation: pulse-glow 2s ease-in-out infinite;
+        letter-spacing: 1px;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    [data-layout-mode="dark"] .glowing-bill {
+        background: linear-gradient(135deg, #90caf9 0%, #ce93d8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        filter: drop-shadow(0 0 15px rgba(144, 202, 249, 0.8)) drop-shadow(0 0 25px rgba(206, 147, 216, 0.5));
+    }
+
+    @keyframes pulse-glow {
+
+        0%,
+        100% {
+            filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.6));
+            transform: scale(1);
+        }
+
+        50% {
+            filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.9)) drop-shadow(0 0 30px rgba(118, 75, 162, 0.6));
+            transform: scale(1.02);
+        }
+    }
+
+    [data-layout-mode="dark"] .glowing-bill {
+        animation: pulse-glow-dark 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-glow-dark {
+
+        0%,
+        100% {
+            filter: drop-shadow(0 0 15px rgba(144, 202, 249, 0.8)) drop-shadow(0 0 25px rgba(206, 147, 216, 0.5));
+            transform: scale(1);
+        }
+
+        50% {
+            filter: drop-shadow(0 0 25px rgba(144, 202, 249, 1)) drop-shadow(0 0 35px rgba(206, 147, 216, 0.8));
+            transform: scale(1.02);
+        }
     }
 </style>
 
@@ -123,12 +451,35 @@
     // Initialize first tab on page load
     document.addEventListener('DOMContentLoaded', () => {
         createNewTab();
-        
+
         // New Sale button handler
         document.getElementById('new-sale-tab-btn').addEventListener('click', () => {
             createNewTab();
         });
+
+        // Initialize clock updates
+        updateAllClocks();
+        setInterval(updateAllClocks, 1000);
     });
+
+    // Update all visible clocks
+    function updateAllClocks() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', { hour12: false });
+        const dateString = now.toLocaleDateString('en-US', {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+
+        document.querySelectorAll('.digital-clock').forEach(clock => {
+            const timeEl = clock.querySelector('.clock-time');
+            const dateEl = clock.querySelector('.clock-date');
+            if (timeEl) timeEl.textContent = timeString;
+            if (dateEl) dateEl.textContent = dateString;
+        });
+    }
 
     function createNewTab() {
         tabCounter++;
@@ -204,69 +555,49 @@
 
     function getTabContentHTML(tabId) {
         return `
-            <div class="row justify-content-between flex-wrap mt-0" style="height: 100%;">
-                <div class="col-lg-6">
+            <div class="row g-2 mt-0" style="height: 100%;">
+                <!-- Left Column: Product Search (25%) -->
+                <div class="col-lg-3">
                     <div class="card h-100">
-                        <div class="card-body d-flex flex-column justify-content-between">
-                            <div class="mb-4" id="search-product-sales-page-search-seaction-${tabId}" style="position: relative;">
-                                <label for="product-search-${tabId}" class="form-label text-muted text-uppercase fw-semibold">Search Product</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" id="product-search-${tabId}" placeholder="Enter product name or barcode">
-                                    <div class="input-group-text">
-                                        <div class="form-check mb-0">
-                                            <input type="checkbox" class="form-check-input" checked id="search-barcode-${tabId}">
-                                            <label class="form-check-label">Barcode</label>
-                                        </div>
+                        <div class="card-body d-flex flex-column" style="height: 100%;">
+                            <div id="search-product-sales-page-search-seaction-${tabId}" style="position: relative;">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label for="product-search-${tabId}" class="form-label text-muted text-uppercase fw-semibold mb-0">Search Product</label>
+                                    <div class="btn-group btn-group-sm search-mode-toggle-compact" role="group">
+                                        <input type="radio" class="btn-check" name="search-mode-${tabId}" id="search-manual-${tabId}" autocomplete="off">
+                                        <label class="btn btn-outline-secondary" for="search-manual-${tabId}">Manual</label>
+                                        
+                                        <input type="radio" class="btn-check" name="search-mode-${tabId}" id="search-barcode-${tabId}" autocomplete="off" checked>
+                                        <label class="btn btn-outline-primary" for="search-barcode-${tabId}">Barcode</label>
                                     </div>
                                 </div>
-                                <small class="text-warning">
+                                <input type="text" class="form-control mb-2" id="product-search-${tabId}" placeholder="Enter product name or barcode">
+                                <small class="text-warning d-block mb-3">
                                     Out of stock or products with inactive sales won't appear in search results.
                                 </small>
                                 <div id="search-results-${tabId}" class="shadow-lg rounded p-3 d-none" style="position: absolute; width: 100%; z-index: 9999;"></div>
                             </div>
-
-                            <div class="pt-3">
-                                <div class="mb-3">
-                                    <label for="customer-${tabId}" class="form-label text-muted text-uppercase fw-semibold">Customer</label>
-                                    <select id="customer-${tabId}" class="form-select select2" data-placeholder="Select Customer">
-                                        <option value="">Select Customer</option>
-                                    </select>
-                                </div>
-
-                                <div class="row g-3">
-                                    <div class="col-12">
-                                        <label class="form-label text-muted text-uppercase fw-semibold">Total Bill</label>
-                                        <h4 id="total-bill-amount-${tabId}" class="mb-0">Rs.0.00</h4>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label for="discountpercentage-${tabId}" class="form-label text-muted text-uppercase fw-semibold">Discount %</label>
-                                        <input type="number" class="form-control" id="discountpercentage-${tabId}" value="0">
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label for="total-payment-${tabId}" class="form-label text-muted text-uppercase fw-semibold">Payment</label>
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" id="total-payment-${tabId}">
-                                            <div class="input-group-text">
-                                                <div class="form-check mb-0">
-                                                    <input type="checkbox" class="form-check-input" id="ledger-${tabId}">
-                                                    <label class="form-check-label">Ledger</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <label class="form-label text-muted text-uppercase fw-semibold">Change</label>
-                                        <h4 id="change-${tabId}" class="mb-0 text-success">Rs.0.00</h4>
-                                    </div>
+                            
+                            <!-- Spacer to push clock and button to bottom -->
+                            <div class="flex-grow-1"></div>
+                            
+                            <!-- Digital Clock -->
+                            <div class="digital-clock-container mb-3">
+                                <div class="digital-clock" id="digital-clock-${tabId}">
+                                    <span class="clock-time">00:00:00</span>
+                                    <span class="clock-date">Loading...</span>
                                 </div>
                             </div>
+                            
+                            <!-- Complete Sale Button -->
+                            <button class="btn btn-primary w-100 mb-2" onclick="completeSale('${tabId}')" style="padding: 0.75rem;">
+                                <i class="ri-check-double-line me-2"></i>Complete Sale
+                            </button>
                         </div>
                     </div>
                 </div>
 
+                <!-- Middle Column: Selected Products (50%) -->
                 <div class="col-lg-6">
                     <div class="card h-100">
                         <div class="card-header align-items-center d-flex">
@@ -289,10 +620,51 @@
                                     <tbody id="selected-products-${tabId}"></tbody>
                                 </table>
                             </div>
-                            <div class="mt-3">
-                                <button class="btn btn-primary w-100" onclick="completeSale('${tabId}')">
-                                    Complete Sale
-                                </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Billing Information (25%) -->
+                <div class="col-lg-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="mb-4 total-bill-section">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-label text-muted text-uppercase fw-semibold mb-0">Total Bill</label>
+                                    <h2 id="total-bill-amount-${tabId}" class="mb-0 glowing-bill">Rs.0.00</h2>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label for="discountpercentage-${tabId}" class="form-label text-muted text-uppercase fw-semibold mb-0">Discount %</label>
+                                    <input type="number" class="form-control form-control-sm inline-input" id="discountpercentage-${tabId}" value="0" style="width: 100px;">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label for="total-payment-${tabId}" class="form-label text-muted text-uppercase fw-semibold mb-0">Payment</label>
+                                    <input type="number" class="form-control form-control-sm inline-input" id="total-payment-${tabId}" style="width: 120px;">
+                                </div>
+                                <div class="form-check mt-2 ms-2">
+                                    <input type="checkbox" class="form-check-input" id="ledger-${tabId}">
+                                    <label class="form-check-label text-muted" for="ledger-${tabId}">Ledger</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-label text-muted text-uppercase fw-semibold mb-0">Change</label>
+                                    <h4 id="change-${tabId}" class="mb-0 text-success">Rs.0.00</h4>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="customer-${tabId}" class="form-label text-muted text-uppercase fw-semibold">Customer</label>
+                                <select id="customer-${tabId}" class="form-select select2" data-placeholder="Select Customer">
+                                    <option value="">Select Customer</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -328,7 +700,7 @@
 
     function closeTab(tabId, event) {
         event.stopPropagation();
-        
+
         if (saleTabs.length <= 1) {
             toastr.warning('At least one sale tab must remain open');
             return;
@@ -360,7 +732,8 @@
 
         if (!productSearch) return;
 
-        // Update placeholder
+        // Update placeholder based on radio button selection
+        const searchManual = document.getElementById(`search-manual-${tabId}`);
         function updatePlaceholder() {
             if (searchBarcode.checked) {
                 productSearch.placeholder = 'Scan or enter product barcode';
@@ -370,6 +743,7 @@
         }
         updatePlaceholder();
         searchBarcode.addEventListener('change', updatePlaceholder);
+        searchManual.addEventListener('change', updatePlaceholder);
 
         // Product search handlers
         productSearch.addEventListener('keydown', async (event) => {

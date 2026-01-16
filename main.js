@@ -3,7 +3,13 @@ const fs = require('fs');
 require('dotenv').config();
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 require('./server/app'); // DON'T REMOVE THIS. THIS LINKS TO THE EXPRESS APP
-const { autoUpdater } = require('electron-updater');
+// Defer autoUpdater requirement to after app is ready or inside a try-catch
+let autoUpdater;
+try {
+  autoUpdater = require('electron-updater').autoUpdater;
+} catch (e) {
+  console.error('AutoUpdater load error:', e.message);
+}
 const config = require('./installEnv.js'); // Link to the Express app
 const logi = require('./utils/logi.js');
 
@@ -30,6 +36,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 900,
+    icon: path.join(__dirname, 'assets', 'images', 'icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false, // Disable Node.js integration in renderer process

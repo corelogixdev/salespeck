@@ -1,0 +1,327 @@
+/**
+ * Responsive Sidebar Menu Styles
+ * Transforms horizontal navigation into vertical sidebar on narrow screens
+ */
+
+/* ============================================
+   Hamburger Toggle Button
+   ============================================ */
+
+.hamburger-icon {
+    display: none;
+    z-index: 1001;
+}
+
+/* Show hamburger on screens ≤ 1200px */
+@media (max-width: 1200px) {
+    .hamburger-icon {
+        display: inline-flex !important;
+    }
+
+    /* Ensure header stays on top of sidebar */
+    #page-topbar {
+        position: relative;
+        z-index: 1000 !important;
+    }
+}
+
+/* ============================================
+   Responsive Navigation Wrapper
+   ============================================ */
+
+@media (max-width: 1200px) {
+
+    /* Transform horizontal menu to vertical sidebar */
+    #scrollbar.navbar-menu {
+        position: fixed !important;
+        left: 0;
+        top: 0;
+        /* Start from top */
+        padding-top: 70px;
+        /* Add padding for header */
+        height: 100vh !important;
+        width: 260px !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1) !important;
+        transform: translateX(-260px);
+        /* Hidden by default */
+        transition: transform 0.3s ease, width 0.3s ease !important;
+        z-index: 999;
+        /* Below header but above content */
+        overflow-y: auto;
+        overflow-x: hidden;
+        margin-top: 0 !important;
+    }
+
+    [data-layout-mode="dark"] #scrollbar.navbar-menu {
+        background: rgba(42, 47, 58, 0.95) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        box-shadow: 2px 0 15px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    /* Show sidebar when active */
+    #scrollbar.navbar-menu.show {
+        transform: translateX(0) !important;
+    }
+
+    /* Collapsed mode (icon-only) */
+    #scrollbar.navbar-menu.collapsed {
+        width: 70px !important;
+        transform: translateX(0) !important;
+    }
+
+    /* Vertical navigation layout */
+    #navbar-nav {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        padding: 1rem 0 !important;
+    }
+
+    /* Menu items styling */
+    #navbar-nav .nav-item {
+        width: 100%;
+    }
+
+    #navbar-nav .nav-link {
+        display: flex !important;
+        align-items: center;
+        padding: 0.75rem 1.25rem !important;
+        width: 100%;
+        white-space: nowrap;
+        transition: all 0.2s ease !important;
+        cursor: pointer !important;
+        pointer-events: auto !important;
+        text-decoration: none !important;
+        color: inherit !important;
+    }
+
+    #navbar-nav .nav-link i {
+        font-size: 20px;
+        min-width: 24px;
+        margin-right: 12px;
+        transition: margin 0.3s ease;
+    }
+
+    /* Ensure text is visible by default */
+    #navbar-nav .nav-link span {
+        opacity: 1;
+        visibility: visible;
+        display: inline;
+    }
+
+    /* Hide text in collapsed mode */
+    #scrollbar.navbar-menu.collapsed .nav-link span {
+        opacity: 0;
+        visibility: hidden;
+        width: 0;
+        overflow: hidden;
+        transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+
+    #scrollbar.navbar-menu.collapsed .nav-link i {
+        margin-right: 0;
+    }
+
+    /* Menu title */
+    .menu-title {
+        padding: 0.5rem 1.25rem;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: #878a99;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    #scrollbar.navbar-menu.collapsed .menu-title {
+        display: none;
+    }
+
+    /* Dropdown menus */
+    .menu-dropdown {
+        position: static !important;
+        width: 100% !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        padding-left: 2rem !important;
+        display: block !important;
+        /* Ensure dropdowns can be shown */
+    }
+
+    /* Make dropdown items visible when parent is expanded */
+    .menu-dropdown.show {
+        display: block !important;
+    }
+
+    #scrollbar.navbar-menu.collapsed .menu-dropdown {
+        position: absolute !important;
+        left: 70px !important;
+        top: 0 !important;
+        width: 200px !important;
+        background: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: blur(10px) !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+        border-radius: 8px;
+        padding: 0.5rem 0 !important;
+        z-index: 1001;
+    }
+
+    [data-layout-mode="dark"] #scrollbar.navbar-menu.collapsed .menu-dropdown {
+        background: rgba(42, 47, 58, 0.98) !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    /* Hover effects */
+    #navbar-nav .nav-link:hover {
+        background: rgba(102, 126, 234, 0.1) !important;
+        color: #667eea !important;
+        padding-left: 1.5rem !important;
+    }
+
+    [data-layout-mode="dark"] #navbar-nav .nav-link:hover {
+        background: rgba(102, 126, 234, 0.2) !important;
+    }
+
+    #scrollbar.navbar-menu.collapsed .nav-link:hover {
+        padding-left: 1.25rem !important;
+    }
+
+    /* Active menu item */
+    #navbar-nav .nav-link.active {
+        background: linear-gradient(90deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%) !important;
+        color: #667eea !important;
+        border-left: 3px solid #667eea;
+    }
+
+    /* Submenu items */
+    .menu-dropdown .nav-link {
+        padding: 0.5rem 1rem !important;
+        font-size: 0.875rem;
+    }
+
+    /* Mobile overlay backdrop */
+    @media (max-width: 768px) {
+        #scrollbar.navbar-menu::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: -1;
+        }
+
+        #scrollbar.navbar-menu.show::before {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #scrollbar.navbar-menu.collapsed {
+            transform: translateX(-260px) !important;
+        }
+
+        #scrollbar.navbar-menu.show {
+            transform: translateX(0) !important;
+        }
+    }
+}
+
+/* ============================================
+   Desktop Mode (> 1200px) - Keep Horizontal
+   ============================================ */
+
+@media (min-width: 1201px) {
+
+    /* Horizontal layout remains unchanged */
+    #scrollbar.navbar-menu {
+        position: static !important;
+        width: 100% !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+    }
+
+    #navbar-nav {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+    }
+}
+
+/* ============================================
+   Smooth Scrollbar for Sidebar
+   ============================================ */
+
+@media (max-width: 1200px) {
+    #scrollbar.navbar-menu::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    #scrollbar.navbar-menu::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+    }
+
+    #scrollbar.navbar-menu::-webkit-scrollbar-thumb {
+        background: rgba(102, 126, 234, 0.3);
+        border-radius: 10px;
+    }
+
+    #scrollbar.navbar-menu::-webkit-scrollbar-thumb:hover {
+        background: rgba(102, 126, 234, 0.5);
+    }
+}
+
+/* ============================================
+   Animation Classes
+   ============================================ */
+
+.sidebar-transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* ============================================
+   Content Adjustment
+   ============================================ */
+
+@media (max-width: 1200px) {
+
+    /* Adjust main content when sidebar is expanded */
+    #layout-wrapper {
+        transition: padding-left 0.3s ease;
+    }
+
+    .sidebar-expanded #layout-wrapper {
+        padding-left: 0;
+        /* No shift on small screens */
+    }
+}
+
+/* ============================================
+   Collapsed Mode Tooltip (Optional Enhancement)
+   ============================================ */
+
+#scrollbar.navbar-menu.collapsed .nav-item {
+    position: relative;
+}
+
+#scrollbar.navbar-menu.collapsed .nav-link {
+    justify-content: center;
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+
+@media print {
+
+    .hamburger-icon,
+    #scrollbar.navbar-menu {
+        display: none !important;
+    }
+}

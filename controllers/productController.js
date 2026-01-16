@@ -1,46 +1,113 @@
 const { Op } = require('sequelize');
 const db = require('../models');
 const { findLike } = require('../utils/searchquery');
-const { getPagination, getPagingData } = require('../utils/pagination');
+const { getPaginationMeta, buildSortClause, sanitizeFilters } = require('../utils/paginationHelper');
 
 exports.index = async (req, res) => {
   try {
-    const { name, barcode, category } = req.body;
-    let whereClause = {};
+    const query = req.query;
 
-    if (name) {
-      whereClause.name = { [Op.like]: `%${name}%` };
-    }
-    if (barcode) {
-      whereClause.barcode = { [Op.like]: `%${barcode}%` };
-    }
-    if (category) {
-      whereClause.category = { [Op.like]: `%${category}%` };
-    }
-    
-    const page = parseInt(req.query.page) || parseInt(req.body.page) || 1;
-    const { limit, offset } = getPagination(page, 10);
+    // Pagination parameters
+    const page = parseInt(query.page) || 1;
+    const pageSize = parseInt(query.pageSize) || 50; // Default 50 for products
 
+    // Build comprehensive filter
+    const whereClause = {};
+
+    // Name filter (partial match)
+    if (query.name) {
+      whereClause.name = { [Op.like]: `%${query.name}%` };
+    }
+
+    // Barcode filter (exact match recommended for performance)
+    if (query.barcode) {
+      whereClause.barcode = query.barcode;
+    }
+
+    // Category filter
+    if (query.category) {
+      whereClause.category = { [Op.like]: `%${query.category}%` };
+    }
+
+    // Brand filter
+    if (query.brand) {
+      whereClause.brand = { [Op.like]: `%${query.brand}%` };
+    }
+
+    // Price range filters
+    if (query.price_min) {
+      whereClause.saleprice = whereClause.saleprice || {};
+      whereClause.saleprice[Op.gte] = parseFloat(query.price_min);
+    }
+    if (query.price_max) {
+      whereClause.saleprice = whereClause.saleprice || {};
+      whereClause.saleprice[Op.lte] = parseFloat(query.price_max);
+    }
+
+    // Stock status filter
+    if (query.stock_status) {
+      if (query.stock_status === 'out_of_stock') {
+        whereClause.quantity = 0;
+      } else if (query.stock_status === 'low_stock') {
+        whereClause.quantity = { [Op.gt]: 0, [Op.lt]: 10 };
+      } else if (query.stock_status === 'in_stock') {
+        whereClause.quantity = { [Op.gte]: 10 };
+      }
+    }
+
+    // Active status filters
+    if (query.sale_active !== undefined && query.sale_active !== '') {
+      whereClause.saleactive = query.sale_active === '1';
+    }
+    if (query.purchase_active !== undefined && query.purchase_active !== '') {
+      whereClause.purchaseactive = query.purchase_active === '1';
+    }
+
+    // Sort parameters
+    const sortBy = query.sortBy || 'id';
+    const sortOrder = query.sortOrder || 'desc';
+    const order = buildSortClause(sortBy, sortOrder, 'id');
+
+    // Get total count and paginated data
     const { count, rows: data } = await db.product.findAndCountAll({
       where: whereClause,
-      order: [['id', 'DESC']],
-      limit,
-      offset
+      order,
+      limit: pageSize,
+      offset: (page - 1) * pageSize
     });
-    
-    const pagination = getPagingData(count, page, limit);
 
-    res.render('products/index', { 
-      title: "Products", 
+    // Generate pagination metadata
+    const pagination = getPaginationMeta(page, pageSize, count);
+
+    // Get brands and categories for filters
+    const brands = await db.brand.findAll({
+      where: { status: true },
+      attributes: ['id', 'name'],
+      order: [['name', 'ASC']]
+    });
+
+    const categories = await db.category.findAll({
+      where: { status: true },
+      attributes: ['id', 'name'],
+      order: [['name', 'ASC']]
+    });
+
+    res.render('products/index', {
+      title: "Products",
       data,
-      searchParams: req.body,
-      pagination
+      searchParams: query,
+      pagination,
+      query,
+      sortBy,
+      sortOrder,
+      brands,
+      categories
     });
   } catch (error) {
     console.error('Error fetching products:', error);
-    req.session.message = { 
-      type: "error", 
-      text: "An error occurred while fetching products." 
+    req.session.message = {
+      type: "error",
+      text: "An error occurred while fetching products."
     };
     res.redirect("/dashboard");
   }
@@ -79,13 +146,13 @@ exports.form = async (req, res) => {
         ]
       });
     }
-    
-    res.render('products/form', { 
-      title: data ? 'Edit product' : 'Create product', 
-      product: data, 
+
+    res.render('products/form', {
+      title: data ? 'Edit product' : 'Create product',
+      product: data,
       taxes,
       brands,
-      categories 
+      categories
     });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Internal Server Error' });
@@ -95,7 +162,7 @@ exports.form = async (req, res) => {
 exports.save = async (req, res) => {
   var body = req.body;
   let id = body.id;
-  
+
   try {
     const product = await db.product.findOne({ where: { name: body.name } });
     if (product && product.id != id) {
@@ -129,7 +196,7 @@ exports.save = async (req, res) => {
     } else {
       await db.product.create(data);
     }
-    
+
     res.send({ success: true, message: 'Product saved successfully' });
   } catch (error) {
     console.error('Error saving product:', error);
@@ -140,7 +207,7 @@ exports.save = async (req, res) => {
 exports.delete = async (req, res) => {
   try {
     let alreadyInSale = await db.soldproducts.findOne({ where: { product: req.params.id } });
-    if(alreadyInSale) {
+    if (alreadyInSale) {
       return res.status(400).json({ success: false, message: 'You cannot delete a product that is already in sale' });
     }
     await db.product.destroy({ where: { id: req.params.id } });
@@ -173,8 +240,8 @@ exports.quantityForm = async (req, res) => {
     if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
-    res.render('products/quantity-form', { 
-      title: 'Add Product Quantity', 
+    res.render('products/quantity-form', {
+      title: 'Add Product Quantity',
       product,
       hidenav: true,
       type
@@ -186,11 +253,11 @@ exports.quantityForm = async (req, res) => {
 
 exports.saveQuantity = async (req, res) => {
   let { id, quantity, note, expirydate } = req.body;
-  
+
   if (!quantity || isNaN(quantity)) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Please enter a valid quantity' 
+    return res.status(400).json({
+      success: false,
+      message: 'Please enter a valid quantity'
     });
   }
 
@@ -202,9 +269,9 @@ exports.saveQuantity = async (req, res) => {
     const product = await db.product.findByPk(id);
     quantity = quantity * 1;
     if (!product) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Product not found' 
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found'
       });
     }
 
@@ -228,19 +295,19 @@ exports.saveQuantity = async (req, res) => {
         quantity: quantity,
         expirydate: expirydate
       });
-    }else{
+    } else {
       let batches = await db.productbatches.findAll({
         where: { product: id },
         order: [['createdAt', 'ASC']]
       });
-      let iteration=0,reducedQuantity=0, absquantity = Math.abs(quantity);
-      while(reducedQuantity !== absquantity && iteration < batches.length){
+      let iteration = 0, reducedQuantity = 0, absquantity = Math.abs(quantity);
+      while (reducedQuantity !== absquantity && iteration < batches.length) {
         let batch = batches[iteration];
-        if(batch.quantity > absquantity){
+        if (batch.quantity > absquantity) {
           batch.quantity -= absquantity;
           reducedQuantity += absquantity;
           await batch.save();
-        }else{
+        } else {
           reducedQuantity += batch.quantity;
           await batch.destroy();
         }
@@ -248,15 +315,15 @@ exports.saveQuantity = async (req, res) => {
       }
     }
 
-    res.json({ 
-      success: true, 
-      message: 'Product quantity updated successfully' 
+    res.json({
+      success: true,
+      message: 'Product quantity updated successfully'
     });
   } catch (error) {
     console.error('Error updating quantity:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Internal Server Error' 
+    res.status(500).json({
+      success: false,
+      message: 'Internal Server Error'
     });
   }
 };

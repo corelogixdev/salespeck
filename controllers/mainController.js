@@ -223,12 +223,21 @@ const registerpost = async (req, res) => {
   try {
     logi("Creating user in local database...");
     const hashedPassword = encrypt.encrypt(req.body.password);
+
+    // Handle profile image if uploaded
+    let profileImageUrl = null;
+    if (req.file) {
+      profileImageUrl = `/uploads/profile-images/${req.file.filename}`;
+      logi("Profile image uploaded:", profileImageUrl);
+    }
+
     let user = await db.user.create({
       ...req.body,
       firstname: req.body.firstName,
       lastname: req.body.lastName,
       password: hashedPassword,
       role: "branchmanager",
+      profile_image_url: profileImageUrl
     });
     logi("BranchManager user created successfully!");
     req.session.message = { type: "success", text: "Registration successful! Please login." };

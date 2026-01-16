@@ -1,9 +1,10 @@
 const router = require("express").Router();
 const mainController = require("../controllers/mainController");
+const upload = require("../middleware/upload");
 router.get("/", mainController.index);
 router.get('/export-db', mainController.exportDb);
 router.get("/register", mainController.registerget);
-router.post("/register", mainController.registerpost);
+router.post("/register", upload.single('profileImage'), mainController.registerpost);
 router.get("/dashboard", mainController.dashboard);
 router.get("/switch-server", mainController.switchServer);
 router.get("/inventorylogs", mainController.inventorylogs);

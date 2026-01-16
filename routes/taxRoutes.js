@@ -1,9 +1,37 @@
 const router = require("express").Router();
 let db = require("../models");
+const { getPaginationMeta, buildSortClause } = require('../utils/paginationHelper');
 
-router.get("/", async (_, res) => {
-  let taxes = await db.taxes.findAll();
-  res.render("accounting/tax/index", { title: "Accounting", taxes });
+router.get("/", async (req, res) => {
+  try {
+    const query = req.query;
+    const page = parseInt(query.page) || 1;
+    const pageSize = parseInt(query.pageSize) || 10;
+
+    const sortBy = query.sortBy || 'id';
+    const sortOrder = query.sortOrder || 'asc';
+    const order = buildSortClause(sortBy, sortOrder, 'id');
+
+    const { count, rows: taxes } = await db.taxes.findAndCountAll({
+      order,
+      limit: pageSize,
+      offset: (page - 1) * pageSize
+    });
+
+    const pagination = getPaginationMeta(page, pageSize, count);
+
+    res.render("accounting/tax/index", {
+      title: "Accounting",
+      taxes,
+      pagination,
+      query,
+      sortBy,
+      sortOrder
+    });
+  } catch (error) {
+    console.error('Error fetching taxes:', error);
+    res.redirect("/dashboard");
+  }
 });
 
 router.post("/save", async (req, res) => {

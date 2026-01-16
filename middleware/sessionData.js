@@ -35,13 +35,13 @@ module.exports = async (req, res, next) => {
         if (!userData) {
             userData = await User.findOne({
                 where: { id: req.session.user_id },
-                attributes: ['id', 'firstname', 'lastname', 'username', 'role'],
+                attributes: ['id', 'firstname', 'lastname', 'username', 'role', 'profile_image_url'],
                 raw: true
             });
 
             if (!userData) {
-              req.session = null;
-              return res.redirect("/login");
+                req.session = null;
+                return res.redirect("/login");
             }
 
             userCache.set(req.session.user_id, userData);
@@ -50,7 +50,7 @@ module.exports = async (req, res, next) => {
         res.locals.isAuthenticated = true;
         res.locals.user = userData;
         res.locals.user_id = userData.id;
-        
+
         // Set dummy permissions object - all features accessible (no permission checks)
         res.locals.permissions = {
             productsList: true,

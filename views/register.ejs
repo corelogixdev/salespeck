@@ -1,5 +1,5 @@
 <style>
-    .page-content{
+    .page-content {
         margin-top: 0px !important;
         margin-bottom: 0 !important;
     }
@@ -21,42 +21,54 @@
                                 </div>
                             </div>
                             <div class="p-1 mt-2">
-                                <form action="/register" method="post">
+                                <form action="/register" method="post" enctype="multipart/form-data">
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="firstName" class="form-label">First Name</label>
-                                            <input type="text" class="form-control <%= locals.errors?.firstName ? 'is-invalid' : '' %>" 
-                                                   id="firstName" name="firstName" placeholder="Enter first name">
+                                            <input type="text"
+                                                class="form-control <%= locals.errors?.firstName ? 'is-invalid' : '' %>"
+                                                id="firstName" name="firstName" placeholder="Enter first name">
                                             <% if (locals.errors?.firstName) { %>
-                                                <div class="invalid-feedback"><%= errors.firstName %></div>
-                                            <% } %>
+                                                <div class="invalid-feedback">
+                                                    <%= errors.firstName %>
+                                                </div>
+                                                <% } %>
                                         </div>
                                         <div class="col-md-6">
                                             <label for="lastName" class="form-label">Last Name</label>
-                                            <input type="text" class="form-control <%= locals.errors?.lastName ? 'is-invalid' : '' %>" 
-                                                   id="lastName" name="lastName" placeholder="Enter last name">
+                                            <input type="text"
+                                                class="form-control <%= locals.errors?.lastName ? 'is-invalid' : '' %>"
+                                                id="lastName" name="lastName" placeholder="Enter last name">
                                             <% if (locals.errors?.lastName) { %>
-                                                <div class="invalid-feedback"><%= errors.lastName %></div>
-                                            <% } %>
+                                                <div class="invalid-feedback">
+                                                    <%= errors.lastName %>
+                                                </div>
+                                                <% } %>
                                         </div>
                                     </div>
 
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="username" class="form-label">Username</label>
-                                            <input type="text" class="form-control <%= locals.errors?.username ? 'is-invalid' : '' %>" 
-                                                   id="username" name="username" placeholder="Enter username" required>
+                                            <input type="text"
+                                                class="form-control <%= locals.errors?.username ? 'is-invalid' : '' %>"
+                                                id="username" name="username" placeholder="Enter username" required>
                                             <% if (locals.errors?.username) { %>
-                                                <div class="invalid-feedback"><%= errors.username %></div>
-                                            <% } %>
+                                                <div class="invalid-feedback">
+                                                    <%= errors.username %>
+                                                </div>
+                                                <% } %>
                                         </div>
                                         <div class="col-md-6">
                                             <label for="email" class="form-label">Email</label>
-                                            <input type="email" class="form-control <%= locals.errors?.email ? 'is-invalid' : '' %>" 
-                                                   id="email" name="email" placeholder="Enter email">
+                                            <input type="email"
+                                                class="form-control <%= locals.errors?.email ? 'is-invalid' : '' %>"
+                                                id="email" name="email" placeholder="Enter email">
                                             <% if (locals.errors?.email) { %>
-                                                <div class="invalid-feedback"><%= errors.email %></div>
-                                            <% } %>
+                                                <div class="invalid-feedback">
+                                                    <%= errors.email %>
+                                                </div>
+                                                <% } %>
                                         </div>
                                     </div>
 
@@ -64,41 +76,66 @@
                                         <div class="col-md-6">
                                             <label class="form-label" for="password">Password</label>
                                             <div class="position-relative auth-pass-inputgroup">
-                                                <input type="password" 
-                                                       class="form-control pe-5 <%= locals.errors?.password ? 'is-invalid' : '' %>" 
-                                                       id="password"
-                                                       name="password" 
-                                                       placeholder="Enter password" 
-                                                       autocomplete="new-password"
-                                                       required>
-                                                <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted" 
-                                                        type="button" 
-                                                        onclick="togglePassword(this)">
+                                                <input type="password"
+                                                    class="form-control pe-5 <%= locals.errors?.password ? 'is-invalid' : '' %>"
+                                                    id="password" name="password" placeholder="Enter password"
+                                                    autocomplete="new-password" required>
+                                                <button
+                                                    class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted"
+                                                    type="button" onclick="togglePassword(this)">
                                                     <i class="ri-eye-fill align-middle"></i>
                                                 </button>
                                                 <% if (locals.errors?.password) { %>
-                                                    <div class="invalid-feedback"><%= errors.password %></div>
-                                                <% } %>
+                                                    <div class="invalid-feedback">
+                                                        <%= errors.password %>
+                                                    </div>
+                                                    <% } %>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <label for="phone" class="form-label">Phone Number</label>
-                                            <input type="tel" class="form-control <%= locals.errors?.phone ? 'is-invalid' : '' %>" 
-                                                   id="phone" name="phone" placeholder="Enter phone number">
+                                            <input type="tel"
+                                                class="form-control <%= locals.errors?.phone ? 'is-invalid' : '' %>"
+                                                id="phone" name="phone" placeholder="Enter phone number">
                                             <% if (locals.errors?.phone) { %>
-                                                <div class="invalid-feedback"><%= errors.phone %></div>
-                                            <% } %>
+                                                <div class="invalid-feedback">
+                                                    <%= errors.phone %>
+                                                </div>
+                                                <% } %>
                                         </div>
                                     </div>
 
                                     <div class="row mb-3">
                                         <div class="col-md-12">
                                             <label for="address" class="form-label">Address</label>
-                                            <textarea class="form-control <%= locals.errors?.address ? 'is-invalid' : '' %>" 
-                                                      id="address" name="address" rows="1" placeholder="Enter address"></textarea>
+                                            <textarea
+                                                class="form-control <%= locals.errors?.address ? 'is-invalid' : '' %>"
+                                                id="address" name="address" rows="1"
+                                                placeholder="Enter address"></textarea>
                                             <% if (locals.errors?.address) { %>
-                                                <div class="invalid-feedback"><%= errors.address %></div>
-                                            <% } %>
+                                                <div class="invalid-feedback">
+                                                    <%= errors.address %>
+                                                </div>
+                                                <% } %>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label for="profileImage" class="form-label">
+                                                Profile Picture <span class="text-muted">(Optional)</span>
+                                            </label>
+                                            <input type="file" class="form-control" id="profileImage"
+                                                name="profileImage" accept="image/jpeg,image/jpg,image/png">
+                                            <div class="form-text">Max size: 5MB. Formats: JPG, JPEG, PNG</div>
+                                            <div class="mt-2" id="imagePreview" style="display: none;">
+                                                <img id="previewImg" src="" alt="Preview"
+                                                    style="max-width: 150px; max-height: 150px; border-radius: 8px; border: 2px solid #ddd;">
+                                                <button type="button" class="btn btn-sm btn-danger ms-2"
+                                                    onclick="removeImage()">
+                                                    <i class="ri-delete-bin-line"></i> Remove
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -118,7 +155,8 @@
                                     </div>
                                     <div class="col-6 text-end">
                                         <p class="mb-0 text-muted">
-                                            Already have an account? <a href="/login" class="fw-semibold text-primary text-decoration-underline">Login</a>
+                                            Already have an account? <a href="/login"
+                                                class="fw-semibold text-primary text-decoration-underline">Login</a>
                                         </p>
                                     </div>
                                 </div>
@@ -136,7 +174,7 @@
         function togglePassword(button) {
             const input = button.parentElement.querySelector('input');
             const icon = button.querySelector('i');
-            
+
             if (input.type === 'password') {
                 input.type = 'text';
                 icon.classList.remove('ri-eye-fill');
@@ -146,6 +184,41 @@
                 icon.classList.remove('ri-eye-off-fill');
                 icon.classList.add('ri-eye-fill');
             }
+        }
+
+        // Image preview functionality
+        document.getElementById('profileImage')?.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Validate file type
+                const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Please select a valid image file (JPG, JPEG, or PNG)');
+                    e.target.value = '';
+                    return;
+                }
+
+                // Validate file size (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Image size must be less than 5MB');
+                    e.target.value = '';
+                    return;
+                }
+
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function removeImage() {
+            document.getElementById('profileImage').value = '';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('previewImg').src = '';
         }
     </script>
 </div>

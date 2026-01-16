@@ -25,6 +25,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from the "public" directory
 app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 // Serve static files from the "node_modules" directory
 app.use('/node_modules', express.static(path.join(__dirname, '..', 'node_modules')));
 // Set view engine
@@ -40,7 +42,7 @@ app.use(
     secret: 'your-secret',
     resave: false,
     saveUninitialized: true,
-    cookie: { 
+    cookie: {
       secure: false, // Set to true if using HTTPS
       maxAge: 3600000 // 1 hour
     }
@@ -79,6 +81,7 @@ app.use('/accounting', routes.accountingRoutes);
 // Add these routes
 app.use('/brands', brandRoutes);
 app.use('/categories', categoryRoutes);
+app.use('/', require('../routes/profile')); // Profile routes
 
 // app.get('/*', (req, res) => {
 //   res.redirect('/');

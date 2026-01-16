@@ -22,6 +22,10 @@
     <script src="/assets/js/select2.min.js"></script>
     <script src="/assets/libs/flatpickr/flatpickr.min.js"></script>
     <link rel="stylesheet" href="/assets//css/select2.min.css">
+    <link href="/assets/css/enhanced-light-theme.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/enhanced-dark-theme.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/profile-modal.css" rel="stylesheet" type="text/css" />
+    <script src="/assets/js/user-profile-dropdown.js"></script>
 </head>
 <style>
     .logo img {
@@ -58,12 +62,197 @@
         font-size: 0.85rem;
         /* Reduce dropdown menu text size */
     }
+
+    /* User Profile Dropdown Styles */
+    .user-profile-card {
+        position: relative;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .user-profile-trigger {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 15px;
+        border-radius: 50px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        transition: all 0.3s ease;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        min-width: 240px;
+    }
+
+    .user-profile-trigger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+
+    .user-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        object-fit: cover;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: white;
+        font-size: 14px;
+    }
+
+    .user-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .user-greeting {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.9);
+        margin: 0;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        line-height: 1.2;
+    }
+
+    .user-name {
+        font-size: 13px;
+        color: #fff;
+        margin: 0;
+        font-weight: 700;
+        line-height: 1.3;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 140px;
+    }
+
+    .dropdown-arrow {
+        color: #fff;
+        font-size: 18px;
+        transition: transform 0.3s ease;
+        margin-left: auto;
+    }
+
+    .user-profile-card.show .dropdown-arrow {
+        transform: rotate(180deg);
+    }
+
+    .user-profile-menu {
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
+        min-width: 240px;
+        width: 100%;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+        z-index: 1050;
+        overflow: hidden;
+    }
+
+    [data-layout-mode="dark"] .user-profile-menu {
+        background: #2a2f3a;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .user-profile-card.show .user-profile-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .user-profile-menu-header {
+        padding: 12px 16px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .menu-user-name {
+        color: white;
+        font-weight: 700;
+        font-size: 14px;
+        margin: 0;
+        line-height: 1.3;
+    }
+
+    .menu-user-role {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 11px;
+        margin: 3px 0 0 0;
+        line-height: 1.2;
+    }
+
+    .user-profile-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 16px;
+        color: #495057;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        font-size: 13px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    [data-layout-mode="dark"] .user-profile-menu-item {
+        color: #e9ecef;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .user-profile-menu-item:last-child {
+        border-bottom: none;
+    }
+
+    .user-profile-menu-item:hover {
+        background: linear-gradient(90deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        color: #667eea;
+        padding-left: 20px;
+    }
+
+    [data-layout-mode="dark"] .user-profile-menu-item:hover {
+        background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+        color: #8b9bef;
+    }
+
+    .user-profile-menu-item i {
+        font-size: 18px;
+        width: 20px;
+    }
+
+    .user-profile-menu-item.logout-item {
+        color: #dc3545;
+    }
+
+    [data-layout-mode="dark"] .user-profile-menu-item.logout-item {
+        color: #ff6b7a;
+    }
+
+    .user-profile-menu-item.logout-item:hover {
+        background: linear-gradient(90deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
+        color: #c82333;
+    }
+
+    [data-layout-mode="dark"] .user-profile-menu-item.logout-item:hover {
+        background: linear-gradient(90deg, rgba(255, 107, 122, 0.2) 0%, rgba(255, 107, 122, 0.1) 100%);
+        color: #ff8a95;
+    }
 </style>
 
 <body>
-        <div id="layout-wrapper">
-            <header id="page-topbar">
-                <div class="navbar-header">
+    <div id="layout-wrapper">
+        <header id="page-topbar">
+            <div class="navbar-header">
+                <% if (typeof user !=='undefined' && user) { %>
                     <div class="d-flex">
                         <div class="navbar-brand-box horizontal-logo" style="padding-right: 10px;">
                             <a href="/" class="logo logo-dark">
@@ -85,618 +274,820 @@
                             </a>
                         </div>
                     </div>
-                    <a href="/" style="display: block; min-width: fit-content;" class="fs-2 me-2">
-                        Open Menu
-                    </a>
-                    <% var permissions = typeof permissions !== 'undefined' ? permissions : {}; %>
-                    <div id="scrollbar" class="navbar-menu"
-                        style="width: 100%;position: static;box-shadow: none;margin-top: 0; background-color: transparent;">
-                        <div id="two-column-menu">
-                        </div>
-                        <ul class="navbar-nav" id="navbar-nav" style="display: flex;
+                    <% } %>
+                        <% if (typeof user !=='undefined' && user) { %>
+                            <a href="/" style="display: block; min-width: fit-content;" class="fs-2 me-2">
+                                Open Menu
+                            </a>
+                            <% } %>
+                                <% var permissions=typeof permissions !=='undefined' ? permissions : {}; %>
+                                    <% if (typeof user !=='undefined' && user) { %>
+                                        <div id="scrollbar" class="navbar-menu"
+                                            style="width: 100%;position: static;box-shadow: none;margin-top: 0; background-color: transparent;">
+                                            <div id="two-column-menu">
+                                            </div>
+                                            <ul class="navbar-nav" id="navbar-nav" style="display: flex;
                             flex-direction: row;
                             align-items: center;">
-                            <li class="menu-title"><span data-key="t-menu">Menu</span></li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link pe-0" href="/" role="button">
-                                    <i class="las la-tachometer-alt"></i> <span>Dashboard</span>
-                                </a>
-                            </li>
-                            <% if (permissions.productsList || permissions.productCreate || permissions.purchasesCreate)
-                                { %>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link menu-link" href="#sidebarStock" data-bs-toggle="collapse"
-                                        role="button">
-                                        <i class="las la-box"></i> <span>Stock</span>
-                                    </a>
-                                    <div class="collapse menu-dropdown" id="sidebarStock">
-                                        <ul class="nav nav-sm flex-column">
-                                            <% if (permissions.productsCreate) { %>
+                                                <li class="menu-title"><span data-key="t-menu">Menu</span></li>
                                                 <li class="nav-item">
-                                                    <a href="/products/form" class="nav-link">New
-                                                        Product</a>
-                                                </li>
-                                                <% } %>
-                                                    <% if (permissions.purchasesCreate) { %>
-                                                        <li class="nav-item">
-                                                        <a href="/accounting/purchase/form"
-                                                            class="nav-link">New Purchase</a>
-                                                        </li>
-                                                        <% } %>
-                                                            <% if (permissions.productsList) { %>
-                                                                <li class="nav-item">
-                                                                    <a href="/products" class="nav-link">Products
-                                                                        List</a>
-                                                                </li>
-                                                                <li class="nav-item">
-                                                                    <a href="/inventorylogs" class="nav-link">Inventory
-                                                                        Logs</a>
-                                                                </li>
-                                                                <% } %>
-                                        </ul>
-                                    </div>
-                                </li>
-                                <% } %>
-                                    <% if (permissions.customersList || permissions.usersList) { %>
-                                        <li class="nav-item dropdown">
-                                            <a class="nav-link menu-link" href="#sidebarParties"
-                                                data-bs-toggle="collapse" role="button">
-                                                <i class="las la-users"></i> <span>Parties</span>
-                                            </a>
-                                            <div class="collapse menu-dropdown" id="sidebarParties">
-                                                <ul class="nav nav-sm flex-column">
-                                                    <% if (permissions.customersList) { %>
-
-                                                        <li class="nav-item">
-                                                            <a href="/users?role=customer"
-                                                                class="nav-link">Customers</a>
-                                                        </li>
-                                                        <% } %>
-                                                            <% if (permissions.usersList) { %>
-                                                                <li class="nav-item">
-                                                                    <a href="/users?role=user"
-                                                                        class="nav-link">Users</a>
-                                                                </li>
-                                                                <% } %>
-                                                                    <% if (permissions.vendorsList) { %>
-                                                                        <li class="nav-item">
-                                                                            <a href="users?role=vendor"
-                                                                                class="nav-link">Vendors</a>
-                                                                        </li>
-                                                                        <% } %>
-                                                </ul>
-                                            </div>
-                                        </li>
-                                        <% } %>
-                                            <% if (permissions.salesList || permissions.salesList ||
-                                                permissions.salesCreate) { %>
-                                                <li class="nav-item dropdown">
-                                                    <a class="nav-link menu-link" href="#sidebarSales"
-                                                        data-bs-toggle="collapse" role="button">
-                                                        <i class="las la-shopping-cart"></i> <span>Sales</span>
+                                                    <a class="nav-link menu-link pe-0" href="/" role="button">
+                                                        <i class="las la-tachometer-alt"></i> <span>Dashboard</span>
                                                     </a>
-                                                    <div class="collapse menu-dropdown" id="sidebarSales">
-                                                        <ul class="nav nav-sm flex-column">
-                                                            <% if (permissions.salesList) { %>
-                                                                <li class="nav-item">
-                                                                    <a href="/sales" class="nav-link">POS Sales</a>
-                                                                </li>
-                                                                <% } %>
-                                                                    <% if (permissions.salesCreate) { %>
-                                                                        <li class="nav-item">
-                                                                            <a href="/sales/form"
-                                                                                class="nav-link" id="new-sale-menu-link">New
-                                                                                Sale</a>
-                                                                        </li>
-                                                                        <% } %>
-                                                                            <li class="nav-item">
-                                                                                <a href="/sales/returns"
-                                                                                    class="nav-link disabled">Returns</a>
-                                                                            </li>
-                                                        </ul>
-                                                    </div>
                                                 </li>
-                                                <% } %>
+                                                <% if (permissions.productsList || permissions.productCreate ||
+                                                    permissions.purchasesCreate) { %>
                                                     <li class="nav-item dropdown">
-                                                        <a class="nav-link menu-link" href="#sidebarAccounting"
+                                                        <a class="nav-link menu-link" href="#sidebarStock"
                                                             data-bs-toggle="collapse" role="button">
-                                                            <i class="las la-calculator"></i> <span>Accounting</span>
+                                                            <i class="las la-box"></i> <span>Stock</span>
                                                         </a>
-                                                        <div class="collapse menu-dropdown" id="sidebarAccounting">
+                                                        <div class="collapse menu-dropdown" id="sidebarStock">
                                                             <ul class="nav nav-sm flex-column">
-                                                                <li class="nav-item">
-                                                                    <a href="/accounting/coa"
-                                                                        class="nav-link disabled">Chart of Accounts</a>
-                                                                </li>
-                                                                <li class="nav-item">
-                                                                    <a href="/accounting/balance-sheet"
-                                                                        class="nav-link disabled">Balance Sheet</a>
-                                                                </li>
-                                                                <% if (permissions.purchasesList) { %>
+                                                                <% if (permissions.productsCreate) { %>
                                                                     <li class="nav-item">
-                                                                        <a href="/accounting/purchase"
-                                                                            class="nav-link">Purchases List</a>
+                                                                        <a href="/products/form" class="nav-link">New
+                                                                            Product</a>
                                                                     </li>
                                                                     <% } %>
-                                                                        <li class="nav-item">
-                                                                            <a href="/accounting/expenses"
-                                                                                class="nav-link disabled">Expenses</a>
-                                                                        </li>
-                                                                        <li class="nav-item">
-                                                                            <a href="/accounting/transactions"
-                                                                                class="nav-link disabled">Transactions</a>
-                                                                        </li>
-                                                                        <li class="nav-item">
-                                                                            <a href="/accounting/cash-closing"
-                                                                                class="nav-link disabled">Cash
-                                                                                Closing</a>
-                                                                        </li>
-                                                                        <li class="nav-item">
-                                                                            <a href="/accounting/cash-closing-report"
-                                                                                class="nav-link disabled">Cash Closing
-                                                                                Report</a>
-                                                                        </li>
-                                                                        <% if (permissions.taxesList ||
-                                                                            permissions.taxesView) { %>
+                                                                        <% if (permissions.purchasesCreate) { %>
                                                                             <li class="nav-item">
-                                                                                <a href="/accounting/taxes"
-                                                                                    class="nav-link">Taxes</a>
+                                                                                <a href="/accounting/purchase/form"
+                                                                                    class="nav-link">New
+                                                                                    Purchase</a>
                                                                             </li>
                                                                             <% } %>
-                                                                                <% if (permissions.brandsList ||
-                                                                                    permissions.brandsView) { %>
+                                                                                <% if (permissions.productsList) { %>
                                                                                     <li class="nav-item">
-                                                                                        <a href="/brands"
-                                                                                            class="nav-link">Brands</a>
+                                                                                        <a href="/products"
+                                                                                            class="nav-link">Products
+                                                                                            List</a>
+                                                                                    </li>
+                                                                                    <li class="nav-item">
+                                                                                        <a href="/inventorylogs"
+                                                                                            class="nav-link">Inventory
+                                                                                            Logs</a>
                                                                                     </li>
                                                                                     <% } %>
-                                                                                        <% if
-                                                                                            (permissions.categoriesList
-                                                                                            ||
-                                                                                            permissions.categoriesView)
-                                                                                            { %>
+                                                                                        <% if (permissions.brandsList ||
+                                                                                            permissions.brandsView) { %>
                                                                                             <li class="nav-item">
-                                                                                                <a href="/categories"
-                                                                                                    class="nav-link">Categories</a>
+                                                                                                <a href="/brands"
+                                                                                                    class="nav-link">Brands</a>
                                                                                             </li>
                                                                                             <% } %>
+                                                                                                <% if
+                                                                                                    (permissions.categoriesList
+                                                                                                    ||
+                                                                                                    permissions.categoriesView)
+                                                                                                    { %>
+                                                                                                    <li
+                                                                                                        class="nav-item">
+                                                                                                        <a href="/categories"
+                                                                                                            class="nav-link">Categories</a>
+                                                                                                    </li>
+                                                                                                    <% } %>
                                                             </ul>
                                                         </div>
                                                     </li>
-                                                    <li class="nav-item dropdown">
-                                                        <a class="nav-link menu-link" href="#sidebarOthers"
-                                                            data-bs-toggle="collapse" role="button">
-                                                             <span>Others</span>
-                                                        </a>
-                                                        <div class="collapse menu-dropdown" id="sidebarOthers">
-                                                            <ul class="nav nav-sm flex-column">
-                                                                <% if (permissions.settings) { %>
-                                                                    <li class="nav-item">
-                                                                        <a href="/settings"
-                                                                            class="nav-link">Settings</a>
+                                                    <% } %>
+                                                        <% if (permissions.customersList || permissions.usersList) { %>
+                                                            <li class="nav-item dropdown">
+                                                                <a class="nav-link menu-link" href="#sidebarParties"
+                                                                    data-bs-toggle="collapse" role="button">
+                                                                    <i class="las la-users"></i> <span>Parties</span>
+                                                                </a>
+                                                                <div class="collapse menu-dropdown" id="sidebarParties">
+                                                                    <ul class="nav nav-sm flex-column">
+                                                                        <% if (permissions.customersList) { %>
+
+                                                                            <li class="nav-item">
+                                                                                <a href="/users?role=customer"
+                                                                                    class="nav-link">Customers</a>
+                                                                            </li>
+                                                                            <% } %>
+                                                                                <% if (permissions.usersList) { %>
+                                                                                    <li class="nav-item">
+                                                                                        <a href="/users?role=user"
+                                                                                            class="nav-link">Users</a>
+                                                                                    </li>
+                                                                                    <% } %>
+                                                                                        <% if (permissions.vendorsList)
+                                                                                            { %>
+                                                                                            <li class="nav-item">
+                                                                                                <a href="users?role=vendor"
+                                                                                                    class="nav-link">Vendors</a>
+                                                                                            </li>
+                                                                                            <% } %>
+                                                                    </ul>
+                                                                </div>
+                                                            </li>
+                                                            <% } %>
+                                                                <% if (permissions.salesList || permissions.salesList ||
+                                                                    permissions.salesCreate) { %>
+                                                                    <li class="nav-item dropdown">
+                                                                        <a class="nav-link menu-link"
+                                                                            href="#sidebarSales"
+                                                                            data-bs-toggle="collapse" role="button">
+                                                                            <i class="las la-shopping-cart"></i>
+                                                                            <span>Sales</span>
+                                                                        </a>
+                                                                        <div class="collapse menu-dropdown"
+                                                                            id="sidebarSales">
+                                                                            <ul class="nav nav-sm flex-column">
+                                                                                <% if (permissions.salesList) { %>
+                                                                                    <li class="nav-item">
+                                                                                        <a href="/sales"
+                                                                                            class="nav-link">POS
+                                                                                            Sales</a>
+                                                                                    </li>
+                                                                                    <% } %>
+                                                                                        <% if (permissions.salesCreate)
+                                                                                            { %>
+                                                                                            <li class="nav-item">
+                                                                                                <a href="/sales/form"
+                                                                                                    class="nav-link"
+                                                                                                    id="new-sale-menu-link">New
+                                                                                                    Sale</a>
+                                                                                            </li>
+                                                                                            <% } %>
+                                                                                                <li class="nav-item">
+                                                                                                    <a href="/sales/returns"
+                                                                                                        class="nav-link disabled">Returns</a>
+                                                                                                </li>
+                                                                            </ul>
+                                                                        </div>
                                                                     </li>
                                                                     <% } %>
-                                                                        <li class="nav-item">
-                                                                            <a href="/export-db" class="nav-link">Export
-                                                                                DB</a>
+                                                                        <li class="nav-item dropdown">
+                                                                            <a class="nav-link menu-link"
+                                                                                href="#sidebarAccounting"
+                                                                                data-bs-toggle="collapse" role="button">
+                                                                                <i class="las la-calculator"></i>
+                                                                                <span>Accounting</span>
+                                                                            </a>
+                                                                            <div class="collapse menu-dropdown"
+                                                                                id="sidebarAccounting">
+                                                                                <ul class="nav nav-sm flex-column">
+                                                                                    <li class="nav-item">
+                                                                                        <a href="/accounting/coa"
+                                                                                            class="nav-link disabled">Chart
+                                                                                            of
+                                                                                            Accounts</a>
+                                                                                    </li>
+                                                                                    <li class="nav-item">
+                                                                                        <a href="/accounting/balance-sheet"
+                                                                                            class="nav-link disabled">Balance
+                                                                                            Sheet</a>
+                                                                                    </li>
+                                                                                    <% if (permissions.purchasesList) {
+                                                                                        %>
+                                                                                        <li class="nav-item">
+                                                                                            <a href="/accounting/purchase"
+                                                                                                class="nav-link">Purchases
+                                                                                                List</a>
+                                                                                        </li>
+                                                                                        <% } %>
+                                                                                            <li class="nav-item">
+                                                                                                <a href="/accounting/expenses"
+                                                                                                    class="nav-link disabled">Expenses</a>
+                                                                                            </li>
+                                                                                            <li class="nav-item">
+                                                                                                <a href="/accounting/transactions"
+                                                                                                    class="nav-link disabled">Transactions</a>
+                                                                                            </li>
+                                                                                            <li class="nav-item">
+                                                                                                <a href="/accounting/cash-closing"
+                                                                                                    class="nav-link disabled">Cash
+                                                                                                    Closing</a>
+                                                                                            </li>
+                                                                                            <li class="nav-item">
+                                                                                                <a href="/accounting/cash-closing-report"
+                                                                                                    class="nav-link disabled">Cash
+                                                                                                    Closing
+                                                                                                    Report</a>
+                                                                                            </li>
+                                                                                            <% if (permissions.taxesList
+                                                                                                ||
+                                                                                                permissions.taxesView) {
+                                                                                                %>
+                                                                                                <li class="nav-item">
+                                                                                                    <a href="/accounting/taxes"
+                                                                                                        class="nav-link">Taxes</a>
+                                                                                                </li>
+                                                                                                <% } %>
+                                                                                </ul>
+                                                                            </div>
                                                                         </li>
-                                                            </ul>
+                                                                        <li class="nav-item dropdown">
+                                                                            <a class="nav-link menu-link"
+                                                                                href="#sidebarOthers"
+                                                                                data-bs-toggle="collapse" role="button">
+                                                                                <span>Others</span>
+                                                                            </a>
+                                                                            <div class="collapse menu-dropdown"
+                                                                                id="sidebarOthers">
+                                                                                <ul class="nav nav-sm flex-column">
+                                                                                    <% if (permissions.settings) { %>
+                                                                                        <li class="nav-item">
+                                                                                            <a href="/settings"
+                                                                                                class="nav-link">Settings</a>
+                                                                                        </li>
+                                                                                        <% } %>
+                                                                                            <li class="nav-item">
+                                                                                                <a href="/export-db"
+                                                                                                    class="nav-link">Export
+                                                                                                    DB</a>
+                                                                                            </li>
+                                                                                </ul>
+                                                                            </div>
+                                                                        </li>
+                                            </ul>
+                                        </div>
+                                        <% } %>
+                                            <div class="d-flex align-items-center ms-auto">
+
+                                                <div class="ms-1 header-item d-none d-sm-flex">
+                                                    <button type="button" id="themeToggleBtn"
+                                                        class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle light-dark-mode">
+                                                        <i class='bx bx-moon fs-22'></i>
+                                                    </button>
+                                                </div>
+
+                                                <% if (typeof user !=='undefined' && user) { %>
+
+                                                    <div class="dropdown topbar-head-dropdown ms-1 header-item"
+                                                        id="notificationDropdown">
+                                                        <button type="button"
+                                                            class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"
+                                                            id="page-header-notifications-dropdown"
+                                                            data-bs-toggle="dropdown" data-bs-auto-close="outside"
+                                                            aria-haspopup="true" aria-expanded="false">
+                                                            <i class='bx bx-bell fs-22'></i>
+                                                            <span
+                                                                class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger">3<span
+                                                                    class="visually-hidden">unread
+                                                                    messages</span></span>
+                                                        </button>
+                                                        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                                                            aria-labelledby="page-header-notifications-dropdown">
+
+                                                            <div
+                                                                class="dropdown-head bg-primary bg-pattern rounded-top">
+                                                                <div class="p-3">
+                                                                    <div class="row align-items-center">
+                                                                        <div class="col">
+                                                                            <h6
+                                                                                class="m-0 fs-16 fw-semibold text-white">
+                                                                                Notifications
+                                                                            </h6>
+                                                                        </div>
+                                                                        <div class="col-auto dropdown-tabs">
+                                                                            <span
+                                                                                class="badge bg-light-subtle text-body fs-13">
+                                                                                4
+                                                                                New</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="px-2 pt-2">
+                                                                    <ul class="nav nav-tabs dropdown-tabs nav-tabs-custom"
+                                                                        data-dropdown-tabs="true"
+                                                                        id="notificationItemsTab" role="tablist">
+                                                                        <li class="nav-item waves-effect waves-light">
+                                                                            <a class="nav-link active"
+                                                                                data-bs-toggle="tab"
+                                                                                href="#all-noti-tab" role="tab"
+                                                                                aria-selected="true">
+                                                                                All (4)
+                                                                            </a>
+                                                                        </li>
+                                                                        <li class="nav-item waves-effect waves-light">
+                                                                            <a class="nav-link" data-bs-toggle="tab"
+                                                                                href="#messages-tab" role="tab"
+                                                                                aria-selected="false">
+                                                                                Messages
+                                                                            </a>
+                                                                        </li>
+                                                                        <li class="nav-item waves-effect waves-light">
+                                                                            <a class="nav-link" data-bs-toggle="tab"
+                                                                                href="#alerts-tab" role="tab"
+                                                                                aria-selected="false">
+                                                                                Alerts
+                                                                            </a>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+
+                                                            </div>
+
+                                                            <div class="tab-content position-relative"
+                                                                id="notificationItemsTabContent">
+                                                                <div class="tab-pane fade show active py-2 ps-2"
+                                                                    id="all-noti-tab" role="tabpanel">
+                                                                    <div data-simplebar style="max-height: 300px;"
+                                                                        class="pe-2">
+                                                                        <div
+                                                                            class="text-reset notification-item d-block dropdown-item position-relative">
+                                                                            <div class="d-flex">
+                                                                                <div
+                                                                                    class="avatar-xs me-3 flex-shrink-0">
+                                                                                    <span
+                                                                                        class="avatar-title bg-info-subtle text-info rounded-circle fs-16">
+                                                                                        <i
+                                                                                            class="bx bx-badge-check"></i>
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div class="flex-grow-1">
+                                                                                    <a href="#!" class="stretched-link">
+                                                                                        <h6 class="mt-0 mb-2 lh-base">
+                                                                                            Your
+                                                                                            <b>Elite</b>
+                                                                                            author
+                                                                                            Graphic
+                                                                                            Optimization <span
+                                                                                                class="text-secondary">reward</span>
+                                                                                            is
+                                                                                            ready!
+                                                                                        </h6>
+                                                                                    </a>
+                                                                                    <p
+                                                                                        class="mb-0 fs-11 fw-medium text-uppercase text-muted">
+                                                                                        <span><i
+                                                                                                class="mdi mdi-clock-outline"></i>
+                                                                                            Just
+                                                                                            30 sec
+                                                                                            ago</span>
+                                                                                    </p>
+                                                                                </div>
+                                                                                <div class="px-2 fs-15">
+                                                                                    <div
+                                                                                        class="form-check notification-check">
+                                                                                        <input class="form-check-input"
+                                                                                            type="checkbox" value=""
+                                                                                            id="all-notification-check01">
+                                                                                        <label class="form-check-label"
+                                                                                            for="all-notification-check01"></label>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div
+                                                                            class="text-reset notification-item d-block dropdown-item position-relative">
+                                                                            <div class="d-flex">
+                                                                                <img src="/assets/images/users/avatar-2.jpg"
+                                                                                    class="me-3 rounded-circle avatar-xs flex-shrink-0"
+                                                                                    alt="user-pic">
+                                                                                <div class="flex-grow-1">
+                                                                                    <a href="#!" class="stretched-link">
+                                                                                        <h6
+                                                                                            class="mt-0 mb-1 fs-13 fw-semibold">
+                                                                                            Angela
+                                                                                            Bernier
+                                                                                        </h6>
+                                                                                    </a>
+                                                                                    <div class="fs-13 text-muted">
+                                                                                        <p class="mb-1">Answered to your
+                                                                                            comment
+                                                                                            on the
+                                                                                            cash
+                                                                                            flow
+                                                                                            forecast's
+                                                                                            graph 🔔.</p>
+                                                                                    </div>
+                                                                                    <p
+                                                                                        class="mb-0 fs-11 fw-medium text-uppercase text-muted">
+                                                                                        <span><i
+                                                                                                class="mdi mdi-clock-outline"></i>
+                                                                                            48
+                                                                                            min
+                                                                                            ago</span>
+                                                                                    </p>
+                                                                                </div>
+                                                                                <div class="px-2 fs-15">
+                                                                                    <div
+                                                                                        class="form-check notification-check">
+                                                                                        <input class="form-check-input"
+                                                                                            type="checkbox" value=""
+                                                                                            id="all-notification-check02">
+                                                                                        <label class="form-check-label"
+                                                                                            for="all-notification-check02"></label>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div
+                                                                            class="text-reset notification-item d-block dropdown-item position-relative">
+                                                                            <div class="d-flex">
+                                                                                <div
+                                                                                    class="avatar-xs me-3 flex-shrink-0">
+                                                                                    <span
+                                                                                        class="avatar-title bg-danger-subtle text-danger rounded-circle fs-16">
+                                                                                        <i
+                                                                                            class='bx bx-message-square-dots'></i>
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div class="flex-grow-1">
+                                                                                    <a href="#!" class="stretched-link">
+                                                                                        <h6
+                                                                                            class="mt-0 mb-2 fs-13 lh-base">
+                                                                                            You
+                                                                                            have
+                                                                                            received <b
+                                                                                                class="text-success">20</b>
+                                                                                            new
+                                                                                            messages in the
+                                                                                            conversation
+                                                                                        </h6>
+                                                                                    </a>
+                                                                                    <p
+                                                                                        class="mb-0 fs-11 fw-medium text-uppercase text-muted">
+                                                                                        <span><i
+                                                                                                class="mdi mdi-clock-outline"></i>
+                                                                                            2
+                                                                                            hrs
+                                                                                            ago</span>
+                                                                                    </p>
+                                                                                </div>
+                                                                                <div class="px-2 fs-15">
+                                                                                    <div
+                                                                                        class="form-check notification-check">
+                                                                                        <input class="form-check-input"
+                                                                                            type="checkbox" value=""
+                                                                                            id="all-notification-check03">
+                                                                                        <label class="form-check-label"
+                                                                                            for="all-notification-check03"></label>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div
+                                                                            class="text-reset notification-item d-block dropdown-item position-relative">
+                                                                            <div class="d-flex">
+                                                                                <img src="/assets/images/users/avatar-8.jpg"
+                                                                                    class="me-3 rounded-circle avatar-xs flex-shrink-0"
+                                                                                    alt="user-pic">
+                                                                                <div class="flex-grow-1">
+                                                                                    <a href="#!" class="stretched-link">
+                                                                                        <h6
+                                                                                            class="mt-0 mb-1 fs-13 fw-semibold">
+                                                                                            Maureen
+                                                                                            Gibson
+                                                                                        </h6>
+                                                                                    </a>
+                                                                                    <div class="fs-13 text-muted">
+                                                                                        <p class="mb-1">We talked about
+                                                                                            a
+                                                                                            project on
+                                                                                            linkedin.
+                                                                                        </p>
+                                                                                    </div>
+                                                                                    <p
+                                                                                        class="mb-0 fs-11 fw-medium text-uppercase text-muted">
+                                                                                        <span><i
+                                                                                                class="mdi mdi-clock-outline"></i>
+                                                                                            4
+                                                                                            hrs
+                                                                                            ago</span>
+                                                                                    </p>
+                                                                                </div>
+                                                                                <div class="px-2 fs-15">
+                                                                                    <div
+                                                                                        class="form-check notification-check">
+                                                                                        <input class="form-check-input"
+                                                                                            type="checkbox" value=""
+                                                                                            id="all-notification-check04">
+                                                                                        <label class="form-check-label"
+                                                                                            for="all-notification-check04"></label>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="my-3 text-center view-all">
+                                                                            <button type="button"
+                                                                                class="btn btn-soft-success waves-effect waves-light">View
+                                                                                All Notifications <i
+                                                                                    class="ri-arrow-right-line align-middle"></i></button>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+
+                                                                <div class="tab-pane fade py-2 ps-2" id="messages-tab"
+                                                                    role="tabpanel" aria-labelledby="messages-tab">
+                                                                    <div data-simplebar style="max-height: 300px;"
+                                                                        class="pe-2">
+                                                                        <div
+                                                                            class="text-reset notification-item d-block dropdown-item">
+                                                                            <div class="d-flex">
+                                                                                <img src="/assets/images/users/avatar-3.jpg"
+                                                                                    class="me-3 rounded-circle avatar-xs"
+                                                                                    alt="user-pic">
+                                                                                <div class="flex-grow-1">
+                                                                                    <a href="#!" class="stretched-link">
+                                                                                        <h6
+                                                                                            class="mt-0 mb-1 fs-13 fw-semibold">
+                                                                                            James
+                                                                                            Lemire
+                                                                                        </h6>
+                                                                                    </a>
+                                                                                    <div class="fs-13 text-muted">
+                                                                                        <p class="mb-1">We talked about
+                                                                                            a
+                                                                                            project on
+                                                                                            linkedin.
+                                                                                        </p>
+                                                                                    </div>
+                                                                                    <p
+                                                                                        class="mb-0 fs-11 fw-medium text-uppercase text-muted">
+                                                                                        <span><i
+                                                                                                class="mdi mdi-clock-outline"></i>
+                                                                                            30
+                                                                                            min
+                                                                                            ago</span>
+                                                                                    </p>
+                                                                                </div>
+                                                                                <div class="px-2 fs-15">
+                                                                                    <div
+                                                                                        class="form-check notification-check">
+                                                                                        <input class="form-check-input"
+                                                                                            type="checkbox" value=""
+                                                                                            id="messages-notification-check01">
+                                                                                        <label class="form-check-label"
+                                                                                            for="messages-notification-check01"></label>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div
+                                                                            class="text-reset notification-item d-block dropdown-item">
+                                                                            <div class="d-flex">
+                                                                                <img src="/assets/images/users/avatar-2.jpg"
+                                                                                    class="me-3 rounded-circle avatar-xs"
+                                                                                    alt="user-pic">
+                                                                                <div class="flex-grow-1">
+                                                                                    <a href="#!" class="stretched-link">
+                                                                                        <h6
+                                                                                            class="mt-0 mb-1 fs-13 fw-semibold">
+                                                                                            Angela
+                                                                                            Bernier
+                                                                                        </h6>
+                                                                                    </a>
+                                                                                    <div class="fs-13 text-muted">
+                                                                                        <p class="mb-1">Answered to your
+                                                                                            comment
+                                                                                            on the
+                                                                                            cash
+                                                                                            flow
+                                                                                            forecast's
+                                                                                            graph 🔔.</p>
+                                                                                    </div>
+                                                                                    <p
+                                                                                        class="mb-0 fs-11 fw-medium text-uppercase text-muted">
+                                                                                        <span><i
+                                                                                                class="mdi mdi-clock-outline"></i>
+                                                                                            2
+                                                                                            hrs
+                                                                                            ago</span>
+                                                                                    </p>
+                                                                                </div>
+                                                                                <div class="px-2 fs-15">
+                                                                                    <div
+                                                                                        class="form-check notification-check">
+                                                                                        <input class="form-check-input"
+                                                                                            type="checkbox" value=""
+                                                                                            id="messages-notification-check02">
+                                                                                        <label class="form-check-label"
+                                                                                            for="messages-notification-check02"></label>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div
+                                                                            class="text-reset notification-item d-block dropdown-item">
+                                                                            <div class="d-flex">
+                                                                                <img src="/assets/images/users/avatar-6.jpg"
+                                                                                    class="me-3 rounded-circle avatar-xs"
+                                                                                    alt="user-pic">
+                                                                                <div class="flex-grow-1">
+                                                                                    <a href="#!" class="stretched-link">
+                                                                                        <h6
+                                                                                            class="mt-0 mb-1 fs-13 fw-semibold">
+                                                                                            Kenneth
+                                                                                            Brown
+                                                                                        </h6>
+                                                                                    </a>
+                                                                                    <div class="fs-13 text-muted">
+                                                                                        <p class="mb-1">Mentionned you
+                                                                                            in his
+                                                                                            comment on
+                                                                                            📃
+                                                                                            invoice
+                                                                                            #12501.
+                                                                                        </p>
+                                                                                    </div>
+                                                                                    <p
+                                                                                        class="mb-0 fs-11 fw-medium text-uppercase text-muted">
+                                                                                        <span><i
+                                                                                                class="mdi mdi-clock-outline"></i>
+                                                                                            10
+                                                                                            hrs
+                                                                                            ago</span>
+                                                                                    </p>
+                                                                                </div>
+                                                                                <div class="px-2 fs-15">
+                                                                                    <div
+                                                                                        class="form-check notification-check">
+                                                                                        <input class="form-check-input"
+                                                                                            type="checkbox" value=""
+                                                                                            id="messages-notification-check03">
+                                                                                        <label class="form-check-label"
+                                                                                            for="messages-notification-check03"></label>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div
+                                                                            class="text-reset notification-item d-block dropdown-item">
+                                                                            <div class="d-flex">
+                                                                                <img src="/assets/images/users/avatar-8.jpg"
+                                                                                    class="me-3 rounded-circle avatar-xs"
+                                                                                    alt="user-pic">
+                                                                                <div class="flex-grow-1">
+                                                                                    <a href="#!" class="stretched-link">
+                                                                                        <h6
+                                                                                            class="mt-0 mb-1 fs-13 fw-semibold">
+                                                                                            Maureen
+                                                                                            Gibson
+                                                                                        </h6>
+                                                                                    </a>
+                                                                                    <div class="fs-13 text-muted">
+                                                                                        <p class="mb-1">We talked about
+                                                                                            a
+                                                                                            project on
+                                                                                            linkedin.
+                                                                                        </p>
+                                                                                    </div>
+                                                                                    <p
+                                                                                        class="mb-0 fs-11 fw-medium text-uppercase text-muted">
+                                                                                        <span><i
+                                                                                                class="mdi mdi-clock-outline"></i>
+                                                                                            3
+                                                                                            days
+                                                                                            ago</span>
+                                                                                    </p>
+                                                                                </div>
+                                                                                <div class="px-2 fs-15">
+                                                                                    <div
+                                                                                        class="form-check notification-check">
+                                                                                        <input class="form-check-input"
+                                                                                            type="checkbox" value=""
+                                                                                            id="messages-notification-check04">
+                                                                                        <label class="form-check-label"
+                                                                                            for="messages-notification-check04"></label>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="my-3 text-center view-all">
+                                                                            <button type="button"
+                                                                                class="btn btn-soft-success waves-effect waves-light">View
+                                                                                All Messages <i
+                                                                                    class="ri-arrow-right-line align-middle"></i></button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="tab-pane fade p-4" id="alerts-tab"
+                                                                    role="tabpanel" aria-labelledby="alerts-tab"></div>
+
+                                                                <div class="notification-actions"
+                                                                    id="notification-actions">
+                                                                    <div
+                                                                        class="d-flex text-muted justify-content-center">
+                                                                        Select <div id="select-content"
+                                                                            class="text-body fw-semibold px-1">0
+                                                                        </div>
+                                                                        Result <button type="button"
+                                                                            class="btn btn-link link-danger p-0 ms-3"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#removeNotificationModal">Remove</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                    </li>
-                        </ul>
+                                                    </div>
+                                                    <% } %>
+
+                                                        <!-- User Profile Dropdown -->
+                                                        <% if (typeof user !=='undefined' && user !==null) { %>
+                                                            <div class="ms-1 header-item d-none d-sm-flex user-profile-card"
+                                                                id="userProfileDropdown">
+                                                                <div class="user-profile-trigger">
+                                                                    <div class="user-avatar">
+                                                                        <% if (user.profile_image_url) { %>
+                                                                            <img src="<%= user.profile_image_url %>"
+                                                                                alt="User Avatar"
+                                                                                style="width: 100%; height: 100%; object-fit: cover;">
+                                                                            <% } else { %>
+                                                                                <%= user.firstname.charAt(0).toUpperCase()
+                                                                                    +
+                                                                                    user.lastname.charAt(0).toUpperCase()
+                                                                                    %>
+                                                                                    <% } %>
+                                                                    </div>
+                                                                    <div class="user-info">
+                                                                        <p class="user-greeting">Welcome back,</p>
+                                                                        <p class="user-name">
+                                                                            <%= user.firstname %>
+                                                                        </p>
+                                                                    </div>
+                                                                    <i class='bx bx-chevron-down dropdown-arrow'></i>
+                                                                </div>
+                                                                <div class="user-profile-menu">
+                                                                    <div class="user-profile-menu-header">
+                                                                        <p class="menu-user-name">
+                                                                            <%= user.firstname + " " + user.lastname %>
+                                                                        </p>
+                                                                        <p class="menu-user-role">Administrator</p>
+                                                                    </div>
+                                                                    <a href="#profile-modal"
+                                                                        class="user-profile-menu-item">
+                                                                        <i class='bx bx-user'></i>
+                                                                        <span>My Profile</span>
+                                                                    </a>
+                                                                    <a href="/logout"
+                                                                        class="user-profile-menu-item logout-item">
+                                                                        <i class='bx bx-log-out'></i>
+                                                                        <span>Logout</span>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                            <% } %>
+                                            </div>
+            </div>
+        </header>
+        <div id="removeNotificationModal" class="modal fade zoomIn" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            id="NotificationModalbtn-close"></button>
                     </div>
-                    <div class="d-flex align-items-center">
-
-                        <div class="ms-1 header-item d-none d-sm-flex">
-                            <button type="button" id="themeToggleBtn"
-                                class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle light-dark-mode">
-                                <i class='bx bx-moon fs-22'></i>
-                            </button>
-                        </div>
-
-                        <div class="dropdown topbar-head-dropdown ms-1 header-item" id="notificationDropdown">
-                            <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"
-                                id="page-header-notifications-dropdown" data-bs-toggle="dropdown"
-                                data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false">
-                                <i class='bx bx-bell fs-22'></i>
-                                <span
-                                    class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger">3<span
-                                        class="visually-hidden">unread messages</span></span>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
-                                aria-labelledby="page-header-notifications-dropdown">
-
-                                <div class="dropdown-head bg-primary bg-pattern rounded-top">
-                                    <div class="p-3">
-                                        <div class="row align-items-center">
-                                            <div class="col">
-                                                <h6 class="m-0 fs-16 fw-semibold text-white"> Notifications </h6>
-                                            </div>
-                                            <div class="col-auto dropdown-tabs">
-                                                <span class="badge bg-light-subtle text-body fs-13"> 4 New</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="px-2 pt-2">
-                                        <ul class="nav nav-tabs dropdown-tabs nav-tabs-custom" data-dropdown-tabs="true"
-                                            id="notificationItemsTab" role="tablist">
-                                            <li class="nav-item waves-effect waves-light">
-                                                <a class="nav-link active" data-bs-toggle="tab" href="#all-noti-tab"
-                                                    role="tab" aria-selected="true">
-                                                    All (4)
-                                                </a>
-                                            </li>
-                                            <li class="nav-item waves-effect waves-light">
-                                                <a class="nav-link" data-bs-toggle="tab" href="#messages-tab" role="tab"
-                                                    aria-selected="false">
-                                                    Messages
-                                                </a>
-                                            </li>
-                                            <li class="nav-item waves-effect waves-light">
-                                                <a class="nav-link" data-bs-toggle="tab" href="#alerts-tab" role="tab"
-                                                    aria-selected="false">
-                                                    Alerts
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                </div>
-
-                                <div class="tab-content position-relative" id="notificationItemsTabContent">
-                                    <div class="tab-pane fade show active py-2 ps-2" id="all-noti-tab" role="tabpanel">
-                                        <div data-simplebar style="max-height: 300px;" class="pe-2">
-                                            <div
-                                                class="text-reset notification-item d-block dropdown-item position-relative">
-                                                <div class="d-flex">
-                                                    <div class="avatar-xs me-3 flex-shrink-0">
-                                                        <span
-                                                            class="avatar-title bg-info-subtle text-info rounded-circle fs-16">
-                                                            <i class="bx bx-badge-check"></i>
-                                                        </span>
-                                                    </div>
-                                                    <div class="flex-grow-1">
-                                                        <a href="#!" class="stretched-link">
-                                                            <h6 class="mt-0 mb-2 lh-base">Your <b>Elite</b> author
-                                                                Graphic
-                                                                Optimization <span class="text-secondary">reward</span>
-                                                                is
-                                                                ready!
-                                                            </h6>
-                                                        </a>
-                                                        <p class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                                                            <span><i class="mdi mdi-clock-outline"></i> Just 30 sec
-                                                                ago</span>
-                                                        </p>
-                                                    </div>
-                                                    <div class="px-2 fs-15">
-                                                        <div class="form-check notification-check">
-                                                            <input class="form-check-input" type="checkbox" value=""
-                                                                id="all-notification-check01">
-                                                            <label class="form-check-label"
-                                                                for="all-notification-check01"></label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div
-                                                class="text-reset notification-item d-block dropdown-item position-relative">
-                                                <div class="d-flex">
-                                                    <img src="/assets/images/users/avatar-2.jpg"
-                                                        class="me-3 rounded-circle avatar-xs flex-shrink-0"
-                                                        alt="user-pic">
-                                                    <div class="flex-grow-1">
-                                                        <a href="#!" class="stretched-link">
-                                                            <h6 class="mt-0 mb-1 fs-13 fw-semibold">Angela Bernier
-                                                            </h6>
-                                                        </a>
-                                                        <div class="fs-13 text-muted">
-                                                            <p class="mb-1">Answered to your comment on the cash
-                                                                flow
-                                                                forecast's
-                                                                graph 🔔.</p>
-                                                        </div>
-                                                        <p class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                                                            <span><i class="mdi mdi-clock-outline"></i> 48 min
-                                                                ago</span>
-                                                        </p>
-                                                    </div>
-                                                    <div class="px-2 fs-15">
-                                                        <div class="form-check notification-check">
-                                                            <input class="form-check-input" type="checkbox" value=""
-                                                                id="all-notification-check02">
-                                                            <label class="form-check-label"
-                                                                for="all-notification-check02"></label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div
-                                                class="text-reset notification-item d-block dropdown-item position-relative">
-                                                <div class="d-flex">
-                                                    <div class="avatar-xs me-3 flex-shrink-0">
-                                                        <span
-                                                            class="avatar-title bg-danger-subtle text-danger rounded-circle fs-16">
-                                                            <i class='bx bx-message-square-dots'></i>
-                                                        </span>
-                                                    </div>
-                                                    <div class="flex-grow-1">
-                                                        <a href="#!" class="stretched-link">
-                                                            <h6 class="mt-0 mb-2 fs-13 lh-base">You have received <b
-                                                                    class="text-success">20</b> new messages in the
-                                                                conversation
-                                                            </h6>
-                                                        </a>
-                                                        <p class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                                                            <span><i class="mdi mdi-clock-outline"></i> 2 hrs
-                                                                ago</span>
-                                                        </p>
-                                                    </div>
-                                                    <div class="px-2 fs-15">
-                                                        <div class="form-check notification-check">
-                                                            <input class="form-check-input" type="checkbox" value=""
-                                                                id="all-notification-check03">
-                                                            <label class="form-check-label"
-                                                                for="all-notification-check03"></label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div
-                                                class="text-reset notification-item d-block dropdown-item position-relative">
-                                                <div class="d-flex">
-                                                    <img src="/assets/images/users/avatar-8.jpg"
-                                                        class="me-3 rounded-circle avatar-xs flex-shrink-0"
-                                                        alt="user-pic">
-                                                    <div class="flex-grow-1">
-                                                        <a href="#!" class="stretched-link">
-                                                            <h6 class="mt-0 mb-1 fs-13 fw-semibold">Maureen Gibson
-                                                            </h6>
-                                                        </a>
-                                                        <div class="fs-13 text-muted">
-                                                            <p class="mb-1">We talked about a project on linkedin.
-                                                            </p>
-                                                        </div>
-                                                        <p class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                                                            <span><i class="mdi mdi-clock-outline"></i> 4 hrs
-                                                                ago</span>
-                                                        </p>
-                                                    </div>
-                                                    <div class="px-2 fs-15">
-                                                        <div class="form-check notification-check">
-                                                            <input class="form-check-input" type="checkbox" value=""
-                                                                id="all-notification-check04">
-                                                            <label class="form-check-label"
-                                                                for="all-notification-check04"></label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="my-3 text-center view-all">
-                                                <button type="button"
-                                                    class="btn btn-soft-success waves-effect waves-light">View
-                                                    All Notifications <i
-                                                        class="ri-arrow-right-line align-middle"></i></button>
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="tab-pane fade py-2 ps-2" id="messages-tab" role="tabpanel"
-                                        aria-labelledby="messages-tab">
-                                        <div data-simplebar style="max-height: 300px;" class="pe-2">
-                                            <div class="text-reset notification-item d-block dropdown-item">
-                                                <div class="d-flex">
-                                                    <img src="/assets/images/users/avatar-3.jpg"
-                                                        class="me-3 rounded-circle avatar-xs" alt="user-pic">
-                                                    <div class="flex-grow-1">
-                                                        <a href="#!" class="stretched-link">
-                                                            <h6 class="mt-0 mb-1 fs-13 fw-semibold">James Lemire
-                                                            </h6>
-                                                        </a>
-                                                        <div class="fs-13 text-muted">
-                                                            <p class="mb-1">We talked about a project on linkedin.
-                                                            </p>
-                                                        </div>
-                                                        <p class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                                                            <span><i class="mdi mdi-clock-outline"></i> 30 min
-                                                                ago</span>
-                                                        </p>
-                                                    </div>
-                                                    <div class="px-2 fs-15">
-                                                        <div class="form-check notification-check">
-                                                            <input class="form-check-input" type="checkbox" value=""
-                                                                id="messages-notification-check01">
-                                                            <label class="form-check-label"
-                                                                for="messages-notification-check01"></label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="text-reset notification-item d-block dropdown-item">
-                                                <div class="d-flex">
-                                                    <img src="/assets/images/users/avatar-2.jpg"
-                                                        class="me-3 rounded-circle avatar-xs" alt="user-pic">
-                                                    <div class="flex-grow-1">
-                                                        <a href="#!" class="stretched-link">
-                                                            <h6 class="mt-0 mb-1 fs-13 fw-semibold">Angela Bernier
-                                                            </h6>
-                                                        </a>
-                                                        <div class="fs-13 text-muted">
-                                                            <p class="mb-1">Answered to your comment on the cash
-                                                                flow
-                                                                forecast's
-                                                                graph 🔔.</p>
-                                                        </div>
-                                                        <p class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                                                            <span><i class="mdi mdi-clock-outline"></i> 2 hrs
-                                                                ago</span>
-                                                        </p>
-                                                    </div>
-                                                    <div class="px-2 fs-15">
-                                                        <div class="form-check notification-check">
-                                                            <input class="form-check-input" type="checkbox" value=""
-                                                                id="messages-notification-check02">
-                                                            <label class="form-check-label"
-                                                                for="messages-notification-check02"></label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="text-reset notification-item d-block dropdown-item">
-                                                <div class="d-flex">
-                                                    <img src="/assets/images/users/avatar-6.jpg"
-                                                        class="me-3 rounded-circle avatar-xs" alt="user-pic">
-                                                    <div class="flex-grow-1">
-                                                        <a href="#!" class="stretched-link">
-                                                            <h6 class="mt-0 mb-1 fs-13 fw-semibold">Kenneth Brown
-                                                            </h6>
-                                                        </a>
-                                                        <div class="fs-13 text-muted">
-                                                            <p class="mb-1">Mentionned you in his comment on 📃
-                                                                invoice
-                                                                #12501.
-                                                            </p>
-                                                        </div>
-                                                        <p class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                                                            <span><i class="mdi mdi-clock-outline"></i> 10 hrs
-                                                                ago</span>
-                                                        </p>
-                                                    </div>
-                                                    <div class="px-2 fs-15">
-                                                        <div class="form-check notification-check">
-                                                            <input class="form-check-input" type="checkbox" value=""
-                                                                id="messages-notification-check03">
-                                                            <label class="form-check-label"
-                                                                for="messages-notification-check03"></label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="text-reset notification-item d-block dropdown-item">
-                                                <div class="d-flex">
-                                                    <img src="/assets/images/users/avatar-8.jpg"
-                                                        class="me-3 rounded-circle avatar-xs" alt="user-pic">
-                                                    <div class="flex-grow-1">
-                                                        <a href="#!" class="stretched-link">
-                                                            <h6 class="mt-0 mb-1 fs-13 fw-semibold">Maureen Gibson
-                                                            </h6>
-                                                        </a>
-                                                        <div class="fs-13 text-muted">
-                                                            <p class="mb-1">We talked about a project on linkedin.
-                                                            </p>
-                                                        </div>
-                                                        <p class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                                                            <span><i class="mdi mdi-clock-outline"></i> 3 days
-                                                                ago</span>
-                                                        </p>
-                                                    </div>
-                                                    <div class="px-2 fs-15">
-                                                        <div class="form-check notification-check">
-                                                            <input class="form-check-input" type="checkbox" value=""
-                                                                id="messages-notification-check04">
-                                                            <label class="form-check-label"
-                                                                for="messages-notification-check04"></label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="my-3 text-center view-all">
-                                                <button type="button"
-                                                    class="btn btn-soft-success waves-effect waves-light">View
-                                                    All Messages <i
-                                                        class="ri-arrow-right-line align-middle"></i></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="tab-pane fade p-4" id="alerts-tab" role="tabpanel"
-                                        aria-labelledby="alerts-tab"></div>
-
-                                    <div class="notification-actions" id="notification-actions">
-                                        <div class="d-flex text-muted justify-content-center">
-                                            Select <div id="select-content" class="text-body fw-semibold px-1">0
-                                            </div>
-                                            Result <button type="button" class="btn btn-link link-danger p-0 ms-3"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#removeNotificationModal">Remove</button>
-                                        </div>
-                                    </div>
-                                </div>
+                    <div class="modal-body">
+                        <div class="mt-2 text-center">
+                            <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop"
+                                colors="primary:#f7b84b,secondary:#f06548" style="width:100px;height:100px"></lord-icon>
+                            <div class="mt-4 pt-2 fs-15 mx-4 mx-sm-5">
+                                <h4>Are you sure ?</h4>
+                                <p class="text-muted mx-4 mb-0">Are you sure you want to remove this Notification ?
+                                </p>
                             </div>
                         </div>
-
-                        <!-- add a logout button. no dropdown. icon only -->
-                        <div class="ms-1 header-item d-none d-sm-flex" title="Logout">
-                            <a href="/logout" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle">
-                                <i class='bx bx-log-out fs-22'></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </header>
-            <div id="removeNotificationModal" class="modal fade zoomIn" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                                id="NotificationModalbtn-close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="mt-2 text-center">
-                                <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop"
-                                    colors="primary:#f7b84b,secondary:#f06548"
-                                    style="width:100px;height:100px"></lord-icon>
-                                <div class="mt-4 pt-2 fs-15 mx-4 mx-sm-5">
-                                    <h4>Are you sure ?</h4>
-                                    <p class="text-muted mx-4 mb-0">Are you sure you want to remove this Notification ?
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
-                                <button type="button" class="btn w-sm btn-light" data-bs-dismiss="modal">Close</button>
-                                <button type="button" class="btn w-sm btn-danger" id="delete-notification">Yes, Delete
-                                    It!</button>
-                            </div>
+                        <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
+                            <button type="button" class="btn w-sm btn-light" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn w-sm btn-danger" id="delete-notification">Yes, Delete
+                                It!</button>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="vertical-overlay"></div>
         </div>
-                <div class="main-content">
-                    <div class="page-content">
-                        <%- body %>
-                    </div>
-                </div>
-                        <script src="/assets/js/toastr.min.js"></script>
-                        <script>
-                            toastr.options = {
-                                "closeButton": true,
-                                "progressBar": true,
-                                "positionClass": "toast-bottom-right",
-                                "showDuration": "300",
-                                "hideDuration": "1000",
-                                "timeOut": "5000",
-                                "extendedTimeOut": "1000",
-                                "showEasing": "swing",
-                                "hideEasing": "linear",
-                                "showMethod": "fadeIn",
-                                "hideMethod": "fadeOut",
-                                "toastClass": "toast",
-                            };
-                        </script>
-                        <script src="/assets/libs/simplebar/simplebar.min.js"></script>
-                        <script src="/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+        <div class="vertical-overlay"></div>
+    </div>
+    <div class="main-content">
+        <div class="page-content">
+            <%- body %>
+        </div>
+    </div>
+    <script src="/assets/js/toastr.min.js"></script>
+    <script>
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-bottom-right",
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut",
+            "toastClass": "toast",
+        };
+    </script>
+    <script src="/assets/libs/simplebar/simplebar.min.js"></script>
+    <script src="/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 </html>
 <script src="/assets/libs/feather-icons/feather.min.js"></script>
@@ -719,7 +1110,7 @@
                 // Handle "New Sale" link - create tab if already on sales form page
                 const newSaleLink = document.getElementById('new-sale-menu-link');
                 if (newSaleLink) {
-                    newSaleLink.addEventListener('click', function(e) {
+                    newSaleLink.addEventListener('click', function (e) {
                         // Check if we're already on the sales form page
                         if (window.location.pathname === '/sales/form') {
                             e.preventDefault();
@@ -741,6 +1132,157 @@
                 }
             });
         </script>
-        </body>
+        <!-- Profile Modal -->
+        <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content profile-modal-content">
+                    <div class="profile-modal-header">
+                        <div class="profile-header-content">
+                            <h4 class="modal-title mb-1">My Profile</h4>
+                            <p class="mb-0 opacity-75">Manage your personal information and security</p>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="profile-modal-body p-0">
+                        <div class="profile-image-wrapper p-4 bg-light-subtle text-center border-bottom">
+                            <div class="profile-image-container mb-0 mx-auto">
+                                <div class="initials-avatar"></div>
+                                <label for="profile-image-upload" class="profile-upload-btn">
+                                    <i class="ri-camera-fill"></i>
+                                </label>
+                                <input type="file" id="profile-image-upload" accept="image/*" style="display: none;">
+                            </div>
+                        </div>
 
-        </html>
+                        <div class="p-3">
+                            <ul class="nav nav-tabs nav-tabs-custom nav-justified mb-3" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-bs-toggle="tab" href="#personalInfo" role="tab">
+                                        <i class="ri-user-line me-1 align-middle"></i> Personal Info
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#security" role="tab">
+                                        <i class="ri-lock-2-line me-1 align-middle"></i> Security
+                                    </a>
+                                </li>
+                            </ul>
+
+                            <div class="tab-content text-muted">
+                                <div class="tab-pane active" id="personalInfo" role="tabpanel">
+                                    <form id="profile-form">
+                                        <div class="row g-2">
+                                            <div class="col-md-6">
+                                                <div class="profile-form-group">
+                                                    <label class="profile-form-label small">First Name</label>
+                                                    <input type="text"
+                                                        class="form-control profile-input form-control-sm"
+                                                        id="profile-firstname" name="firstname" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="profile-form-group">
+                                                    <label class="profile-form-label small">Last Name</label>
+                                                    <input type="text"
+                                                        class="form-control profile-input form-control-sm"
+                                                        id="profile-lastname" name="lastname" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="profile-form-group">
+                                                    <label class="profile-form-label small">Username</label>
+                                                    <input type="text"
+                                                        class="form-control profile-input form-control-sm"
+                                                        id="profile-username" disabled>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="profile-form-group">
+                                                    <label class="profile-form-label small">Email</label>
+                                                    <input type="email"
+                                                        class="form-control profile-input form-control-sm"
+                                                        id="profile-email" name="email">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="profile-form-group">
+                                                    <label class="profile-form-label small">Phone</label>
+                                                    <input type="tel" class="form-control profile-input form-control-sm"
+                                                        id="profile-phone" name="phone">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="profile-form-group">
+                                                    <label class="profile-form-label small">Address</label>
+                                                    <input type="text"
+                                                        class="form-control profile-input form-control-sm"
+                                                        id="profile-address" name="address">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="text-end mt-3">
+                                            <button type="submit" class="btn btn-primary btn-sm">
+                                                <i class="ri-save-line align-middle me-1"></i> Save Changes
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="tab-pane" id="security" role="tabpanel">
+                                    <form id="password-form">
+                                        <div class="row g-2">
+                                            <div class="col-12">
+                                                <div class="profile-form-group position-relative">
+                                                    <label class="profile-form-label small">Current Password</label>
+                                                    <input type="password"
+                                                        class="form-control profile-input form-control-sm"
+                                                        id="current-password" required>
+                                                    <button type="button"
+                                                        class="password-toggle-btn top-50 translate-middle-y">
+                                                        <i class="ri-eye-off-line"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="profile-form-group position-relative">
+                                                    <label class="profile-form-label small">New Password</label>
+                                                    <input type="password"
+                                                        class="form-control profile-input form-control-sm"
+                                                        id="new-password" required minlength="6">
+                                                    <button type="button"
+                                                        class="password-toggle-btn top-50 translate-middle-y">
+                                                        <i class="ri-eye-off-line"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="profile-form-group position-relative">
+                                                    <label class="profile-form-label small">Confirm</label>
+                                                    <input type="password"
+                                                        class="form-control profile-input form-control-sm"
+                                                        id="confirm-password" required minlength="6">
+                                                    <button type="button"
+                                                        class="password-toggle-btn top-50 translate-middle-y">
+                                                        <i class="ri-eye-off-line"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-end mt-3">
+                                            <button type="submit" class="btn btn-warning btn-sm">
+                                                <i class="ri-lock-password-line align-middle me-1"></i> Update Password
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script src="/assets/js/profile-modal.js"></script>
+            </body>
+
+            </html>

@@ -1,0 +1,379 @@
+/**
+ * Enhanced Light Mode Theme
+ * Provides vibrant, prominent colors and glowing effects for better visibility
+ */
+
+/* ============================================
+   Light Mode Only Styles
+   ============================================ */
+
+[data-layout-mode="light"] {
+
+    /* Enhanced Dashboard Cards */
+    .card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%) !important;
+        border: 1px solid rgba(102, 126, 234, 0.15) !important;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.12),
+            0 1px 3px rgba(0, 0, 0, 0.08) !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .card:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.18),
+            0 3px 8px rgba(0, 0, 0, 0.12) !important;
+    }
+
+    .card-animate {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-animate::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .card-animate:hover::before {
+        left: 100%;
+    }
+
+    /* Card Body Enhancements */
+    .card-body {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Stat Numbers - Keep same size as dark mode, just enhance colors */
+    .counter-value {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 900 !important;
+    }
+
+    /* Enhanced Text Labels - Keep size consistent  */
+    .text-uppercase.fw-medium.text-muted {
+        color: #4a5568 !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.5px !important;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    }
+
+    /* Success Color Enhancement */
+    .text-success {
+        color: #10b981 !important;
+        font-weight: 700 !important;
+        text-shadow: 0 1px 3px rgba(16, 185, 129, 0.3) !important;
+    }
+
+    .bg-success-subtle {
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%) !important;
+        border: 1px solid rgba(16, 185, 129, 0.2) !important;
+    }
+
+    /* Danger Color Enhancement */
+    .text-danger {
+        color: #ef4444 !important;
+        font-weight: 700 !important;
+        text-shadow: 0 1px 3px rgba(239, 68, 68, 0.3) !important;
+    }
+
+    /* Avatar/Icon Enhancements */
+    .avatar-title {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        border: 2px solid rgba(255, 255, 255, 0.8) !important;
+    }
+
+    .avatar-title.bg-success-subtle .text-success {
+        font-size: 1.5rem !important;
+        font-weight: 900 !important;
+    }
+
+    /* Chart Container Enhancements */
+    #barChart,
+    #usersChart {
+        border-radius: 12px;
+        padding: 10px;
+        background: linear-gradient(135deg, #ffffff 0%, #fafbff 100%);
+        box-shadow: inset 0 2px 8px rgba(102, 126, 234, 0.05);
+    }
+
+    /* Link Enhancements */
+    .text-decoration-underline {
+        color: #667eea !important;
+        font-weight: 600 !important;
+        text-decoration-thickness: 2px !important;
+        text-underline-offset: 3px !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .text-decoration-underline:hover {
+        color: #764ba2 !important;
+        text-shadow: 0 2px 6px rgba(102, 126, 234, 0.3) !important;
+        transform: translateX(2px);
+    }
+
+    /* Percentage Change Badges */
+    .fs-14 {
+        font-weight: 700 !important;
+        padding: 4px 8px !important;
+        border-radius: 6px !important;
+        background: rgba(255, 255, 255, 0.5) !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+    }
+
+    /* Arrow Icons */
+    .ri-arrow-right-up-line,
+    .ri-arrow-right-down-line {
+        font-weight: 900 !important;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+    }
+
+    /* Enhanced Row Spacing */
+    .row {
+        margin-bottom: 1.5rem;
+    }
+
+    /* Card Title Enhancements */
+    .card h4,
+    .card h5,
+    .card h6 {
+        color: #1a1a2e !important;
+        font-weight: 700 !important;
+    }
+
+    /* Enhanced Button Styles */
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        border: none !important;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
+    }
+
+    /* Info Color Enhancement */
+    .text-info {
+        color: #0ea5e9 !important;
+        font-weight: 700 !important;
+        text-shadow: 0 1px 3px rgba(14, 165, 233, 0.3) !important;
+    }
+
+    /* Warning Color Enhancement */
+    .text-warning {
+        color: #d4a44f !important;
+        font-weight: 700 !important;
+        text-shadow: 0 1px 3px rgba(245, 158, 11, 0.3) !important;
+    }
+
+    /* Page Background Enhancement */
+    body {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+    }
+
+    .main-content {
+        background: transparent !important;
+    }
+
+    /* Enhanced Card Headers */
+    .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        font-weight: 700 !important;
+        border: none !important;
+        padding: 1rem 1.5rem !important;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2) !important;
+    }
+
+    /* Icon Box Enhancement */
+    .bx,
+    .las,
+    .ri {
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Table Enhancements (if present) */
+    .table {
+        background: white !important;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05) !important;
+    }
+
+    .table thead th {
+        background: linear-gradient(135deg, #f8f9ff 0%, #f0f1ff 100%) !important;
+        color: #1a1a2e !important;
+        font-weight: 700 !important;
+        border-color: rgba(102, 126, 234, 0.2) !important;
+    }
+
+    /* Form Input Enhancements - Login Form Specific */
+    .form-control,
+    .form-select {
+        background-color: #f8f9fa !important;
+        /* Lighter background */
+        color: #1a1a2e !important;
+        /* Darker text for contrast */
+        border: 2px solid rgba(102, 126, 234, 0.2) !important;
+        font-weight: 500 !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .form-control::placeholder {
+        color: #6c757d !important;
+        /* Visible placeholder text */
+        opacity: 0.7 !important;
+    }
+
+    .form-label {
+        color: #1a1a2e !important;
+        /* Dark labels for contrast */
+        font-weight: 600 !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        background-color: #ffffff !important;
+        /* White on focus */
+        color: #1a1a2e !important;
+        border-color: #667eea !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+    }
+
+    /* Auth page specific */
+    .auth-pass-inputgroup .form-control {
+        padding-right: 3rem !important;
+        /* Space for eye icon */
+    }
+
+    .auth-pass-inputgroup .btn-link {
+        color: #6c757d !important;
+    }
+
+    .auth-pass-inputgroup .btn-link:hover {
+        color: #667eea !important;
+    }
+
+    /* Alert/Badge Enhancements */
+    .badge {
+        font-weight: 700 !important;
+        padding: 0.4em 0.8em !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .badge-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    }
+
+    .badge-danger {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    }
+
+    .badge-warning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    }
+
+    .badge-info {
+        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
+    }
+
+    /* Glow Effect for Important Elements */
+    .card-animate .fs-22 {
+        animation: subtle-glow 3s ease-in-out infinite;
+    }
+
+    @keyframes subtle-glow {
+
+        0%,
+        100% {
+            text-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+        }
+
+        50% {
+            text-shadow: 0 2px 12px rgba(102, 126, 234, 0.3);
+        }
+    }
+
+    /* Navigation Enhancement */
+    .navbar-menu {
+        background: #f8f9fa !important;
+        backdrop-filter: blur(10px) !important;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
+        border-radius: 16px !important;
+        margin: 10px 15px !important;
+        width: calc(100% - 30px) !important;
+        border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    }
+
+    .nav-link {
+        color: #4a5568 !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+        color: #667eea !important;
+        background: rgba(102, 126, 234, 0.1) !important;
+        transform: translateX(3px);
+    }
+
+    /* Submenu Dropdown Enhancement */
+    .menu-dropdown {
+        background: #f1f3f5 !important;
+        border: 1px solid rgba(0, 0, 0, 0.08) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .menu-dropdown .nav-link {
+        color: #495057 !important;
+    }
+
+    .menu-dropdown .nav-link:hover {
+        background: rgba(102, 126, 234, 0.08) !important;
+        color: #667eea !important;
+    }
+
+    /* Topbar Enhancement */
+    #page-topbar {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%) !important;
+        box-shadow: 0 2px 15px rgba(102, 126, 234, 0.1) !important;
+        border-bottom: 2px solid rgba(102, 126, 234, 0.1) !important;
+    }
+}
+
+/* ============================================
+   Responsive Adjustments
+   ============================================ */
+
+@media (max-width: 768px) {
+    [data-layout-mode="light"] .fs-22 {
+        font-size: 1.5rem !important;
+    }
+
+    [data-layout-mode="light"] .card {
+        margin-bottom: 1rem !important;
+    }
+}
+
+/* ============================================
+   Print Styles (Light Mode)
+   ============================================ */
+
+@media print {
+    [data-layout-mode="light"] .card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+    }
+}
