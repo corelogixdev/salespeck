@@ -25,7 +25,16 @@ function buildPaginationUrl(page, pageSize) {
     return `${baseUrl}?${params.toString()}`;
 }
 
-const pageSizeOptions = [10, 25, 50, 100];
+const pageSizeOptions = [
+    { value: 10, label: '10' },
+    { value: 25, label: '25' },
+    { value: 50, label: '50' },
+    { value: 100, label: '100' },
+    { value: 200, label: '200' },
+    { value: 500, label: '500' },
+    { value: 1000, label: '1000' },
+    { value: 9999, label: 'All' }
+];
 const currentPageSize = pagination.pageSize || 10;
 %>
 
@@ -52,10 +61,9 @@ const currentPageSize = pagination.pageSize || 10;
                     <label for="pageSize" class="me-2 text-muted">Show:</label>
                     <select id="pageSize" class="form-select form-select-sm"
                         onchange="(function() { const params = new URLSearchParams(window.location.search); params.set('page', 1); params.set('pageSize', this.value); window.location.href = '<%= baseUrl %>' + '?' + params.toString(); }).call(this)">
-                        <% pageSizeOptions.forEach(size=> { %>
-                            <option value="<%= size %>" <%=currentPageSize==size ? 'selected' : '' %>><%= size %>
-                            </option>
-                            <% }) %>
+                        <% pageSizeOptions.forEach(option => { %>
+                            <option value="<%= option.value %>" <%=currentPageSize==option.value ? 'selected' : '' %>><%= option.label %></option>
+                        <% }) %>
                     </select>
                 </div>
 

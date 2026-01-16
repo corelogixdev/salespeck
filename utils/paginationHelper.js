@@ -12,7 +12,8 @@
  */
 function getPaginationMeta(page, pageSize, totalCount) {
     const currentPage = Math.max(1, parseInt(page) || 1);
-    const limit = Math.max(1, Math.min(100, parseInt(pageSize) || 10));
+    // Allow large page sizes (up to 9999 for "All" option)
+    const limit = Math.max(1, Math.min(9999, parseInt(pageSize) || 10));
     const totalPages = Math.ceil(totalCount / limit);
     const offset = (currentPage - 1) * limit;
 

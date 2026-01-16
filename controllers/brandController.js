@@ -49,6 +49,31 @@ exports.listBrands = async (req, res) => {
     }
 };
 
+exports.getBrand = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const brand = await db.brand.findByPk(id);
+        
+        if (!brand) {
+            return res.status(404).json({
+                success: false,
+                message: 'Brand not found'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            brand: brand
+        });
+    } catch (error) {
+        console.error('Error fetching brand:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal Server Error'
+        });
+    }
+};
+
 exports.saveBrand = async (req, res) => {
     try {
         const { name, description } = req.body;

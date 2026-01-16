@@ -90,39 +90,79 @@
                     </table>
                 </div>
 
-                <!-- Pagination -->
-                <% if (pagination && pagination.totalPages > 1) { %>
-                    <div class="d-flex justify-content-between align-items-center mt-4">
+                <!-- Enhanced Pagination -->
+                <% if (pagination && pagination.totalPages > 0) { %>
+                    <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-3">
+                        <!-- Records Info -->
                         <div class="text-muted">
                             Showing <strong><%= pagination.startRecord %></strong> to 
                             <strong><%= pagination.endRecord %></strong> of 
                             <strong><%= pagination.totalCount %></strong> entries
                         </div>
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination mb-0">
-                                <li class="page-item <%= pagination.currentPage === 1 ? 'disabled' : '' %>">
-                                    <a class="page-link" href="<%= pagination.currentPage === 1 ? '#' : '/categories?' + (query.name_like ? 'name_like=' + query.name_like + '&' : '') + (query.status ? 'status=' + query.status + '&' : '') + 'page=' + (pagination.currentPage - 1) %>">
-                                        <i class="mdi mdi-chevron-left"></i>
-                                    </a>
-                                </li>
-                                <% for(let i = 1; i <= pagination.totalPages; i++) { %>
-                                    <% if (i === 1 || i === pagination.totalPages || (i >= pagination.currentPage - 1 && i <= pagination.currentPage + 1)) { %>
-                                        <li class="page-item <%= i === pagination.currentPage ? 'active' : '' %>">
-                                            <a class="page-link" href="/categories?<%= query.name_like ? 'name_like=' + query.name_like + '&' : '' %><%= query.status ? 'status=' + query.status + '&' : '' %>page=<%= i %>">
-                                                <%= i %>
-                                            </a>
-                                        </li>
-                                    <% } else if (i === 2 || i === pagination.totalPages - 1) { %>
-                                        <li class="page-item disabled"><a class="page-link">...</a></li>
+
+                        <!-- Page Size Selector -->
+                        <div class="d-flex align-items-center gap-2">
+                            <label for="pageSize" class="text-muted mb-0">Show:</label>
+                            <select id="pageSize" class="form-select form-select-sm" style="width: 80px;"
+                                onchange="(function() { const params = new URLSearchParams(window.location.search); params.set('page', 1); params.set('pageSize', this.value); window.location.href = '/categories?' + params.toString(); }).call(this)">
+                                <option value="10" <%= (pagination.pageSize || 10) == 10 ? 'selected' : '' %>>10</option>
+                                <option value="25" <%= (pagination.pageSize || 10) == 25 ? 'selected' : '' %>>25</option>
+                                <option value="50" <%= (pagination.pageSize || 10) == 50 ? 'selected' : '' %>>50</option>
+                                <option value="100" <%= (pagination.pageSize || 10) == 100 ? 'selected' : '' %>>100</option>
+                                <option value="200" <%= (pagination.pageSize || 10) == 200 ? 'selected' : '' %>>200</option>
+                                <option value="500" <%= (pagination.pageSize || 10) == 500 ? 'selected' : '' %>>500</option>
+                                <option value="1000" <%= (pagination.pageSize || 10) == 1000 ? 'selected' : '' %>>1000</option>
+                                <option value="9999" <%= (pagination.pageSize || 10) == 9999 ? 'selected' : '' %>>All</option>
+                            </select>
+                        </div>
+
+                        <!-- Pagination Controls -->
+                        <% if (pagination.totalPages > 1) { %>
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination mb-0">
+                                    <!-- First Page -->
+                                    <li class="page-item <%= pagination.currentPage === 1 ? 'disabled' : '' %>">
+                                        <a class="page-link" href="<%= pagination.currentPage === 1 ? '#' : '/categories?' + (query.name_like ? 'name_like=' + query.name_like + '&' : '') + (query.status ? 'status=' + query.status + '&' : '') + (pagination.pageSize ? 'pageSize=' + pagination.pageSize + '&' : '') + 'page=1' %>" title="First">
+                                            <i class="ri-arrow-left-double-line"></i>
+                                        </a>
+                                    </li>
+                                    
+                                    <!-- Previous Page -->
+                                    <li class="page-item <%= pagination.currentPage === 1 ? 'disabled' : '' %>">
+                                        <a class="page-link" href="<%= pagination.currentPage === 1 ? '#' : '/categories?' + (query.name_like ? 'name_like=' + query.name_like + '&' : '') + (query.status ? 'status=' + query.status + '&' : '') + (pagination.pageSize ? 'pageSize=' + pagination.pageSize + '&' : '') + 'page=' + (pagination.currentPage - 1) %>" title="Previous">
+                                            <i class="mdi mdi-chevron-left"></i>
+                                        </a>
+                                    </li>
+                                    
+                                    <!-- Page Numbers -->
+                                    <% for(let i = 1; i <= pagination.totalPages; i++) { %>
+                                        <% if (i === 1 || i === pagination.totalPages || (i >= pagination.currentPage - 1 && i <= pagination.currentPage + 1)) { %>
+                                            <li class="page-item <%= i === pagination.currentPage ? 'active' : '' %>">
+                                                <a class="page-link" href="/categories?<%= query.name_like ? 'name_like=' + query.name_like + '&' : '' %><%= query.status ? 'status=' + query.status + '&' : '' %><%= pagination.pageSize ? 'pageSize=' + pagination.pageSize + '&' : '' %>page=<%= i %>">
+                                                    <%= i %>
+                                                </a>
+                                            </li>
+                                        <% } else if (i === 2 || i === pagination.totalPages - 1) { %>
+                                            <li class="page-item disabled"><a class="page-link">...</a></li>
+                                        <% } %>
                                     <% } %>
-                                <% } %>
-                                <li class="page-item <%= pagination.currentPage === pagination.totalPages ? 'disabled' : '' %>">
-                                    <a class="page-link" href="<%= pagination.currentPage === pagination.totalPages ? '#' : '/categories?' + (query.name_like ? 'name_like=' + query.name_like + '&' : '') + (query.status ? 'status=' + query.status + '&' : '') + 'page=' + (pagination.currentPage + 1) %>">
-                                        <i class="mdi mdi-chevron-right"></i>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
+                                    
+                                    <!-- Next Page -->
+                                    <li class="page-item <%= pagination.currentPage === pagination.totalPages ? 'disabled' : '' %>">
+                                        <a class="page-link" href="<%= pagination.currentPage === pagination.totalPages ? '#' : '/categories?' + (query.name_like ? 'name_like=' + query.name_like + '&' : '') + (query.status ? 'status=' + query.status + '&' : '') + (pagination.pageSize ? 'pageSize=' + pagination.pageSize + '&' : '') + 'page=' + (pagination.currentPage + 1) %>" title="Next">
+                                            <i class="mdi mdi-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                    
+                                    <!-- Last Page -->
+                                    <li class="page-item <%= pagination.currentPage === pagination.totalPages ? 'disabled' : '' %>">
+                                        <a class="page-link" href="<%= pagination.currentPage === pagination.totalPages ? '#' : '/categories?' + (query.name_like ? 'name_like=' + query.name_like + '&' : '') + (query.status ? 'status=' + query.status + '&' : '') + (pagination.pageSize ? 'pageSize=' + pagination.pageSize + '&' : '') + 'page=' + pagination.totalPages %>" title="Last">
+                                            <i class="ri-arrow-right-double-line"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        <% } %>
                     </div>
                 <% } %>
             </div>
