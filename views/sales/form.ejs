@@ -460,6 +460,46 @@
         // Initialize clock updates
         updateAllClocks();
         setInterval(updateAllClocks, 1000);
+
+        // Prevent window from losing focus during barcode scanning
+        // This prevents the application from minimizing when barcode scanner input is processed
+        let isSearchInputFocused = false;
+
+        // Track when any search input is focused
+        document.addEventListener('focusin', (event) => {
+            if (event.target && event.target.id && event.target.id.startsWith('product-search-')) {
+                isSearchInputFocused = true;
+            }
+        });
+
+        document.addEventListener('focusout', (event) => {
+            if (event.target && event.target.id && event.target.id.startsWith('product-search-')) {
+                // Small delay to handle quick focus changes
+                setTimeout(() => {
+                    const activeElement = document.activeElement;
+                    if (!activeElement || !activeElement.id || !activeElement.id.startsWith('product-search-')) {
+                        isSearchInputFocused = false;
+                    }
+                }, 50);
+            }
+        });
+
+        // Prevent window blur when search input is focused
+        window.addEventListener('blur', (event) => {
+            if (isSearchInputFocused && currentTabId) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                // Immediately refocus the window and input
+                requestAnimationFrame(() => {
+                    window.focus();
+                    const activeSearch = document.getElementById(`product-search-${currentTabId}`);
+                    if (activeSearch) {
+                        activeSearch.focus();
+                    }
+                });
+            }
+        }, true); // Use capture phase for earlier handling
     });
 
     // Update all visible clocks
@@ -745,6 +785,29 @@
         searchBarcode.addEventListener('change', updatePlaceholder);
         searchManual.addEventListener('change', updatePlaceholder);
 
+        // Lock window focus when search input is focused (prevents minimize during barcode scanning)
+        productSearch.addEventListener('focus', () => {
+            if (window.electron && searchBarcode.checked) {
+                window.electron.send('lock-window-focus');
+            }
+        });
+
+        // Extend lock on any input activity
+        productSearch.addEventListener('input', () => {
+            if (window.electron && searchBarcode.checked) {
+                window.electron.send('lock-window-focus');
+            }
+        });
+
+        // Unlock when search loses focus (with delay to handle quick refocus)
+        productSearch.addEventListener('blur', () => {
+            setTimeout(() => {
+                if (window.electron && document.activeElement !== productSearch) {
+                    window.electron.send('unlock-window-focus');
+                }
+            }, 500);
+        });
+
         // Product search handlers
         productSearch.addEventListener('keydown', async (event) => {
             const searchResults = document.getElementById(`search-results-${tabId}`);
@@ -752,7 +815,11 @@
                 event.preventDefault();
                 event.stopPropagation();
 
+                // Hide search results immediately to prevent any focus issues
+                searchResults.classList.add('d-none');
+
                 if (searchBarcode.checked) {
+                    // In barcode mode, search and add product directly
                     await searchProductByBarcode(productSearch.value, tabId);
                     return;
                 } else {
@@ -1061,18 +1128,45 @@
 
     async function searchProductByBarcode(barcode, tabId) {
         const tab = saleTabs.find(t => t.id === tabId);
+        const productSearchInput = document.getElementById(`product-search-${tabId}`);
+
+        // Lock window focus immediately to prevent minimize
+        if (window.electron) {
+            window.electron.send('lock-window-focus');
+        }
+
         if (!barcode) {
             return tab.previousEntry ? addProduct(tab.previousEntry, tabId) : null;
         }
+
         const products = await getProducts({ barcode });
         if (products.length > 0) {
             addProduct(products[0], tabId);
-            document.getElementById(`product-search-${tabId}`).value = '';
-            setTimeout(() => document.getElementById(`product-search-${tabId}`).focus(), 100);
+            productSearchInput.value = '';
+
+            // Multi-level focus restoration to prevent window minimization
+            // Strategy 1: Immediate focus
+            productSearchInput.focus();
+
+            // Strategy 2: Focus via requestAnimationFrame (next render cycle)
+            requestAnimationFrame(() => {
+                productSearchInput.focus();
+                // Extend focus lock
+                if (window.electron) {
+                    window.electron.send('lock-window-focus');
+                }
+            });
+
+            // Strategy 3: Focus with slight delay as final fallback
+            setTimeout(() => {
+                if (document.activeElement !== productSearchInput) {
+                    productSearchInput.focus();
+                }
+            }, 10);
         } else {
             toastr.warning('No product found.');
-            document.getElementById(`product-search-${tabId}`).value = '';
-            document.getElementById(`product-search-${tabId}`).focus();
+            productSearchInput.value = '';
+            productSearchInput.focus();
         }
     }
 
