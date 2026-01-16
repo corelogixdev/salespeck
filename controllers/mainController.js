@@ -5,7 +5,6 @@ const logi = require("../utils/logi");
 const { Op } = require("sequelize");
 const config = require("../installEnv");
 
-
 const index = (req, res) => {
   if (!req.session.user_id) {
     return res.redirect("/login");
@@ -110,7 +109,7 @@ async function getDashboardStats() {
       todaysSalesAmount,
       salesPercentageChange,
       salesArrowDirection,
-    }
+    };
   } catch (error) {
     logi("Error:", error);
     return {};
@@ -237,10 +236,13 @@ const registerpost = async (req, res) => {
       lastname: req.body.lastName,
       password: hashedPassword,
       role: "branchmanager",
-      profile_image_url: profileImageUrl
+      profile_image_url: profileImageUrl,
     });
     logi("BranchManager user created successfully!");
-    req.session.message = { type: "success", text: "Registration successful! Please login." };
+    req.session.message = {
+      type: "success",
+      text: "Registration successful! Please login.",
+    };
     res.redirect("/login");
   } catch (e) {
     logi("Error:");
@@ -267,7 +269,11 @@ const exportDb = async (req, res) => {
 
 const inventorylogs = async (req, res) => {
   try {
-    let logs = await db.inventorylogs.findAll({
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 25;
+    const offset = (page - 1) * pageSize;
+
+    const { count, rows: logs } = await db.inventorylogs.findAndCountAll({
       include: [
         {
           model: db.product,
@@ -281,10 +287,11 @@ const inventorylogs = async (req, res) => {
         },
       ],
       order: [["createdAt", "DESC"]],
+      limit: pageSize,
+      offset: offset,
     });
 
-    if (!logs) logs = [];
-    logs = logs.map((log) => {
+    const processedLogs = logs.map((log) => {
       const plainLog = log.get({ plain: true });
       return {
         ...plainLog,
@@ -293,24 +300,42 @@ const inventorylogs = async (req, res) => {
       };
     });
 
+    const totalPages = Math.ceil(count / pageSize);
+    const pagination = {
+      currentPage: page,
+      totalPages: totalPages,
+      pageSize: pageSize,
+      totalCount: count,
+      startRecord: offset + 1,
+      endRecord: Math.min(offset + pageSize, count),
+      hasPrevious: page > 1,
+      hasNext: page < totalPages,
+    };
+
     res.render("inventorylogs", {
-      logs,
+      logs: processedLogs,
       searchParams: {},
+      pagination,
+      query: req.query,
     });
   } catch (error) {
     console.error("Error fetching inventory logs:", error);
-    req.session.message = {
-      type: "error",
-      text: "An error occurred while fetching inventory logs.",
+    res.render("inventorylogs", {
+      logs: [],
       searchParams: {},
-    };
-    res.redirect("/dashboard");
+      pagination: null,
+      query: {},
+      error: "An error occurred while fetching inventory logs.",
+    });
   }
 };
 
 const searchInventoryLogs = async (req, res) => {
   try {
     const { dateRange, product, createdBy } = req.body;
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 25;
+    const offset = (page - 1) * pageSize;
 
     let whereClause = {};
     let includeOptions = [
@@ -323,7 +348,7 @@ const searchInventoryLogs = async (req, res) => {
       {
         model: db.user,
         as: "User",
-        attributes: ["id", "name"],
+        attributes: ["id", "firstname", "lastname"],
         where: {},
       },
     ];
@@ -351,43 +376,67 @@ const searchInventoryLogs = async (req, res) => {
     }
 
     if (createdBy) {
-      includeOptions[1].where.name = { [Op.like]: `%${createdBy}%` };
+      includeOptions[1].where[Op.or] = [
+        { firstname: { [Op.like]: `%${createdBy}%` } },
+        { lastname: { [Op.like]: `%${createdBy}%` } },
+      ];
     }
 
-    let logs = await db.inventorylogs.findAll({
+    const { count, rows: logs } = await db.inventorylogs.findAndCountAll({
       where: whereClause,
       include: includeOptions,
       order: [["createdAt", "DESC"]],
+      limit: pageSize,
+      offset: offset,
     });
 
-    if (!logs) logs = [];
-    logs = logs.map((log) => {
+    const processedLogs = logs.map((log) => {
       const plainLog = log.get({ plain: true });
       return {
         ...plainLog,
         Product: plainLog.Product || { name: "Unknown Product" },
-        User: plainLog.User || { name: "Unknown User" },
+        User: plainLog.User || { firstname: "Unknown User", lastname: "" },
       };
     });
 
+    const totalPages = Math.ceil(count / pageSize);
+    const pagination = {
+      currentPage: page,
+      totalPages: totalPages,
+      pageSize: pageSize,
+      totalCount: count,
+      startRecord: offset + 1,
+      endRecord: Math.min(offset + pageSize, count),
+      hasPrevious: page > 1,
+      hasNext: page < totalPages,
+    };
+
     res.render("inventorylogs", {
-      logs,
+      logs: processedLogs,
       searchParams: req.body,
+      pagination,
+      query: req.query,
     });
   } catch (error) {
     console.error("Error searching inventory logs:", error);
-    req.session.message = {
-      type: "error",
-      text: "An error occurred while searching inventory logs.",
-    };
-    res.redirect("/inventorylogs");
+    res.render("inventorylogs", {
+      logs: [],
+      searchParams: req.body,
+      pagination: null,
+      query: {},
+      error: "An error occurred while searching inventory logs.",
+    });
   }
 };
 
 const inventorylogsById = async (req, res) => {
   try {
     const productId = req.params.id;
-    let logs = await db.inventorylogs.findAll({
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 25;
+    const offset = (page - 1) * pageSize;
+
+    const { count, rows: logs } = await db.inventorylogs.findAndCountAll({
       where: {
         product_id: productId,
       },
@@ -404,41 +453,56 @@ const inventorylogsById = async (req, res) => {
         },
       ],
       order: [["createdAt", "DESC"]],
+      limit: pageSize,
+      offset: offset,
     });
 
-    if (!logs) {
-      logs = [];
-    }
-
-    // Add error handling for missing associations
-    logs = logs.map((log) => {
+    const processedLogs = logs.map((log) => {
       const plainLog = log.get({ plain: true });
       return {
         ...plainLog,
         Product: plainLog.Product || { name: "Unknown Product" },
-        User: plainLog.User || { name: "Unknown User" },
+        User: plainLog.User || { firstname: "Unknown User", lastname: "" },
       };
     });
 
+    const totalPages = Math.ceil(count / pageSize);
+    const pagination = {
+      currentPage: page,
+      totalPages: totalPages,
+      pageSize: pageSize,
+      totalCount: count,
+      startRecord: offset + 1,
+      endRecord: Math.min(offset + pageSize, count),
+      hasPrevious: page > 1,
+      hasNext: page < totalPages,
+    };
+
     res.render("inventorylogs", {
-      logs,
-      title: `Inventory Logs - ${logs[0]?.Product?.name || "Product"}`,
+      logs: processedLogs,
+      title: `Inventory Logs - ${processedLogs[0]?.Product?.name || "Product"}`,
       hidenav: true,
       searchParams: {},
+      pagination,
+      query: req.query,
     });
   } catch (error) {
     console.error("Error fetching inventory logs:", error);
-    req.session.message = {
-      type: "error",
-      text: "An error occurred while fetching inventory logs.",
-    };
-    res.redirect("/dashboard");
+    res.render("inventorylogs", {
+      logs: [],
+      title: "Inventory Logs",
+      hidenav: true,
+      searchParams: {},
+      pagination: null,
+      query: {},
+      error: "An error occurred while fetching inventory logs.",
+    });
   }
 };
 
 const switchServer = async (req, res) => {
-  res.render('switch-server', {
-    title: 'Switch Server',
+  res.render("switch-server", {
+    title: "Switch Server",
     port: config.port,
   });
 };
@@ -456,5 +520,5 @@ module.exports = {
   searchInventoryLogs,
   inventorylogsById,
   switchServer,
-  getDashboardStats
+  getDashboardStats,
 };

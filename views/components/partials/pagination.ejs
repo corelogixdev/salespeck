@@ -1,19 +1,33 @@
-<% /** * Reusable Pagination Component * * Usage: * <%- include('../components/partials/pagination', { * pagination: { *
-    currentPage: 1, * totalPages: 10, * pageSize: 10, * totalCount: 95, * startRecord: 1, * endRecord: 10 * }, *
-    baseUrl: '/brands' , * query: req.query * }) %>
-    */
+<%
+/**
+ * Reusable Pagination Component
+ * 
+ * Usage:
+ * <%- include('../components/partials/pagination', {
+ *   pagination: {
+ *     currentPage: 1,
+ *     totalPages: 10,
+ *     pageSize: 10,
+ *     totalCount: 95,
+ *     startRecord: 1,
+ *     endRecord: 10
+ *   },
+ *   baseUrl: '/brands',
+ *   query: req.query
+ * }) %>
+ */
 
-    // Helper function to build URL with query parameters
-    function buildPaginationUrl(page, pageSize) {
+// Helper function to build URL with query parameters
+function buildPaginationUrl(page, pageSize) {
     const params = new URLSearchParams(query || {});
     params.set('page', page);
     if (pageSize) params.set('pageSize', pageSize);
     return `${baseUrl}?${params.toString()}`;
-    }
+}
 
-    const pageSizeOptions = [10, 25, 50, 100];
-    const currentPageSize = pagination.pageSize || 10;
-    %>
+const pageSizeOptions = [10, 25, 50, 100];
+const currentPageSize = pagination.pageSize || 10;
+%>
 
     <% if (pagination && pagination.totalCount> 0) { %>
         <div class="pagination-wrapper">
