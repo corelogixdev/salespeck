@@ -241,9 +241,6 @@
             }
         }
 
-        .code {
-            /* font-family: monospace !important; */
-        }
 
         * {
             font-family: Arial !important;
@@ -386,59 +383,62 @@
 
             .table:not(.footer-table) th,
             .table:not(.footer-table) td {
-                padding: 1pt 2pt !important;
+                padding: 1pt 1pt !important;
                 white-space: normal !important;
                 word-break: break-word;
                 margin-left: 0 !important;
+                font-size: 7pt !important;
             }
 
             .table:not(.footer-table) th:first-child {
-                width: 5% !important;
+                width: 8% !important;
             }
 
             .table:not(.footer-table) th:nth-child(2) {
-                width: 30% !important;
+                width: 35% !important;
             }
 
             .table:not(.footer-table) th:nth-child(3) {
-                width: 25% !important;
+                width: 18% !important;
             }
 
             .table:not(.footer-table) th:nth-child(4) {
-                width: 10% !important;
+                width: 12% !important;
             }
 
             .table:not(.footer-table) th:last-child {
-                width: 25% !important;
+                width: 27% !important;
+                text-align: right !important;
+                padding-right: 2pt !important;
             }
 
             /* Footer table specific styles */
             .footer-table {
                 width: auto !important;
-                min-width: 50% !important;
-                max-width: 70% !important;
+                min-width: 45% !important;
+                max-width: 65% !important;
                 margin-left: auto !important;
                 margin-right: 0 !important;
-                font-size: 8pt !important;
+                font-size: 7pt !important;
                 table-layout: auto !important;
             }
 
             .footer-table td,
             .footer-table th {
                 white-space: nowrap !important;
-                padding: 1pt 3pt !important;
+                padding: 1pt 2pt !important;
             }
 
             .footer-table td:first-child,
             .footer-table th:first-child {
                 text-align: left !important;
-                padding-right: 10pt !important;
+                padding-right: 8pt !important;
             }
 
             .footer-table td:last-child,
             .footer-table th:last-child {
                 text-align: right !important;
-                padding-left: 5pt !important;
+                padding-left: 3pt !important;
             }
 
             /* Font size adjustments */
@@ -474,10 +474,19 @@
                 margin-bottom: 2pt !important;
             }
 
-            /* Remove all margins from page */
+            /* Page margins - small padding to prevent overflow */
             @page {
-                margin: 0 !important;
+                margin: 5mm !important;
                 padding: 0 !important;
+            }
+
+            /* Add small padding to card content in print */
+            .card-body {
+                padding: 2pt 4pt !important;
+            }
+
+            .card-header {
+                padding: 2pt 4pt !important;
             }
 
             /* Remove all borders and spacing */
@@ -515,13 +524,14 @@
 </body>
 <script src="/assets/js/moment.min.js"></script>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         setTimeout(() => {
-            $('.format-date').each(function() {
+            $('.format-date').each(function () {
                 var date = $(this).text().trim();
                 $(this).text(moment(new Date(date)).format('MMMM Do YYYY'));
-            });    
+            });
         });
     });
 </script>
+
 </html>

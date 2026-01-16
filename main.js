@@ -94,9 +94,10 @@ ipcMain.on('switch-server', async (event, serverIp) => {
   }
 });
 
-// Focus lock for barcode scanning - prevents window minimize
+// Focus lock for barcode scanning - prevents window minimize and preserves maximize state
 let focusLockActive = false;
 let focusLockTimer = null;
+let wasMaximized = false;
 
 ipcMain.on('lock-window-focus', (event) => {
   if (!mainWindow || mainWindow.isDestroyed()) return;
@@ -108,6 +109,9 @@ ipcMain.on('lock-window-focus', (event) => {
     clearTimeout(focusLockTimer);
   }
 
+  // Remember if window was maximized before locking
+  wasMaximized = mainWindow.isMaximized();
+
   // Keep window focused and on top during scanning
   if (!mainWindow.isVisible()) {
     mainWindow.show();
@@ -115,6 +119,12 @@ ipcMain.on('lock-window-focus', (event) => {
   if (mainWindow.isMinimized()) {
     mainWindow.restore();
   }
+
+  // Restore maximized state if it was maximized
+  if (wasMaximized && !mainWindow.isMaximized()) {
+    mainWindow.maximize();
+  }
+
   mainWindow.focus();
   mainWindow.setAlwaysOnTop(true, 'screen-saver');
 
