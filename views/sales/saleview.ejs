@@ -43,39 +43,39 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card-header border-bottom-dashed px-4">
-                            <img src="/assets/images/icon.png" class="card-logo card-logo-dark mx-auto mb-3" alt="logo"
-                                height="50">
-                            <img src="/assets/images/icon.png" class="card-logo card-logo-light mx-auto mb-3" alt="logo"
-                                height="50">
-                            <div class="d-flex justify-content-between">
-                                <div class="flex-grow-1">
-                                    <div class="mt-1">
-                                        <h6 class="text-uppercase fw-semibold">Company Details</h6>
-                                        <p class="mb-1">
-                                            <%= companySettings.name %>
-                                        </p>
-                                        <p class="mb-0">
-                                            <%= companySettings.address %>
-                                        </p>
-                                        <p class="mb-0">Contact: <%= companySettings.phone %>
-                                        </p>
-                                    </div>
-                                </div>
-                                <% if(sale.Customer) { %>
-                                    <div class="flex-shrink-0">
-                                        <h6 class="text-uppercase fw-semibold mt-1">Customer Details</h6>
-                                        <p class="mb-2">
-                                            <%= sale.Customer.firstname %>
-                                                <%= sale.Customer.lastname %>
-                                        </p>
-                                        <p class="mb-1">
-                                            <%= sale.Customer.address %>
-                                        </p>
-                                        <p class="mb-1">Phone: <%= sale.Customer.phone %>
-                                        </p>
-                                    </div>
-                                    <% } %>
+                            <!-- Logo - Centered -->
+                            <div class="text-center mb-3">
+                                <img src="/assets/images/icon.png" class="card-logo" alt="logo" height="50">
                             </div>
+
+                            <!-- Company Details - Centered -->
+                            <div class="text-center mb-3">
+                                <h6 class="text-uppercase fw-semibold">Company Details</h6>
+                                <p class="mb-1">
+                                    <%= companySettings.name %>
+                                </p>
+                                <p class="mb-0">
+                                    <%= companySettings.address %>
+                                </p>
+                                <p class="mb-0">Contact: <%= companySettings.phone %>
+                                </p>
+                            </div>
+
+                            <!-- Customer Details - Right aligned if exists -->
+                            <% if(sale.Customer) { %>
+                                <div class="text-end">
+                                    <h6 class="text-uppercase fw-semibold mt-1">Customer Details</h6>
+                                    <p class="mb-2">
+                                        <%= sale.Customer.firstname %>
+                                            <%= sale.Customer.lastname %>
+                                    </p>
+                                    <p class="mb-1">
+                                        <%= sale.Customer.address %>
+                                    </p>
+                                    <p class="mb-1">Phone: <%= sale.Customer.phone %>
+                                    </p>
+                                </div>
+                                <% } %>
                         </div>
 
                         <div class="card-body pt-4 pb-0 px-4">
@@ -190,7 +190,7 @@
                                                             <% } %>
                                     </tbody>
                                 </table>
-                                <p class="text-end border-top pt-2">
+                                <p class="text-center border-top pt-2">
                                     Powered by <strong>OpenMenu</strong>
                                 </p>
 
@@ -379,6 +379,7 @@
                 padding: 0 !important;
                 margin-left: 0 !important;
                 table-layout: fixed !important;
+                border-collapse: collapse !important;
             }
 
             .table:not(.footer-table) th,
@@ -388,6 +389,12 @@
                 word-break: break-word;
                 margin-left: 0 !important;
                 font-size: 7pt !important;
+                border: 1pt solid #000 !important;
+            }
+
+            /* Table header with thicker border */
+            .table:not(.footer-table) thead tr {
+                border-bottom: 1.5pt solid #000 !important;
             }
 
             .table:not(.footer-table) th:first-child {
@@ -468,10 +475,13 @@
                 margin: 1pt 0 !important;
             }
 
-            /* Image sizing */
+            /* Image sizing and centering */
             .card-logo {
                 height: 30pt !important;
                 margin-bottom: 2pt !important;
+                display: block !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
             }
 
             /* Page margins - small padding to prevent overflow */
@@ -489,12 +499,13 @@
                 padding: 2pt 4pt !important;
             }
 
-            /* Remove all borders and spacing */
+            /* Make borders black and thicker for print */
             .border-top,
             .border-bottom-dashed,
             .border-top-dashed {
-                border-color: #ddd !important;
-                border-width: 0.5pt !important;
+                border-color: #000 !important;
+                border-width: 1.5pt !important;
+                border-style: solid !important;
             }
 
             .px-3,
@@ -528,7 +539,8 @@
         setTimeout(() => {
             $('.format-date').each(function () {
                 var date = $(this).text().trim();
-                $(this).text(moment(new Date(date)).format('MMMM Do YYYY'));
+                // Format: 16-1-2026 20:37
+                $(this).text(moment(new Date(date)).format('DD-M-YYYY HH:mm'));
             });
         });
     });
