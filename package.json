@@ -13,7 +13,8 @@
     "test:update": "node test-update.js",
     "migrate": "sequelize db:migrate",
     "seed": "sequelize db:seed:all",
-    "seed:demo": "node scripts/seed-demo-data.js"
+    "seed:demo": "node scripts/seed-demo-data.js",
+    "seed:large": "node scripts/seed-large-demo-data.js"
   },
   "build": {
     "appId": "io.openmenu.app",
