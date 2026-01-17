@@ -112,21 +112,21 @@ async function seedDemoData() {
     const products = [
       {
         name: 'a',
-        barcode: 'a',
+        barcode: '123',
         carrycost: 0,
         discount: 0,
         ispurchaseable: true,
         issaleable: false,
         purchaseprice: 1,
         purchaseactive: true,
-        quantity: 0,
+        quantity: 100,
         saleprice: 0,
         saleactive: false,
         createdby: 1,
         updatedby: 1,
       },
       {
-        name: 'b',
+        name: '124',
         barcode: 'b',
         carrycost: 0,
         discount: 0,
@@ -134,7 +134,7 @@ async function seedDemoData() {
         issaleable: true,
         purchaseprice: 0,
         purchaseactive: false,
-        quantity: 0,
+        quantity: 100,
         saleprice: 2,
         saleactive: true,
         createdby: 1,
@@ -142,21 +142,21 @@ async function seedDemoData() {
       },
       {
         name: 'c',
-        barcode: 'c',
+        barcode: '321',
         carrycost: 0,
         discount: 0,
         ispurchaseable: true,
         issaleable: true,
         purchaseprice: 3,
         purchaseactive: true,
-        quantity: 0,
+        quantity: 100,
         saleprice: 4,
         saleactive: true,
         createdby: 1,
         updatedby: 1,
       }
     ];
-    
+
     let productsCreated = 0;
     for (const product of products) {
       const existingProduct = await db.product.findOne({
@@ -166,7 +166,7 @@ async function seedDemoData() {
       if (existingProduct) {
         continue;
       }
-      
+
       await db.product.create({
         ...product,
         createdAt: new Date(),
@@ -174,9 +174,9 @@ async function seedDemoData() {
       });
       productsCreated++;
     }
-    
+
     console.log('Demo data seeded successfully');
-    
+
   } catch (error) {
     console.error('Error seeding demo data:', error);
     throw error;

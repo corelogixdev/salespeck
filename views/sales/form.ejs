@@ -21,8 +21,14 @@
         color: var(--vz-body-color);
     }
 
-    .search-result-product:hover {
+    .search-result-product:hover,
+    .search-result-product.selected {
         background-color: var(--vz-light);
+    }
+
+    .search-result-product.selected {
+        background-color: var(--vz-primary);
+        color: #fff;
     }
 
     .editable-input {
@@ -811,19 +817,84 @@
         // Product search handlers
         productSearch.addEventListener('keydown', async (event) => {
             const searchResults = document.getElementById(`search-results-${tabId}`);
-            if (event.key === 'Enter') {
+            const tab = saleTabs.find(t => t.id === tabId);
+
+            // Check if this is an Enter key event (including Ctrl+M from barcode scanners)
+            const isEnterKey = event.key === 'Enter' || event.keyCode === 13;
+            const isCtrlM = event.ctrlKey && (event.key === 'm' || event.key === 'M');
+
+            // Prevent Ctrl+M from minimizing window (barcode scanners often send this)
+            if (isCtrlM) {
+                event.preventDefault();
+                event.stopPropagation();
+                // In barcode mode, treat Ctrl+M as Enter to process the scan
+                if (searchBarcode.checked) {
+                    const barcode = productSearch.value.trim();
+                    productSearch.value = '';
+                    if (barcode) {
+                        await searchProductByBarcode(barcode, tabId);
+                    }
+                    productSearch.focus();
+                }
+                return;
+            }
+
+            // Handle arrow key navigation for manual mode dropdown
+            if (!searchBarcode.checked && !searchResults.classList.contains('d-none')) {
+                const items = searchResults.querySelectorAll('.search-result-product');
+                if (items.length > 0) {
+                    let currentIndex = -1;
+                    items.forEach((item, index) => {
+                        if (item.classList.contains('selected')) {
+                            currentIndex = index;
+                        }
+                    });
+
+                    if (event.key === 'ArrowDown') {
+                        event.preventDefault();
+                        items.forEach(item => item.classList.remove('selected'));
+                        const nextIndex = currentIndex < items.length - 1 ? currentIndex + 1 : 0;
+                        items[nextIndex].classList.add('selected');
+                        items[nextIndex].scrollIntoView({ block: 'nearest' });
+                        // Store selected product ID
+                        const productId = items[nextIndex].id.split('-')[1];
+                        tab.selectedProduct = productId;
+                        return;
+                    }
+
+                    if (event.key === 'ArrowUp') {
+                        event.preventDefault();
+                        items.forEach(item => item.classList.remove('selected'));
+                        const prevIndex = currentIndex > 0 ? currentIndex - 1 : items.length - 1;
+                        items[prevIndex].classList.add('selected');
+                        items[prevIndex].scrollIntoView({ block: 'nearest' });
+                        // Store selected product ID
+                        const productId = items[prevIndex].id.split('-')[1];
+                        tab.selectedProduct = productId;
+                        return;
+                    }
+                }
+            }
+
+            if (isEnterKey) {
                 event.preventDefault();
                 event.stopPropagation();
 
-                // Hide search results immediately to prevent any focus issues
-                searchResults.classList.add('d-none');
-
                 if (searchBarcode.checked) {
                     // In barcode mode, search and add product directly
-                    await searchProductByBarcode(productSearch.value, tabId);
+                    const barcode = productSearch.value.trim();
+                    // Clear input immediately
+                    productSearch.value = '';
+
+                    if (barcode) {
+                        await searchProductByBarcode(barcode, tabId);
+                    }
+                    // Always keep focus on input for next scan
+                    productSearch.focus();
                     return;
                 } else {
-                    const tab = saleTabs.find(t => t.id === tabId);
+                    // Manual mode - add selected product from dropdown
+                    searchResults.classList.add('d-none');
                     let _selectedProduct = allProducts.find(p => p.id === parseInt(tab.selectedProduct));
                     if (_selectedProduct) {
                         addProduct(_selectedProduct, tabId);
@@ -832,7 +903,7 @@
                             addProduct(tab.previousEntry, tabId);
                     }
                     productSearch.value = '';
-                    searchResults.classList.add('d-none');
+                    tab.selectedProduct = null;
                     setTimeout(() => productSearch.focus(), 100);
                 }
             }
@@ -1139,35 +1210,20 @@
             return tab.previousEntry ? addProduct(tab.previousEntry, tabId) : null;
         }
 
-        const products = await getProducts({ barcode });
-        if (products.length > 0) {
-            addProduct(products[0], tabId);
-            productSearchInput.value = '';
-
-            // Multi-level focus restoration to prevent window minimization
-            // Strategy 1: Immediate focus
-            productSearchInput.focus();
-
-            // Strategy 2: Focus via requestAnimationFrame (next render cycle)
-            requestAnimationFrame(() => {
-                productSearchInput.focus();
-                // Extend focus lock
-                if (window.electron) {
-                    window.electron.send('lock-window-focus');
-                }
-            });
-
-            // Strategy 3: Focus with slight delay as final fallback
-            setTimeout(() => {
-                if (document.activeElement !== productSearchInput) {
-                    productSearchInput.focus();
-                }
-            }, 10);
-        } else {
-            toastr.warning('No product found.');
-            productSearchInput.value = '';
-            productSearchInput.focus();
+        try {
+            const products = await getProducts({ barcode });
+            if (products.length > 0) {
+                addProduct(products[0], tabId);
+            } else {
+                toastr.warning('No product found for barcode: ' + barcode);
+            }
+        } catch (error) {
+            toastr.error('Error searching product');
+            console.error('Barcode search error:', error);
         }
+
+        // Ensure focus remains on input for next scan
+        productSearchInput.focus();
     }
 
     function setAllProducts(product) {
