@@ -9,77 +9,134 @@ exports.index = async (req, res) => {
   const page = parseInt(req.query.page) || parseInt(req.body.page) || 1;
   const { limit, offset } = getPagination(page, 10);
 
-  let queryOptions = {
-    include: [
-      {
-        model: db.user,
-        as: "Customer",
-        attributes: ["id", "firstname", "lastname", "phone", "address"],
-      },
-      {
-        model: db.user,
-        as: "DeliveryUser",
-        attributes: ["id", "firstname", "lastname", "phone", "address"],
-      },
-      {
-        model: db.user,
-        as: "User",
-        attributes: ["id", "firstname", "lastname", "phone", "address"],
-      },
-      {
-        model: db.soldproducts,
-        as: "SoldPoducts",
-        include: [
-          {
-            model: db.product,
-            as: "Product",
-            attributes: ["name", "saleprice"],
-          },
-        ],
-      },
-    ],
-    order: [["createdAt", "DESC"]],
-    limit,
-    offset
-  };
-
   try {
-    if (customer) {
-      queryOptions.include[0].where = {
-        [Op.or]: [
-          { firstname: { [Op.like]: `%${customer}%` } },
-          { lastname: { [Op.like]: `%${customer}%` } },
-        ],
-      };
-    }
-
-    if (daterange) {
-      let [start, end] = daterange.split(" to ");
-      start = moment(new Date(start)).startOf("day").toDate();
-      end = moment(new Date(end)).endOf("day").toDate();
-      queryOptions.where = {
-        ...queryOptions.where,
-        createdAt: {
-          [Op.between]: [start, end],
-        },
-      };
-    }
-
-    if (productId) {
-      queryOptions.include[3].where = {
-        product: !isNaN(productId) ? parseInt(productId) : null,
-      };
-    }
-
-    const { count } = await db.sale.findAndCountAll({
-      ...queryOptions,
-      limit: undefined,
-      offset: undefined,
-      distinct: true,
-      col: 'id'
-    });
+    // Optimized count query - use raw SQL for better performance
+    let countQuery = 'SELECT COUNT(DISTINCT s.id) as count FROM sale s';
+    const replacements = [];
     
-    const sales = await db.sale.findAll(queryOptions);
+    if (customer) {
+      countQuery += ' INNER JOIN user u ON s.customer = u.id';
+      countQuery += ' WHERE (u.firstname LIKE ? OR u.lastname LIKE ?)';
+      const customerSearch = `%${customer}%`;
+      replacements.push(customerSearch, customerSearch);
+    }
+    
+    if (daterange) {
+      const [start, end] = daterange.split(" to ");
+      const startDate = moment(new Date(start)).startOf("day").toISOString();
+      const endDate = moment(new Date(end)).endOf("day").toISOString();
+      if (customer) {
+        countQuery += ' AND s.createdAt >= ? AND s.createdAt <= ?';
+      } else {
+        countQuery += ' WHERE s.createdAt >= ? AND s.createdAt <= ?';
+      }
+      replacements.push(startDate, endDate);
+    }
+    
+    if (productId) {
+      countQuery += customer || daterange ? ' AND' : ' WHERE';
+      countQuery += ' EXISTS (SELECT 1 FROM soldproducts sp WHERE sp.sale = s.id AND sp.product = ?)';
+      replacements.push(productId);
+    }
+    
+    // Build optimized sales query with raw SQL - much faster than Sequelize includes
+    // Get sales with pagination first, then fetch product names separately for only these sales
+    let salesQuery = `
+      SELECT 
+        s.id,
+        s.invoicenum,
+        s.discountpercentage,
+        s.totalprice,
+        s.totalpayment,
+        s.createdAt
+      FROM sale s
+    `;
+    
+    const salesReplacements = [];
+    const whereConditions = [];
+    
+    if (customer) {
+      salesQuery += ' INNER JOIN user u ON s.customer = u.id';
+      whereConditions.push('(u.firstname LIKE ? OR u.lastname LIKE ?)');
+      const customerSearch = `%${customer}%`;
+      salesReplacements.push(customerSearch, customerSearch);
+    }
+    
+    if (daterange) {
+      const [start, end] = daterange.split(" to ");
+      const startDate = moment(new Date(start)).startOf("day").toISOString();
+      const endDate = moment(new Date(end)).endOf("day").toISOString();
+      whereConditions.push('s.createdAt >= ? AND s.createdAt <= ?');
+      salesReplacements.push(startDate, endDate);
+    }
+    
+    if (productId) {
+      whereConditions.push('EXISTS (SELECT 1 FROM soldproducts sp2 WHERE sp2.sale = s.id AND sp2.product = ?)');
+      salesReplacements.push(productId);
+    }
+    
+    if (whereConditions.length > 0) {
+      salesQuery += ' WHERE ' + whereConditions.join(' AND ');
+    }
+    
+    salesQuery += `
+      GROUP BY s.id, s.invoicenum, s.discountpercentage, s.totalprice, s.totalpayment, s.createdAt
+      ORDER BY s.createdAt DESC
+      LIMIT ? OFFSET ?
+    `;
+    salesReplacements.push(limit, offset);
+    
+    // Parallelize count and sales queries
+    const [countResult, salesResult] = await Promise.all([
+      db.sequelize.query(countQuery, {
+        replacements,
+        type: db.sequelize.QueryTypes.SELECT
+      }),
+      db.sequelize.query(salesQuery, {
+        replacements: salesReplacements,
+        type: db.sequelize.QueryTypes.SELECT
+      })
+    ]);
+    
+    const count = parseInt(countResult[0]?.count || 0);
+    
+    // Fetch product names separately for only the paginated sales (much faster)
+    let productNamesMap = {};
+    if (salesResult.length > 0) {
+      const saleIds = salesResult.map(s => s.id);
+      const placeholders = saleIds.map(() => '?').join(',');
+      const productQuery = `
+        SELECT 
+          sp.sale,
+          GROUP_CONCAT(DISTINCT p.name) as product_names
+        FROM soldproducts sp
+        INNER JOIN product p ON sp.product = p.id
+        WHERE sp.sale IN (${placeholders})
+        GROUP BY sp.sale
+      `;
+      
+      const productResult = await db.sequelize.query(productQuery, {
+        replacements: saleIds,
+        type: db.sequelize.QueryTypes.SELECT
+      });
+      
+      productResult.forEach(row => {
+        productNamesMap[row.sale] = row.product_names ? row.product_names.split(',').map(n => n.trim()) : [];
+      });
+    }
+    
+    // Transform raw SQL results to match expected format
+    const sales = salesResult.map(sale => ({
+      id: sale.id,
+      invoicenum: sale.invoicenum,
+      discountpercentage: sale.discountpercentage,
+      totalprice: sale.totalprice,
+      totalpayment: sale.totalpayment,
+      createdAt: sale.createdAt,
+      SoldPoducts: (productNamesMap[sale.id] || []).slice(0, 5).map(name => ({
+        Product: { name: name }
+      }))
+    }));
     
     const pagination = getPagingData(count, page, limit);
 

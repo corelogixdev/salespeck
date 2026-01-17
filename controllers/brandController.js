@@ -209,7 +209,8 @@ exports.searchBrands = async (req, res) => {
                 status: true,
                 name: { [Op.like]: `%${search}%` }
             },
-            order: [['name', 'ASC']]
+            order: [['name', 'ASC']],
+            limit: 20 // Limit search results for better performance
         });
 
         res.status(200).json({
