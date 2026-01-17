@@ -3,6 +3,7 @@
 const encrypt = require("../utils/encrypt");
 const { generateId } = require("../utils/idGenerator");
 const db = require("../models");
+const { Op } = require("sequelize");
 
 // Configuration
 const CONFIG = {
@@ -429,11 +430,17 @@ async function generateVendors() {
   console.log("\n[3/8] Generating Vendors...");
   const startTime = Date.now();
   const vendors = [];
-  const now = new Date();
+  
+  // Use random dates over the past 2 years
+  const startDate = new Date();
+  startDate.setFullYear(startDate.getFullYear() - 2);
+  const endDate = new Date();
 
   for (let i = 0; i < CONFIG.VENDORS_COUNT; i++) {
     const firstName = randomElement(firstNames);
     const lastName = randomElement(lastNames);
+    const createdDate = randomDate(startDate, endDate);
+    
     vendors.push({
       id: generateId(32),
       firstname: firstName,
@@ -445,8 +452,8 @@ async function generateVendors() {
       address: generateAddress(),
       role: "vendor",
       source: "demo-seeder",
-      createdAt: now,
-      updatedAt: now,
+      createdAt: createdDate,
+      updatedAt: createdDate,
     });
   }
 
@@ -460,11 +467,17 @@ async function generateClients() {
   console.log("\n[4/8] Generating Clients (20,000)...");
   const startTime = Date.now();
   const clients = [];
-  const now = new Date();
+  
+  // Use random dates over the past 2 years
+  const startDate = new Date();
+  startDate.setFullYear(startDate.getFullYear() - 2);
+  const endDate = new Date();
 
   for (let i = 0; i < CONFIG.CLIENTS_COUNT; i++) {
     const firstName = randomElement(firstNames);
     const lastName = randomElement(lastNames);
+    const createdDate = randomDate(startDate, endDate);
+    
     clients.push({
       id: generateId(32),
       firstname: firstName,
@@ -477,8 +490,8 @@ async function generateClients() {
       address: generateAddress(),
       role: "customer",
       source: "demo-seeder",
-      createdAt: now,
-      updatedAt: now,
+      createdAt: createdDate,
+      updatedAt: createdDate,
     });
   }
 
@@ -537,11 +550,24 @@ async function generateSales(clients, products, adminUser) {
     saleableProducts.push(...products);
   }
 
+  // Get sales finance account (pos sale or sale)
+  const salesFinanceAccount = await db.financeaccount.findOne({
+    where: {
+      name: { [Op.in]: ['pos sale', 'sale'] },
+      type: 'income'
+    }
+  });
+  
+  if (!salesFinanceAccount) {
+    console.log("  Warning: No sales finance account found. Sales will not be linked to finance accounts.");
+  }
+
   const startDate = new Date("2023-01-01");
   const endDate = new Date();
 
   let salesInserted = 0;
   let soldProductsInserted = 0;
+  let financeTransactionsInserted = 0;
 
   // Process sales in larger batches
   const SALES_BATCH = 5000;
@@ -554,6 +580,7 @@ async function generateSales(clients, products, adminUser) {
     const batchEnd = Math.min(batchStart + SALES_BATCH, CONFIG.SALES_COUNT);
     const sales = [];
     const soldProducts = [];
+    const financeTransactions = [];
 
     for (let i = batchStart; i < batchEnd; i++) {
       const saleId = generateId(32);
@@ -618,11 +645,36 @@ async function generateSales(clients, products, adminUser) {
         createdAt: saleDate,
         updatedAt: saleDate,
       });
+
+      // Create finance transaction for this sale if finance account exists
+      if (salesFinanceAccount) {
+        financeTransactions.push({
+          id: generateId(32),
+          name: `Sale ${saleId.substring(0, 8)}`,
+          amount: parseFloat(payment),
+          status: 'completed',
+          date: saleDate,
+          details: `Sale transaction for invoice ${sales[sales.length - 1].invoicenum}`,
+          fk_financeaccount_in_financetransaction: salesFinanceAccount.id,
+          fk_user_targetto_in_financetransaction: customer.id,
+          createdby: adminUser.id,
+          updatedby: adminUser.id,
+          source: "demo-seeder",
+          createdAt: saleDate,
+          updatedAt: saleDate,
+        });
+      }
     }
 
     // Bulk insert this batch
     await db.sale.bulkCreate(sales, { ignoreDuplicates: true });
     await db.soldproducts.bulkCreate(soldProducts, { ignoreDuplicates: true });
+    
+    // Create finance transactions for sales
+    if (financeTransactions.length > 0) {
+      await db.financetransaction.bulkCreate(financeTransactions, { ignoreDuplicates: true });
+      financeTransactionsInserted += financeTransactions.length;
+    }
 
     salesInserted += sales.length;
     soldProductsInserted += soldProducts.length;
@@ -633,6 +685,11 @@ async function generateSales(clients, products, adminUser) {
   console.log(
     `    - Total Sold Product Items: ${soldProductsInserted.toLocaleString()}`,
   );
+  if (salesFinanceAccount) {
+    console.log(
+      `    - Finance Transactions Created: ${financeTransactionsInserted.toLocaleString()}`,
+    );
+  }
 
   return { salesCount: salesInserted, soldProductsCount: soldProductsInserted };
 }
