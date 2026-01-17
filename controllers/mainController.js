@@ -14,130 +14,146 @@ const index = (req, res) => {
 };
 async function getDashboardStats() {
   try {
-    // Define date ranges once
+    // Pre-calculate all date ranges - use ISO strings for SQLite
     const todayStartDate = moment().startOf("day").toDate();
     const todayEndDate = moment().endOf("day").toDate();
     const yesterdayStartDate = moment().subtract(1, "day").startOf("day").toDate();
     const yesterdayEndDate = moment().subtract(1, "day").endOf("day").toDate();
-    const lastMonthStartDate = moment().subtract(30, "days").startOf("day").toDate();
+    const last7DaysStart = moment().subtract(7, "days").startOf("day").toDate();
+    const last30DaysStart = moment().subtract(30, "days").startOf("day").toDate();
 
-    // Parallelize all independent queries for better performance
+    // Use parameterized dates instead of datetime() functions for better performance
+    const last7DaysISO = last7DaysStart.toISOString();
+    const last30DaysISO = last30DaysStart.toISOString();
+
+    // Parallelize all independent queries
     const [
       todaySalesResult,
       yesterdaySalesResult,
       todayCustomersResult,
       yesterdayCustomersResult,
-      totalSalesResult,
-      topProductsResult,
-      salesByDayResult,
-      weeklySummaryResult,
-      monthlySummaryResult,
+      salesAndTopProductsResult,
+      weeklyMonthlySummaryResult,
       lowStockResult
     ] = await Promise.all([
-      // Today's sales amount - optimized SQL query
+      // Today's sales amount - simplified calculation
       db.sequelize.query(
-        `SELECT COALESCE(SUM(CAST(totalprice AS REAL) - (CAST(totalprice AS REAL) * CAST(discountpercentage AS REAL) / 100.0)), 0) as total
-         FROM sale WHERE createdAt >= ? AND createdAt <= ?`,
+        `SELECT COALESCE(SUM(CAST(totalprice AS REAL) * (1 - CAST(discountpercentage AS REAL) / 100.0)), 0) as total
+         FROM sale WHERE createdAt >= ? AND createdAt < ?`,
         {
-          replacements: [todayStartDate.toISOString(), todayEndDate.toISOString()],
+          replacements: [todayStartDate.toISOString(), moment(todayEndDate).add(1, 'day').toISOString()],
           type: db.sequelize.QueryTypes.SELECT
         }
       ),
       // Yesterday's sales amount
       db.sequelize.query(
-        `SELECT COALESCE(SUM(CAST(totalprice AS REAL) - (CAST(totalprice AS REAL) * CAST(discountpercentage AS REAL) / 100.0)), 0) as total
-         FROM sale WHERE createdAt >= ? AND createdAt <= ?`,
+        `SELECT COALESCE(SUM(CAST(totalprice AS REAL) * (1 - CAST(discountpercentage AS REAL) / 100.0)), 0) as total
+         FROM sale WHERE createdAt >= ? AND createdAt < ?`,
         {
-          replacements: [yesterdayStartDate.toISOString(), yesterdayEndDate.toISOString()],
+          replacements: [yesterdayStartDate.toISOString(), moment(yesterdayEndDate).add(1, 'day').toISOString()],
           type: db.sequelize.QueryTypes.SELECT
         }
       ),
-      // Today's customer count
-      db.user.count({
-        where: {
-          role: "customer",
-          createdAt: { [Op.between]: [todayStartDate, todayEndDate] },
-        },
-      }),
-      // Yesterday's customer count
-      db.user.count({
-        where: {
-          role: "customer",
-          createdAt: { [Op.between]: [yesterdayStartDate, yesterdayEndDate] },
-        },
-      }),
-      // Last 30 days sales count
-      db.sale.count({
-        where: {
-          createdAt: { [Op.gte]: lastMonthStartDate }
+      // Today's customer count - optimized with raw SQL
+      db.sequelize.query(
+        `SELECT COUNT(*) as today_count FROM user WHERE role = 'customer' AND createdAt >= ? AND createdAt < ?`,
+        {
+          replacements: [todayStartDate.toISOString(), moment(todayEndDate).add(1, 'day').toISOString()],
+          type: db.sequelize.QueryTypes.SELECT
         }
-      }),
-      // Top 5 sold products (last 30 days) - optimized with LIMIT
-      db.sequelize.query(
-        `SELECT
-          p.name as product_name,
-          COUNT(*) as times_added,
-          SUM(s.quantity) as total_quantity
-        FROM soldproducts s
-        INNER JOIN product p ON s.product = p.id
-        WHERE s.createdAt >= datetime('now', '-30 days')
-        GROUP BY p.id, p.name
-        ORDER BY total_quantity DESC, times_added DESC
-        LIMIT 5`,
-        { type: db.sequelize.QueryTypes.SELECT }
       ),
-      // Sales count by day for last 30 days - single optimized query
+      // Yesterday's customer count
       db.sequelize.query(
-        `SELECT
+        `SELECT COUNT(*) as yesterday_count FROM user WHERE role = 'customer' AND createdAt >= ? AND createdAt < ?`,
+        {
+          replacements: [yesterdayStartDate.toISOString(), moment(yesterdayEndDate).add(1, 'day').toISOString()],
+          type: db.sequelize.QueryTypes.SELECT
+        }
+      ),
+      // Combined query for sales count and sales by day (last 30 days)
+      db.sequelize.query(
+        `SELECT 
           strftime('%Y-%m-%d', createdAt) as date,
           COUNT(*) as total,
-          COALESCE(SUM(CAST(totalprice AS REAL) - (CAST(totalprice AS REAL) * CAST(discountpercentage AS REAL) / 100.0)), 0) as revenue
+          COALESCE(SUM(CAST(totalprice AS REAL) * (1 - CAST(discountpercentage AS REAL) / 100.0)), 0) as revenue
         FROM sale
-        WHERE createdAt >= datetime('now', '-30 days')
+        WHERE createdAt >= ?
         GROUP BY date
         ORDER BY date ASC`,
-        { type: db.sequelize.QueryTypes.SELECT }
+        {
+          replacements: [last30DaysISO],
+          type: db.sequelize.QueryTypes.SELECT
+        }
       ),
-      // Weekly sales summary
+      // Combined weekly and monthly summary in one query
       db.sequelize.query(
-        `SELECT
+        `SELECT 
+          'weekly' as period,
           COUNT(*) as total_orders,
-          COALESCE(SUM(CAST(totalprice AS REAL) - (CAST(totalprice AS REAL) * CAST(discountpercentage AS REAL) / 100.0)), 0) as total_revenue,
-          COALESCE(AVG(CAST(totalprice AS REAL) - (CAST(totalprice AS REAL) * CAST(discountpercentage AS REAL) / 100.0)), 0) as avg_order_value
+          COALESCE(SUM(CAST(totalprice AS REAL) * (1 - CAST(discountpercentage AS REAL) / 100.0)), 0) as total_revenue,
+          COALESCE(AVG(CAST(totalprice AS REAL) * (1 - CAST(discountpercentage AS REAL) / 100.0)), 0) as avg_order_value
         FROM sale
-        WHERE createdAt >= datetime('now', '-7 days')`,
-        { type: db.sequelize.QueryTypes.SELECT }
+        WHERE createdAt >= ? AND createdAt < ?
+        UNION ALL
+        SELECT 
+          'monthly' as period,
+          COUNT(*) as total_orders,
+          COALESCE(SUM(CAST(totalprice AS REAL) * (1 - CAST(discountpercentage AS REAL) / 100.0)), 0) as total_revenue,
+          COALESCE(AVG(CAST(totalprice AS REAL) * (1 - CAST(discountpercentage AS REAL) / 100.0)), 0) as avg_order_value
+        FROM sale
+        WHERE createdAt >= ?`,
+        {
+          replacements: [
+            last7DaysISO,
+            moment().add(1, 'day').startOf("day").toISOString(),
+            last30DaysISO
+          ],
+          type: db.sequelize.QueryTypes.SELECT
+        }
       ),
-      // Monthly sales summary
+      // Low stock products - using raw SQL for better performance
       db.sequelize.query(
-        `SELECT
-          COUNT(*) as total_orders,
-          COALESCE(SUM(CAST(totalprice AS REAL) - (CAST(totalprice AS REAL) * CAST(discountpercentage AS REAL) / 100.0)), 0) as total_revenue,
-          COALESCE(AVG(CAST(totalprice AS REAL) - (CAST(totalprice AS REAL) * CAST(discountpercentage AS REAL) / 100.0)), 0) as avg_order_value
-        FROM sale
-        WHERE createdAt >= datetime('now', '-30 days')`,
+        `SELECT id, name, quantity, saleprice 
+         FROM product 
+         WHERE quantity < 10 AND saleactive = 1 
+         ORDER BY quantity ASC 
+         LIMIT 5`,
         { type: db.sequelize.QueryTypes.SELECT }
-      ),
-      // Low stock products - optimized with specific attributes only
-      db.product.findAll({
-        where: {
-          quantity: { [Op.lt]: 10 },
-          saleactive: true
-        },
-        attributes: ['id', 'name', 'quantity', 'saleprice'],
-        order: [['quantity', 'ASC']],
-        limit: 5,
-        raw: true // Use raw queries for better performance
-      })
+      )
     ]);
 
-    // Extract results
+    // Get top 5 products separately (smaller dataset)
+    const topProductsResult = await db.sequelize.query(
+      `SELECT
+        p.name as product_name,
+        COUNT(*) as times_added,
+        SUM(s.quantity) as total_quantity
+      FROM soldproducts s
+      INNER JOIN product p ON s.product = p.id
+      WHERE s.createdAt >= ?
+      GROUP BY p.id, p.name
+      ORDER BY total_quantity DESC
+      LIMIT 5`,
+      {
+        replacements: [last30DaysISO],
+        type: db.sequelize.QueryTypes.SELECT
+      }
+    );
+
+    // Extract and process results
     let todaysSalesAmount = parseFloat(todaySalesResult[0]?.total || 0);
     todaysSalesAmount = todaysSalesAmount > 0 ? todaysSalesAmount.toFixed(2) : 0;
     const yesterdaySalesAmount = parseFloat(yesterdaySalesResult[0]?.total || 0);
-    const todayCustomersCount = todayCustomersResult || 0;
-    const yesterdayCustomersCount = yesterdayCustomersResult || 0;
-    const totalSalesCount = totalSalesResult || 0;
+    
+    const todayCustomersCount = parseInt(todayCustomersResult[0]?.today_count || 0);
+    const yesterdayCustomersCount = parseInt(yesterdayCustomersResult[0]?.yesterday_count || 0);
+    
+    const salesByDayResult = salesAndTopProductsResult || [];
+    const totalSalesCount = salesByDayResult.reduce((sum, day) => sum + (parseInt(day.total) || 0), 0);
+    
+    // Split weekly and monthly summary
+    const weeklySummaryResult = weeklyMonthlySummaryResult.find(r => r.period === 'weekly') || {};
+    const monthlySummaryResult = weeklyMonthlySummaryResult.find(r => r.period === 'monthly') || {};
 
     // Calculate percentage changes
     const salesPercentageChange = calculatePercentageChange(
@@ -163,8 +179,16 @@ async function getDashboardStats() {
       todaysSalesAmount,
       salesPercentageChange,
       salesArrowDirection,
-      weeklySalesSummary: weeklySummaryResult[0] || {},
-      monthlySalesSummary: monthlySummaryResult[0] || {},
+      weeklySalesSummary: {
+        total_orders: parseInt(weeklySummaryResult.total_orders || 0),
+        total_revenue: parseFloat(weeklySummaryResult.total_revenue || 0),
+        avg_order_value: parseFloat(weeklySummaryResult.avg_order_value || 0)
+      },
+      monthlySalesSummary: {
+        total_orders: parseInt(monthlySummaryResult.total_orders || 0),
+        total_revenue: parseFloat(monthlySummaryResult.total_revenue || 0),
+        avg_order_value: parseFloat(monthlySummaryResult.avg_order_value || 0)
+      },
       lowStockProducts: lowStockResult || [],
     };
   } catch (error) {
@@ -174,14 +198,22 @@ async function getDashboardStats() {
 }
 const dashboard = async (req, res) => {
   try {
-    // Fetch company settings
-    const settings = await db.softwaresetting.findOne({
-      where: { name: "company" },
-    });
-    const company = JSON.parse(settings?.value || "{}");
-    let data = await getDashboardStats();
+    // Parallelize fetching company settings, user, and dashboard stats
+    const [settings, user, data] = await Promise.all([
+      db.softwaresetting.findOne({
+        where: { name: "company" },
+        attributes: ['value'],
+        raw: true
+      }),
+      db.user.findOne({ 
+        where: { id: req.session.user_id },
+        attributes: ['id', 'firstname', 'lastname', 'username', 'role', 'profile_image_url'],
+        raw: true
+      }),
+      getDashboardStats()
+    ]);
 
-    const user = await db.user.findOne({ where: { id: req.session.user_id } });
+    const company = settings?.value ? JSON.parse(settings.value) : {};
 
     // Render dashboard
     res.render("dashboard", {
