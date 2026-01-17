@@ -14,36 +14,46 @@ const index = (req, res) => {
 };
 async function getDashboardStats() {
   try {
-    // Define start and end of today's date
+    // Define date ranges
     const todayStartDate = moment().startOf("day").toDate();
     const todayEndDate = moment().endOf("day").toDate();
+    const yesterdayStartDate = moment().subtract(1, "day").startOf("day").toDate();
+    const yesterdayEndDate = moment().subtract(1, "day").endOf("day").toDate();
+    const lastMonthStartDate = moment().subtract(30, "days").startOf("day").toDate();
+    const lastWeekStartDate = moment().subtract(7, "days").startOf("day").toDate();
 
-    let todaysSalesAmount = await db.sequelize.query(
-      `
-        SELECT SUM(totalprice - (totalprice * discountpercentage / 100)) as total FROM sale WHERE DATE(createdAt) = DATE('now')
-        `,
-      { type: db.sequelize.QueryTypes.SELECT }
-    );
-    todaysSalesAmount = todaysSalesAmount[0]?.total || 0;
-    if (todaysSalesAmount > 0) todaysSalesAmount.toFixed(2);
-    // Fetch today's and yesterday's sales
-    const salesComparison = await db.sequelize.query(
-      `
-        SELECT
-          (SELECT SUM(price*quantity) FROM soldproducts WHERE createdAt BETWEEN date('now', '-1 day') AND date('now', '-1 day', '+1 day')) as yesterday,
-          (SELECT SUM(price*quantity) FROM soldproducts WHERE createdAt BETWEEN date('now') AND date('now', '+1 day')) as today
-        `,
-      { type: db.sequelize.QueryTypes.SELECT }
-    );
-    const { yesterday: yesterdaySales = 0, today: todaySales = 0 } =
-      salesComparison[0];
+    // Optimized: Today's sales amount using Sequelize
+    const todaySales = await db.sale.findAll({
+      attributes: [
+        [db.sequelize.literal('SUM(totalprice - (totalprice * discountpercentage / 100))'), 'total']
+      ],
+      where: {
+        createdAt: { [Op.between]: [todayStartDate, todayEndDate] }
+      },
+      raw: true
+    });
+    let todaysSalesAmount = todaySales[0]?.total || 0;
+    if (todaysSalesAmount > 0) todaysSalesAmount = parseFloat(todaysSalesAmount).toFixed(2);
+
+    // Optimized: Yesterday's sales amount
+    const yesterdaySales = await db.sale.findAll({
+      attributes: [
+        [db.sequelize.literal('SUM(totalprice - (totalprice * discountpercentage / 100))'), 'total']
+      ],
+      where: {
+        createdAt: { [Op.between]: [yesterdayStartDate, yesterdayEndDate] }
+      },
+      raw: true
+    });
+    const yesterdaySalesAmount = yesterdaySales[0]?.total || 0;
+
     const salesPercentageChange = calculatePercentageChange(
-      yesterdaySales,
-      todaySales
+      yesterdaySalesAmount,
+      todaysSalesAmount
     ).toFixed(2);
-    const salesArrowDirection = todaySales >= yesterdaySales ? "up" : "down";
+    const salesArrowDirection = todaysSalesAmount >= yesterdaySalesAmount ? "up" : "down";
 
-    // Fetch today's customer count
+    // Optimized: Today's customer count
     const todayCustomersCount = await db.user.count({
       where: {
         role: "customer",
@@ -51,16 +61,11 @@ async function getDashboardStats() {
       },
     });
 
-    // Fetch yesterday's customer count
+    // Optimized: Yesterday's customer count
     const yesterdayCustomersCount = await db.user.count({
       where: {
         role: "customer",
-        createdAt: {
-          [Op.between]: [
-            moment().subtract(1, "day").startOf("day").toDate(),
-            moment().subtract(1, "day").endOf("day").toDate(),
-          ],
-        },
+        createdAt: { [Op.between]: [yesterdayStartDate, yesterdayEndDate] },
       },
     });
 
@@ -72,43 +77,95 @@ async function getDashboardStats() {
     const customerArrowDirection =
       todayCustomersCount >= yesterdayCustomersCount ? "up" : "down";
 
-    // Fetch total sales count
-    const totalSalesCount = await db.sale.count();
+    // Optimized: Last 30 days sales count (instead of all time)
+    const totalSalesCount = await db.sale.count({
+      where: {
+        createdAt: { [Op.gte]: lastMonthStartDate }
+      }
+    });
 
-    // Fetch top 5 sold products with sold quantities
+    // Optimized: Top 5 sold products (last 30 days only)
     const topFiveSoldProductsWithSoldQuantity = await db.sequelize.query(
       `
-        SELECT 
-          strftime('%m', s.createdAt) as month,
+        SELECT
           p.name as product_name,
           COUNT(*) as times_added,
           SUM(s.quantity) as total_quantity
         FROM soldproducts s
         JOIN product p ON s.product = p.id
-        GROUP BY month, p.name
-        ORDER BY times_added DESC, total_quantity DESC
+        WHERE s.createdAt >= datetime('now', '-30 days')
+        GROUP BY p.name
+        ORDER BY total_quantity DESC, times_added DESC
         LIMIT 5
         `,
       { type: db.sequelize.QueryTypes.SELECT }
     );
 
-    // Fetch sales count by month
-    const salesCountByMonth = await db.sequelize.query(
+    // Optimized: Sales count by day for last 30 days
+    const salesCountByDay = await db.sequelize.query(
       `
-        SELECT strftime('%m', createdAt) as month, COUNT(*) as total FROM sale GROUP BY month
+        SELECT
+          strftime('%Y-%m-%d', createdAt) as date,
+          COUNT(*) as total,
+          SUM(totalprice - (totalprice * discountpercentage / 100)) as revenue
+        FROM sale
+        WHERE createdAt >= datetime('now', '-30 days')
+        GROUP BY date
+        ORDER BY date ASC
         `,
       { type: db.sequelize.QueryTypes.SELECT }
     );
+
+    // NEW: Weekly sales summary
+    const weeklySalesSummary = await db.sequelize.query(
+      `
+        SELECT
+          COUNT(*) as total_orders,
+          SUM(totalprice - (totalprice * discountpercentage / 100)) as total_revenue,
+          AVG(totalprice - (totalprice * discountpercentage / 100)) as avg_order_value
+        FROM sale
+        WHERE createdAt >= datetime('now', '-7 days')
+        `,
+      { type: db.sequelize.QueryTypes.SELECT }
+    );
+
+    // NEW: Monthly sales summary
+    const monthlySalesSummary = await db.sequelize.query(
+      `
+        SELECT
+          COUNT(*) as total_orders,
+          SUM(totalprice - (totalprice * discountpercentage / 100)) as total_revenue,
+          AVG(totalprice - (totalprice * discountpercentage / 100)) as avg_order_value
+        FROM sale
+        WHERE createdAt >= datetime('now', '-30 days')
+        `,
+      { type: db.sequelize.QueryTypes.SELECT }
+    );
+
+    // NEW: Low stock products (quantity < 10)
+    const lowStockProducts = await db.product.findAll({
+      where: {
+        quantity: { [Op.lt]: 10 },
+        saleactive: true
+      },
+      attributes: ['id', 'name', 'quantity', 'saleprice'],
+      order: [['quantity', 'ASC']],
+      limit: 5
+    });
+
     return {
       todayCustomersCount,
       customerPercentageChange,
       customerArrowDirection,
       totalSalesCount,
       topFiveSoldProductsWithSoldQuantity,
-      salesCountByMonth,
+      salesCountByDay,
       todaysSalesAmount,
       salesPercentageChange,
       salesArrowDirection,
+      weeklySalesSummary: weeklySalesSummary[0] || {},
+      monthlySalesSummary: monthlySalesSummary[0] || {},
+      lowStockProducts: lowStockProducts || [],
     };
   } catch (error) {
     logi("Error:", error);

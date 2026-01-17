@@ -96,13 +96,9 @@ exports.index = async (req, res) => {
 };
 
 exports.form = async (req, res) => {
-  let customers = await db.user.findAll({
-    where: {
-      role: "customer",
-    },
-    attributes: ["id", "firstname", "lastname", "phone"],
-  });
-  res.render("sales/form", { customers, hidenav: true });
+  // OPTIMIZED: Don't load all customers upfront, use AJAX search instead
+  // Only send empty array, customers will be loaded via searchCustomers endpoint
+  res.render("sales/form", { customers: [], hidenav: true });
 };
 
 exports.save = async (req, res) => {
@@ -129,20 +125,40 @@ exports.save = async (req, res) => {
     const inventoryUpdates = [];
     const { user } = res.locals;
 
+    // OPTIMIZED: Fetch all batches for all products in one query instead of N queries
+    const allBatches = await db.productbatches.findAll({
+      where: { product: allProductIds },
+      order: [["product", "ASC"], ["createdAt", "ASC"]],
+      transaction
+    });
+
+    // Group batches by product ID for efficient lookup
+    const batchesByProduct = {};
+    allBatches.forEach(batch => {
+      if (!batchesByProduct[batch.product]) {
+        batchesByProduct[batch.product] = [];
+      }
+      batchesByProduct[batch.product].push(batch);
+    });
+
+    // Prepare batch operations
+    const batchUpdates = [];
+    const batchDeletes = [];
+
     for (const orderProduct of products) {
       const dbProduct = allProducts.find(p => p.id === orderProduct.productId);
       if (!dbProduct) {
         await transaction.rollback();
-        return res.status(400).send({ 
-          status: "error", 
-          message: `Product with ID ${orderProduct.productId} not found` 
+        return res.status(400).send({
+          status: "error",
+          message: `Product with ID ${orderProduct.productId} not found`
         });
       }
       if (orderProduct.quantity > dbProduct.quantity) {
         await transaction.rollback();
-        return res.status(400).send({ 
-          status: "error", 
-          message: `Insufficient stock for ${dbProduct.name}. Available: ${dbProduct.quantity}, Requested: ${orderProduct.quantity}` 
+        return res.status(400).send({
+          status: "error",
+          message: `Insufficient stock for ${dbProduct.name}. Available: ${dbProduct.quantity}, Requested: ${orderProduct.quantity}`
         });
       }
 
@@ -157,39 +173,46 @@ exports.save = async (req, res) => {
         id: dbProduct.id,
         quantity: dbProduct.quantity - orderProduct.quantity
       });
-      
-      let batches = await db.productbatches.findAll({
-        where: { product: orderProduct.productId },
-        order: [["createdAt", "ASC"]],
-        transaction
-      });
+
+      // Get batches for this product from grouped data
+      let batches = batchesByProduct[orderProduct.productId] || [];
 
       let reducedQuantity = 0;
       let iteration = 0;
-      while (reducedQuantity!==orderProduct.quantity && iteration < batches.length) {
+      while (reducedQuantity !== orderProduct.quantity && iteration < batches.length) {
         let batch = batches[iteration];
-        if(batch.quantity > orderProduct.quantity - reducedQuantity){
-          await db.productbatches.update(
-            { quantity: db.sequelize.literal(`quantity - ${orderProduct.quantity - reducedQuantity}`) },
-            {
-              where: {
-                id: batch.id,
-              },
-              transaction
-            }
-          );
+        if (batch.quantity > orderProduct.quantity - reducedQuantity) {
+          batchUpdates.push({
+            id: batch.id,
+            quantityToReduce: orderProduct.quantity - reducedQuantity
+          });
           reducedQuantity = orderProduct.quantity;
         } else {
-          await db.productbatches.destroy({
-            where: {
-              id: batch.id,
-            },
-            transaction
-          });
+          batchDeletes.push(batch.id);
           reducedQuantity += batch.quantity;
         }
         iteration++;
       }
+    }
+
+    // Execute batch updates and deletes
+    if (batchUpdates.length > 0) {
+      await Promise.all(batchUpdates.map(update =>
+        db.productbatches.update(
+          { quantity: db.sequelize.literal(`quantity - ${update.quantityToReduce}`) },
+          {
+            where: { id: update.id },
+            transaction
+          }
+        )
+      ));
+    }
+
+    if (batchDeletes.length > 0) {
+      await db.productbatches.destroy({
+        where: { id: batchDeletes },
+        transaction
+      });
     }
 
     // 2. Create sale record
@@ -348,6 +371,7 @@ exports.productsget = async (req, res) => {
   if (req.body.barcode) {
     search = { ...search, barcode: req.body.barcode };
   }
+  // OPTIMIZED: Add limit to prevent loading too many products
   let data = await db.product.findAll({
     where: {
       ...search,
@@ -362,6 +386,8 @@ exports.productsget = async (req, res) => {
         attributes: ["id", "expirydate", "quantity", "createdAt"],
       },
     ],
+    limit: 50, // Limit results to 50 products
+    order: [["name", "ASC"]] // Order by name for consistent results
   });
   let today = new Date();
   today.setHours(0, 0, 0, 0);

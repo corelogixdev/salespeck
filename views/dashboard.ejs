@@ -89,7 +89,7 @@
         <div class="d-flex align-items-center">
           <div class="flex-grow-1 overflow-hidden">
             <p class="text-uppercase fw-medium text-muted text-truncate mb-0">
-              Total Sales
+              Last 30 Days Sales
             </p>
           </div>
         </div>
@@ -113,109 +113,290 @@
   </div>
 
 </div>
-<!-- Charts Row -->
-<div class="row">
+
+<!-- Weekly & Monthly Summary Cards -->
+<div class="row my-3">
   <div class="col-lg-6">
     <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Weekly Summary (Last 7 Days)</h5>
+      </div>
       <div class="card-body">
-        <div id="barChart"></div>
+        <div class="table-responsive">
+          <table class="table table-borderless mb-0">
+            <tbody>
+              <tr>
+                <td class="text-muted">Total Orders:</td>
+                <td class="fw-medium text-end"><%= weeklySalesSummary.total_orders || 0 %></td>
+              </tr>
+              <tr>
+                <td class="text-muted">Total Revenue:</td>
+                <td class="fw-medium text-end">Rs. <%= (weeklySalesSummary.total_revenue || 0).toFixed(2) %></td>
+              </tr>
+              <tr>
+                <td class="text-muted">Avg Order Value:</td>
+                <td class="fw-medium text-end">Rs. <%= (weeklySalesSummary.avg_order_value || 0).toFixed(2) %></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
   <div class="col-lg-6">
     <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Monthly Summary (Last 30 Days)</h5>
+      </div>
       <div class="card-body">
-        <div id="usersChart"></div>
+        <div class="table-responsive">
+          <table class="table table-borderless mb-0">
+            <tbody>
+              <tr>
+                <td class="text-muted">Total Orders:</td>
+                <td class="fw-medium text-end"><%= monthlySalesSummary.total_orders || 0 %></td>
+              </tr>
+              <tr>
+                <td class="text-muted">Total Revenue:</td>
+                <td class="fw-medium text-end">Rs. <%= (monthlySalesSummary.total_revenue || 0).toFixed(2) %></td>
+              </tr>
+              <tr>
+                <td class="text-muted">Avg Order Value:</td>
+                <td class="fw-medium text-end">Rs. <%= (monthlySalesSummary.avg_order_value || 0).toFixed(2) %></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Charts Row -->
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body">
+        <div id="salesTrendChart"></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body">
+        <div id="topProductsChart"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Low Stock Products Table -->
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="bx bx-error-circle text-warning"></i> Low Stock Alert
+        </h5>
+      </div>
+      <div class="card-body">
+        <% if (lowStockProducts && lowStockProducts.length > 0) { %>
+        <div class="table-responsive">
+          <table class="table table-hover table-striped align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Product Name</th>
+                <th class="text-center">Current Stock</th>
+                <th class="text-end">Sale Price</th>
+                <th class="text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% lowStockProducts.forEach(product => { %>
+              <tr>
+                <td><a href="/product/<%= product.id %>" class="text-decoration-none"><%= product.name %></a></td>
+                <td class="text-center">
+                  <span class="badge <%= product.quantity <= 5 ? 'bg-danger' : 'bg-warning' %>">
+                    <%= product.quantity %>
+                  </span>
+                </td>
+                <td class="text-end">Rs. <%= product.saleprice.toFixed(2) %></td>
+                <td class="text-center">
+                  <% if (product.quantity <= 5) { %>
+                    <span class="badge bg-danger">Critical</span>
+                  <% } else { %>
+                    <span class="badge bg-warning">Low</span>
+                  <% } %>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+        <% } else { %>
+        <div class="text-center text-muted py-3">
+          <i class="bx bx-check-circle fs-1 text-success"></i>
+          <p class="mb-0">All products are well stocked!</p>
+        </div>
+        <% } %>
       </div>
     </div>
   </div>
 </div>
 
 <!-- Hidden data containers -->
-<div id="products-data" data-products='<%- JSON.stringify(topFiveSoldProductsWithSoldQuantity).replace(/' /g, "&#39;" )
-  %>'
-  style="display: none;"></div>
-<div id="sales-data" data-sales='<%- JSON.stringify(salesCountByMonth).replace(/' /g, "&#39;" ) %>'
-  style="display: none;"></div>
+<div id="products-data" data-products='<%- JSON.stringify(topFiveSoldProductsWithSoldQuantity).replace(/'/g, "&#39;") %>' style="display: none;"></div>
+<div id="sales-data" data-sales='<%- JSON.stringify(salesCountByDay).replace(/'/g, "&#39;") %>' style="display: none;"></div>
 
 <script>
-  // Parse data from data attributes
-  const productsData = document.getElementById('products-data');
-  const salesData = document.getElementById('sales-data');
-
-  let topProducts = JSON.parse(productsData.getAttribute('data-products'));
-  let topProducts_chartData = {
-    labels: [],
-    data: []
-  };
-  for (let i = 0; i < 5; i++) {
-    topProducts_chartData.labels.push(topProducts[i]?.product_name || '');
-    topProducts_chartData.data.push(topProducts[i]?.total_quantity || 0);
-  }
-
-  let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-  let totalSales = JSON.parse(salesData.getAttribute('data-sales'));
-  let totalSales_chartData = months.reduce((acc, month, index) => {
-    let monthNumber = (index + 1).toString().padStart(2, '0');
-    acc.labels.push(month);
-    let sales = totalSales.find(sale => sale.month === monthNumber);
-    acc.data.push(sales?.total || 0);
-    return acc;
-  }, {
-    labels: [],
-    data: []
-  });
   document.addEventListener('DOMContentLoaded', () => {
-    const topProductsSales = document.getElementById('barChart')
-    const monthSaleGraph = document.getElementById('usersChart')
+    // Parse data from data attributes
+    const productsData = document.getElementById('products-data');
+    const salesData = document.getElementById('sales-data');
 
-    const topProductsSalesChart = new ApexCharts(topProductsSales, {
+    let topProducts = JSON.parse(productsData.getAttribute('data-products'));
+    let salesByDay = JSON.parse(salesData.getAttribute('data-sales'));
+
+    // Prepare top products chart data
+    let topProducts_chartData = {
+      labels: [],
+      data: []
+    };
+    topProducts.forEach((product, index) => {
+      if (index < 5) {
+        topProducts_chartData.labels.push(product?.product_name || 'N/A');
+        topProducts_chartData.data.push(parseInt(product?.total_quantity) || 0);
+      }
+    });
+
+    // Prepare sales trend chart data (last 30 days)
+    let salesTrend_chartData = {
+      dates: [],
+      totals: [],
+      revenues: []
+    };
+    salesByDay.forEach(sale => {
+      salesTrend_chartData.dates.push(sale.date);
+      salesTrend_chartData.totals.push(parseInt(sale.total) || 0);
+      salesTrend_chartData.revenues.push(parseFloat(sale.revenue) || 0);
+    });
+
+    // Top Products Chart (Donut Chart)
+    const topProductsChart = new ApexCharts(document.getElementById('topProductsChart'), {
       chart: {
-        type: 'bar',
+        type: 'donut',
         height: 350
       },
       title: {
-        text: 'Top Selling Products',
-        align: 'center'
+        text: 'Top 5 Products (Last 30 Days)',
+        align: 'center',
+        style: {
+          fontSize: '14px',
+          fontWeight: 600
+        }
       },
-      series: [{
-        name: 'Quantity',
-        data: topProducts_chartData.data
-      }],
-      xaxis: {
-        categories: topProducts_chartData.labels
+      series: topProducts_chartData.data.length > 0 ? topProducts_chartData.data : [1],
+      labels: topProducts_chartData.labels.length > 0 ? topProducts_chartData.labels : ['No Data'],
+      colors: ['#7084C7', '#4CAF50', '#FF9800', '#F44336', '#9C27B0'],
+      legend: {
+        position: 'bottom'
       },
-      colors: ['#7084C7'],
       plotOptions: {
-        bar: {
-          horizontal: true
+        pie: {
+          donut: {
+            size: '65%'
+          }
+        }
+      },
+      dataLabels: {
+        enabled: true,
+        formatter: function(val, opts) {
+          return opts.w.config.series[opts.seriesIndex]
         }
       }
     });
 
-    const monthSaleGraphChart = new ApexCharts(monthSaleGraph, {
+    // Sales Trend Chart (Area Chart with dual axis)
+    const salesTrendChart = new ApexCharts(document.getElementById('salesTrendChart'), {
       chart: {
-        type: 'line',
-        height: 350
+        type: 'area',
+        height: 350,
+        stacked: false
       },
       title: {
-        text: 'Monthly Sales Trend',
-        align: 'center'
+        text: 'Sales Trend (Last 30 Days)',
+        align: 'center',
+        style: {
+          fontSize: '14px',
+          fontWeight: 600
+        }
       },
       series: [{
-        name: 'Sales',
-        data: totalSales_chartData.data
+        name: 'Orders',
+        type: 'column',
+        data: salesTrend_chartData.totals
+      }, {
+        name: 'Revenue (Rs.)',
+        type: 'area',
+        data: salesTrend_chartData.revenues
       }],
       xaxis: {
-        categories: totalSales_chartData.labels
+        categories: salesTrend_chartData.dates,
+        labels: {
+          rotate: -45,
+          rotateAlways: true,
+          formatter: function(val) {
+            if (!val) return '';
+            // Format date as MM-DD
+            const date = new Date(val);
+            return (date.getMonth() + 1).toString().padStart(2, '0') + '-' +
+                   date.getDate().toString().padStart(2, '0');
+          }
+        }
       },
-      colors: ['#7084C7'],
-      menubar: false
+      yaxis: [{
+        title: {
+          text: 'Orders'
+        },
+        labels: {
+          formatter: function(val) {
+            return Math.round(val);
+          }
+        }
+      }, {
+        opposite: true,
+        title: {
+          text: 'Revenue (Rs.)'
+        },
+        labels: {
+          formatter: function(val) {
+            return 'Rs. ' + val.toFixed(0);
+          }
+        }
+      }],
+      colors: ['#7084C7', '#4CAF50'],
+      fill: {
+        type: ['solid', 'gradient'],
+        gradient: {
+          shadeIntensity: 1,
+          opacityFrom: 0.7,
+          opacityTo: 0.3,
+          stops: [0, 90, 100]
+        }
+      },
+      stroke: {
+        width: [0, 2],
+        curve: 'smooth'
+      },
+      dataLabels: {
+        enabled: false
+      },
+      legend: {
+        position: 'top'
+      }
     });
 
-    topProductsSalesChart.render();
-    monthSaleGraphChart.render();
+    topProductsChart.render();
+    salesTrendChart.render();
   });
 </script>
 <style>
