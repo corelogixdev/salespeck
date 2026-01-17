@@ -169,14 +169,14 @@
                     <td class="limit-text"><%= row.name %></td>
                     <td class="limit-text"><%= row.category %></td>
                     <td><%= row.discount || 0 %>%</td>
-                    <td>Rs.<%= row.purchaseprice %></td>
+                    <td>Rs.<%= formatNumber(row.purchaseprice) %></td>
                     <td>
                       <span class="badge bg-<%= row.purchaseactive ? 'success' : 'danger' %>">
                         <%= row.purchaseactive ? 'Active' : 'Inactive' %>
                       </span>
                     </td>
                     <td><%= row.quantity %></td>
-                    <td>Rs.<%= row.saleprice %></td>
+                    <td>Rs.<%= formatNumber(row.saleprice) %></td>
                     <td>
                       <span class="badge bg-<%= row.saleactive ? 'success' : 'danger' %>">
                         <%= row.saleactive ? 'Active' : 'Inactive' %>

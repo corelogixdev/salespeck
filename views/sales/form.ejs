@@ -866,7 +866,7 @@
                         <div class="product-name-cell" title="${product.name}">${product.name}</div>
                         <small class="d-block text-muted">Stock: ${product.quantity}</small>
                     </div>
-                    <span>Rs. ${product.saleprice}</span>
+                    <span>Rs. ${parseFloat(product.saleprice || 0).toFixed(2)}</span>
                 `;
                 productElement.addEventListener('click', () => {
                     addProduct(product, tabId);

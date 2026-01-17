@@ -131,7 +131,7 @@
                                                         <%= product.Product.name %>
                                                     </span>
                                                 </td>
-                                                <td class="code">Rs.<%= product.price %>
+                                                <td class="code">Rs.<%= formatNumber(product.price) %>
                                                 </td>
                                                 <td class="code">
                                                     <%= product.quantity %>
@@ -151,7 +151,7 @@
                                     <tbody>
                                         <tr>
                                             <td class="p-1">Sub Total</td>
-                                            <td class="text-end code p-1">Rs.<%= sale.totalprice %>
+                                            <td class="text-end code p-1">Rs.<%= formatNumber(sale.totalprice) %>
                                             </td>
                                         </tr>
                                         <% if(sale.discountpercentage) { %>

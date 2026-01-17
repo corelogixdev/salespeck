@@ -371,7 +371,7 @@ exports.productsget = async (req, res) => {
   if (req.body.barcode) {
     search = { ...search, barcode: req.body.barcode };
   }
-  // OPTIMIZED: Add limit to prevent loading too many products
+  // OPTIMIZED: Limit to 5 products for faster search results
   let data = await db.product.findAll({
     where: {
       ...search,
@@ -386,7 +386,7 @@ exports.productsget = async (req, res) => {
         attributes: ["id", "expirydate", "quantity", "createdAt"],
       },
     ],
-    limit: 50, // Limit results to 50 products
+    limit: 5, // Limit results to 5 products for faster performance
     order: [["name", "ASC"]] // Order by name for consistent results
   });
   let today = new Date();

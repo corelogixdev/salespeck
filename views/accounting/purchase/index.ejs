@@ -91,7 +91,7 @@
                                             <td class="date"><%= purchase.createdAt %></td>
                                             <td><%= purchase.createdby %></td>
                                             <td><%= purchase.vendor ? purchase.vendor : "None" %></td>
-                                            <td><%= purchase.totalAmount %></td>
+                                            <td>Rs.<%= formatNumber(purchase.totalAmount) %></td>
                                             <td><%= purchase.invoicenum %></td>
                                             <td>
                                                 <button class="btn btn-sm btn-primary" onclick="viewPurchase('<%= purchase.id %>')">

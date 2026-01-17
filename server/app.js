@@ -8,8 +8,12 @@ const expressLayouts = require('express-ejs-layouts');
 const config = require('../installEnv.js'); // Link to the Express app
 const sessionDataMiddleware = require('../middleware/sessionData');
 const routes = require('../routes');
+const { formatNumber } = require('../utils/formatNumber');
 const app = express();
 const runMigrationsAndSeeders = require('../utils/runMigrationsAndSeeders.js');
+
+// Make formatNumber available to all views
+app.locals.formatNumber = formatNumber;
 
 // CORS Configuration
 const corsOptions = {

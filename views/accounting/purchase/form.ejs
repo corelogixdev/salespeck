@@ -205,7 +205,7 @@
             <td class="product-price">
                 <input type="number" class="editable-input" value="${product.purchaseprice}" readonly>
             </td>
-            <td class="total-price">${product.purchaseprice}</td>
+            <td class="total-price">${parseFloat(product.purchaseprice || 0).toFixed(2)}</td>
             <td class="expiry-date-cell">
                 <input type="date" class="form-control form-control-sm expiry-date" min="${new Date().toISOString().split('T')[0]}">
             </td>
@@ -462,7 +462,7 @@
                 productElement.style.cursor = 'pointer';
                 productElement.innerHTML = `
                     <span>${product.name}</span>
-                    <span>Rs. ${product.purchaseprice}</span>
+                    <span>Rs. ${parseFloat(product.purchaseprice || 0).toFixed(2)}</span>
                     `;
                 productElement.addEventListener('click', () => {
                     addProduct(product);
