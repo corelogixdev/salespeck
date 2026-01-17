@@ -252,22 +252,18 @@ exports.quantityForm = async (req, res) => {
 };
 
 exports.saveQuantity = async (req, res) => {
-  let { id, quantity, note, expirydate } = req.body;
+  let { id, name, currentQuantity, quantity, note, expirydate } = req.body;
 
-  if (!quantity || isNaN(quantity)) {
-    return res.status(400).json({
-      success: false,
-      message: 'Please enter a valid quantity'
-    });
+  if (quantity === undefined || isNaN(quantity)) {
+    quantity = 0;
   }
 
-  if (!note.trim()) {
+  if (!note || !note.trim()) {
     note = 'Manual quantity update';
   }
 
   try {
     const product = await db.product.findByPk(id);
-    quantity = quantity * 1;
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -275,19 +271,37 @@ exports.saveQuantity = async (req, res) => {
       });
     }
 
-    // Update product quantity
-    await product.update({
-      quantity: db.sequelize.literal(`quantity + ${quantity}`)
-    });
+    const oldQuantity = product.quantity;
+    let baseQuantity = oldQuantity;
+
+    if (currentQuantity !== undefined && currentQuantity !== '') {
+      baseQuantity = parseFloat(currentQuantity);
+    }
+
+    quantity = parseFloat(quantity);
+    const finalQuantity = baseQuantity + quantity;
+
+    // Update product 
+    let updateData = { quantity: finalQuantity };
+    if (name) {
+      updateData.name = name;
+    }
+
+    await product.update(updateData);
 
     // Create inventory log
+    // We log the adjustment specified in the 'quantity' field, 
+    // plus any correction made to 'currentQuantity'
+    const totalAdjustment = finalQuantity - oldQuantity;
+
     await db.inventorylogs.create({
       product_id: id,
-      quantity: quantity,
+      quantity: totalAdjustment,
       note: note,
       createdby: req.session.user.id,
       type: 'manual'
     });
+
     // create or update productbatches
     if (quantity > 0) {
       await db.productbatches.create({

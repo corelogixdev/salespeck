@@ -148,6 +148,12 @@ ipcMain.on('unlock-window-focus', (event) => {
   mainWindow.setAlwaysOnTop(false);
 });
 
+// Maximize window on request (e.g., after login)
+ipcMain.on('maximize-window', (event) => {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  mainWindow.maximize();
+});
+
 app.whenReady().then(() => {
   createWindow();
 
