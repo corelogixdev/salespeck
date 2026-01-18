@@ -628,17 +628,12 @@
                             <div class="flex-grow-1"></div>
                             
                             <!-- Digital Clock -->
-                            <div class="digital-clock-container mb-3">
+                            <div class="digital-clock-container">
                                 <div class="digital-clock" id="digital-clock-${tabId}">
                                     <span class="clock-time">00:00:00</span>
                                     <span class="clock-date">Loading...</span>
                                 </div>
                             </div>
-                            
-                            <!-- Complete Sale Button -->
-                            <button class="btn btn-primary w-100 mb-2" onclick="completeSale('${tabId}')" style="padding: 0.75rem;">
-                                <i class="ri-check-double-line me-2"></i>Complete Sale
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -712,6 +707,11 @@
                                     <option value="">Select Customer</option>
                                 </select>
                             </div>
+
+                            <!-- Complete Sale Button -->
+                            <button class="btn btn-primary w-100 mt-3" onclick="completeSale('${tabId}')" style="padding: 0.75rem;">
+                                <i class="ri-check-double-line me-2"></i>Complete Sale
+                            </button>
                         </div>
                     </div>
                 </div>
