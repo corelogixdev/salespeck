@@ -1,22 +1,21 @@
 <div class="row">
-    <div class="col-12">
-        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-            <h4 class="mb-sm-0">Purchase List</h4>
-            <div class="page-title-right">
-                <button type="button" class="btn btn-primary" onclick="window.location.href='/accounting/purchase/form'">
-                    <i class="bx bx-plus me-1"></i> New Purchase
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
     <div class="col-lg-12">
         <div class="card">
+            <div class="card-header align-items-center d-flex">
+                <h4 class="card-title mb-0 flex-grow-1">Purchase List</h4>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="window.location.href='/accounting/purchase/form'">
+                        <i class="bx bx-plus me-1"></i> New Purchase
+                    </button>
+                    <button onclick="window.location.reload()" class="btn btn-soft-success btn-sm" title="Refresh">
+                        <i class="ri-refresh-line align-middle"></i> Refresh
+                    </button>
+                </div>
+            </div>
             <div class="card-body">
+                <!-- Search Form -->
                 <form id="search-form" class="row g-3 mb-4" action="/accounting/purchase/search" method="POST">
-                    <div class="col-xxl-3 col-sm-4">
+                    <div class="col-xxl-3 col-sm-3">
                         <div class="search-box">
                             <input type="text" 
                                    class="form-control search flatpickr-range"
@@ -49,7 +48,7 @@
                             <i class="ri-file-list-line search-icon"></i>
                         </div>
                     </div>
-                    <div class="col-xxl-2 col-sm-2 d-flex align-items-center justify-content-end">
+                    <div class="col-xxl-3 col-sm-3 d-flex align-items-center justify-content-end">
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-sm btn-primary">
                                 <i class="ri-search-line me-1 align-bottom"></i> Search
@@ -65,158 +64,212 @@
 
                 <!-- Purchase List Table -->
                 <div class="table-responsive">
-                    <table class="table table-striped table-nowrap align-middle">
+                    <table class="table table-striped table-nowrap align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th>Id</th>
-                                <th>Date</th>
-                                <th>Creator</th>
-                                <th>Vendor</th>
-                                <th>Amount</th>
-                                <th>Invoice Id</th>
-                                <th>Actions</th>
+                                <th scope="col">ID</th>
+                                <th scope="col">Date</th>
+                                <th scope="col">Creator</th>
+                                <th scope="col">Vendor</th>
+                                <th scope="col">Amount</th>
+                                <th scope="col">Invoice ID</th>
+                                <th scope="col" style="text-align: end;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <% if (!purchases.length) { %>
+                            <% if (!purchases || purchases.length === 0) { %>
                                 <tr>
                                     <td colspan="7" class="text-center">
-                                    <i class="ri-error-warning-line align-middle me-1"></i> No data found
+                                        <i class="ri-error-warning-line align-middle me-1"></i> No purchases found
                                     </td>
                                 </tr>
-                                <% } else { %>
-                                    <% purchases.forEach(purchase => { %>
-                                        <tr>
-                                            <td><%= purchase.id %></td>
-                                            <td class="date"><%= purchase.createdAt %></td>
-                                            <td><%= purchase.createdby %></td>
-                                            <td><%= purchase.vendor ? purchase.vendor : "None" %></td>
-                                            <td>Rs.<%= formatNumber(purchase.totalAmount) %></td>
-                                            <td><%= purchase.invoicenum %></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-primary" onclick="viewPurchase('<%= purchase.id %>')">
-                                                    <i class="bx bx-detail"></i>
-                                                    Invoice
+                            <% } else { %>
+                                <% purchases.forEach(purchase => { %>
+                                    <tr>
+                                        <td class="fw-medium"><%= purchase.id %></td>
+                                        <td class="date"><%= purchase.createdAt %></td>
+                                        <td><%= purchase.createdby %></td>
+                                        <td><%= purchase.vendor ? purchase.vendor : "None" %></td>
+                                        <td>Rs. <%= formatNumber(purchase.totalAmount) %></td>
+                                        <td><%= purchase.invoicenum %></td>
+                                        <td style="text-align: end;">
+                                            <div class="d-flex gap-1 justify-content-end">
+                                                <button class="btn btn-soft-info btn-sm" onclick="viewPurchase('<%= purchase.id %>')" title="View Invoice">
+                                                    <i class="ri-file-text-line align-middle"></i> Invoice
                                                 </button>
-                                                <button class="btn btn-sm btn-primary btn-secondary" onclick="viewPurchaseDetails('<%= purchase.id %>')">
-                                                    <i class="bx bx-file text-white"></i>
-                                                    Details
+                                                <button class="btn btn-soft-primary btn-sm" onclick="viewPurchaseDetails('<%= purchase.id %>')" title="View Details">
+                                                    <i class="ri-eye-line align-middle"></i> Details
                                                 </button>
-                                            </td>
-                                        </tr>
-                                    <% }); %>
-                                <% } %>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            <% } %>
                         </tbody>
                     </table>
                 </div>
-                
-                <% if (pagination && pagination.totalPages > 1) { %>
-                <div class="d-flex justify-content-end mt-4">
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination">
-                            <li class="page-item <%= pagination.currentPage === 1 ? 'disabled' : '' %>">
-                                <a class="page-link" href="<%= pagination.currentPage === 1 ? '#' : '?page=' + (pagination.currentPage - 1) %>">
-                                    <i class="mdi mdi-chevron-left"></i>
-                                </a>
-                            </li>
-                            <% for(let i = 1; i <= pagination.totalPages; i++) { %>
-                                <% if (i === 1 || i === pagination.totalPages || (i >= pagination.currentPage - 1 && i <= pagination.currentPage + 1)) { %>
-                                    <li class="page-item <%= i === pagination.currentPage ? 'active' : '' %>">
-                                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+
+                <!-- Pagination at Bottom -->
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <% if (pagination && pagination.totalCount > 0) { %>
+                        <div class="text-muted">
+                            Showing <strong><%= pagination.startRecord %></strong> to 
+                            <strong><%= pagination.endRecord %></strong> of 
+                            <strong><%= pagination.totalCount %></strong> entries
+                        </div>
+                    <% } else { %>
+                        <div class="text-muted">
+                            Showing 0 entries
+                        </div>
+                    <% } %>
+
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="mb-0 text-muted">Show:</label>
+                            <select id="perPageSelect" class="form-select form-select-sm" style="width: auto;">
+                                <option value="10" <%= pagination?.limit === 10 ? 'selected' : '' %>>10</option>
+                                <option value="25" <%= pagination?.limit === 25 ? 'selected' : '' %>>25</option>
+                                <option value="50" <%= pagination?.limit === 50 ? 'selected' : '' %>>50</option>
+                                <option value="100" <%= pagination?.limit === 100 ? 'selected' : '' %>>100</option>
+                                <option value="250" <%= pagination?.limit === 250 ? 'selected' : '' %>>250</option>
+                                <option value="500" <%= pagination?.limit === 500 ? 'selected' : '' %>>500</option>
+                                <option value="1000" <%= pagination?.limit === 1000 ? 'selected' : '' %>>1000</option>
+                                <option value="all" <%= pagination?.limit === 'all' ? 'selected' : '' %>>All</option>
+                            </select>
+                        </div>
+
+                        <% if (pagination && pagination.totalPages > 1) { %>
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination mb-0">
+                                    <li class="page-item <%= pagination.currentPage === 1 ? 'disabled' : '' %>">
+                                        <a class="page-link" href="<%= pagination.currentPage === 1 ? '#' : buildPageUrl(pagination.currentPage - 1) %>">
+                                            <i class="mdi mdi-chevron-left"></i>
+                                        </a>
                                     </li>
-                                <% } else if (i === 2 || i === pagination.totalPages - 1) { %>
-                                    <li class="page-item disabled"><a class="page-link">...</a></li>
-                                <% } %>
-                            <% } %>
-                            <li class="page-item <%= pagination.currentPage === pagination.totalPages ? 'disabled' : '' %>">
-                                <a class="page-link" href="<%= pagination.currentPage === pagination.totalPages ? '#' : '?page=' + (pagination.currentPage + 1) %>">
-                                    <i class="mdi mdi-chevron-right"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
+                                    <% for(let i = 1; i <= pagination.totalPages; i++) { %>
+                                        <% if (i === 1 || i === pagination.totalPages || (i >= pagination.currentPage - 1 && i <= pagination.currentPage + 1)) { %>
+                                            <li class="page-item <%= i === pagination.currentPage ? 'active' : '' %>">
+                                                <a class="page-link" href="<%= buildPageUrl(i) %>"><%= i %></a>
+                                            </li>
+                                        <% } else if (i === 2 || i === pagination.totalPages - 1) { %>
+                                            <li class="page-item disabled"><a class="page-link">...</a></li>
+                                        <% } %>
+                                    <% } %>
+                                    <li class="page-item <%= pagination.currentPage === pagination.totalPages ? 'disabled' : '' %>">
+                                        <a class="page-link" href="<%= pagination.currentPage === pagination.totalPages ? '#' : buildPageUrl(pagination.currentPage + 1) %>">
+                                            <i class="mdi mdi-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        <% } %>
+                    </div>
                 </div>
-                <% } %>
             </div>
-            <style>
-                .search-box {
-                    position: relative;
-                }
-
-                .search-box .search-icon {
-                    position: absolute;
-                    left: 13px;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    font-size: 18px;
-                    color: var(--vz-gray-600);
-                }
-
-                .search-box .form-control {
-                    padding-left: 35px;
-                    background-color: var(--vz-card-bg-custom);
-                    border-color: var(--vz-border-color);
-                }
-
-                .search-box .form-control:focus {
-                    border-color: var(--vz-primary);
-                }
-
-                .search-box .flatpickr-range {
-                    background-color: var(--vz-card-bg-custom);
-                }
-            </style>
         </div>
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    $('#reset').click(function () {
-        $('#search-form').find('input').val('');
-        $('#search-form').submit();
-    });
-
-    $('.dash-filter-picker').attr('placeholder', moment().format('D MMM, YYYY'));
-    if (!$('.dash-filter-picker').val()) {
-        $('.dash-filter-picker').val(moment().format('D MMM, YYYY'));
+<style>
+    .search-box {
+        position: relative;
     }
 
+    .search-box .search-icon {
+        position: absolute;
+        left: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 18px;
+        color: var(--vz-gray-600);
+    }
+
+    .search-box .form-control {
+        padding-left: 35px;
+        background-color: var(--vz-card-bg-custom);
+        border-color: var(--vz-border-color);
+    }
+
+    .search-box .form-control:focus {
+        border-color: var(--vz-primary);
+    }
+
+    .search-box .flatpickr-range {
+        background-color: var(--vz-card-bg-custom);
+    }
+</style>
+
+<script>
+// Helper function to build page URLs
+function buildPageUrl(page) {
+    const params = new URLSearchParams(window.location.search);
+    params.set('page', page);
+    
+    // Get limit if it exists
+    const limit = document.getElementById('perPageSelect')?.value;
+    if (limit) {
+        params.set('limit', limit);
+    }
+    
+    return '?' + params.toString();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Per page selector change
+    $('#perPageSelect').on('change', function() {
+        const limit = $(this).val();
+        const params = new URLSearchParams(window.location.search);
+        params.set('limit', limit);
+        params.set('page', '1'); // Reset to first page
+        window.location.search = params.toString();
+    });
+
+    // Reset button
+    $('#reset').click(function () {
+        window.location.href = '/accounting/purchase';
+    });
+
+    // Initialize flatpickr
+    flatpickr(".flatpickr-range", {
+        mode: "range",
+        dateFormat: "Y-m-d",
+        placeholder: "Filter by date range..."
+    });
+
+    // Format dates
     $('.date').each(function () {
         let date = new Date($(this).text());
-        $(this).text(moment(date).format('D MMM, YYYY'));
+        if (!isNaN(date.getTime())) {
+            $(this).text(moment(date).format('D MMM, YYYY'));
+        }
     });
 });
 
 function viewPurchase(id) {
     window.location.href = `/accounting/purchase/view/${id}`;
 }
+
 function viewPurchaseDetails(id) {
     window.location.href = `/accounting/purchase/details/${id}`;
 }
-
-$('.date').each(function() {
-    const date = new Date($(this).text());
-    $(this).text(date.toLocaleDateString());
-});
-
-$(document).ready(function() {
-    // Initialize flatpickr
-    flatpickr(".flatpickr-range", {
-        mode: "range",
-        placeholder: "Filter by date range",
-        dateFormat: "Y-m-d"
-    });
-
-    // Reset form
-    $('#reset').click(function() {
-        window.location.href = '/accounting/purchase';
-    });
-
-    // Format dates
-    $('.date').each(function() {
-        let date = new Date($(this).text());
-        $(this).text(moment(date).format('D MMM, YYYY'));
-    });
-});
 </script>
+
+<%
+// Helper function for building pagination URLs in EJS
+function buildPageUrl(page) {
+    const searchParams = searchquery || {};
+    const params = new URLSearchParams();
+    
+    params.set('page', page);
+    
+    if (pagination && pagination.limit) {
+        params.set('limit', pagination.limit);
+    }
+    
+    if (searchParams.daterange) params.set('daterange', searchParams.daterange);
+    if (searchParams.vendor) params.set('vendor', searchParams.vendor);
+    if (searchParams.invoicenum) params.set('invoicenum', searchParams.invoicenum);
+    
+    return '?' + params.toString();
+}
+%>
