@@ -210,101 +210,14 @@
 
     <style>
         @media print {
-            body * {
+            @page {
+                margin: 5mm !important;
+            }
+
+            body {
                 visibility: hidden;
                 margin: 0 !important;
                 padding: 0 !important;
-            }
-
-            #demo,
-            #demo * {
-                visibility: visible;
-            }
-
-            #demo {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-            }
-
-            .d-print-none {
-                display: none !important;
-            }
-
-            .cstm-row {
-                width: 100% !important;
-            }
-
-            @page {
-                margin: auto;
-            }
-        }
-
-
-        * {
-            font-family: Arial !important;
-        }
-
-        /* Basic styles */
-        .card-body {
-            font-size: 0.85rem;
-        }
-
-        .fs-14 {
-            font-size: 0.875rem !important;
-        }
-
-        .fs-7 {
-            font-size: 0.8rem !important;
-        }
-
-        .fs-6 {
-            font-size: 0.875rem !important;
-        }
-
-        .fs-15 {
-            font-size: 0.9rem !important;
-        }
-
-        .table {
-            font-size: 0.8rem;
-        }
-
-        .card-header {
-            padding: 0.75rem 1rem;
-        }
-
-        .card-body {
-            padding: 0.75rem;
-        }
-
-        @media (max-width: 576px) {
-            .cstm-row {
-                width: 100% !important;
-            }
-
-            .card-body {
-                padding: 0.5rem;
-                font-size: 0.8rem;
-            }
-
-            .table {
-                font-size: 0.75rem;
-            }
-
-            h4,
-            h5,
-            h6 {
-                font-size: 0.9rem;
-            }
-        }
-
-        @media print {
-            body * {
-                visibility: hidden;
-                margin-left: 0 !important;
-                padding-left: 0 !important;
             }
 
             #demo,
@@ -315,14 +228,12 @@
             }
 
             #demo {
-                position: absolute;
-                left: 0;
-                top: 0;
                 width: 100%;
                 max-width: 100%;
                 margin: 0 !important;
                 padding: 0 !important;
-                margin-left: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
             }
 
             .card {
@@ -331,14 +242,13 @@
                 padding: 0 !important;
                 margin: 0 !important;
                 width: 100% !important;
-                margin-left: 0 !important;
             }
 
             .card-header,
             .card-body {
                 width: 100% !important;
-                margin-left: 0 !important;
-                padding-left: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
             }
 
             .d-print-none {
@@ -348,13 +258,10 @@
             .cstm-row {
                 width: 100% !important;
                 padding: 0 !important;
-                margin-left: 0 !important;
                 margin: 0 !important;
             }
 
             /* Container adjustments */
-            .container,
-            .container-fluid,
             .row,
             .col-12,
             .col-lg-12 {
@@ -362,22 +269,21 @@
                 margin: 0 !important;
                 max-width: 100% !important;
                 width: 100% !important;
-                margin-left: 0 !important;
             }
 
             /* Table adjustments */
             .table-responsive {
                 overflow: visible !important;
                 width: 100% !important;
-                padding-left: 0 !important;
-                margin-left: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
             }
 
             .table:not(.footer-table) {
                 font-size: 8pt !important;
                 width: 100% !important;
                 padding: 0 !important;
-                margin-left: 0 !important;
+                margin: 0 !important;
                 table-layout: fixed !important;
                 border-collapse: collapse !important;
             }
@@ -387,7 +293,6 @@
                 padding: 1pt 1pt !important;
                 white-space: normal !important;
                 word-break: break-word;
-                margin-left: 0 !important;
                 font-size: 7pt !important;
                 border: 1pt solid #000 !important;
             }
@@ -484,46 +389,20 @@
                 margin-right: auto !important;
             }
 
-            /* Page margins - small padding to prevent overflow */
-            @page {
-                margin: 5mm !important;
-                padding: 0 !important;
-            }
-
-            /* Add small padding to card content in print */
-            .card-body {
-                padding: 2pt 4pt !important;
-            }
-
-            .card-header {
-                padding: 2pt 4pt !important;
-            }
-
-            /* Make borders black and thicker for print */
+            /* Aggressively remove all borders for print */
             .border-top,
             .border-bottom-dashed,
-            .border-top-dashed {
-                border-color: #000 !important;
-                border-width: 1.5pt !important;
-                border-style: solid !important;
-            }
-
-            .px-3,
-            .px-4,
-            .py-4,
-            .pt-4,
-            .pb-0,
-            .p-1 {
-                padding: 0 !important;
-            }
-
-            .mt-1,
-            .mt-2,
-            .mt-3,
-            .mt-4,
-            .mb-3,
-            .my-2 {
-                margin: 1pt 0 !important;
+            .border-top-dashed,
+            .footer-table,
+            .footer-table td,
+            .footer-table th,
+            .footer-table tr,
+            .border-bottom,
+            .border-start,
+            .border-end {
+                border: none !important;
+                border-top: none !important;
+                border-bottom: none !important;
             }
         }
 
