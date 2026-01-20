@@ -65,62 +65,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <% if (!logs.length) { %>
-                                    <tr>
-                                        <td colspan="7" class="text-center">
-                                            <i class="ri-error-warning-line align-middle me-1"></i> No logs found
-                                        </td>
-                                    </tr>
-                                    <% } else { %>
-                                        <% logs.forEach(log=> { %>
-                                            <tr>
-                                                <td class="date">
-                                                    <%= log.createdAt %>
-                                                </td>
-                                                <td>
-                                                    <% const productName=log.Product ? log.Product.name
-                                                        : 'Unknown Product' %>
-                                                        <span class="limited-text" title="<%= productName %>">
-                                                            <%= productName.length> 20 ? productName.substring(0, 20) +
-                                                                '...' : productName %>
-                                                        </span>
-                                                </td>
-                                                <td>
-                                                    <span
-                                                        class="badge bg-<%= log.type === 'sale' ? 'danger' : 'success' %>">
-                                                        <%= log.type ? (log.type.charAt(0).toUpperCase() +
-                                                            log.type.slice(1)) : 'Unknown' %>
-                                                    </span>
-                                                </td>
-                                                <td
-                                                    class="<%= parseInt(log.quantity) < 0 ? 'text-danger' : 'text-success' %>">
-                                                    <%= log.quantity || 0 %>
-                                                </td>
-                                                <td>
-                                                    <% const note=log.note || '-' %>
-                                                        <span class="limited-note" title="<%= note %>">
-                                                            <%= note.length> 30 ? note.substring(0, 30) + '...' : note
-                                                                %>
-                                                        </span>
-                                                </td>
-                                                <td>
-                                                    <% const userName=log.User ? log.User.firstname+ ' ' +
-                                                        log.User.lastname : 'Unknown User' %>
-                                                        <span class="limited-text" title="<%= userName %>">
-                                                            <%= userName.length> 15 ? userName.substring(0, 15) + '...'
-                                                                : userName %>
-                                                        </span>
-                                                </td>
-                                                <td>
-                                                    <button class="btn btn-soft-primary btn-sm"
-                                                        onclick="viewDetails('<%= log.id %>', '<%= productName %>', `<%= note %>`, '<%= log.createdAt %>', '<%= log.type %>', '<%= log.quantity %>', '<%= userName %>')"
-                                                        title="View Details">
-                                                        <i class="ri-eye-line align-middle"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <% }); %>
-                                                <% } %>
+                                <%- include('_table_rows') %>
                             </tbody>
                         </table>
                     </div>
@@ -140,7 +85,7 @@
                             <div class="d-flex align-items-center gap-2">
                                 <label for="pageSize" class="text-muted mb-0">Show:</label>
                                 <select id="pageSize" class="form-select form-select-sm" style="width: 80px;"
-                                    onchange="(function() { const params = new URLSearchParams(window.location.search); params.set('page', 1); params.set('pageSize', this.value); window.location.href = '/inventorylogs?' + params.toString(); }).call(this)">
+                                    onchange="window.handlePageSizeChange(this, '/inventorylogs?<%= new URLSearchParams(Object.assign({}, query, searchParams, {page: 1})).toString() %>', <%= pagination.totalCount %>)">
                                     <option value="10" <%= (pagination.pageSize || 10) == 10 ? 'selected' : '' %>>10</option>
                                     <option value="25" <%= (pagination.pageSize || 10) == 25 ? 'selected' : '' %>>25</option>
                                     <option value="50" <%= (pagination.pageSize || 10) == 50 ? 'selected' : '' %>>50</option>

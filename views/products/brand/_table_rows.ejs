@@ -1,0 +1,27 @@
+<% if (!brands || brands.length === 0) { %>
+    <tr>
+        <td colspan="4" class="text-center">
+            <i class="ri-error-warning-line align-middle me-1"></i> No data found
+        </td>
+    </tr>
+<% } else { %>
+    <% brands.forEach(brand => { %>
+        <tr>
+            <td class="fw-medium"><%= brand.name %></td>
+            <td><%= brand.description || '-' %></td>
+            <td>
+                <span class="badge bg-<%= brand.status ? 'success' : 'danger' %>">
+                    <%= brand.status ? 'Active' : 'Inactive' %>
+                </span>
+            </td>
+            <td style="text-align: end;">
+                <button type="button" onclick="editBrand('<%= brand.id %>')" class="btn btn-soft-warning btn-sm">
+                    <i class="ri-pencil-fill align-middle"></i> Edit
+                </button>
+                <button type="button" onclick="deleteBrand('<%= brand.id %>')" class="btn btn-soft-danger btn-sm">
+                    <i class="ri-delete-bin-fill align-middle"></i> Delete
+                </button>
+            </td>
+        </tr>
+    <% }) %>
+<% } %>

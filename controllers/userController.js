@@ -2,11 +2,21 @@ const { Op } = require('sequelize');
 const db = require('../models');
 const encrypt = require('../utils/encrypt');
 const { getPaginationMeta, buildSortClause } = require('../utils/paginationHelper');
+const moment = require("moment");
 
 exports.index = async (req, res) => {
   try {
     const query = req.query;
     const role = query.role || 'user';
+    let { filter, daterange } = query;
+
+    // Handle 'today' filter shortcut
+    if (filter === 'today') {
+        const today = moment().format('YYYY-MM-DD');
+        daterange = `${today} to ${today}`;
+        // Update query object so it reflects in the view
+        query.daterange = daterange;
+    }
 
     // Pagination
     const page = parseInt(query.page) || 1;
@@ -14,6 +24,18 @@ exports.index = async (req, res) => {
 
     // Filters
     const whereClause = { role };
+
+    if (daterange) {
+        const [start, end] = daterange.split(" to ");
+        if(start && end) { // Basic validation
+             const startDate = moment(new Date(start)).startOf("day").toISOString();
+             const endDate = moment(new Date(end)).endOf("day").toISOString();
+             whereClause.createdAt = {
+                 [Op.gte]: startDate,
+                 [Op.lte]: endDate
+             };
+        }
+    }
 
     if (query.search) {
       const search = query.search.trim();
@@ -48,6 +70,14 @@ exports.index = async (req, res) => {
       case 'vendor':
         title = 'Vendors';
         break;
+    }
+
+    if (query.partial) {
+      return res.render('users/_table_rows', {
+        layout: false,
+        data,
+        role
+      });
     }
 
     res.render('users/index', {

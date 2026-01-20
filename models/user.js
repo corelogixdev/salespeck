@@ -67,6 +67,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       defaultValue: null
     },
+    dashboard_config: {
+      type: DataTypes.TEXT, // Store as JSON string
+      allowNull: true,
+      defaultValue: '{}'
+    },
   }, {
     tableName: 'user',
     timestamps: true,

@@ -1,0 +1,30 @@
+                    <% if (!sales.length) { %>
+                      <tr>
+                        <td colspan="5" class="text-center">
+                          <i class="ri-error-warning-line align-middle me-1"></i> No sales found
+                        </td>
+                      </tr>
+                      <% } else { %>
+                        <% sales.forEach((sale, index)=> { %>
+                          <% let products=sale.SoldPoducts.map(({Product})=>Product.name).join(', ') %>
+                            <tr>
+                                <td class="limit-text" title="<%= products %>">
+                                    <%= products %>
+                                </td>
+                                <td>
+                                    <%= sale.discountpercentage %>%
+                                </td>
+
+                                <td>Rs.<%= (parseFloat(sale.totalprice) - (parseFloat(sale.totalprice) * (sale.discountpercentage / 100))).toFixed(2) %></td>
+
+                                <td class="date">
+                                    <%= sale.createdAt %>
+                                </td>
+                                <td style="text-align: end;">
+                                    <a href="/sales/<%= sale.id %>" class="btn btn-soft-primary btn-sm" title="View Sale">
+                                        <i class="ri-eye-fill align-middle"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                        <% }) %>
+                      <% } %>

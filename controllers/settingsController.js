@@ -1,4 +1,4 @@
-const { softwaresetting } = require("../models");
+const { softwaresetting, user } = require("../models");
 const config = require("../installEnv");
 
 exports.index = async (req, res) => {
@@ -30,14 +30,33 @@ exports.index = async (req, res) => {
   };
   
   let currenttab = req.query.currenttab || 'env';
-  if (currenttab !== 'env' && currenttab !== 'db') {
+  if (currenttab !== 'env' && currenttab !== 'db' && currenttab !== 'dashboard') {
     currenttab = 'env';
   }
   
+  // Get dashboard config for current user
+  let dashboardConfig = {};
+  if (req.session.user_id) {
+    const currentUser = await user.findOne({ where: { id: req.session.user_id } });
+    if (currentUser && currentUser.dashboard_config) {
+        try {
+            dashboardConfig = JSON.parse(currentUser.dashboard_config);
+        } catch (e) {
+            console.error("Error parsing dashboard config:", e);
+        }
+    }
+  }
+
+  // Consume session message if exists
+  const message = req.session.message;
+  req.session.message = null;
+
   res.render("settings/index", { 
     envSettings, 
     dbSettings: dbSettingsObj, 
-    currenttab 
+    currenttab,
+    dashboardConfig,
+    message
   });
 };
 
@@ -78,6 +97,27 @@ exports.save = async (req, res) => {
     // Save database settings
     let values = JSON.stringify(req.body);
     await softwaresetting.update({ value: values }, { where: { name: settingName } });
+  } else if (tabType === 'dashboard') {
+    // Save dashboard settings to User model
+    console.log('Saving dashboard settings:', req.body);
+    const userId = req.session.user_id; // Use session user_id
+    
+    if (userId) {
+      try {
+        await user.update({ dashboard_config: JSON.stringify(req.body) }, { where: { id: userId } });
+        console.log('Dashboard settings saved to database for user:', userId);
+        
+        // Update session user to reflect changes immediately
+        if (req.session.user) {
+           req.session.user.dashboard_config = JSON.stringify(req.body); 
+           console.log('Session user updated with new dashboard config');
+        }
+      } catch (error) {
+        console.error('Error saving dashboard settings:', error);
+      }
+    } else {
+        console.log('No user session found in request to save settings');
+    }
   }
   
   req.session.message = { type: "success", text: "Settings saved successfully!" };

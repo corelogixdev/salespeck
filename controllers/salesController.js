@@ -2,16 +2,31 @@ const { Op, where } = require("sequelize");
 var db = require("../models");
 var moment = require("moment");
 const { findLike } = require("../utils/searchquery");
-const { getPagination, getPagingData } = require('../utils/pagination');
+const { getPaginationMeta } = require('../utils/paginationHelper');
 
 exports.index = async (req, res) => {
-  let { customer, daterange, productId } = req.body;
-  const page = parseInt(req.query.page) || parseInt(req.body.page) || 1;
-  const { limit, offset } = getPagination(page, 10);
+  const query = { ...req.body, ...req.query };
+  let { customer, daterange, productId, filter } = query;
+  
+  // Handle 'today' filter shortcut
+  if (filter === 'today') {
+     const today = moment().format('YYYY-MM-DD');
+     daterange = `${today} to ${today}`;
+  } else if (filter === 'last30') {
+     const end = moment().format('YYYY-MM-DD');
+     const start = moment().subtract(29, 'days').format('YYYY-MM-DD');
+     daterange = `${start} to ${end}`;
+  }
+  
+  const page = parseInt(query.page) || 1;
+  const pageSize = parseInt(query.pageSize) || 10;
+  const limit = pageSize;
+  const offset = (page - 1) * limit;
 
   try {
     // Optimized count query - use raw SQL for better performance
-    let countQuery = 'SELECT COUNT(DISTINCT s.id) as count FROM sale s';
+    // Use COUNT(*) which is generally faster than COUNT(DISTINCT id) for primary keys
+    let countQuery = 'SELECT COUNT(*) as count FROM sale s';
     const replacements = [];
     
     if (customer) {
@@ -41,6 +56,7 @@ exports.index = async (req, res) => {
     
     // Build optimized sales query with raw SQL - much faster than Sequelize includes
     // Get sales with pagination first, then fetch product names separately for only these sales
+    // SQL_CALC_FOUND_ROWS is deprecated in MySQL 8, so we use separate count query
     let salesQuery = `
       SELECT 
         s.id,
@@ -138,12 +154,19 @@ exports.index = async (req, res) => {
       }))
     }));
     
-    const pagination = getPagingData(count, page, limit);
+    const pagination = getPaginationMeta(page, limit, count);
+
+    if (req.query.partial) {
+      return res.render("sales/_table_rows", {
+        sales,
+        layout: false
+      });
+    }
 
     res.render("sales/index", {
       sales,
       title: "Sales Report",
-      searchquery: req.body,
+      searchquery: { ...req.body, ...req.query },
       pagination
     });
   } catch (error) {

@@ -1111,27 +1111,46 @@
         </div>
     </div>
     <script src="/assets/js/toastr.min.js"></script>
+    <!-- Global toast notification script -->
     <script>
-        toastr.options = {
-            "closeButton": true,
-            "progressBar": true,
-            "positionClass": "toast-bottom-right",
-            "showDuration": "300",
-            "hideDuration": "1000",
-            "timeOut": "5000",
-            "extendedTimeOut": "1000",
-            "showEasing": "swing",
-            "hideEasing": "linear",
-            "showMethod": "fadeIn",
-            "hideMethod": "fadeOut",
-            "toastClass": "toast",
-        };
+        $(document).ready(function() {
+            <% if (typeof message !== 'undefined' && message) { %>
+                toastr.options = {
+                    "closeButton": true,
+                    "progressBar": true,
+                    "positionClass": "toast-bottom-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut",
+                    "toastClass": "toast",
+                };
+                toastr["<%= message.type %>"]("<%= message.text %>");
+            <% } %>
+
+            // Also check for hidden input from redirected pages if any
+            const flashType = $('#flash-message-type').val();
+            const flashText = $('#flash-message-text').val();
+            if(flashType && flashText){
+                 toastr[flashType](flashText);
+            }
+        });
     </script>
     <script src="/assets/libs/simplebar/simplebar.min.js"></script>
     <script src="/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- Global Loader Overlay -->
-    <div id="global-loader">
+    <div id="global-loader" style="flex-direction: column;">
         <div class="spinner"></div>
+        <div class="loader-progress" style="display: none; width: 300px; text-align: center; margin-top: 20px;">
+            <div class="progress" style="height: 10px; border-radius: 5px; background-color: rgba(0,0,0,0.1);">
+                <div class="progress-bar loader-progress-bar bg-primary" role="progressbar" style="width: 0%; border-radius: 5px; transition: width 0.3s ease;"></div>
+            </div>
+            <div class="loader-progress-text mt-2 text-muted fw-medium fs-14">Preparing...</div>
+        </div>
     </div>
 
     <!-- Loader Logic -->
@@ -1153,6 +1172,11 @@
                     setTimeout(() => loader.style.display = 'none', 300);
                 }
             };
+            
+            // Initial Ensure Hidden
+            window.addEventListener('load', function() {
+                 hideLoader();
+            });
 
             // Attach to Search Forms (GET requests)
             document.querySelectorAll('form[method="GET"]').forEach(form => {
@@ -1189,6 +1213,203 @@
             window.addEventListener('pageshow', function(event) {
                 if (event.persisted) {
                     hideLoader();
+                }
+            });
+
+            // Progress Loader Logic
+            window.updateLoader = function(percent, text) {
+                const loader = document.getElementById('global-loader');
+                const progressContainer = document.querySelector('.loader-progress');
+                const progressBar = document.querySelector('.loader-progress-bar');
+                const progressText = document.querySelector('.loader-progress-text');
+                
+                if(loader && progressContainer && progressBar && progressText) {
+                    loader.style.display = 'flex';
+                    loader.style.opacity = '1';
+                    progressContainer.style.display = 'block';
+                    document.querySelector('.spinner').style.display = 'none'; // Hide spinner when showing progress
+                    
+                    progressBar.style.width = percent + '%';
+                    progressText.innerText = text;
+                }
+            };
+
+            window.resetLoader = function() {
+                const progressContainer = document.querySelector('.loader-progress');
+                if(progressContainer) {
+                    progressContainer.style.display = 'none';
+                    document.querySelector('.spinner').style.display = 'block';
+                }
+                hideLoader();
+            }
+
+            // Generic Chunk Loader
+            window.loadChunks = async function(targetBigPage, bigPageSize, baseUrl, totalRecords) {
+                const tbody = document.querySelector('table tbody');
+                if (!tbody) return;
+
+                const CHUNK_SIZE = 500;
+                
+                // Calculate logic
+                // If "All" (9999), we load everything. targetBigPage must be 1.
+                // If specific size (e.g. 2000), we load that size.
+                
+                let effectiveSize = bigPageSize === '9999' ? totalRecords : parseInt(bigPageSize);
+                if (bigPageSize === '9999') targetBigPage = 1;
+
+                // Calculate global offset for the start of this "Big Page"
+                const bigPageStartOffset = (targetBigPage - 1) * effectiveSize;
+                
+                // We need to fetch 'effectiveSize' items starting from 'bigPageStartOffset'.
+                // We do this in chunks of CHUNK_SIZE.
+                
+                const totalChunks = Math.ceil(effectiveSize / CHUNK_SIZE);
+
+                // Reset UI
+                window.updateLoader(0, `Preparing to load ${effectiveSize} records...`);
+                tbody.innerHTML = ''; // Clear table
+                
+                // Update URL
+                const url = new URL(window.location.href);
+                url.searchParams.set('pageSize', bigPageSize);
+                url.searchParams.set('page', targetBigPage);
+                window.history.pushState({}, '', url);
+
+                // Update Pagination Controls UI (Active State)
+                document.querySelectorAll('.page-item').forEach(li => li.classList.remove('active'));
+                // Try to find the link for this page and activate it
+                document.querySelectorAll('.page-link').forEach(link => {
+                    const params = new URLSearchParams(link.href.split('?')[1]);
+                    if (parseInt(params.get('page')) === targetBigPage) {
+                        link.closest('.page-item')?.classList.add('active');
+                    }
+                });
+                
+                // Update Info Text
+                const infoText = document.querySelector('.text-muted');
+                if(infoText && infoText.innerText.includes('Showing')) {
+                     const endRec = Math.min(bigPageStartOffset + effectiveSize, totalRecords);
+                     infoText.innerHTML = `Showing <strong>${bigPageStartOffset + 1}</strong> to <strong>${endRec}</strong> of <strong>${totalRecords}</strong> entries`;
+                }
+
+                let loadedCount = 0;
+
+                try {
+                    for (let chunkIdx = 0; chunkIdx < totalChunks; chunkIdx++) {
+                        // Calculate the "Small Page" number that corresponds to this chunk
+                        // Global offset for this chunk = bigPageStartOffset + (chunkIdx * CHUNK_SIZE)
+                        // effectiveSmallPage = (GlobalOffset / CHUNK_SIZE) + 1
+                        
+                        const chunkGlobalOffset = bigPageStartOffset + (chunkIdx * CHUNK_SIZE);
+                        const effectiveSmallPage = Math.floor(chunkGlobalOffset / CHUNK_SIZE) + 1;
+
+                        // Check limits
+                        const remaining = effectiveSize - loadedCount;
+                        if (remaining <= 0) break;
+
+                        // Construct URL
+                        // Ensure we preserve other existing query params (search, etc.) from baseUrl or current window location
+                        const currentUrlParams = new URLSearchParams(window.location.search);
+                        // We need base params: search, role, etc.
+                        // baseUrl usually comes in as "/path?param=val".
+                        // Let's rely on baseUrl provided, but append page/pageSize/partial.
+                        
+                        const joinChar = baseUrl.includes('?') ? '&' : '?';
+                        const chunkUrl = `${baseUrl}${joinChar}page=${effectiveSmallPage}&pageSize=${CHUNK_SIZE}&partial=true`;
+
+                        const response = await fetch(chunkUrl);
+                        if (!response.ok) throw new Error('Network response was not ok');
+
+                        const html = await response.text();
+                        tbody.insertAdjacentHTML('beforeend', html);
+
+                        loadedCount += CHUNK_SIZE;
+                        const percent = Math.min(Math.round(((chunkIdx + 1) / totalChunks) * 100), 100);
+                        window.updateLoader(percent, `Loaded chunk ${chunkIdx + 1} of ${totalChunks}`);
+                    }
+
+                    // Finalize
+                    window.updateLoader(100, 'Rendering...');
+                    setTimeout(() => {
+                        window.resetLoader();
+                    }, 500);
+
+                } catch (error) {
+                    console.error('Chunk loading failed:', error);
+                    toastr.error('Failed to load data. Please try again.');
+                    window.resetLoader();
+                }
+            };
+
+            // Enhanced Page Size Handler
+            window.handlePageSizeChange = function(selectElement, baseUrl, totalRecords) {
+                const size = selectElement.value;
+                const tbody = document.querySelector('table tbody');
+                
+                // Check if we should use chunk loading
+                if ((size === '9999' || parseInt(size) > 1000) && tbody) {
+                     window.loadChunks(1, size, baseUrl, totalRecords);
+                     
+                     // Hide pagination if "All"
+                     if (size === '9999') {
+                        const nav = document.querySelector('nav');
+                        if(nav) nav.style.display = 'none';
+                     } else {
+                        // Ensure nav is visible if we switched from All to 2000
+                        const nav = document.querySelector('nav');
+                        if(nav) nav.style.display = 'block';
+                     }
+                } else {
+                    // Standard Reload
+                    const params = new URLSearchParams(window.location.search);
+                    params.set('page', 1);
+                    params.set('pageSize', size);
+                    window.location.href = '?' + params.toString();
+                }
+            };
+
+            // Intercept Pagination Clicks
+            document.body.addEventListener('click', function(e) {
+                const link = e.target.closest('.page-link');
+                if (!link) return;
+
+                const href = link.getAttribute('href');
+                if (!href || href === '#') return;
+
+                // Check if we are in "Large Page" mode
+                const urlParams = new URLSearchParams(window.location.search);
+                const currentSize = urlParams.get('pageSize') || '10'; // Default 10
+
+                if (currentSize === '9999' || parseInt(currentSize) > 1000) {
+                     e.preventDefault();
+                     
+                     // Extract target page from href
+                     const targetUrl = new URL(href, window.location.origin);
+                     const targetPage = parseInt(targetUrl.searchParams.get('page')) || 1;
+                     
+                     // Get total records from DOM (safest way without passing it everywhere)
+                     // Parsing: 'Showing 1 to 500 of 20000 entries'
+                     const infoText = document.querySelector('.text-muted')?.innerText;
+                     let totalRecords = 0;
+                     if(infoText) {
+                        const match = infoText.match(/of\s+([0-9,]+)\s+entries/); // Match "of 20,000 entries"
+                        if(match) {
+                            totalRecords = parseInt(match[1].replace(/,/g, ''));
+                        }
+                     }
+                     
+                     if (totalRecords > 0) {
+                         // Get base URL for fetching (remove page/pageSize/partial params)
+                         const baseUrl = window.location.pathname + '?' + Array.from(targetUrl.searchParams.entries())
+                            .filter(([k]) => !['page', 'pageSize', 'partial'].includes(k))
+                            .map(([k,v]) => `${k}=${v}`)
+                            .join('&');
+                            
+                         window.loadChunks(targetPage, currentSize, baseUrl, totalRecords);
+                     } else {
+                         // Fallback if parsing fails
+                         window.location.href = href;
+                     }
                 }
             });
         });

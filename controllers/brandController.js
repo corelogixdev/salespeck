@@ -31,6 +31,13 @@ exports.listBrands = async (req, res) => {
         // Generate pagination metadata
         const pagination = getPaginationMeta(page, pageSize, count);
 
+        if (query.partial) {
+            return res.render('products/brand/_table_rows', {
+                layout: false,
+                brands: rows
+            });
+        }
+
         res.render('products/brand/list', {
             title: "Brands",
             brands: rows,

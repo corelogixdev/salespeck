@@ -13,7 +13,7 @@ try {
 const config = require('./installEnv.js'); // Link to the Express app
 const logi = require('./utils/logi.js');
 
-app.setAppLogsPath();
+// app.setAppLogsPath();
 //log starting app and date time to log file
 logi('Starting OpenMenu Desktop...');
 logi('Date:', new Date().toISOString());

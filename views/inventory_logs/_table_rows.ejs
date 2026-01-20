@@ -1,0 +1,55 @@
+                                    <% if (!inventoryLogs || inventoryLogs.length===0) { %>
+                                        <tr>
+                                            <td colspan="6" class="text-center">No inventory logs found.</td>
+                                        </tr>
+                                        <% } else { %>
+                                            <% inventoryLogs.forEach(log=> { %>
+                                                <tr>
+                                                    <td>
+                                                        <%= log.createdAt ? new Date(log.createdAt).toLocaleString()
+                                                            : 'Unknown Date' %>
+                                                    </td>
+                                                    <td>
+                                                        <% const productName=log.Product ? log.Product.name
+                                                            : 'Unknown Product' %>
+                                                            <span class="limited-text" title="<%= productName %>">
+                                                                <%= productName.length> 20 ? productName.substring(0, 20) +
+                                                                    '...' : productName %>
+                                                            </span>
+                                                    </td>
+                                                    <td>
+                                                        <span
+                                                            class="badge bg-<%= log.type === 'sale' ? 'danger' : 'success' %>">
+                                                            <%= log.type ? (log.type.charAt(0).toUpperCase() +
+                                                                log.type.slice(1)) : 'Unknown' %>
+                                                        </span>
+                                                    </td>
+                                                    <td
+                                                        class="<%= parseInt(log.quantity) < 0 ? 'text-danger' : 'text-success' %>">
+                                                        <%= log.quantity || 0 %>
+                                                    </td>
+                                                    <td>
+                                                        <% const note=log.note || '-' %>
+                                                            <span class="limited-note" title="<%= note %>">
+                                                                <%= note.length> 30 ? note.substring(0, 30) + '...' : note
+                                                                    %>
+                                                            </span>
+                                                    </td>
+                                                    <td>
+                                                        <% const userName=log.User ? log.User.firstname+ ' ' +
+                                                            log.User.lastname : 'Unknown User' %>
+                                                            <span class="limited-text" title="<%= userName %>">
+                                                                <%= userName.length> 15 ? userName.substring(0, 15) + '...'
+                                                                    : userName %>
+                                                            </span>
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-soft-primary btn-sm"
+                                                            onclick="viewDetails('<%= log.id %>', '<%= productName %>', `<%= note %>`, '<%= log.createdAt %>', '<%= log.type %>', '<%= log.quantity %>', '<%= userName %>')"
+                                                            title="View Details">
+                                                            <i class="ri-eye-line align-middle"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <% }); %>
+                                                    <% } %>

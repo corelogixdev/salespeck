@@ -1,0 +1,28 @@
+<% if (!categories || categories.length === 0) { %>
+    <tr>
+        <td colspan="5" class="text-center">
+            <i class="ri-error-warning-line align-middle me-1"></i> No data found
+        </td>
+    </tr>
+<% } else { %>
+    <% categories.forEach(category => { %>
+        <tr>
+            <td class="fw-medium"><%= category.id %></td>
+            <td><%= category.name %></td>
+            <td><%= category.description || '-' %></td>
+            <td>
+                <span class="badge bg-<%= category.status ? 'success' : 'danger' %>">
+                    <%= category.status ? 'Active' : 'Inactive' %>
+                </span>
+            </td>
+            <td style="text-align: end;">
+                <button type="button" onclick="editCategory('<%= category.id %>')" class="btn btn-soft-warning btn-sm">
+                    <i class="ri-pencil-fill align-middle"></i> Edit
+                </button>
+                <button type="button" onclick="deleteCategory('<%= category.id %>')" class="btn btn-soft-danger btn-sm">
+                    <i class="ri-delete-bin-fill align-middle"></i> Delete
+                </button>
+            </td>
+        </tr>
+    <% }) %>
+<% } %>

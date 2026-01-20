@@ -43,13 +43,9 @@ app.use(expressLayouts);
 // Session middleware
 app.use(
   session({
+    name: 'session',
     secret: 'your-secret',
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-      secure: false, // Set to true if using HTTPS
-      maxAge: 3600000 // 1 hour
-    }
+    maxAge: 3600000 // 1 hour
   })
 );
 app.use(sessionDataMiddleware);

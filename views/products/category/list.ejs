@@ -58,34 +58,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <% if (!categories || categories.length === 0) { %>
-                                <tr>
-                                    <td colspan="5" class="text-center">
-                                        <i class="ri-error-warning-line align-middle me-1"></i> No data found
-                                    </td>
-                                </tr>
-                            <% } else { %>
-                                <% categories.forEach(category => { %>
-                                    <tr>
-                                        <td class="fw-medium"><%= category.id %></td>
-                                        <td><%= category.name %></td>
-                                        <td><%= category.description || '-' %></td>
-                                        <td>
-                                            <span class="badge bg-<%= category.status ? 'success' : 'danger' %>">
-                                                <%= category.status ? 'Active' : 'Inactive' %>
-                                            </span>
-                                        </td>
-                                        <td style="text-align: end;">
-                                            <button type="button" onclick="editCategory('<%= category.id %>')" class="btn btn-soft-warning btn-sm">
-                                                <i class="ri-pencil-fill align-middle"></i> Edit
-                                            </button>
-                                            <button type="button" onclick="deleteCategory('<%= category.id %>')" class="btn btn-soft-danger btn-sm">
-                                                <i class="ri-delete-bin-fill align-middle"></i> Delete
-                                            </button>
-                                        </td>
-                                    </tr>
-                                <% }) %>
-                            <% } %>
+                        <tbody>
+                            <%- include('_table_rows') %>
                         </tbody>
                     </table>
                 </div>
@@ -104,7 +78,7 @@
                         <div class="d-flex align-items-center gap-2">
                             <label for="pageSize" class="text-muted mb-0">Show:</label>
                             <select id="pageSize" class="form-select form-select-sm" style="width: 80px;"
-                                onchange="(function() { const params = new URLSearchParams(window.location.search); params.set('page', 1); params.set('pageSize', this.value); window.location.href = '/categories?' + params.toString(); }).call(this)">
+                                onchange="window.handlePageSizeChange(this, '/categories?<%= new URLSearchParams({...query, page: 1}).toString() %>', <%= pagination.totalCount %>)">
                                 <option value="10" <%= (pagination.pageSize || 10) == 10 ? 'selected' : '' %>>10</option>
                                 <option value="25" <%= (pagination.pageSize || 10) == 25 ? 'selected' : '' %>>25</option>
                                 <option value="50" <%= (pagination.pageSize || 10) == 50 ? 'selected' : '' %>>50</option>
@@ -122,14 +96,14 @@
                                 <ul class="pagination mb-0">
                                     <!-- First Page -->
                                     <li class="page-item <%= pagination.currentPage === 1 ? 'disabled' : '' %>">
-                                        <a class="page-link" href="<%= pagination.currentPage === 1 ? '#' : '/categories?' + (query.name_like ? 'name_like=' + query.name_like + '&' : '') + (query.status ? 'status=' + query.status + '&' : '') + (pagination.pageSize ? 'pageSize=' + pagination.pageSize + '&' : '') + 'page=1' %>" title="First">
+                                        <a class="page-link" href="<%= pagination.currentPage === 1 ? '#' : '/categories?' + new URLSearchParams({...query, page: 1}).toString() %>" title="First">
                                             <i class="ri-arrow-left-double-line"></i>
                                         </a>
                                     </li>
                                     
                                     <!-- Previous Page -->
                                     <li class="page-item <%= pagination.currentPage === 1 ? 'disabled' : '' %>">
-                                        <a class="page-link" href="<%= pagination.currentPage === 1 ? '#' : '/categories?' + (query.name_like ? 'name_like=' + query.name_like + '&' : '') + (query.status ? 'status=' + query.status + '&' : '') + (pagination.pageSize ? 'pageSize=' + pagination.pageSize + '&' : '') + 'page=' + (pagination.currentPage - 1) %>" title="Previous">
+                                        <a class="page-link" href="<%= pagination.currentPage === 1 ? '#' : '/categories?' + new URLSearchParams({...query, page: pagination.currentPage - 1}).toString() %>" title="Previous">
                                             <i class="mdi mdi-chevron-left"></i>
                                         </a>
                                     </li>
@@ -138,7 +112,7 @@
                                     <% for(let i = 1; i <= pagination.totalPages; i++) { %>
                                         <% if (i === 1 || i === pagination.totalPages || (i >= pagination.currentPage - 1 && i <= pagination.currentPage + 1)) { %>
                                             <li class="page-item <%= i === pagination.currentPage ? 'active' : '' %>">
-                                                <a class="page-link" href="/categories?<%= query.name_like ? 'name_like=' + query.name_like + '&' : '' %><%= query.status ? 'status=' + query.status + '&' : '' %><%= pagination.pageSize ? 'pageSize=' + pagination.pageSize + '&' : '' %>page=<%= i %>">
+                                                <a class="page-link" href="/categories?<%= new URLSearchParams({...query, page: i}).toString() %>">
                                                     <%= i %>
                                                 </a>
                                             </li>
@@ -149,7 +123,7 @@
                                     
                                     <!-- Next Page -->
                                     <li class="page-item <%= pagination.currentPage === pagination.totalPages ? 'disabled' : '' %>">
-                                        <a class="page-link" href="<%= pagination.currentPage === pagination.totalPages ? '#' : '/categories?' + (query.name_like ? 'name_like=' + query.name_like + '&' : '') + (query.status ? 'status=' + query.status + '&' : '') + (pagination.pageSize ? 'pageSize=' + pagination.pageSize + '&' : '') + 'page=' + (pagination.currentPage + 1) %>" title="Next">
+                                        <a class="page-link" href="<%= pagination.currentPage === pagination.totalPages ? '#' : '/categories?' + new URLSearchParams({...query, page: pagination.currentPage + 1}).toString() %>" title="Next">
                                             <i class="mdi mdi-chevron-right"></i>
                                         </a>
                                     </li>

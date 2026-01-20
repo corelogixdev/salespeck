@@ -156,52 +156,7 @@
               </tr>
             </thead>
             <tbody>
-              <% if (!data || data.length === 0) { %>
-                <tr>
-                  <td colspan="10" class="text-center">
-                    <i class="ri-error-warning-line align-middle me-1"></i> No data found
-                  </td>
-                </tr>
-              <% } else { %>
-                <% data.forEach(row => { %>
-                  <tr>
-                    <td class="limit-text"><%= row.barcode %></td>
-                    <td class="limit-text"><%= row.name %></td>
-                    <td class="limit-text"><%= row.category %></td>
-                    <td><%= row.discount || 0 %>%</td>
-                    <td>Rs.<%= formatNumber(row.purchaseprice) %></td>
-                    <td>
-                      <span class="badge bg-<%= row.purchaseactive ? 'success' : 'danger' %>">
-                        <%= row.purchaseactive ? 'Active' : 'Inactive' %>
-                      </span>
-                    </td>
-                    <td><%= row.quantity %></td>
-                    <td>Rs.<%= formatNumber(row.saleprice) %></td>
-                    <td>
-                      <span class="badge bg-<%= row.saleactive ? 'success' : 'danger' %>">
-                        <%= row.saleactive ? 'Active' : 'Inactive' %>
-                      </span>
-                    </td>
-                    <td style="text-align: end;">
-                      <button type="button" onclick="increaseQty('<%= row.id %>')" class="btn btn-soft-primary btn-sm" title="Increase Qty">
-                        <i class="ri-add-circle-line"></i>
-                      </button>
-                      <button type="button" onclick="reduceQty('<%= row.id %>')" class="btn btn-soft-danger btn-sm" title="Reduce Qty">
-                        <i class="ri-subtract-line"></i>
-                      </button>
-                      <button type="button" onclick="viewLogs('<%= row.id %>')" class="btn btn-soft-info btn-sm" title="Logs">
-                        <i class="ri-history-line"></i>
-                      </button>
-                      <button type="button" onclick="editProduct('<%= row.id %>')" class="btn btn-soft-warning btn-sm" title="Edit">
-                        <i class="ri-pencil-fill"></i>
-                      </button>
-                      <button type="button" onclick="deleteProduct('<%= row.id %>')" class="btn btn-soft-danger btn-sm" title="Delete">
-                        <i class="ri-delete-bin-fill"></i>
-                      </button>
-                    </td>
-                  </tr>
-                <% }) %>
-              <% } %>
+              <%- include('_table_rows') %>
             </tbody>
           </table>
         </div>
@@ -221,7 +176,7 @@
             <div class="d-flex align-items-center gap-2">
               <label for="pageSize" class="text-muted mb-0">Show:</label>
               <select id="pageSize" class="form-select form-select-sm" style="width: 80px;"
-                  onchange="(function() { const params = new URLSearchParams(window.location.search); params.set('page', 1); params.set('pageSize', this.value); window.location.href = '/products?' + params.toString(); }).call(this)">
+                onchange="window.handlePageSizeChange(this, '/products?<%= new URLSearchParams({...query, page: 1}).toString() %>', <%= pagination.totalCount %>)">
                 <option value="10" <%= (pagination.pageSize || 10) == 10 ? 'selected' : '' %>>10</option>
                 <option value="25" <%= (pagination.pageSize || 10) == 25 ? 'selected' : '' %>>25</option>
                 <option value="50" <%= (pagination.pageSize || 10) == 50 ? 'selected' : '' %>>50</option>

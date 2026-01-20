@@ -207,7 +207,7 @@ const dashboard = async (req, res) => {
       }),
       db.user.findOne({ 
         where: { id: req.session.user_id },
-        attributes: ['id', 'firstname', 'lastname', 'username', 'role', 'profile_image_url'],
+        attributes: ['id', 'firstname', 'lastname', 'username', 'role', 'profile_image_url', 'dashboard_config'],
         raw: true
       }),
       getDashboardStats()
@@ -215,11 +215,15 @@ const dashboard = async (req, res) => {
 
     const company = settings?.value ? JSON.parse(settings.value) : {};
 
+    // Parse dashboard config
+    const dashboardConfig = user?.dashboard_config ? JSON.parse(user.dashboard_config) : {};
+
     // Render dashboard
     res.render("dashboard", {
       company,
       ...data,
       user,
+      dashboardConfig, // Pass config to view
     });
   } catch (error) {
     logi("Error:", error);
@@ -267,7 +271,7 @@ const loginPost = async (req, res) => {
       logi("User found:", user.firstname);
       logi("Login successful");
       req.session.user_id = user.id;
-      req.session.user = user;
+      req.session.user = user.get({ plain: true });
       req.session.message = { type: "success", text: "Login successful!" };
       res.redirect("/");
     } else {
@@ -401,16 +405,23 @@ const inventorylogs = async (req, res) => {
       hasNext: page < totalPages,
     };
 
-    res.render("inventorylogs", {
-      logs: processedLogs,
+    if (req.query.partial) {
+        return res.render("inventory_logs/_table_rows", {
+            layout: false,
+            inventoryLogs: processedLogs,
+        });
+    }
+
+    res.render("inventory_logs/index", {
+      inventoryLogs: processedLogs,
       searchParams: {},
       pagination,
       query: req.query,
     });
   } catch (error) {
     console.error("Error fetching inventory logs:", error);
-    res.render("inventorylogs", {
-      logs: [],
+    res.render("inventory_logs/index", {
+      inventoryLogs: [],
       searchParams: {},
       pagination: null,
       query: {},
@@ -500,16 +511,25 @@ const searchInventoryLogs = async (req, res) => {
       hasNext: page < totalPages,
     };
 
-    res.render("inventorylogs", {
-      logs: processedLogs,
+    if (req.query.partial) {
+        return res.render("inventory_logs/_table_rows", {
+            layout: false,
+            inventoryLogs: processedLogs,
+        });
+    }
+
+    res.render("inventory_logs/index", {
+      inventoryLogs: processedLogs,
+      title: "Inventory Logs",
       searchParams: req.body,
       pagination,
       query: req.query,
     });
   } catch (error) {
     console.error("Error searching inventory logs:", error);
-    res.render("inventorylogs", {
-      logs: [],
+    res.render("inventory_logs/index", {
+      inventoryLogs: [],
+      title: "Inventory Logs",
       searchParams: req.body,
       pagination: null,
       query: {},
@@ -567,8 +587,15 @@ const inventorylogsById = async (req, res) => {
       hasNext: page < totalPages,
     };
 
-    res.render("inventorylogs", {
-      logs: processedLogs,
+    if (req.query.partial) {
+        return res.render("inventory_logs/_table_rows", {
+            layout: false,
+            inventoryLogs: processedLogs,
+        });
+    }
+
+    res.render("inventory_logs/index", {
+      inventoryLogs: processedLogs,
       title: `Inventory Logs - ${processedLogs[0]?.Product?.name || "Product"}`,
       hidenav: true,
       searchParams: {},
@@ -577,8 +604,8 @@ const inventorylogsById = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching inventory logs:", error);
-    res.render("inventorylogs", {
-      logs: [],
+    res.render("inventory_logs/index", {
+      inventoryLogs: [],
       title: "Inventory Logs",
       hidenav: true,
       searchParams: {},

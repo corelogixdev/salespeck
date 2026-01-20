@@ -30,6 +30,14 @@
                         <i class="ri-search-line search-icon"></i>
                     </div>
                 </div>
+                <div class="col-sm-3">
+                    <div class="search-box">
+                        <input type="text" class="form-control search flatpickr-range" data-provider="flatpickr"
+                            data-range="true" data-date-format="Y-m-d" name="daterange" placeholder="Filter by date range..."
+                            value="<%= query.daterange || '' %>">
+                         <i class="ri-calendar-2-line search-icon"></i>
+                    </div>
+                </div>
                 <div class="col-auto d-flex gap-2 align-items-center">
                     <button type="submit" class="btn btn-primary">
                         <i class="ri-search-line me-1 align-bottom"></i> Search
@@ -65,69 +73,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <% if (!data || data.length===0) { %>
-                                <tr>
-                                    <td colspan="<%= role === 'user' ? 7 : 5 %>" class="text-center">
-                                        <i class="ri-error-warning-line align-middle me-1"></i> No data found
-                                    </td>
-                                </tr>
-                                <% } else { %>
-                                    <% data.forEach(obj=> { %>
-                                        <tr>
-                                            <td class="fw-medium">
-                                                <%= obj.id %>
-                                            </td>
-                                            <td>
-                                                <%= obj.firstname %>
-                                                    <%= obj.lastname %>
-                                            </td>
-                                            <td>
-                                                <%= obj.phone %>
-                                            </td>
-                                            <td>
-                                                <%= obj.email %>
-                                            </td>
-                                            <% if (role==='user' ) { %>
-                                                <td>
-                                                    <%= obj.username %>
-                                                </td>
-                                                <td><span class="badge bg-primary">
-                                                        <%= obj.role %>
-                                                    </span></td>
-                                                <% } %>
-                                                    <% if ((role=='user' && (permissions.usersUpdate ||
-                                                        permissions.usersDelete)) || (role=='vendor' &&
-                                                        (permissions.vendorsUpdate || permissions.vendorsDelete)) ||
-                                                        (role=='customer' && (permissions.customersUpdate ||
-                                                        permissions.customersDelete))) { %>
-                                                        <td style="text-align: end;">
-                                                            <% if ((role=='user' && permissions.usersUpdate) ||
-                                                                (role=='vendor' && permissions.vendorsUpdate) ||
-                                                                (role=='customer' && permissions.customersUpdate)) { %>
-                                                                <a href="/users/form?id=<%= obj.id %>&role=<%= obj.role %>"
-                                                                    class="btn btn-soft-warning btn-sm <%= obj.role == 'branchmanager' ? 'custom_disabled' : '' %>">
-                                                                    <i class="ri-pencil-fill align-middle"></i> Edit
-                                                                </a>
-                                                                <% } %>
-                                                                    <% if ((role=='user' && permissions.usersDelete) ||
-                                                                        (role=='vendor' && permissions.vendorsDelete) ||
-                                                                        (role=='customer' &&
-                                                                        permissions.customersDelete)) { %>
-                                                                        <button type="button"
-                                                                            onclick="deleteRecord('<%= obj.id %>')"
-                                                                            class="btn btn-soft-danger btn-sm"
-                                                                            <%=obj.role=='branchmanager' ? 'disabled'
-                                                                            : '' %>>
-                                                                            <i
-                                                                                class="ri-delete-bin-fill align-middle"></i>
-                                                                            Delete
-                                                                        </button>
-                                                                        <% } %>
-                                                        </td>
-                                                        <% } %>
-                                        </tr>
-                                        <% }) %>
-                                            <% } %>
+                            <%- include('_table_rows') %>
                         </tbody>
                     </table>
                 </div>
@@ -146,7 +92,7 @@
                         <div class="d-flex align-items-center gap-2">
                             <label for="pageSize" class="text-muted mb-0">Show:</label>
                             <select id="pageSize" class="form-select form-select-sm" style="width: 80px;"
-                                onchange="(function() { const params = new URLSearchParams(window.location.search); params.set('page', 1); params.set('pageSize', this.value); window.location.href = '/users?' + params.toString(); }).call(this)">
+                onchange="window.handlePageSizeChange(this, '/users?<%= new URLSearchParams({...query, role: role, page: 1}).toString() %>', <%= pagination.totalCount %>)">
                                 <option value="10" <%= (pagination.pageSize || 10) == 10 ? 'selected' : '' %>>10</option>
                                 <option value="25" <%= (pagination.pageSize || 10) == 25 ? 'selected' : '' %>>25</option>
                                 <option value="50" <%= (pagination.pageSize || 10) == 50 ? 'selected' : '' %>>50</option>
@@ -165,7 +111,7 @@
                                     <!-- First Page -->
                                     <li class="page-item <%= pagination.currentPage === 1 ? 'disabled' : '' %>">
                                         <a class="page-link"
-                                            href="<%= pagination.currentPage === 1 ? '#' : '/users?role=' + role + (query.search ? '&search=' + query.search : '') + '&page=1' %>" title="First">
+                                            href="<%= pagination.currentPage === 1 ? '#' : '/users?' + new URLSearchParams(Object.assign({}, query, {role: role, page: 1})).toString() %>" title="First">
                                             <i class="ri-arrow-left-double-line"></i>
                                         </a>
                                     </li>
@@ -173,7 +119,7 @@
                                     <!-- Previous Page -->
                                     <li class="page-item <%= pagination.currentPage === 1 ? 'disabled' : '' %>">
                                         <a class="page-link"
-                                            href="<%= pagination.currentPage === 1 ? '#' : '/users?role=' + role + (query.search ? '&search=' + query.search : '') + '&page=' + (pagination.currentPage - 1) %>" title="Previous">
+                                            href="<%= pagination.currentPage === 1 ? '#' : '/users?' + new URLSearchParams(Object.assign({}, query, {role: role, page: pagination.currentPage - 1})).toString() %>" title="Previous">
                                             <i class="mdi mdi-chevron-left"></i>
                                         </a>
                                     </li>
@@ -184,7 +130,7 @@
                                                 pagination.currentPage + 1)) { %>
                                                 <li class="page-item <%= i === pagination.currentPage ? 'active' : '' %>">
                                                     <a class="page-link"
-                                                        href="/users?role=<%= role %><%= query.search ? '&search=' + query.search : '' %>&page=<%= i %>">
+                                                        href="/users?<%= new URLSearchParams(Object.assign({}, query, {role: role, page: i})).toString() %>">
                                                         <%= i %>
                                                     </a>
                                                 </li>
@@ -196,7 +142,7 @@
                                     <!-- Next Page -->
                                     <li class="page-item <%= pagination.currentPage === pagination.totalPages ? 'disabled' : '' %>">
                                         <a class="page-link"
-                                            href="<%= pagination.currentPage === pagination.totalPages ? '#' : '/users?role=' + role + (query.search ? '&search=' + query.search : '') + '&page=' + (pagination.currentPage + 1) %>" title="Next">
+                                            href="<%= pagination.currentPage === pagination.totalPages ? '#' : '/users?' + new URLSearchParams(Object.assign({}, query, {role: role, page: pagination.currentPage + 1})).toString() %>" title="Next">
                                             <i class="mdi mdi-chevron-right"></i>
                                         </a>
                                     </li>
@@ -204,7 +150,7 @@
                                     <!-- Last Page -->
                                     <li class="page-item <%= pagination.currentPage === pagination.totalPages ? 'disabled' : '' %>">
                                         <a class="page-link"
-                                            href="<%= pagination.currentPage === pagination.totalPages ? '#' : '/users?role=' + role + (query.search ? '&search=' + query.search : '') + '&page=' + pagination.totalPages %>" title="Last">
+                                            href="<%= pagination.currentPage === pagination.totalPages ? '#' : '/users?' + new URLSearchParams(Object.assign({}, query, {role: role, page: pagination.totalPages})).toString() %>" title="Last">
                                             <i class="ri-arrow-right-double-line"></i>
                                         </a>
                                     </li>

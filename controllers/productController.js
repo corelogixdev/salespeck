@@ -92,6 +92,14 @@ exports.index = async (req, res) => {
       order: [['name', 'ASC']]
     });
 
+    if (query.partial) {
+      return res.render('products/_table_rows', {
+        layout: false,
+        data,
+        categories
+      });
+    }
+
     res.render('products/index', {
       title: "Products",
       data,

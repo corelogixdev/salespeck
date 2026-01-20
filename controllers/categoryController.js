@@ -31,6 +31,13 @@ exports.listCategories = async (req, res) => {
         // Generate pagination metadata
         const pagination = getPaginationMeta(page, pageSize, count);
 
+        if (query.partial) {
+            return res.render('products/category/_table_rows', {
+                layout: false,
+                categories: rows
+            });
+        }
+
         res.render('products/category/list', {
             title: "Categories",
             categories: rows,
