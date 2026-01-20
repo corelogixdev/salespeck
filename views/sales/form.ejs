@@ -1113,6 +1113,13 @@
         if (totalBillAmount) {
             totalBillAmount.textContent = `Rs. ${parseFloat(total).toFixed(2)}`;
         }
+
+        // Automatically sync payment input with total bill
+        const totalPayment = document.getElementById(`total-payment-${tabId}`);
+        if (totalPayment) {
+            totalPayment.value = parseFloat(total).toFixed(2);
+        }
+
         UpdateChangePrice(tabId);
     }
 

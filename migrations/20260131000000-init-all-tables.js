@@ -68,6 +68,11 @@ module.exports = {
         allowNull: true,
         defaultValue: null
       },
+      dashboard_config: {
+        type: Sequelize.TEXT, // Store as JSON string
+        allowNull: true,
+        defaultValue: '{}'
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
