@@ -124,7 +124,8 @@
                                                 <th scope="row">
                                                     <%= index + 1 %>
                                                 </th>
-                                                <td class="text-center" style="max-width: 8mm; overflow-wrap: break-word; white-space: unset;">
+                                                <td class="text-center"
+                                                    style="max-width: 8mm; overflow-wrap: break-word; white-space: unset;">
                                                     <span class="fw-medium">
                                                         <%= product.Product.name %>
                                                     </span>
@@ -137,8 +138,8 @@
                                                 <td class="code">
                                                     <%= product.quantity %>
                                                 </td>
-                                                <td class="text-end code">Rs.<%= (product.quantity * product.totalAmount ||
-                                                        0).toFixed(2) %>
+                                                <td class="text-end code">Rs.<%= (product.quantity * product.totalAmount
+                                                        || 0).toFixed(2) %>
                                                 </td>
                                             </tr>
                                             <% }); %>
@@ -147,7 +148,8 @@
                             </div>
 
                             <div class="border-top border-top-dashed mt-2 fs-7">
-                                <table class="table table-borderless table-nowrap align-middle mb-0 ms-auto footer-table">
+                                <table
+                                    class="table table-borderless table-nowrap align-middle mb-0 ms-auto footer-table">
                                     <tbody>
                                         <tr>
                                             <td class="p-1">Sub Total</td>
@@ -178,7 +180,7 @@
                                 </table>
                                 <p class="text-end border-top pt-2">
                                     <small class="text-muted">
-                                        Powered by <strong>OpenMenu</strong>
+                                        Powered by <strong>Corelogix</strong>
                                     </small>
                                 </p>
 
@@ -503,13 +505,14 @@
 </body>
 <script src="/assets/js/moment.min.js"></script>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         setTimeout(() => {
-            $('.format-date').each(function() {
+            $('.format-date').each(function () {
                 var date = $(this).text().trim();
                 $(this).text(moment(new Date(date)).format('MMMM Do YYYY'));
-            });    
+            });
         });
     });
 </script>
+
 </html>

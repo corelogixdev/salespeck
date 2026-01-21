@@ -98,7 +98,7 @@ function enableLocalUpdateUrl() {
 
     if (content.includes(configLine) && content.includes(localLineCommented)) {
       content = content.replace(configLine, commentedConfigLine)
-                       .replace(localLineCommented, localLineActive);
+        .replace(localLineCommented, localLineActive);
       fs.writeFileSync(MAIN_JS_PATH, content);
       log('✓ Switched main.js updateUrl to local http://localhost:8000', 'green');
     } else {
@@ -153,7 +153,7 @@ function copyBuildFiles() {
   logStep('4', 'Copying build files to update server...');
 
   const filesToCopy = [
-    { src: 'openmenu.exe', dest: 'openmenu.exe' },
+    { src: 'openmenu.exe', dest: '.exe' },
     { src: 'latest.yml', dest: 'latest.yml' },
     { src: 'latest.yml', dest: 'dev-app-update.yml' } // For development mode (Electron dev config)
   ];
