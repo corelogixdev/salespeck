@@ -247,6 +247,7 @@
         background: linear-gradient(90deg, rgba(255, 107, 122, 0.2) 0%, rgba(255, 107, 122, 0.1) 100%);
         color: #ff8a95;
     }
+
     [data-layout-mode="dark"] .user-profile-menu-item.logout-item:hover {
         background: linear-gradient(90deg, rgba(255, 107, 122, 0.2) 0%, rgba(255, 107, 122, 0.1) 100%);
         color: #ff8a95;
@@ -278,7 +279,8 @@
         position: relative;
     }
 
-    .spinner:before, .spinner:after {
+    .spinner:before,
+    .spinner:after {
         content: "";
         position: absolute;
         top: 0;
@@ -287,12 +289,14 @@
         height: 100%;
         border-radius: 50%;
         border: 4px solid transparent;
-        border-top-color: #667eea; /* Primary Color */
+        border-top-color: #667eea;
+        /* Primary Color */
         animation: spin 1s linear infinite;
     }
 
     .spinner:after {
-        border-top-color: #764ba2; /* Secondary Color */
+        border-top-color: #764ba2;
+        /* Secondary Color */
         animation: spin 1.5s linear infinite;
         width: 40px;
         height: 40px;
@@ -301,8 +305,13 @@
     }
 
     @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
     }
 </style>
 
@@ -335,7 +344,7 @@
                     <% } %>
                         <% if (typeof user !=='undefined' && user) { %>
                             <a href="/" style="display: block; min-width: fit-content;" class="fs-2 me-2">
-                                Open Menu
+                                Corelogix
                             </a>
                             <% } %>
                                 <% var permissions=typeof permissions !=='undefined' ? permissions : {}; %>
@@ -1113,21 +1122,21 @@
     <script src="/assets/js/toastr.min.js"></script>
     <!-- Global toast notification script -->
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             <% if (typeof message !== 'undefined' && message) { %>
                 toastr.options = {
                     "closeButton": true,
-                    "progressBar": true,
-                    "positionClass": "toast-bottom-right",
-                    "showDuration": "300",
-                    "hideDuration": "1000",
-                    "timeOut": "5000",
-                    "extendedTimeOut": "1000",
-                    "showEasing": "swing",
-                    "hideEasing": "linear",
-                    "showMethod": "fadeIn",
-                    "hideMethod": "fadeOut",
-                    "toastClass": "toast",
+                        "progressBar": true,
+                            "positionClass": "toast-bottom-right",
+                                "showDuration": "300",
+                                    "hideDuration": "1000",
+                                        "timeOut": "5000",
+                                            "extendedTimeOut": "1000",
+                                                "showEasing": "swing",
+                                                    "hideEasing": "linear",
+                                                        "showMethod": "fadeIn",
+                                                            "hideMethod": "fadeOut",
+                                                                "toastClass": "toast",
                 };
                 toastr["<%= message.type %>"]("<%= message.text %>");
             <% } %>
@@ -1135,8 +1144,8 @@
             // Also check for hidden input from redirected pages if any
             const flashType = $('#flash-message-type').val();
             const flashText = $('#flash-message-text').val();
-            if(flashType && flashText){
-                 toastr[flashType](flashText);
+            if (flashType && flashText) {
+                toastr[flashType](flashText);
             }
         });
     </script>
@@ -1147,7 +1156,8 @@
         <div class="spinner"></div>
         <div class="loader-progress" style="display: none; width: 300px; text-align: center; margin-top: 20px;">
             <div class="progress" style="height: 10px; border-radius: 5px; background-color: rgba(0,0,0,0.1);">
-                <div class="progress-bar loader-progress-bar bg-primary" role="progressbar" style="width: 0%; border-radius: 5px; transition: width 0.3s ease;"></div>
+                <div class="progress-bar loader-progress-bar bg-primary" role="progressbar"
+                    style="width: 0%; border-radius: 5px; transition: width 0.3s ease;"></div>
             </div>
             <div class="loader-progress-text mt-2 text-muted fw-medium fs-14">Preparing...</div>
         </div>
@@ -1155,32 +1165,32 @@
 
     <!-- Loader Logic -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const loader = document.getElementById('global-loader');
 
-            window.showLoader = function() {
-                if(loader) {
+            window.showLoader = function () {
+                if (loader) {
                     loader.style.display = 'flex';
                     loader.style.opacity = '0';
                     setTimeout(() => loader.style.opacity = '1', 10);
                 }
             };
 
-            window.hideLoader = function() {
-                if(loader) {
+            window.hideLoader = function () {
+                if (loader) {
                     loader.style.opacity = '0';
                     setTimeout(() => loader.style.display = 'none', 300);
                 }
             };
-            
+
             // Initial Ensure Hidden
-            window.addEventListener('load', function() {
-                 hideLoader();
+            window.addEventListener('load', function () {
+                hideLoader();
             });
 
             // Attach to Search Forms (GET requests)
             document.querySelectorAll('form[method="GET"]').forEach(form => {
-                form.addEventListener('submit', function() {
+                form.addEventListener('submit', function () {
                     // Only show if not opening in new tab
                     if (!this.target) {
                         showLoader();
@@ -1190,7 +1200,7 @@
 
             // Attach to Pagination and Page Size
             // Use event delegation for better performance and dynamic content support
-            document.body.addEventListener('click', function(e) {
+            document.body.addEventListener('click', function (e) {
                 // Check for pagination links
                 const link = e.target.closest('.page-link');
                 if (link) {
@@ -1203,40 +1213,40 @@
 
             // Monitor Page Size Selectors
             // Since some use inline onchange, we listen for the change event which bubbles
-            document.body.addEventListener('change', function(e) {
+            document.body.addEventListener('change', function (e) {
                 if (e.target.matches('select#pageSize')) {
                     showLoader();
                 }
             });
 
             // Hide loader when page is restored from bfcache (back/forward navigation)
-            window.addEventListener('pageshow', function(event) {
+            window.addEventListener('pageshow', function (event) {
                 if (event.persisted) {
                     hideLoader();
                 }
             });
 
             // Progress Loader Logic
-            window.updateLoader = function(percent, text) {
+            window.updateLoader = function (percent, text) {
                 const loader = document.getElementById('global-loader');
                 const progressContainer = document.querySelector('.loader-progress');
                 const progressBar = document.querySelector('.loader-progress-bar');
                 const progressText = document.querySelector('.loader-progress-text');
-                
-                if(loader && progressContainer && progressBar && progressText) {
+
+                if (loader && progressContainer && progressBar && progressText) {
                     loader.style.display = 'flex';
                     loader.style.opacity = '1';
                     progressContainer.style.display = 'block';
                     document.querySelector('.spinner').style.display = 'none'; // Hide spinner when showing progress
-                    
+
                     progressBar.style.width = percent + '%';
                     progressText.innerText = text;
                 }
             };
 
-            window.resetLoader = function() {
+            window.resetLoader = function () {
                 const progressContainer = document.querySelector('.loader-progress');
-                if(progressContainer) {
+                if (progressContainer) {
                     progressContainer.style.display = 'none';
                     document.querySelector('.spinner').style.display = 'block';
                 }
@@ -1244,31 +1254,31 @@
             }
 
             // Generic Chunk Loader
-            window.loadChunks = async function(targetBigPage, bigPageSize, baseUrl, totalRecords) {
+            window.loadChunks = async function (targetBigPage, bigPageSize, baseUrl, totalRecords) {
                 const tbody = document.querySelector('table tbody');
                 if (!tbody) return;
 
                 const CHUNK_SIZE = 500;
-                
+
                 // Calculate logic
                 // If "All" (9999), we load everything. targetBigPage must be 1.
                 // If specific size (e.g. 2000), we load that size.
-                
+
                 let effectiveSize = bigPageSize === '9999' ? totalRecords : parseInt(bigPageSize);
                 if (bigPageSize === '9999') targetBigPage = 1;
 
                 // Calculate global offset for the start of this "Big Page"
                 const bigPageStartOffset = (targetBigPage - 1) * effectiveSize;
-                
+
                 // We need to fetch 'effectiveSize' items starting from 'bigPageStartOffset'.
                 // We do this in chunks of CHUNK_SIZE.
-                
+
                 const totalChunks = Math.ceil(effectiveSize / CHUNK_SIZE);
 
                 // Reset UI
                 window.updateLoader(0, `Preparing to load ${effectiveSize} records...`);
                 tbody.innerHTML = ''; // Clear table
-                
+
                 // Update URL
                 const url = new URL(window.location.href);
                 url.searchParams.set('pageSize', bigPageSize);
@@ -1284,12 +1294,12 @@
                         link.closest('.page-item')?.classList.add('active');
                     }
                 });
-                
+
                 // Update Info Text
                 const infoText = document.querySelector('.text-muted');
-                if(infoText && infoText.innerText.includes('Showing')) {
-                     const endRec = Math.min(bigPageStartOffset + effectiveSize, totalRecords);
-                     infoText.innerHTML = `Showing <strong>${bigPageStartOffset + 1}</strong> to <strong>${endRec}</strong> of <strong>${totalRecords}</strong> entries`;
+                if (infoText && infoText.innerText.includes('Showing')) {
+                    const endRec = Math.min(bigPageStartOffset + effectiveSize, totalRecords);
+                    infoText.innerHTML = `Showing <strong>${bigPageStartOffset + 1}</strong> to <strong>${endRec}</strong> of <strong>${totalRecords}</strong> entries`;
                 }
 
                 let loadedCount = 0;
@@ -1299,7 +1309,7 @@
                         // Calculate the "Small Page" number that corresponds to this chunk
                         // Global offset for this chunk = bigPageStartOffset + (chunkIdx * CHUNK_SIZE)
                         // effectiveSmallPage = (GlobalOffset / CHUNK_SIZE) + 1
-                        
+
                         const chunkGlobalOffset = bigPageStartOffset + (chunkIdx * CHUNK_SIZE);
                         const effectiveSmallPage = Math.floor(chunkGlobalOffset / CHUNK_SIZE) + 1;
 
@@ -1313,7 +1323,7 @@
                         // We need base params: search, role, etc.
                         // baseUrl usually comes in as "/path?param=val".
                         // Let's rely on baseUrl provided, but append page/pageSize/partial.
-                        
+
                         const joinChar = baseUrl.includes('?') ? '&' : '?';
                         const chunkUrl = `${baseUrl}${joinChar}page=${effectiveSmallPage}&pageSize=${CHUNK_SIZE}&partial=true`;
 
@@ -1342,23 +1352,23 @@
             };
 
             // Enhanced Page Size Handler
-            window.handlePageSizeChange = function(selectElement, baseUrl, totalRecords) {
+            window.handlePageSizeChange = function (selectElement, baseUrl, totalRecords) {
                 const size = selectElement.value;
                 const tbody = document.querySelector('table tbody');
-                
+
                 // Check if we should use chunk loading
                 if ((size === '9999' || parseInt(size) > 1000) && tbody) {
-                     window.loadChunks(1, size, baseUrl, totalRecords);
-                     
-                     // Hide pagination if "All"
-                     if (size === '9999') {
+                    window.loadChunks(1, size, baseUrl, totalRecords);
+
+                    // Hide pagination if "All"
+                    if (size === '9999') {
                         const nav = document.querySelector('nav');
-                        if(nav) nav.style.display = 'none';
-                     } else {
+                        if (nav) nav.style.display = 'none';
+                    } else {
                         // Ensure nav is visible if we switched from All to 2000
                         const nav = document.querySelector('nav');
-                        if(nav) nav.style.display = 'block';
-                     }
+                        if (nav) nav.style.display = 'block';
+                    }
                 } else {
                     // Standard Reload
                     const params = new URLSearchParams(window.location.search);
@@ -1369,7 +1379,7 @@
             };
 
             // Intercept Pagination Clicks
-            document.body.addEventListener('click', function(e) {
+            document.body.addEventListener('click', function (e) {
                 const link = e.target.closest('.page-link');
                 if (!link) return;
 
@@ -1381,243 +1391,246 @@
                 const currentSize = urlParams.get('pageSize') || '10'; // Default 10
 
                 if (currentSize === '9999' || parseInt(currentSize) > 1000) {
-                     e.preventDefault();
-                     
-                     // Extract target page from href
-                     const targetUrl = new URL(href, window.location.origin);
-                     const targetPage = parseInt(targetUrl.searchParams.get('page')) || 1;
-                     
-                     // Get total records from DOM (safest way without passing it everywhere)
-                     // Parsing: 'Showing 1 to 500 of 20000 entries'
-                     const infoText = document.querySelector('.text-muted')?.innerText;
-                     let totalRecords = 0;
-                     if(infoText) {
+                    e.preventDefault();
+
+                    // Extract target page from href
+                    const targetUrl = new URL(href, window.location.origin);
+                    const targetPage = parseInt(targetUrl.searchParams.get('page')) || 1;
+
+                    // Get total records from DOM (safest way without passing it everywhere)
+                    // Parsing: 'Showing 1 to 500 of 20000 entries'
+                    const infoText = document.querySelector('.text-muted')?.innerText;
+                    let totalRecords = 0;
+                    if (infoText) {
                         const match = infoText.match(/of\s+([0-9,]+)\s+entries/); // Match "of 20,000 entries"
-                        if(match) {
+                        if (match) {
                             totalRecords = parseInt(match[1].replace(/,/g, ''));
                         }
-                     }
-                     
-                     if (totalRecords > 0) {
-                         // Get base URL for fetching (remove page/pageSize/partial params)
-                         const baseUrl = window.location.pathname + '?' + Array.from(targetUrl.searchParams.entries())
+                    }
+
+                    if (totalRecords > 0) {
+                        // Get base URL for fetching (remove page/pageSize/partial params)
+                        const baseUrl = window.location.pathname + '?' + Array.from(targetUrl.searchParams.entries())
                             .filter(([k]) => !['page', 'pageSize', 'partial'].includes(k))
-                            .map(([k,v]) => `${k}=${v}`)
+                            .map(([k, v]) => `${k}=${v}`)
                             .join('&');
-                            
-                         window.loadChunks(targetPage, currentSize, baseUrl, totalRecords);
-                     } else {
-                         // Fallback if parsing fails
-                         window.location.href = href;
-                     }
+
+                        window.loadChunks(targetPage, currentSize, baseUrl, totalRecords);
+                    } else {
+                        // Fallback if parsing fails
+                        window.location.href = href;
+                    }
                 }
             });
         });
     </script>
-<script src="/assets/libs/feather-icons/feather.min.js"></script>
-<script src="/assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
-<script src="/assets/js/moment.min.js"></script>
-<script src="/assets/js/plugins.js"></script>
-<% if (typeof hidenav==='undefined' || hidenav !==true) { %>
-    <script src="/assets/js/app.js"></script>
-    <% } %>
-        <script src="/assets/libs/apexcharts/apexcharts.min.js"></script>
-        <script>
-            $(document).ready(function () {
-                setTimeout(() => {
-                    $('.format-date').each(function () {
-                        var date = $(this).text();
-                        $(this).text(moment(date).format('DD MMM YYYY'));
+    <script src="/assets/libs/feather-icons/feather.min.js"></script>
+    <script src="/assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
+    <script src="/assets/js/moment.min.js"></script>
+    <script src="/assets/js/plugins.js"></script>
+    <% if (typeof hidenav==='undefined' || hidenav !==true) { %>
+        <script src="/assets/js/app.js"></script>
+        <% } %>
+            <script src="/assets/libs/apexcharts/apexcharts.min.js"></script>
+            <script>
+                $(document).ready(function () {
+                    setTimeout(() => {
+                        $('.format-date').each(function () {
+                            var date = $(this).text();
+                            $(this).text(moment(date).format('DD MMM YYYY'));
+                        });
                     });
-                });
 
-                // Handle "New Sale" link - create tab if already on sales form page
-                const newSaleLink = document.getElementById('new-sale-menu-link');
-                if (newSaleLink) {
-                    newSaleLink.addEventListener('click', function (e) {
-                        // Check if we're already on the sales form page
-                        if (window.location.pathname === '/sales/form') {
-                            e.preventDefault();
-                            // Trigger new tab creation if the function exists
-                            if (typeof createNewTab === 'function') {
-                                createNewTab();
-                            } else {
-                                // If tabs aren't initialized yet, wait a bit
-                                setTimeout(() => {
-                                    const newTabBtn = document.getElementById('new-sale-tab-btn');
-                                    if (newTabBtn) {
-                                        newTabBtn.click();
-                                    }
-                                }, 100);
+                    // Handle "New Sale" link - create tab if already on sales form page
+                    const newSaleLink = document.getElementById('new-sale-menu-link');
+                    if (newSaleLink) {
+                        newSaleLink.addEventListener('click', function (e) {
+                            // Check if we're already on the sales form page
+                            if (window.location.pathname === '/sales/form') {
+                                e.preventDefault();
+                                // Trigger new tab creation if the function exists
+                                if (typeof createNewTab === 'function') {
+                                    createNewTab();
+                                } else {
+                                    // If tabs aren't initialized yet, wait a bit
+                                    setTimeout(() => {
+                                        const newTabBtn = document.getElementById('new-sale-tab-btn');
+                                        if (newTabBtn) {
+                                            newTabBtn.click();
+                                        }
+                                    }, 100);
+                                }
                             }
-                        }
-                        // Otherwise, let the default navigation happen
-                    });
-                }
-            });
-        </script>
-        <!-- Profile Modal -->
-        <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content profile-modal-content">
-                    <div class="profile-modal-header">
-                        <div class="profile-header-content">
-                            <h4 class="modal-title mb-1">My Profile</h4>
-                            <p class="mb-0 opacity-75">Manage your personal information and security</p>
-                        </div>
-                        <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3"
-                            data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="profile-modal-body p-0">
-                        <div class="profile-image-wrapper p-4 bg-light-subtle text-center border-bottom">
-                            <div class="profile-image-container mb-0 mx-auto">
-                                <div class="initials-avatar"></div>
-                                <label for="profile-image-upload" class="profile-upload-btn">
-                                    <i class="ri-camera-fill"></i>
-                                </label>
-                                <input type="file" id="profile-image-upload" accept="image/*" style="display: none;">
+                            // Otherwise, let the default navigation happen
+                        });
+                    }
+                });
+            </script>
+            <!-- Profile Modal -->
+            <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content profile-modal-content">
+                        <div class="profile-modal-header">
+                            <div class="profile-header-content">
+                                <h4 class="modal-title mb-1">My Profile</h4>
+                                <p class="mb-0 opacity-75">Manage your personal information and security</p>
                             </div>
+                            <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3"
+                                data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-
-                        <div class="p-3">
-                            <ul class="nav nav-tabs nav-tabs-custom nav-justified mb-3" role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link active" data-bs-toggle="tab" href="#personalInfo" role="tab">
-                                        <i class="ri-user-line me-1 align-middle"></i> Personal Info
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="tab" href="#security" role="tab">
-                                        <i class="ri-lock-2-line me-1 align-middle"></i> Security
-                                    </a>
-                                </li>
-                            </ul>
-
-                            <div class="tab-content text-muted">
-                                <div class="tab-pane active" id="personalInfo" role="tabpanel">
-                                    <form id="profile-form">
-                                        <div class="row g-2">
-                                            <div class="col-md-6">
-                                                <div class="profile-form-group">
-                                                    <label class="profile-form-label small">First Name</label>
-                                                    <input type="text"
-                                                        class="form-control profile-input form-control-sm"
-                                                        id="profile-firstname" name="firstname" required>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="profile-form-group">
-                                                    <label class="profile-form-label small">Last Name</label>
-                                                    <input type="text"
-                                                        class="form-control profile-input form-control-sm"
-                                                        id="profile-lastname" name="lastname" required>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="profile-form-group">
-                                                    <label class="profile-form-label small">Username</label>
-                                                    <input type="text"
-                                                        class="form-control profile-input form-control-sm"
-                                                        id="profile-username" disabled>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="profile-form-group">
-                                                    <label class="profile-form-label small">Email</label>
-                                                    <input type="email"
-                                                        class="form-control profile-input form-control-sm"
-                                                        id="profile-email" name="email">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="profile-form-group">
-                                                    <label class="profile-form-label small">Phone</label>
-                                                    <input type="tel" class="form-control profile-input form-control-sm"
-                                                        id="profile-phone" name="phone">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="profile-form-group">
-                                                    <label class="profile-form-label small">Address</label>
-                                                    <input type="text"
-                                                        class="form-control profile-input form-control-sm"
-                                                        id="profile-address" name="address">
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="text-end mt-3">
-                                            <button type="submit" class="btn btn-primary btn-sm">
-                                                <i class="ri-save-line align-middle me-1"></i> Save Changes
-                                            </button>
-                                        </div>
-                                    </form>
+                        <div class="profile-modal-body p-0">
+                            <div class="profile-image-wrapper p-4 bg-light-subtle text-center border-bottom">
+                                <div class="profile-image-container mb-0 mx-auto">
+                                    <div class="initials-avatar"></div>
+                                    <label for="profile-image-upload" class="profile-upload-btn">
+                                        <i class="ri-camera-fill"></i>
+                                    </label>
+                                    <input type="file" id="profile-image-upload" accept="image/*"
+                                        style="display: none;">
                                 </div>
-                                <div class="tab-pane" id="security" role="tabpanel">
-                                    <form id="password-form">
-                                        <div class="row g-2">
-                                            <div class="col-12">
-                                                <div class="profile-form-group position-relative">
-                                                    <label class="profile-form-label small">Current Password</label>
-                                                    <input type="password"
-                                                        class="form-control profile-input form-control-sm"
-                                                        id="current-password" required>
-                                                    <button type="button"
-                                                        class="password-toggle-btn top-50 translate-middle-y">
-                                                        <i class="ri-eye-off-line"></i>
-                                                    </button>
+                            </div>
+
+                            <div class="p-3">
+                                <ul class="nav nav-tabs nav-tabs-custom nav-justified mb-3" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" data-bs-toggle="tab" href="#personalInfo" role="tab">
+                                            <i class="ri-user-line me-1 align-middle"></i> Personal Info
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#security" role="tab">
+                                            <i class="ri-lock-2-line me-1 align-middle"></i> Security
+                                        </a>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content text-muted">
+                                    <div class="tab-pane active" id="personalInfo" role="tabpanel">
+                                        <form id="profile-form">
+                                            <div class="row g-2">
+                                                <div class="col-md-6">
+                                                    <div class="profile-form-group">
+                                                        <label class="profile-form-label small">First Name</label>
+                                                        <input type="text"
+                                                            class="form-control profile-input form-control-sm"
+                                                            id="profile-firstname" name="firstname" required>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="profile-form-group">
+                                                        <label class="profile-form-label small">Last Name</label>
+                                                        <input type="text"
+                                                            class="form-control profile-input form-control-sm"
+                                                            id="profile-lastname" name="lastname" required>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="profile-form-group">
+                                                        <label class="profile-form-label small">Username</label>
+                                                        <input type="text"
+                                                            class="form-control profile-input form-control-sm"
+                                                            id="profile-username" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="profile-form-group">
+                                                        <label class="profile-form-label small">Email</label>
+                                                        <input type="email"
+                                                            class="form-control profile-input form-control-sm"
+                                                            id="profile-email" name="email">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="profile-form-group">
+                                                        <label class="profile-form-label small">Phone</label>
+                                                        <input type="tel"
+                                                            class="form-control profile-input form-control-sm"
+                                                            id="profile-phone" name="phone">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="profile-form-group">
+                                                        <label class="profile-form-label small">Address</label>
+                                                        <input type="text"
+                                                            class="form-control profile-input form-control-sm"
+                                                            id="profile-address" name="address">
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
-                                                <div class="profile-form-group position-relative">
-                                                    <label class="profile-form-label small">New Password</label>
-                                                    <input type="password"
-                                                        class="form-control profile-input form-control-sm"
-                                                        id="new-password" required minlength="6">
-                                                    <button type="button"
-                                                        class="password-toggle-btn top-50 translate-middle-y">
-                                                        <i class="ri-eye-off-line"></i>
-                                                    </button>
+
+                                            <div class="text-end mt-3">
+                                                <button type="submit" class="btn btn-primary btn-sm">
+                                                    <i class="ri-save-line align-middle me-1"></i> Save Changes
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="tab-pane" id="security" role="tabpanel">
+                                        <form id="password-form">
+                                            <div class="row g-2">
+                                                <div class="col-12">
+                                                    <div class="profile-form-group position-relative">
+                                                        <label class="profile-form-label small">Current Password</label>
+                                                        <input type="password"
+                                                            class="form-control profile-input form-control-sm"
+                                                            id="current-password" required>
+                                                        <button type="button"
+                                                            class="password-toggle-btn top-50 translate-middle-y">
+                                                            <i class="ri-eye-off-line"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="profile-form-group position-relative">
+                                                        <label class="profile-form-label small">New Password</label>
+                                                        <input type="password"
+                                                            class="form-control profile-input form-control-sm"
+                                                            id="new-password" required minlength="6">
+                                                        <button type="button"
+                                                            class="password-toggle-btn top-50 translate-middle-y">
+                                                            <i class="ri-eye-off-line"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="profile-form-group position-relative">
+                                                        <label class="profile-form-label small">Confirm</label>
+                                                        <input type="password"
+                                                            class="form-control profile-input form-control-sm"
+                                                            id="confirm-password" required minlength="6">
+                                                        <button type="button"
+                                                            class="password-toggle-btn top-50 translate-middle-y">
+                                                            <i class="ri-eye-off-line"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
-                                                <div class="profile-form-group position-relative">
-                                                    <label class="profile-form-label small">Confirm</label>
-                                                    <input type="password"
-                                                        class="form-control profile-input form-control-sm"
-                                                        id="confirm-password" required minlength="6">
-                                                    <button type="button"
-                                                        class="password-toggle-btn top-50 translate-middle-y">
-                                                        <i class="ri-eye-off-line"></i>
-                                                    </button>
-                                                </div>
+                                            <div class="text-end mt-3">
+                                                <button type="submit" class="btn btn-warning btn-sm">
+                                                    <i class="ri-lock-password-line align-middle me-1"></i> Update
+                                                    Password
+                                                </button>
                                             </div>
-                                        </div>
-                                        <div class="text-end mt-3">
-                                            <button type="submit" class="btn btn-warning btn-sm">
-                                                <i class="ri-lock-password-line align-middle me-1"></i> Update Password
-                                            </button>
-                                        </div>
-                                    </form>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <script src="/assets/js/profile-modal.js"></script>
+                <script src="/assets/js/profile-modal.js"></script>
 
-            <% if (typeof user !=='undefined' && user) { %>
-                <script>
-                    // Maximize window after login
-                    document.addEventListener('DOMContentLoaded', function () {
-                        if (window.electron) {
-                            window.electron.send('maximize-window');
-                        }
-                    });
-                </script>
-                <% } %>
-                    </body>
+                <% if (typeof user !=='undefined' && user) { %>
+                    <script>
+                        // Maximize window after login
+                        document.addEventListener('DOMContentLoaded', function () {
+                            if (window.electron) {
+                                window.electron.send('maximize-window');
+                            }
+                        });
+                    </script>
+                    <% } %>
+</body>
 
-                    </html>
+</html>

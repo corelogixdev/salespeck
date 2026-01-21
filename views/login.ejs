@@ -15,43 +15,43 @@
                                     <div class="mb-3">
                                         <label for="username" class="form-label">Username</label>
                                         <div class="position-relative auth-pass-inputgroup">
-                                            <input type="text" 
-                                                   class="form-control pe-5 <%= locals.errors?.username ? 'is-invalid' : '' %>" 
-                                                   id="username" 
-                                                   name="username" 
-                                                   placeholder="Enter username" 
-                                                   required>
+                                            <input type="text"
+                                                class="form-control pe-5 <%= locals.errors?.username ? 'is-invalid' : '' %>"
+                                                id="username" name="username" placeholder="Enter username" required>
                                             <% if (locals.errors?.username) { %>
-                                                <div class="invalid-feedback"><%= errors.username %></div>
-                                            <% } %>
+                                                <div class="invalid-feedback">
+                                                    <%= errors.username %>
+                                                </div>
+                                                <% } %>
                                         </div>
                                     </div>
 
                                     <div class="mb-3">
                                         <label class="form-label" for="password">Password</label>
                                         <div class="position-relative auth-pass-inputgroup">
-                                            <input type="password" 
-                                                   class="form-control pe-5 <%= locals.errors?.password ? 'is-invalid' : '' %>" 
-                                                   id="password"
-                                                   name="password" 
-                                                   placeholder="Enter password" 
-                                                   autocomplete="on"
-                                                   required>
-                                            <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted" 
-                                                   type="button" 
-                                                   onclick="togglePassword(this)">
+                                            <input type="password"
+                                                class="form-control pe-5 <%= locals.errors?.password ? 'is-invalid' : '' %>"
+                                                id="password" name="password" placeholder="Enter password"
+                                                autocomplete="on" required>
+                                            <button
+                                                class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted"
+                                                type="button" onclick="togglePassword(this)">
                                                 <i class="ri-eye-fill align-middle"></i>
                                             </button>
                                             <% if (locals.errors?.password) { %>
-                                                <div class="invalid-feedback"><%= errors.password %></div>
-                                            <% } %>
+                                                <div class="invalid-feedback">
+                                                    <%= errors.password %>
+                                                </div>
+                                                <% } %>
                                         </div>
                                     </div>
 
                                     <div class="mt-4">
                                         <button class="btn btn-primary w-100" type="submit" id="loginBtn">
-                                            <span class="spinner-border spinner-border-sm me-1 d-none" role="status" aria-hidden="true"></span>
-                                            <span class="btn-text"><i class="ri-login-box-line align-middle me-1"></i> Sign In</span>
+                                            <span class="spinner-border spinner-border-sm me-1 d-none" role="status"
+                                                aria-hidden="true"></span>
+                                            <span class="btn-text"><i class="ri-login-box-line align-middle me-1"></i>
+                                                Sign In</span>
                                         </button>
                                     </div>
                                 </form>
@@ -60,12 +60,14 @@
                                 <div class="row">
                                     <div class="col-6 text-start">
                                         <p class="mb-0 text-muted">
-                                            Powered by <a href="javascript:void(0);" class="fw-semibold text-primary text-decoration-underline">OpenMenu</a>
+                                            Powered by <a href="javascript:void(0);"
+                                                class="fw-semibold text-primary text-decoration-underline">Corelogix</a>
                                         </p>
                                     </div>
                                     <div class="col-6 text-end">
                                         <p class="mb-0 text-muted">
-                                            Don't have an account? <a href="/register" class="fw-semibold text-primary text-decoration-underline">Register</a>
+                                            Don't have an account? <a href="/register"
+                                                class="fw-semibold text-primary text-decoration-underline">Register</a>
                                         </p>
                                     </div>
                                 </div>
@@ -83,7 +85,7 @@
         function togglePassword(button) {
             const input = button.parentElement.querySelector('input');
             const icon = button.querySelector('i');
-            
+
             if (input.type === 'password') {
                 input.type = 'text';
                 icon.classList.remove('ri-eye-fill');
@@ -95,24 +97,24 @@
             }
         }
 
-        document.querySelector('form').addEventListener('submit', function(e) {
+        document.querySelector('form').addEventListener('submit', function (e) {
             const btn = document.getElementById('loginBtn');
             const spinner = btn.querySelector('.spinner-border');
             const text = btn.querySelector('.btn-text');
-            
+
             // Only disable if validity check passes
             if (this.checkValidity()) {
                 btn.classList.add('disabled'); // Use class instead of disabled attribute so form still submits
                 btn.style.pointerEvents = 'none';
                 spinner.classList.remove('d-none');
                 text.textContent = 'Signing In...';
-                
+
                 // Safety timeout - re-enable after 5 seconds if no response
                 setTimeout(() => {
                     btn.classList.remove('disabled');
                     btn.style.pointerEvents = 'auto';
                     spinner.classList.add('d-none');
-                    text.textContent = 'Sign In'; 
+                    text.textContent = 'Sign In';
                 }, 5000);
             }
         });
