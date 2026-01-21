@@ -149,6 +149,70 @@
     manualMode.addEventListener('change', updateBarcodePlaceholder);
     barcodeMode.addEventListener('change', updateBarcodePlaceholder);
 
+    // Prevent window from losing focus during barcode scanning
+    // This prevents the application from minimizing when barcode scanner input is processed
+    let isBarcodeInputFocused = false;
+
+    barcodeInput.addEventListener('focus', () => {
+      isBarcodeInputFocused = true;
+      if (window.electron && barcodeMode.checked) {
+        window.electron.send('lock-window-focus');
+      }
+    });
+
+    barcodeInput.addEventListener('input', () => {
+      if (window.electron && barcodeMode.checked) {
+        window.electron.send('lock-window-focus');
+      }
+    });
+
+    barcodeInput.addEventListener('blur', () => {
+      setTimeout(() => {
+        if (document.activeElement !== barcodeInput) {
+          isBarcodeInputFocused = false;
+          if (window.electron) {
+            window.electron.send('unlock-window-focus');
+          }
+        }
+      }, 500);
+    });
+
+    // Prevent window blur when search input is focused
+    window.addEventListener('blur', (event) => {
+      if (isBarcodeInputFocused && barcodeMode.checked) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        // Immediately refocus the window and input
+        requestAnimationFrame(() => {
+          window.focus();
+          barcodeInput.focus();
+        });
+      }
+    }, true);
+
+    // Handle keydown to prevent minimize shortcuts
+    barcodeInput.addEventListener('keydown', (event) => {
+      const isEnterKey = event.key === 'Enter' || event.keyCode === 13;
+      const isCtrlM = event.ctrlKey && (event.key === 'm' || event.key === 'M');
+
+      if (isCtrlM) {
+        event.preventDefault();
+        event.stopPropagation();
+        barcodeInput.focus();
+        return;
+      }
+
+      if (isEnterKey && barcodeMode.checked) {
+        // Prevent form submission on barcode scan if in barcode mode
+        // Most scanners send Enter after the barcode
+        event.preventDefault();
+        event.stopPropagation();
+        barcodeInput.focus();
+        return;
+      }
+    });
+
     document.querySelector('form').addEventListener('submit', async (event) => {
       event.preventDefault();
       document.querySelectorAll('input').forEach(input => {
