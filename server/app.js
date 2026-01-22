@@ -9,11 +9,13 @@ const config = require('../installEnv.js'); // Link to the Express app
 const sessionDataMiddleware = require('../middleware/sessionData');
 const routes = require('../routes');
 const { formatNumber } = require('../utils/formatNumber');
+const moment = require('moment');
 const app = express();
 const runMigrationsAndSeeders = require('../utils/runMigrationsAndSeeders.js');
 
-// Make formatNumber available to all views
+// Make formatNumber and moment available to all views
 app.locals.formatNumber = formatNumber;
+app.locals.moment = moment;
 
 // CORS Configuration
 const corsOptions = {
@@ -77,6 +79,7 @@ app.use('/users', routes.userRoutes);
 app.use('/settings', routes.settingRoutes);
 app.use('/sales', routes.saleRoutes);
 app.use('/accounting', routes.accountingRoutes);
+app.use('/reports', routes.reportRoutes);
 
 // Add these routes
 app.use('/brands', brandRoutes);

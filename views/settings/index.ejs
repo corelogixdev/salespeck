@@ -36,91 +36,78 @@
             <div class="tab-pane fade <%= (typeof currenttab !== 'undefined' && currenttab === 'env') || (typeof currenttab === 'undefined') ? 'show active' : '' %>"
                 id="env" role="tabpanel" aria-labelledby="env-tab">
                 <form action="/settings/save?type=env" method="POST" class="p-2 card mt-3">
-                    <h6 class="mb-3">Update URL & API Settings</h6>
                     <div class="row">
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label class="form-label" for="update_url">Update URL:</label>
-                                <input type="text" class="form-control" id="update_url" name="update_url" value="<%= envSettings.update_url %>">
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label class="form-label" for="CI_PROJECT_ID">CI Project ID:</label>
-                                <input type="number" class="form-control" id="CI_PROJECT_ID" name="CI_PROJECT_ID" value="<%= envSettings.CI_PROJECT_ID %>">
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label class="form-label" for="install_date">Install Date:</label>
-                                <input type="text" class="form-control" id="install_date" name="install_date" value="<%= envSettings.install_date %>" readonly>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label class="form-label" for="install_type">Install Type:</label>
-                                <input type="text" class="form-control" id="install_type" name="install_type" value="<%= envSettings.install_type %>">
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr class="my-4">
-                    <h6 class="mb-3">Server Settings</h6>
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label class="form-label" for="SERVER_IP">Server IP:</label>
-                                <input type="text" class="form-control" id="SERVER_IP" name="SERVER_IP" value="<%= envSettings.SERVER_IP %>">
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label class="form-label" for="port">Port:</label>
-                                <input type="number" class="form-control" id="port" name="port" value="<%= envSettings.port %>">
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr class="my-4">
-                    <h6 class="mb-3">Logging Settings</h6>
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label class="form-label" for="logging">Logging:</label>
-                                <input type="checkbox" class="form-check-input" id="logging" name="logging" <%= envSettings.logging ? 'checked' : '' %>>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label class="form-label" for="logger">Logger:</label>
-                                <input type="text" class="form-control" id="logger" name="logger" value="<%= envSettings.logger %>">
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label class="form-label" for="env">Environment:</label>
-                                <select class="form-control" id="env" name="env">
-                                    <option value="development" <%= envSettings.env === 'development' ? 'selected' : '' %>>Development</option>
-                                    <option value="production" <%= envSettings.env === 'production' ? 'selected' : '' %>>Production</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr class="my-4">
-                    <h6 class="mb-3">Printer Settings</h6>
-                    <div class="row">
-                        <% Object.keys(envSettings.printer).forEach(key => { %>
+                        <% 
+                        // Loop through variables from envSettings (which comes from DEFAULT_SETTINGS)
+                        // installEnv.js is the single source of truth - only show variables defined there
+                        Object.keys(envSettings).forEach(key => { 
+                            if (key === 'printer') {
+                                // Handle printer settings separately
+                                return;
+                            }
+                            
+                            // Get label from translations if available, otherwise use key name
+                            const label = translations[key] || key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
+                            const value = envSettings[key];
+                            const fieldType = typeof value;
+                        %>
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label class="form-label" for="printer-<%= key %>">
-                                        <%= key.charAt(0).toUpperCase() + key.slice(1) %>:
+                                    <label class="form-label" for="<%= key %>">
+                                        <%= label %>:
+                                        <% if (typeof envOnlyVars !== 'undefined' && envOnlyVars[key]) { %>
+                                            <span class="badge bg-info ms-2" title="This value comes from .env file and is read-only">From .env</span>
+                                        <% } %>
                                     </label>
-                                    <input type="text" class="form-control" id="printer-<%= key %>" name="printer[<%= key %>]" value="<%= envSettings.printer[key] %>">
+                                    <% 
+                                    const isReadOnly = (typeof envOnlyVars !== 'undefined' && envOnlyVars[key]) || key === 'install_date';
+                                    %>
+                                    <% if (key === 'env') { %>
+                                        <select class="form-control" id="<%= key %>" name="<%= key %>" <%= isReadOnly ? 'disabled' : '' %>>
+                                            <option value="development" <%= value === 'development' ? 'selected' : '' %>>Development</option>
+                                            <option value="production" <%= value === 'production' ? 'selected' : '' %>>Production</option>
+                                        </select>
+                                    <% } else if (key === 'logging') { %>
+                                        <input type="checkbox" class="form-check-input" id="<%= key %>" name="<%= key %>" <%= value ? 'checked' : '' %> <%= isReadOnly ? 'disabled' : '' %>>
+                                    <% } else if (fieldType === 'number' || key === 'CI_PROJECT_ID' || key === 'port') { %>
+                                        <input type="number" class="form-control" id="<%= key %>" name="<%= key %>" value="<%= value %>" <%= isReadOnly ? 'readonly' : '' %>>
+                                    <% } else { %>
+                                        <input type="text" class="form-control" id="<%= key %>" name="<%= key %>" value="<%= value || '' %>" <%= isReadOnly ? 'readonly' : '' %>>
+                                    <% } %>
                                 </div>
                             </div>
                         <% }) %>
                     </div>
+
+                    <% if (translations.printer) { %>
+                        <hr class="my-4">
+                        <h6 class="mb-3">Printer Settings</h6>
+                        <div class="row">
+                            <% Object.keys(translations.printer).forEach(key => { %>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-label" for="printer-<%= key %>">
+                                            <%= translations.printer[key] %>:
+                                        </label>
+                                        <% if (key === 'silentPrinting') { %>
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" id="printer-<%= key %>" name="printer[<%= key %>]" value="true" <%= envSettings.printer[key] === true || envSettings.printer[key] === 'true' ? 'checked' : '' %>>
+                                                <label class="form-check-label" for="printer-<%= key %>">
+                                                    Enable Silent Printing
+                                                </label>
+                                            </div>
+                                        <% } else if (key === 'numberOfPrints') { %>
+                                            <input type="number" class="form-control" id="printer-<%= key %>" name="printer[<%= key %>]" value="<%= envSettings.printer[key] || 1 %>" min="1" max="10">
+                                        <% } else if (key === 'width' || key === 'height' || key === 'fontSize') { %>
+                                            <input type="number" class="form-control" id="printer-<%= key %>" name="printer[<%= key %>]" value="<%= envSettings.printer[key] %>">
+                                        <% } else { %>
+                                            <input type="text" class="form-control" id="printer-<%= key %>" name="printer[<%= key %>]" value="<%= envSettings.printer[key] || '' %>">
+                                        <% } %>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                    <% } %>
 
                     <div class="text-end">
                         <button type="submit" class="btn btn-primary mt-3">Save Environment Settings</button>

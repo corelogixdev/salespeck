@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Purchases Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { color: #333; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    .text-end { text-align: right; }
+  </style>
+</head>
+<body>
+  <h1>Purchases Report</h1>
+  <p><strong>Generated:</strong> <%= moment(reportData.generatedAt).format('YYYY-MM-DD HH:mm:ss') %></p>
+  <% if (reportData.filters.startDate || reportData.filters.endDate) { %>
+    <p><strong>Period:</strong> <%= reportData.filters.startDate || 'All' %> to <%= reportData.filters.endDate || 'All' %></p>
+  <% } %>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Invoice #</th>
+        <th>Date</th>
+        <th>Vendor</th>
+        <th>Total Amount</th>
+        <th>Payment</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% reportData.purchases.forEach(purchase => { %>
+        <tr>
+          <td><%= purchase.invoicenum || 'N/A' %></td>
+          <td><%= moment(purchase.createdAt).format('YYYY-MM-DD') %></td>
+          <td><%= purchase.Vendor ? `${purchase.Vendor.firstname || ''} ${purchase.Vendor.lastname || ''}`.trim() : 'N/A' %></td>
+          <td class="text-end"><%= parseFloat(purchase.totalAmount || 0).toFixed(2) %></td>
+          <td class="text-end"><%= parseFloat(purchase.totalPayment || 0).toFixed(2) %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+    <tfoot>
+      <tr style="font-weight: bold;">
+        <td colspan="3">TOTAL</td>
+        <td class="text-end"><%= reportData.totals.totalAmount.toFixed(2) %></td>
+        <td class="text-end"><%= reportData.totals.totalPayment.toFixed(2) %></td>
+      </tr>
+    </tfoot>
+  </table>
+</body>
+</html>

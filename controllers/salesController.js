@@ -3,6 +3,7 @@ var db = require("../models");
 var moment = require("moment");
 const { findLike } = require("../utils/searchquery");
 const { getPaginationMeta } = require('../utils/paginationHelper');
+const config = require("../installEnv");
 
 exports.index = async (req, res) => {
   const query = { ...req.body, ...req.query };
@@ -437,6 +438,15 @@ exports.saleview = async (req, res) => {
     res.render("sales/saleview", {
       sale: result,
       companySettings: JSON.parse(companySettings.value),
+      printerConfig: config.printer || {
+        printer: '',
+        paper: '58mm',
+        width: 58,
+        height: 200,
+        fontSize: 12,
+        silentPrinting: false,
+        numberOfPrints: 1
+      },
       hidenav: true,
       layout: false
     });

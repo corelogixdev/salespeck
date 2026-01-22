@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Customer Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { color: #333; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    .text-end { text-align: right; }
+  </style>
+</head>
+<body>
+  <h1>Customer Report</h1>
+  <p><strong>Generated:</strong> <%= moment(reportData.generatedAt).format('YYYY-MM-DD HH:mm:ss') %></p>
+  <% if (reportData.filters.startDate || reportData.filters.endDate) { %>
+    <p><strong>Period:</strong> <%= reportData.filters.startDate || 'All' %> to <%= reportData.filters.endDate || 'All' %></p>
+  <% } %>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Email</th>
+        <th class="text-end">Total Purchases</th>
+        <th class="text-end">Total Spent</th>
+        <th>Last Purchase</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% reportData.customers.forEach(customer => { %>
+        <tr>
+          <td><%= `${customer.firstname || ''} ${customer.lastname || ''}`.trim() || 'N/A' %></td>
+          <td><%= customer.phone || 'N/A' %></td>
+          <td><%= customer.email || 'N/A' %></td>
+          <td class="text-end"><%= customer.totalPurchases || 0 %></td>
+          <td class="text-end"><%= customer.totalSpent.toFixed(2) %></td>
+          <td><%= customer.lastPurchaseDate ? moment(customer.lastPurchaseDate).format('YYYY-MM-DD') : 'Never' %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+    <tfoot>
+      <tr style="font-weight: bold;">
+        <td colspan="3">TOTAL</td>
+        <td class="text-end"><%= reportData.totals.totalSales %></td>
+        <td class="text-end"><%= reportData.totals.totalRevenue.toFixed(2) %></td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+</body>
+</html>

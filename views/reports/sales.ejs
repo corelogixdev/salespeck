@@ -1,0 +1,138 @@
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-header align-items-center d-flex">
+        <h4 class="card-title mb-0 flex-grow-1">Sales Report</h4>
+        <div class="d-flex gap-2">
+          <button onclick="window.print()" class="btn btn-soft-info btn-sm">
+            <i class="ri-printer-line"></i> Print
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <!-- Filters -->
+        <form method="GET" action="/reports/sales" class="row g-3 mb-4">
+          <div class="col-md-3">
+            <label class="form-label">Start Date</label>
+            <input type="date" class="form-control" name="startDate" value="<%= reportData.filters.startDate || '' %>">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">End Date</label>
+            <input type="date" class="form-control" name="endDate" value="<%= reportData.filters.endDate || '' %>">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Customer</label>
+            <input type="text" class="form-control" name="customer" value="<%= reportData.filters.customer || '' %>" placeholder="Customer ID">
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="ri-search-line me-1"></i> Filter
+            </button>
+          </div>
+        </form>
+
+        <!-- Summary Cards -->
+        <div class="row mb-4">
+          <div class="col-md-3">
+            <div class="card border border-primary">
+              <div class="card-body">
+                <h6 class="text-muted mb-2">Total Sales</h6>
+                <h4 class="mb-0"><%= reportData.totals.totalSales %></h4>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card border border-success">
+              <div class="card-body">
+                <h6 class="text-muted mb-2">Total Amount</h6>
+                <h4 class="mb-0"><%= formatNumber(reportData.totals.totalAmount) %></h4>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card border border-info">
+              <div class="card-body">
+                <h6 class="text-muted mb-2">Total Payment</h6>
+                <h4 class="mb-0"><%= formatNumber(reportData.totals.totalPayment) %></h4>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card border border-warning">
+              <div class="card-body">
+                <h6 class="text-muted mb-2">Total Discount</h6>
+                <h4 class="mb-0"><%= formatNumber(reportData.totals.totalDiscount) %></h4>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Export Buttons -->
+        <div class="d-flex gap-2 mb-3">
+          <a href="/reports/sales?<%= new URLSearchParams({...reportData.filters, format: 'csv'}).toString() %>" class="btn btn-success btn-sm">
+            <i class="ri-file-excel-line me-1"></i> Export CSV
+          </a>
+          <a href="/reports/sales?<%= new URLSearchParams({...reportData.filters, format: 'excel'}).toString() %>" class="btn btn-success btn-sm">
+            <i class="ri-file-excel-2-line me-1"></i> Export Excel
+          </a>
+          <a href="/reports/sales?<%= new URLSearchParams({...reportData.filters, format: 'pdf'}).toString() %>" target="_blank" class="btn btn-danger btn-sm">
+            <i class="ri-file-pdf-line me-1"></i> Export PDF
+          </a>
+        </div>
+
+        <!-- Report Table -->
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>Invoice #</th>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th class="text-end">Total Price</th>
+                <th class="text-end">Payment</th>
+                <th class="text-end">Discount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% reportData.sales.forEach(sale => { %>
+                <tr>
+                  <td><%= sale.invoicenum || 'N/A' %></td>
+                  <td><%= moment(sale.createdAt).format('YYYY-MM-DD HH:mm') %></td>
+                  <td>
+                    <%= sale.Customer 
+                      ? `${sale.Customer.firstname || ''} ${sale.Customer.lastname || ''}`.trim() 
+                      : 'Walk-in' %>
+                  </td>
+                  <td><%= sale.SoldPoducts ? sale.SoldPoducts.length : 0 %></td>
+                  <td class="text-end"><%= formatNumber(sale.totalprice) %></td>
+                  <td class="text-end"><%= formatNumber(sale.totalpayment) %></td>
+                  <td class="text-end">
+                    <%= formatNumber((parseFloat(sale.totalprice || 0) - parseFloat(sale.totalpayment || 0))) %>
+                  </td>
+                </tr>
+              <% }) %>
+              <% if (reportData.sales.length === 0) { %>
+                <tr>
+                  <td colspan="7" class="text-center">No sales found</td>
+                </tr>
+              <% } %>
+            </tbody>
+            <tfoot>
+              <tr class="fw-bold">
+                <td colspan="4">TOTAL</td>
+                <td class="text-end"><%= formatNumber(reportData.totals.totalAmount) %></td>
+                <td class="text-end"><%= formatNumber(reportData.totals.totalPayment) %></td>
+                <td class="text-end"><%= formatNumber(reportData.totals.totalDiscount) %></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="text-muted mt-3">
+          <small>Report generated on: <%= moment(reportData.generatedAt).format('YYYY-MM-DD HH:mm:ss') %></small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

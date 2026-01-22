@@ -29,5 +29,24 @@
     "helpMenu": {
         "documentation": "Documentation",
         "about": "About"
+    },
+    "envSettings": {
+        "update_url": "Update URL",
+        "CI_PROJECT_ID": "CI Project ID",
+        "install_date": "Install Date",
+        "SERVER_IP": "Server IP",
+        "port": "Port",
+        "logging": "Logging",
+        "logger": "Logger",
+        "env": "Environment",
+        "printer": {
+            "printer": "Printer",
+            "paper": "Paper",
+            "width": "Width",
+            "height": "Height",
+            "fontSize": "Font Size",
+            "silentPrinting": "Silent Printing",
+            "numberOfPrints": "Number of Prints"
+        }
     }
 }

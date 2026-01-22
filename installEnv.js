@@ -6,20 +6,21 @@ const os = require('os');
 // Default runtime settings (for .settings file)
 const DEFAULT_SETTINGS = [
   { key: 'install_date', value: new Date().toISOString() },
-  { key: 'install_type', value: 'desktop' },
   { key: 'update_url', value: 'https://gitlab.com/api/v4/projects/62990895/packages/generic/openmenu/release' },
   { key: 'CI_PROJECT_ID', value: 62990895 },
   { key: 'SERVER_IP', value: 'localhost' },
-  { key: 'port', value: 3000 },
-  { key: 'logging', value: true },
+  { key: 'port', value: 5783 },
+  { key: 'logging', value: false },
   { key: 'logger', value: 'file' },
-  { key: 'env', value: 'development' },
+  { key: 'env', value: 'production' },
   { key: 'printer', value: JSON.stringify({
-    printer: 'printer',
-    paper: 'paper',
-    width: 'width',
-    height: 'height',
-    fontSize: 'fontSize'
+    printer: 'Default',
+    paper: '58mm',
+    width: 58,
+    height: 200,
+    fontSize: 12,
+    silentPrinting: false,
+    numberOfPrints: 1
   })}
 ];
 
@@ -49,10 +50,12 @@ function getSettingsPath() {
 const settingsPath = getSettingsPath();
 
 // Load or create .settings file (runtime settings)
+// Note: Values from .env file (process.env) take precedence over .settings file
 function loadSettings() {
   let settings = {};
+  let fileExists = fs.existsSync(settingsPath);
   
-  if (fs.existsSync(settingsPath)) {
+  if (fileExists) {
     // File exists - load existing settings
     try {
       const content = fs.readFileSync(settingsPath, 'utf8');
@@ -67,111 +70,182 @@ function loadSettings() {
     console.log('Creating .settings file with default values...');
   }
   
-  // Merge defaults with existing settings (existing values take priority)
+  // Merge: Add any new variables from DEFAULT_SETTINGS that don't exist in .settings
+  // Existing values in .settings take priority (don't override)
   let settingsContent = '';
   let hasChanges = false;
   
-  DEFAULT_SETTINGS.forEach(({ key, value }) => {
-    // Keep existing value if present, otherwise use default
-    if (settings[key] === undefined) {
-      settings[key] = value;
-      hasChanges = true;
+  // First, write all existing settings from .settings file
+  Object.keys(settings).forEach(key => {
+    // Skip if value comes from .env file (it's read-only)
+    if (process.env[key] !== undefined) {
+      return;
     }
     settingsContent += `${key}=${settings[key]}\n`;
   });
   
-  // Add any extra settings that exist but aren't in defaults (preserve them)
-  Object.keys(settings).forEach(key => {
-    const existsInDefaults = DEFAULT_SETTINGS.some(s => s.key === key);
-    if (!existsInDefaults) {
-      settingsContent += `${key}=${settings[key]}\n`;
+  // Then, add any new variables from DEFAULT_SETTINGS that aren't in .settings
+  DEFAULT_SETTINGS.forEach(({ key, value }) => {
+    // Skip if value comes from .env file (it's read-only)
+    if (process.env[key] !== undefined) {
+      return;
+    }
+    
+    // If this key doesn't exist in .settings, add it with default value
+    if (settings[key] === undefined) {
+      settings[key] = value;
+      settingsContent += `${key}=${value}\n`;
+      hasChanges = true;
     }
   });
   
   // Write .settings file if it didn't exist or if we added new defaults
-  if (!fs.existsSync(settingsPath) || hasChanges) {
+  if (!fileExists || hasChanges) {
     fs.writeFileSync(settingsPath, settingsContent);
-    console.log('Updated .settings file');
+    if (hasChanges) {
+      console.log('Added new variables to .settings file');
+    } else {
+      console.log('Created .settings file with default values');
+    }
   }
   
+  // Return merged settings (existing + new defaults)
   return settings;
 }
 
 // Load settings
 const runtimeSettings = loadSettings();
 
-// Build config object
-const config = {
-  // Runtime settings (from .settings)
-  port: parseInt(runtimeSettings.port) || 3000,
-  logging: runtimeSettings.logging === 'true' || runtimeSettings.logging === true,
-  logger: runtimeSettings.logger || 'file',
-  env: runtimeSettings.env || 'production',
-  install_date: runtimeSettings.install_date,
-  install_type: runtimeSettings.install_type || 'desktop',
-  update_url: runtimeSettings.update_url,
-  CI_PROJECT_ID: parseInt(runtimeSettings.CI_PROJECT_ID) || 62990895,
-  SERVER_IP: runtimeSettings.SERVER_IP || 'localhost',
-  printer: runtimeSettings.printer ? (typeof runtimeSettings.printer === 'string' ? JSON.parse(runtimeSettings.printer) : runtimeSettings.printer) : {
-    printer: 'printer',
-    paper: 'paper',
-    width: 'width',
-    height: 'height',
-    fontSize: 'fontSize'
+// Helper function to get value from process.env, then .settings, then default
+function getConfigValue(key, defaultValue) {
+  // Priority: process.env (from .env file) > .settings file > default value
+  if (process.env[key] !== undefined) {
+    return process.env[key];
   }
+  if (runtimeSettings[key] !== undefined) {
+    return runtimeSettings[key];
+  }
+  return defaultValue;
+}
+
+// Build config object
+// Priority: process.env (.env file) > .settings file > hardcoded defaults
+const config = {
+  // Get from .env first, then .settings, then default
+  port: parseInt(getConfigValue('port', 5783)),
+  logging: getConfigValue('logging', 'false') === 'true' || getConfigValue('logging', false) === true,
+  logger: getConfigValue('logger', 'file'),
+  env: getConfigValue('env', 'production'),
+  install_date: getConfigValue('install_date', new Date().toISOString()),
+  update_url: getConfigValue('update_url', 'https://gitlab.com/api/v4/projects/62990895/packages/generic/openmenu/release'),
+  CI_PROJECT_ID: parseInt(getConfigValue('CI_PROJECT_ID', 62990895)),
+  SERVER_IP: getConfigValue('SERVER_IP', 'localhost'),
+  printer: (() => {
+    const printerValue = getConfigValue('printer', null);
+    if (printerValue) {
+      try {
+        const parsed = typeof printerValue === 'string' ? JSON.parse(printerValue) : printerValue;
+        // Ensure new fields have defaults if not present
+        return {
+          printer: parsed.printer || '',
+          paper: parsed.paper || '58mm',
+          width: parsed.width || 58,
+          height: parsed.height || 200,
+          fontSize: parsed.fontSize || 12,
+          silentPrinting: parsed.silentPrinting !== undefined ? parsed.silentPrinting : false,
+          numberOfPrints: parsed.numberOfPrints || 1
+        };
+      } catch (e) {
+        return {
+          printer: '',
+          paper: '58mm',
+          width: 58,
+          height: 200,
+          fontSize: 12,
+          silentPrinting: false,
+          numberOfPrints: 1
+        };
+      }
+    }
+    return {
+      printer: '',
+      paper: '58mm',
+      width: 58,
+      height: 200,
+      fontSize: 12,
+      silentPrinting: false,
+      numberOfPrints: 1
+    };
+  })()
 };
 
-// Export function to update settings (for settings page)
-config.updateSetting = function(key, value) {
-  let settings = {};
+// Export function to update all settings (for settings page)
+// Note: Cannot update settings that are defined in .env file (they are read-only)
+config.updateAllSettings = function(newSettings) {
+  // Read current .settings file
+  let currentSettings = {};
   
   if (fs.existsSync(settingsPath)) {
     try {
       const content = fs.readFileSync(settingsPath, 'utf8');
-      settings = dotenv.parse(content);
+      currentSettings = dotenv.parse(content);
     } catch (error) {
       console.error('Error reading .settings file:', error);
     }
   }
   
-  // Update the setting
-  // If value is an object, stringify it for storage
-  const valueToStore = typeof value === 'object' && value !== null ? JSON.stringify(value) : value;
-  settings[key] = valueToStore;
-  
-  // Write back to file
-  let settingsContent = '';
-  DEFAULT_SETTINGS.forEach(({ key: defaultKey }) => {
-    const defaultValue = DEFAULT_SETTINGS.find(s => s.key === defaultKey)?.value;
-    settingsContent += `${defaultKey}=${settings[defaultKey] !== undefined ? settings[defaultKey] : defaultValue}\n`;
+  // Merge new settings with current settings
+  Object.keys(newSettings).forEach(key => {
+    // Check if this setting is defined in .env file - if so, skip it (read-only)
+    if (process.env[key] !== undefined) {
+      console.warn(`Cannot update ${key} - it is defined in .env file and is read-only`);
+      return;
+    }
+    
+    // Update the setting
+    const value = newSettings[key];
+    const valueToStore = typeof value === 'object' && value !== null ? JSON.stringify(value) : value;
+    currentSettings[key] = valueToStore;
   });
   
-  // Add any extra settings
-  Object.keys(settings).forEach(key => {
-    const existsInDefaults = DEFAULT_SETTINGS.some(s => s.key === key);
-    if (!existsInDefaults) {
-      settingsContent += `${key}=${settings[key]}\n`;
+  // Write all settings back to file (excluding values that are in .env)
+  let settingsContent = '';
+  Object.keys(currentSettings).forEach(key => {
+    // Skip if value comes from .env file (it's read-only)
+    if (process.env[key] !== undefined) {
+      return;
     }
+    settingsContent += `${key}=${currentSettings[key]}\n`;
   });
   
   fs.writeFileSync(settingsPath, settingsContent);
   
-  // Update runtime config
-  // Parse JSON strings back to objects for config
-  if (key === 'printer' && typeof valueToStore === 'string') {
-    try {
-      this[key] = JSON.parse(valueToStore);
-    } catch (e) {
-      this[key] = valueToStore;
+  // Reload settings to update runtime config
+  const updatedSettings = loadSettings();
+  Object.keys(updatedSettings).forEach(key => {
+    if (process.env[key] === undefined) {
+      if (key === 'printer') {
+        try {
+          this[key] = typeof updatedSettings[key] === 'string' ? JSON.parse(updatedSettings[key]) : updatedSettings[key];
+        } catch (e) {
+          this[key] = updatedSettings[key];
+        }
+      } else {
+        this[key] = updatedSettings[key];
+      }
     }
-  } else {
-    this[key] = value;
-  }
+  });
   
-  console.log(`Updated setting: ${key} = ${value}`);
+  console.log('Updated .settings file with all changes');
+  return true;
 };
 
-// Export function to get all settings
+// Export function to update a single setting (for backward compatibility)
+config.updateSetting = function(key, value) {
+  return config.updateAllSettings({ [key]: value });
+};
+
+// Export function to get all settings from .settings file
 config.getAllSettings = function() {
   let settings = {};
   if (fs.existsSync(settingsPath)) {
@@ -183,6 +257,11 @@ config.getAllSettings = function() {
     }
   }
   return settings;
+};
+
+// Export function to get DEFAULT_SETTINGS (single source of truth)
+config.getDefaultSettings = function() {
+  return DEFAULT_SETTINGS;
 };
 
 module.exports = config;

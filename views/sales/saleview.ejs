@@ -199,7 +199,7 @@
                             </div>
 
                             <div class="hstack gap-2 justify-content-end d-print-none mt-4">
-                                <button onclick="window.print()" class="btn btn-success">
+                                <button onclick="printReceipt()" class="btn btn-success">
                                     <i class="ri-printer-line align-bottom me-1"></i> Print
                                 </button>
                             </div>
@@ -421,6 +421,101 @@
 </body>
 <script src="/assets/js/moment.min.js"></script>
 <script>
+    // Printer configuration from settings
+    const printerConfig = <%- JSON.stringify(typeof printerConfig !== 'undefined' ? printerConfig : { silentPrinting: false, numberOfPrints: 1 }) %>;
+    
+    function printReceipt() {
+        const numberOfPrints = parseInt(printerConfig.numberOfPrints || 1);
+        const silentPrinting = printerConfig.silentPrinting === true || printerConfig.silentPrinting === 'true';
+        
+        // Function to trigger print
+        function doPrint() {
+            if (silentPrinting) {
+                // Silent printing - use iframe to avoid print dialog
+                const iframe = document.createElement('iframe');
+                iframe.style.position = 'fixed';
+                iframe.style.right = '0';
+                iframe.style.bottom = '0';
+                iframe.style.width = '0';
+                iframe.style.height = '0';
+                iframe.style.border = '0';
+                
+                document.body.appendChild(iframe);
+                
+                const printContent = document.getElementById('demo').innerHTML;
+                const printWindow = iframe.contentWindow;
+                
+                printWindow.document.open();
+                // Get all styles from the current document
+                let styles = '';
+                Array.from(document.querySelectorAll('style')).forEach(styleEl => {
+                    styles += styleEl.innerHTML + '\n';
+                });
+                
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Print Receipt</title>
+                        <style>
+                            ${styles}
+                        </style>
+                    </head>
+                    <body>
+                        ${printContent}
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                
+                // Wait for content to load, then print
+                printWindow.onload = function() {
+                    setTimeout(() => {
+                        printWindow.focus();
+                        printWindow.print();
+                        
+                        // Remove iframe after printing
+                        setTimeout(() => {
+                            if (document.body.contains(iframe)) {
+                                document.body.removeChild(iframe);
+                            }
+                        }, 1000);
+                    }, 100);
+                };
+                
+                // Fallback if onload doesn't fire
+                setTimeout(() => {
+                    if (iframe.parentNode) {
+                        printWindow.focus();
+                        printWindow.print();
+                        setTimeout(() => {
+                            if (document.body.contains(iframe)) {
+                                document.body.removeChild(iframe);
+                            }
+                        }, 1000);
+                    }
+                }, 500);
+            } else {
+                // Normal printing with dialog
+                window.print();
+            }
+        }
+        
+        // Print multiple times if needed
+        if (numberOfPrints > 1) {
+            let printCount = 0;
+            const printInterval = setInterval(() => {
+                doPrint();
+                printCount++;
+                if (printCount >= numberOfPrints) {
+                    clearInterval(printInterval);
+                }
+            }, silentPrinting ? 1500 : 500); // Longer delay for silent printing
+        } else {
+            doPrint();
+        }
+    }
+    
     $(document).ready(function () {
         setTimeout(() => {
             // Format date only
