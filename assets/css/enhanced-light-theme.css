@@ -351,6 +351,81 @@
         box-shadow: 0 2px 15px rgba(102, 126, 234, 0.1) !important;
         border-bottom: 2px solid rgba(102, 126, 234, 0.1) !important;
     }
+
+    /* Fix white text on light backgrounds - Specific overrides */
+    
+    /* Fix white text in table body (keep white on gradient headers) */
+    .table tbody td,
+    .table tbody th,
+    .data-table tbody td,
+    .data-table tbody th {
+        color: #1a1a2e !important;
+    }
+
+    /* Fix white text in user profile menu items (keep white on gradient header) */
+    .user-profile-menu .user-profile-menu-item,
+    .user-profile-menu .user-profile-menu-item *:not(.user-profile-menu-header *) {
+        color: #1a1a2e !important;
+    }
+
+    /* Fix white text in dropdown menus (keep white on gradient backgrounds) */
+    .dropdown-menu .dropdown-item:not([class*="gradient"]) {
+        color: #1a1a2e !important;
+    }
+
+    /* Fix white text in modals */
+    .modal-body,
+    .modal-body p,
+    .modal-body span:not(.badge):not(.btn) {
+        color: #1a1a2e !important;
+    }
+
+    /* Fix white text in search results (keep white on selected items with gradient) */
+    .search-result-product:not(.selected),
+    .search-result-product:not(.selected) * {
+        color: #1a1a2e !important;
+    }
+
+    /* Fix white text in list groups */
+    .list-group-item:not([class*="active"]):not([class*="gradient"]) {
+        color: #1a1a2e !important;
+    }
+
+    /* Keep white text on gradient/dark backgrounds */
+    .card-header,
+    .table-header,
+    .user-profile-menu-header,
+    .pagination .page-item.active .page-link,
+    .pagination .page-link:hover,
+    .search-result-product.selected,
+    [style*="gradient"] *,
+    [class*="gradient"] * {
+        color: white !important;
+    }
+
+    /* Override any white text color on light backgrounds - more specific */
+    .card-body *:not(.card-header *):not([class*="gradient"]):not(.btn-primary):not(.btn-success):not(.btn-danger):not(.btn-warning):not(.btn-info):not(.badge-primary):not(.badge-success):not(.badge-danger):not(.badge-warning):not(.badge-info) {
+        color: #1a1a2e !important;
+    }
+
+    /* Fix white text in specific components */
+    .page-title,
+    .section-title,
+    h1:not(.card-header h1),
+    h2:not(.card-header h2),
+    h3:not(.card-header h3),
+    h4:not(.card-header h4),
+    h5:not(.card-header h5),
+    h6:not(.card-header h6) {
+        color: #1a1a2e !important;
+    }
+
+    /* Fix text in reports and other content areas */
+    .report-content,
+    .content-area,
+    .main-content *:not(.card-header):not([class*="gradient"]):not(.btn):not(.badge) {
+        color: #1a1a2e !important;
+    }
 }
 
 /* ============================================

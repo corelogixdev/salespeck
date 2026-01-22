@@ -515,6 +515,19 @@
                                                                                                 List</a>
                                                                                         </li>
                                                                                         <% } %>
+                                                                                        <% if (permissions.purchasesCreate) {
+                                                                                            %>
+                                                                                            <li class="nav-item">
+                                                                                                <a href="/accounting/purchase/form"
+                                                                                                    class="nav-link">New
+                                                                                                    Purchase</a>
+                                                                                            </li>
+                                                                                            <% } %>
+                                                                                            <li class="nav-item">
+                                                                                                <a href="/inventorylogs"
+                                                                                                    class="nav-link">Inventory
+                                                                                                    Logs</a>
+                                                                                            </li>
                                                                                             <li class="nav-item">
                                                                                                 <a href="/accounting/expenses"
                                                                                                     class="nav-link disabled">Expenses</a>
