@@ -362,96 +362,65 @@
                                                         <i class="las la-tachometer-alt"></i> <span>Dashboard</span>
                                                     </a>
                                                 </li>
-                                                <% if (permissions.productsList || permissions.productCreate ||
-                                                    permissions.purchasesCreate) { %>
-                                                    <li class="nav-item dropdown">
-                                                        <a class="nav-link menu-link" href="#sidebarStock"
-                                                            data-bs-toggle="collapse" role="button">
-                                                            <i class="las la-box"></i> <span>Stock</span>
-                                                        </a>
-                                                        <div class="collapse menu-dropdown" id="sidebarStock">
-                                                            <ul class="nav nav-sm flex-column">
-                                                                <% if (permissions.productsCreate) { %>
-                                                                    <li class="nav-item">
-                                                                        <a href="/products/form" class="nav-link">New
-                                                                            Product</a>
-                                                                    </li>
-                                                                    <% } %>
-                                                                        <% if (permissions.purchasesCreate) { %>
-                                                                            <li class="nav-item">
-                                                                                <a href="/accounting/purchase/form"
-                                                                                    class="nav-link">New
-                                                                                    Purchase</a>
-                                                                            </li>
-                                                                            <% } %>
-                                                                                <% if (permissions.productsList) { %>
-                                                                                    <li class="nav-item">
-                                                                                        <a href="/products"
-                                                                                            class="nav-link">Products
-                                                                                            List</a>
-                                                                                    </li>
-                                                                                    <li class="nav-item">
-                                                                                        <a href="/inventorylogs"
-                                                                                            class="nav-link">Inventory
-                                                                                            Logs</a>
-                                                                                    </li>
-                                                                                    <% } %>
-                                                                                        <% if (permissions.brandsList ||
-                                                                                            permissions.brandsView) { %>
-                                                                                            <li class="nav-item">
-                                                                                                <a href="/brands"
-                                                                                                    class="nav-link">Brands</a>
-                                                                                            </li>
-                                                                                            <% } %>
-                                                                                                <% if
-                                                                                                    (permissions.categoriesList
-                                                                                                    ||
-                                                                                                    permissions.categoriesView)
-                                                                                                    { %>
-                                                                                                    <li
-                                                                                                        class="nav-item">
-                                                                                                        <a href="/categories"
-                                                                                                            class="nav-link">Categories</a>
-                                                                                                    </li>
-                                                                                                    <% } %>
-                                                            </ul>
-                                                        </div>
-                                                    </li>
-                                                    <% } %>
-                                                        <% if (permissions.customersList || permissions.usersList) { %>
-                                                            <li class="nav-item dropdown">
-                                                                <a class="nav-link menu-link" href="#sidebarParties"
-                                                                    data-bs-toggle="collapse" role="button">
-                                                                    <i class="las la-users"></i> <span>Parties</span>
-                                                                </a>
-                                                                <div class="collapse menu-dropdown" id="sidebarParties">
-                                                                    <ul class="nav nav-sm flex-column">
-                                                                        <% if (permissions.customersList) { %>
-
-                                                                            <li class="nav-item">
-                                                                                <a href="/users?role=customer"
-                                                                                    class="nav-link">Customers</a>
-                                                                            </li>
-                                                                            <% } %>
-                                                                                <% if (permissions.usersList) { %>
-                                                                                    <li class="nav-item">
-                                                                                        <a href="/users?role=user"
-                                                                                            class="nav-link">Users</a>
-                                                                                    </li>
-                                                                                    <% } %>
-                                                                                        <% if (permissions.vendorsList)
-                                                                                            { %>
-                                                                                            <li class="nav-item">
-                                                                                                <a href="users?role=vendor"
-                                                                                                    class="nav-link">Vendors</a>
-                                                                                            </li>
-                                                                                            <% } %>
-                                                                    </ul>
-                                                                </div>
+                                                <li class="nav-item dropdown">
+                                                    <a class="nav-link menu-link" href="#sidebarStock"
+                                                        data-bs-toggle="collapse" role="button">
+                                                        <i class="las la-box"></i> <span>Stock</span>
+                                                    </a>
+                                                    <div class="collapse menu-dropdown" id="sidebarStock">
+                                                        <ul class="nav nav-sm flex-column">
+                                                            <li class="nav-item">
+                                                                <a href="/products/form" class="nav-link">New
+                                                                    Product</a>
                                                             </li>
-                                                            <% } %>
-                                                                <% if (permissions.salesList || permissions.salesList ||
-                                                                    permissions.salesCreate) { %>
+                                                            <li class="nav-item">
+                                                                <a href="/accounting/purchase/form"
+                                                                    class="nav-link">New
+                                                                    Purchase</a>
+                                                            </li>
+                                                            <li class="nav-item">
+                                                                <a href="/products"
+                                                                    class="nav-link">Products
+                                                                    List</a>
+                                                            </li>
+                                                            <li class="nav-item">
+                                                                <a href="/inventorylogs"
+                                                                    class="nav-link">Inventory
+                                                                    Logs</a>
+                                                            </li>
+                                                            <li class="nav-item">
+                                                                <a href="/brands"
+                                                                    class="nav-link">Brands</a>
+                                                            </li>
+                                                            <li class="nav-item">
+                                                                <a href="/categories"
+                                                                    class="nav-link">Categories</a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </li>
+                                                        <li class="nav-item dropdown">
+                                                            <a class="nav-link menu-link" href="#sidebarParties"
+                                                                data-bs-toggle="collapse" role="button">
+                                                                <i class="las la-users"></i> <span>Parties</span>
+                                                            </a>
+                                                            <div class="collapse menu-dropdown" id="sidebarParties">
+                                                                <ul class="nav nav-sm flex-column">
+                                                                    <li class="nav-item">
+                                                                        <a href="/users?role=customer"
+                                                                            class="nav-link">Customers</a>
+                                                                    </li>
+                                                                    <li class="nav-item">
+                                                                        <a href="/users?role=user"
+                                                                            class="nav-link">Users</a>
+                                                                    </li>
+                                                                    <li class="nav-item">
+                                                                        <a href="users?role=vendor"
+                                                                            class="nav-link">Vendors</a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </li>
                                                                     <li class="nav-item dropdown">
                                                                         <a class="nav-link menu-link"
                                                                             href="#sidebarSales"
@@ -462,30 +431,24 @@
                                                                         <div class="collapse menu-dropdown"
                                                                             id="sidebarSales">
                                                                             <ul class="nav nav-sm flex-column">
-                                                                                <% if (permissions.salesList) { %>
-                                                                                    <li class="nav-item">
-                                                                                        <a href="/sales"
-                                                                                            class="nav-link">POS
-                                                                                            Sales</a>
-                                                                                    </li>
-                                                                                    <% } %>
-                                                                                        <% if (permissions.salesCreate)
-                                                                                            { %>
-                                                                                            <li class="nav-item">
-                                                                                                <a href="/sales/form"
-                                                                                                    class="nav-link"
-                                                                                                    id="new-sale-menu-link">New
-                                                                                                    Sale</a>
-                                                                                            </li>
-                                                                                            <% } %>
-                                                                                                <li class="nav-item">
-                                                                                                    <a href="/sales/returns"
-                                                                                                        class="nav-link disabled">Returns</a>
-                                                                                                </li>
+                                                                                <li class="nav-item">
+                                                                                    <a href="/sales"
+                                                                                        class="nav-link">POS
+                                                                                        Sales</a>
+                                                                                </li>
+                                                                                <li class="nav-item">
+                                                                                    <a href="/sales/form"
+                                                                                        class="nav-link"
+                                                                                        id="new-sale-menu-link">New
+                                                                                        Sale</a>
+                                                                                </li>
+                                                                                <li class="nav-item">
+                                                                                    <a href="/sales/returns"
+                                                                                        class="nav-link disabled">Returns</a>
+                                                                                </li>
                                                                             </ul>
                                                                         </div>
                                                                     </li>
-                                                                    <% } %>
                                                                         <li class="nav-item dropdown">
                                                                             <a class="nav-link menu-link"
                                                                                 href="#sidebarAccounting"
@@ -507,22 +470,16 @@
                                                                                             class="nav-link disabled">Balance
                                                                                             Sheet</a>
                                                                                     </li>
-                                                                                    <% if (permissions.purchasesList) {
-                                                                                        %>
-                                                                                        <li class="nav-item">
-                                                                                            <a href="/accounting/purchase"
-                                                                                                class="nav-link">Purchases
-                                                                                                List</a>
-                                                                                        </li>
-                                                                                        <% } %>
-                                                                                        <% if (permissions.purchasesCreate) {
-                                                                                            %>
-                                                                                            <li class="nav-item">
-                                                                                                <a href="/accounting/purchase/form"
-                                                                                                    class="nav-link">New
-                                                                                                    Purchase</a>
-                                                                                            </li>
-                                                                                            <% } %>
+                                                                                    <li class="nav-item">
+                                                                                        <a href="/accounting/purchase"
+                                                                                            class="nav-link">Purchases
+                                                                                            List</a>
+                                                                                    </li>
+                                                                                    <li class="nav-item">
+                                                                                        <a href="/accounting/purchase/form"
+                                                                                            class="nav-link">New
+                                                                                            Purchase</a>
+                                                                                    </li>
                                                                                             <li class="nav-item">
                                                                                                 <a href="/inventorylogs"
                                                                                                     class="nav-link">Inventory
@@ -547,15 +504,10 @@
                                                                                                     Closing
                                                                                                     Report</a>
                                                                                             </li>
-                                                                                            <% if (permissions.taxesList
-                                                                                                ||
-                                                                                                permissions.taxesView) {
-                                                                                                %>
-                                                                                                <li class="nav-item">
-                                                                                                    <a href="/accounting/taxes"
-                                                                                                        class="nav-link">Taxes</a>
-                                                                                                </li>
-                                                                                                <% } %>
+                                                                                            <li class="nav-item">
+                                                                                                <a href="/accounting/taxes"
+                                                                                                    class="nav-link">Taxes</a>
+                                                                                            </li>
                                                                                 </ul>
                                                                             </div>
                                                                         </li>
@@ -601,12 +553,10 @@
                                                                             <div class="collapse menu-dropdown"
                                                                                 id="sidebarOthers">
                                                                                 <ul class="nav nav-sm flex-column">
-                                                                                    <% if (permissions.settings) { %>
-                                                                                        <li class="nav-item">
-                                                                                            <a href="/settings"
-                                                                                                class="nav-link">Settings</a>
-                                                                                        </li>
-                                                                                        <% } %>
+                                                                                    <li class="nav-item">
+                                                                                        <a href="/settings"
+                                                                                            class="nav-link">Settings</a>
+                                                                                    </li>
                                                                                             <li class="nav-item">
                                                                                                 <a href="/export-db"
                                                                                                     class="nav-link">Export
