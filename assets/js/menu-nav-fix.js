@@ -1,52 +1,50 @@
 /**
- * Fix for menu navigation bug where clicking links inside collapsed 
- * dropdown menus requires two clicks (first to open dropdown, second to navigate)
+ * Fix for menu navigation bug where clicking links in the navbar sometimes
+ * requires two clicks or behaves inconsistently due to conflicting event listeners.
  * 
- * This script ensures that clicks on links inside dropdown menus always navigate
- * immediately, even if the dropdown is currently collapsed.
- * 
- * REFACTOR: Uses event delegation to handle dynamically added elements.
- * REFACTOR 2: Uses capture phase and shows loader.
+ * This script ensures that clicks on valid navigation links (links with real URLs)
+ * always navigate immediately on the first click.
  */
 
-(function() {
+(function () {
     'use strict';
-    
-    // Use event delegation on the document body with CAPTURE phase to preempt other handlers
-    document.addEventListener('click', function(e) {
-        // Find the closest nav-link within a menu-dropdown or nav-item
-        const link = e.target.closest('.menu-dropdown .nav-link, .nav-item .nav-link');
-        
+
+    // Use capture phase to intercept the click before any other menu scripts
+    document.addEventListener('click', function (e) {
+        // Target any anchor link with an href inside the navbar
+        const link = e.target.closest('#navbar-nav a[href], .navbar-header a[href], .user-profile-menu a[href]');
+
         if (!link) return;
 
-        // Skip if disabled
-        if (link.classList.contains('disabled') || link.getAttribute('disabled')) return;
+        // Skip if it's a dropdown toggle (Bootstrap needs to handle these)
+        if (link.hasAttribute('data-bs-toggle') || link.classList.contains('dropdown-toggle')) {
+            return;
+        }
 
-        // Get the actual href
         const href = link.getAttribute('href');
-        
-        // If it's a valid navigation link (not a collapse toggle, not empty)
-        if (href && href !== '#' && !href.startsWith('#') && !link.hasAttribute('data-bs-toggle')) {
-            // Check if it's a real URL (not javascript:)
-            if (href.startsWith('javascript:')) return;
 
-            // Show loader for feedback
+        // Only handle real navigation URLs (skip hashes and javascript:)
+        if (href && href !== '#' && !href.startsWith('#') && !href.startsWith('javascript:')) {
+
+            // Skip if the link is disabled
+            if (link.classList.contains('disabled') || link.hasAttribute('disabled')) {
+                return;
+            }
+
+            // Optional: Show the global loader if it exists
             const loader = document.getElementById('global-loader');
-            if (window.showLoader && typeof window.showLoader === 'function') {
-                window.showLoader();
-            } else if (loader) {
-                // Fallback direct manipulation if function doesn't exist
+            if (loader) {
                 loader.style.display = 'flex';
                 loader.style.opacity = '1';
                 loader.style.visibility = 'visible';
             }
 
-            // Prevent other handlers (like sidebar collapse) from interfering
-            e.preventDefault(); 
+            // Stop other scripts from interfering and navigate immediately
+            e.preventDefault();
             e.stopPropagation();
 
-            // Allow the navigation to happen immediately
+            // Use window.location.href for immediate redirection
             window.location.href = href;
         }
-    }, true); // TRUE = Capture phase!
+    }, true); // TRUE: Capture phase is critical here
 })();

@@ -776,7 +776,8 @@
         const discountpercentage = document.getElementById(`discountpercentage-${tabId}`);
         const selectedProductsTable = document.getElementById(`selected-products-${tabId}`);
 
-        if (!productSearch) return;
+        if (!productSearch || productSearch.dataset.listenersAttached) return;
+        productSearch.dataset.listenersAttached = 'true';
 
         // Update placeholder based on radio button selection
         const searchManual = document.getElementById(`search-manual-${tabId}`);
@@ -894,15 +895,14 @@
                     return;
                 } else {
                     // Manual mode - add selected product from dropdown
-                    searchResults.classList.add('d-none');
-                    let _selectedProduct = allProducts.find(p => p.id === parseInt(tab.selectedProduct));
-                    if (_selectedProduct) {
-                        addProduct(_selectedProduct, tabId);
-                    } else {
-                        if (tab.previousEntry)
-                            addProduct(tab.previousEntry, tabId);
+                    const selectedItem = searchResults.querySelector('.search-result-product.selected');
+                    if (selectedItem) {
+                        selectedItem.click();
+                    } else if (tab.previousEntry) {
+                        addProduct(tab.previousEntry, tabId);
+                        productSearch.value = '';
                     }
-                    productSearch.value = '';
+
                     tab.selectedProduct = null;
                     setTimeout(() => productSearch.focus(), 100);
                 }
@@ -926,10 +926,19 @@
             searchResults.classList.remove('d-none');
             searchResults.innerHTML = '';
 
+            const tab = saleTabs.find(t => t.id === tabId);
             let filteredProds = products.filter(product => product.name.toLowerCase().includes(query.toLowerCase()));
-            filteredProds.forEach(product => {
+
+            filteredProds.forEach((product, index) => {
                 const productElement = document.createElement('div');
                 productElement.classList.add('search-result-product', 'p-2', 'd-flex', 'justify-content-between', 'align-items-center');
+
+                // Auto-select first item
+                if (index === 0) {
+                    productElement.classList.add('selected');
+                    tab.selectedProduct = product.id;
+                }
+
                 productElement.id = `product-${product.id}-${tabId}`;
                 productElement.style.cursor = 'pointer';
                 productElement.innerHTML = `
@@ -943,8 +952,7 @@
                     addProduct(product, tabId);
                     productSearch.value = '';
                     searchResults.classList.add('d-none');
-                    const tab = saleTabs.find(t => t.id === tabId);
-                    if (tab) tab.selectedProduct = null;
+                    tab.selectedProduct = null;
                     productSearch.focus();
                 });
                 searchResults.appendChild(productElement);
