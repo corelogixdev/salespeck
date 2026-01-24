@@ -199,7 +199,7 @@ exports.save = async (req, res) => {
     }
 
     if (id) {
-      delete data.quantity;
+      // delete data.quantity;
       await db.product.update(data, { where: { id } });
     } else {
       await db.product.create(data);

@@ -1,341 +1,347 @@
 <div class="row my-3">
-  <% if ((!dashboardConfig.todays_sales || dashboardConfig.todays_sales !== 'hidden')) { %>
-  <div class="col-lg-4">
-    <div class="card card-animate">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="flex-grow-1 overflow-hidden">
-            <p class="text-uppercase fw-medium text-muted text-truncate mb-0">
-              Today's Sales
-            </p>
+  <% if ((!dashboardConfig.todays_sales || dashboardConfig.todays_sales !=='hidden' )) { %>
+    <div class="col-lg-4">
+      <div class="card card-animate">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-grow-1 overflow-hidden">
+              <p class="text-uppercase fw-medium text-muted text-truncate mb-0">
+                Today's Sales
+              </p>
+            </div>
+            <div class="flex-shrink-0">
+              <% if (dashboardConfig.todays_sales==='partial' ) { %>
+                <h5 class="text-muted fs-14 mb-0">****</h5>
+                <% } else { %>
+                  <% if (salesArrowDirection==='up' ) { %>
+                    <h5 class="text-success fs-14 mb-0">
+                      <i class="ri-arrow-right-up-line fs-13 align-middle"></i>
+                      +<%= salesPercentageChange %> %
+                    </h5>
+                    <% } else { %>
+                      <h5 class="text-danger fs-14 mb-0">
+                        <i class="ri-arrow-right-down-line fs-13 align-middle"></i>
+                        <%= salesPercentageChange %> %
+                      </h5>
+                      <% } %>
+                        <% } %>
+            </div>
           </div>
-          <div class="flex-shrink-0">
-            <% if (dashboardConfig.todays_sales === 'partial') { %>
-              <h5 class="text-muted fs-14 mb-0">****</h5>
-            <% } else { %>
-              <% if (salesArrowDirection==='up' ) { %>
-                <h5 class="text-success fs-14 mb-0">
-                  <i class="ri-arrow-right-up-line fs-13 align-middle"></i>
-                  +<%= salesPercentageChange %> %
-                </h5>
-              <% } else { %>
-                <h5 class="text-danger fs-14 mb-0">
-                  <i class="ri-arrow-right-down-line fs-13 align-middle"></i>
-                  <%= salesPercentageChange %> %
-                </h5>
-              <% } %>
-            <% } %>
-          </div>
-        </div>
-        <div class="d-flex align-items-end justify-content-between mt-4">
-          <div>
-            <h4 class="fs-22 fw-semibold ff-secondary mb-4">
-              <% if (dashboardConfig.todays_sales === 'partial') { %>
-                Rs. ****
-              <% } else { %>
-                Rs.<span class="counter-value" data-target="<%= todaysSalesAmount %>">
-                  <%= todaysSalesAmount %>
-                </span>
-              <% } %>
-            </h4>
-            <a href="/sales?filter=today" class="text-decoration-underline text-muted">View Sales</a>
-          </div>
-          <div class="avatar-sm flex-shrink-0">
-            <span class="avatar-title bg-success-subtle rounded fs-3">
-              <span class="text-success fs-5">PKR</span>
-            </span>
-          </div>
-        </div>
-      </div><!-- end card body -->
-    </div><!-- end card -->
-  </div>
-  <% } %>
-
-  <% if ((!dashboardConfig.todays_customers || dashboardConfig.todays_customers !== 'hidden')) { %>
-  <div class="col-lg-4">
-    <div class="card card-animate">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="flex-grow-1 overflow-hidden">
-            <p class="text-uppercase fw-medium text-muted text-truncate mb-0">
-              Today's Customers
-            </p>
-          </div>
-          <div class="flex-shrink-0">
-            <% if (dashboardConfig.todays_customers === 'partial') { %>
-              <h5 class="text-muted fs-14 mb-0">****</h5>
-            <% } else { %>
-              <% if (customerArrowDirection==='up' ) { %>
-                <h5 class="text-success fs-14 mb-0">
-                  <i class="ri-arrow-right-up-line fs-13 align-middle"></i>
-                  +<%= customerPercentageChange %> %
-                </h5>
-              <% } else { %>
-                <h5 class="text-danger fs-14 mb-0">
-                  <i class="ri-arrow-right-down-line fs-13 align-middle"></i>
-                  <%= customerPercentageChange %> %
-                </h5>
-              <% } %>
-            <% } %>
-          </div>
-        </div>
-        <div class="d-flex align-items-end justify-content-between mt-4">
-          <div>
-            <h4 class="fs-22 fw-semibold ff-secondary mb-4">
-              <% if (dashboardConfig.todays_customers === 'partial') { %>
-                ****
-              <% } else { %>
-              <span class="counter-value" data-target="<%= todayCustomersCount %>">
-                <%= todayCustomersCount %>
+          <div class="d-flex align-items-end justify-content-between mt-4">
+            <div>
+              <h4 class="fs-22 fw-semibold ff-secondary mb-4">
+                <% if (dashboardConfig.todays_sales==='partial' ) { %>
+                  Rs. ****
+                  <% } else { %>
+                    Rs.<span class="counter-value" data-target="<%= todaysSalesAmount %>">
+                      <%= todaysSalesAmount %>
+                    </span>
+                    <% } %>
+              </h4>
+              <a href="/sales?filter=today" class="text-decoration-underline text-muted">View Sales</a>
+            </div>
+            <div class="avatar-sm flex-shrink-0">
+              <span class="avatar-title bg-success-subtle rounded fs-3">
+                <span class="text-success fs-5">PKR</span>
               </span>
-              <% } %>
-            </h4>
-            <a href="/users?role=customer&filter=today" class="text-decoration-underline text-muted">View Customers</a>
+            </div>
           </div>
-          <div class="avatar-sm flex-shrink-0">
-            <span class="avatar-title bg-success-subtle rounded fs-1">
-              <i class="bx bx-user-plus fs-3 text-success"></i>
-            </span>
-          </div>
-        </div>
-      </div>
+        </div><!-- end card body -->
+      </div><!-- end card -->
     </div>
-  </div>
-  <% } %>
+    <% } %>
 
-  <% if ((!dashboardConfig.last_30_days_sales || dashboardConfig.last_30_days_sales !== 'hidden')) { %>
-  <div class="col-lg-4">
-    <div class="card card-animate">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="flex-grow-1 overflow-hidden">
-            <p class="text-uppercase fw-medium text-muted text-truncate mb-0">
-              Last 30 Days Sales
-            </p>
+      <% if ((!dashboardConfig.todays_customers || dashboardConfig.todays_customers !=='hidden' )) { %>
+        <div class="col-lg-4">
+          <div class="card card-animate">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="flex-grow-1 overflow-hidden">
+                  <p class="text-uppercase fw-medium text-muted text-truncate mb-0">
+                    Today's Customers
+                  </p>
+                </div>
+                <div class="flex-shrink-0">
+                  <% if (dashboardConfig.todays_customers==='partial' ) { %>
+                    <h5 class="text-muted fs-14 mb-0">****</h5>
+                    <% } else { %>
+                      <% if (customerArrowDirection==='up' ) { %>
+                        <h5 class="text-success fs-14 mb-0">
+                          <i class="ri-arrow-right-up-line fs-13 align-middle"></i>
+                          +<%= customerPercentageChange %> %
+                        </h5>
+                        <% } else { %>
+                          <h5 class="text-danger fs-14 mb-0">
+                            <i class="ri-arrow-right-down-line fs-13 align-middle"></i>
+                            <%= customerPercentageChange %> %
+                          </h5>
+                          <% } %>
+                            <% } %>
+                </div>
+              </div>
+              <div class="d-flex align-items-end justify-content-between mt-4">
+                <div>
+                  <h4 class="fs-22 fw-semibold ff-secondary mb-4">
+                    <% if (dashboardConfig.todays_customers==='partial' ) { %>
+                      ****
+                      <% } else { %>
+                        <span class="counter-value" data-target="<%= todayCustomersCount %>">
+                          <%= todayCustomersCount %>
+                        </span>
+                        <% } %>
+                  </h4>
+                  <a href="/users?role=customer&filter=today" class="text-decoration-underline text-muted">View
+                    Customers</a>
+                </div>
+                <div class="avatar-sm flex-shrink-0">
+                  <span class="avatar-title bg-success-subtle rounded fs-1">
+                    <i class="bx bx-user-plus fs-3 text-success"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="d-flex align-items-end justify-content-between mt-4">
-          <div>
-            <h4 class="fs-22 fw-semibold ff-secondary mb-4">
-              <% if (dashboardConfig.last_30_days_sales === 'partial') { %>
-                ****
-              <% } else { %>
-              <span class="counter-value" data-target="<%= totalSalesCount %>">
-                <%- totalSalesCount %>
-              </span>
-              <% } %>
-            </h4>
-            <a href="/sales?filter=last30" class="text-decoration-underline text-muted">View Sales</a>
-          </div>
-          <div class="avatar-sm flex-shrink-0">
-            <span class="avatar-title bg-success-subtle rounded fs-3">
-              <i class="bx bx-cart fs-2 text-success"></i>
-            </span>
-          </div>
-        </div>
-      </div><!-- end card body -->
-    </div><!-- end card -->
-  </div>
-  <% } %>
+        <% } %>
+
+          <% if ((!dashboardConfig.last_30_days_sales || dashboardConfig.last_30_days_sales !=='hidden' )) { %>
+            <div class="col-lg-4">
+              <div class="card card-animate">
+                <div class="card-body">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-grow-1 overflow-hidden">
+                      <p class="text-uppercase fw-medium text-muted text-truncate mb-0">
+                        Last 30 Days Sales
+                      </p>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-end justify-content-between mt-4">
+                    <div>
+                      <h4 class="fs-22 fw-semibold ff-secondary mb-4">
+                        <% if (dashboardConfig.last_30_days_sales==='partial' ) { %>
+                          ****
+                          <% } else { %>
+                            <span class="counter-value" data-target="<%= totalSalesCount %>">
+                              <%- totalSalesCount %>
+                            </span>
+                            <% } %>
+                      </h4>
+                      <a href="/sales?filter=last30" class="text-decoration-underline text-muted">View Sales</a>
+                    </div>
+                    <div class="avatar-sm flex-shrink-0">
+                      <span class="avatar-title bg-success-subtle rounded fs-3">
+                        <i class="bx bx-cart fs-2 text-success"></i>
+                      </span>
+                    </div>
+                  </div>
+                </div><!-- end card body -->
+              </div><!-- end card -->
+            </div>
+            <% } %>
 
 </div>
 
 <!-- Weekly & Monthly Summary Cards -->
 <div class="row my-3">
-  <% if ((!dashboardConfig.weekly_summary || dashboardConfig.weekly_summary !== 'hidden')) { %>
-  <div class="col-lg-6">
-    <div class="card">
-      <div class="card-header">
-        <h5 class="card-title mb-0">Weekly Summary (Last 7 Days)</h5>
-      </div>
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="table table-borderless mb-0">
-            <tbody>
-              <tr>
-                <td class="text-muted">Total Orders:</td>
-                <td class="fw-medium text-end">
-                  <% if (dashboardConfig.weekly_summary === 'partial') { %>
-                    ****
-                  <% } else { %>
-                    <%= weeklySalesSummary.total_orders || 0 %>
-                  <% } %>
-                </td>
-              </tr>
-              <tr>
-                <td class="text-muted">Total Revenue:</td>
-                <td class="fw-medium text-end">
-                  <% if (dashboardConfig.weekly_summary === 'partial') { %>
-                    Rs. ****
-                  <% } else { %>
-                    Rs. <%= (weeklySalesSummary.total_revenue || 0).toFixed(2) %>
-                  <% } %>
-                </td>
-              </tr>
-              <tr>
-                <td class="text-muted">Avg Order Value:</td>
-                <td class="fw-medium text-end">
-                  <% if (dashboardConfig.weekly_summary === 'partial') { %>
-                    Rs. ****
-                  <% } else { %>
-                    Rs. <%= (weeklySalesSummary.avg_order_value || 0).toFixed(2) %>
-                  <% } %>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+  <% if ((!dashboardConfig.weekly_summary || dashboardConfig.weekly_summary !=='hidden' )) { %>
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Weekly Summary (Last 7 Days)</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-borderless mb-0">
+              <tbody>
+                <tr>
+                  <td class="text-muted">Total Orders:</td>
+                  <td class="fw-medium text-end">
+                    <% if (dashboardConfig.weekly_summary==='partial' ) { %>
+                      ****
+                      <% } else { %>
+                        <%= weeklySalesSummary.total_orders || 0 %>
+                          <% } %>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="text-muted">Total Revenue:</td>
+                  <td class="fw-medium text-end">
+                    <% if (dashboardConfig.weekly_summary==='partial' ) { %>
+                      Rs. ****
+                      <% } else { %>
+                        Rs. <%= (weeklySalesSummary.total_revenue || 0).toFixed(2) %>
+                          <% } %>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="text-muted">Avg Order Value:</td>
+                  <td class="fw-medium text-end">
+                    <% if (dashboardConfig.weekly_summary==='partial' ) { %>
+                      Rs. ****
+                      <% } else { %>
+                        Rs. <%= (weeklySalesSummary.avg_order_value || 0).toFixed(2) %>
+                          <% } %>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <% } %>
-  <% if ((!dashboardConfig.monthly_summary || dashboardConfig.monthly_summary !== 'hidden')) { %>
-  <div class="col-lg-6">
-    <div class="card">
-      <div class="card-header">
-        <h5 class="card-title mb-0">Monthly Summary (Last 30 Days)</h5>
-      </div>
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="table table-borderless mb-0">
-            <tbody>
-              <tr>
-                <td class="text-muted">Total Orders:</td>
-                <td class="fw-medium text-end">
-                  <% if (dashboardConfig.monthly_summary === 'partial') { %>
-                    ****
-                  <% } else { %>
-                    <%= monthlySalesSummary.total_orders || 0 %>
-                  <% } %>
-                </td>
-              </tr>
-              <tr>
-                <td class="text-muted">Total Revenue:</td>
-                <td class="fw-medium text-end">
-                  <% if (dashboardConfig.monthly_summary === 'partial') { %>
-                    Rs. ****
-                  <% } else { %>
-                    Rs. <%= (monthlySalesSummary.total_revenue || 0).toFixed(2) %>
-                  <% } %>
-                </td>
-              </tr>
-              <tr>
-                <td class="text-muted">Avg Order Value:</td>
-                <td class="fw-medium text-end">
-                  <% if (dashboardConfig.monthly_summary === 'partial') { %>
-                    Rs. ****
-                  <% } else { %>
-                    Rs. <%= (monthlySalesSummary.avg_order_value || 0).toFixed(2) %>
-                  <% } %>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+    <% } %>
+      <% if ((!dashboardConfig.monthly_summary || dashboardConfig.monthly_summary !=='hidden' )) { %>
+        <div class="col-lg-6">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">Monthly Summary (Last 30 Days)</h5>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-borderless mb-0">
+                  <tbody>
+                    <tr>
+                      <td class="text-muted">Total Orders:</td>
+                      <td class="fw-medium text-end">
+                        <% if (dashboardConfig.monthly_summary==='partial' ) { %>
+                          ****
+                          <% } else { %>
+                            <%= monthlySalesSummary.total_orders || 0 %>
+                              <% } %>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="text-muted">Total Revenue:</td>
+                      <td class="fw-medium text-end">
+                        <% if (dashboardConfig.monthly_summary==='partial' ) { %>
+                          Rs. ****
+                          <% } else { %>
+                            Rs. <%= (monthlySalesSummary.total_revenue || 0).toFixed(2) %>
+                              <% } %>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="text-muted">Avg Order Value:</td>
+                      <td class="fw-medium text-end">
+                        <% if (dashboardConfig.monthly_summary==='partial' ) { %>
+                          Rs. ****
+                          <% } else { %>
+                            Rs. <%= (monthlySalesSummary.avg_order_value || 0).toFixed(2) %>
+                              <% } %>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
-  <% } %>
+        <% } %>
 </div>
 <!-- Charts Row -->
 <div class="row">
-  <% if ((!dashboardConfig.sales_trend_chart || dashboardConfig.sales_trend_chart !== 'hidden')) { %>
-  <div class="col-lg-8">
-    <div class="card">
-      <div class="card-body">
-        <% if (dashboardConfig.sales_trend_chart === 'partial') { %>
-          <div class="d-flex align-items-center justify-content-center" style="height: 350px;">
-            <p class="text-muted">Chart hidden due to privacy settings</p>
-          </div>
-        <% } else { %>
-          <div id="salesTrendChart"></div>
-        <% } %>
+  <% if ((!dashboardConfig.sales_trend_chart || dashboardConfig.sales_trend_chart !=='hidden' )) { %>
+    <div class="col-lg-8">
+      <div class="card h-100">
+        <div class="card-body">
+          <% if (dashboardConfig.sales_trend_chart==='partial' ) { %>
+            <div class="d-flex align-items-center justify-content-center" style="height: 350px;">
+              <p class="text-muted">Chart hidden due to privacy settings</p>
+            </div>
+            <% } else { %>
+              <div id="salesTrendChart"></div>
+              <% } %>
+        </div>
       </div>
     </div>
-  </div>
-  <% } %>
-  <% if ((!dashboardConfig.top_products_chart || dashboardConfig.top_products_chart !== 'hidden')) { %>
-  <div class="col-lg-4">
-    <div class="card">
-      <div class="card-body">
-        <% if (dashboardConfig.top_products_chart === 'partial') { %>
-          <div class="d-flex align-items-center justify-content-center" style="height: 350px;">
-            <p class="text-muted">Chart hidden due to privacy settings</p>
+    <% } %>
+      <% if ((!dashboardConfig.top_products_chart || dashboardConfig.top_products_chart !=='hidden' )) { %>
+        <div class="col-lg-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <% if (dashboardConfig.top_products_chart==='partial' ) { %>
+                <div class="d-flex align-items-center justify-content-center" style="height: 350px;">
+                  <p class="text-muted">Chart hidden due to privacy settings</p>
+                </div>
+                <% } else { %>
+                  <div id="topProductsChart"></div>
+                  <% } %>
+            </div>
           </div>
-        <% } else { %>
-          <div id="topProductsChart"></div>
+        </div>
         <% } %>
-      </div>
-    </div>
-  </div>
-  <% } %>
 </div>
 
 <!-- Low Stock Products Table -->
 <div class="row">
-  <% if ((!dashboardConfig.low_stock_alert || dashboardConfig.low_stock_alert !== 'hidden')) { %>
-  <div class="col-lg-12">
-    <div class="card">
-      <div class="card-header">
-        <h5 class="card-title mb-0">
-          <i class="bx bx-error-circle text-warning"></i> Low Stock Alert
-        </h5>
-      </div>
-      <div class="card-body">
-        <% if (dashboardConfig.low_stock_alert === 'partial' && lowStockProducts && lowStockProducts.length > 0) { %>
-          <!-- Show generic alert or limited info -->
-           <div class="text-center text-muted py-3">
-            <i class="bx bx-error-circle fs-1 text-warning"></i>
-            <p class="mb-0">There are <%= lowStockProducts.length %> items with low stock.</p>
-          </div>
-        <% } else if (lowStockProducts && lowStockProducts.length > 0) { %>
-        <div class="table-responsive">
-          <table class="table table-hover table-striped align-middle mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>Product Name</th>
-                <th class="text-center">Current Stock</th>
-                <th class="text-end">Sale Price</th>
-                <th class="text-center">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% lowStockProducts.forEach(product => { %>
-              <tr>
-                <td><a href="/product/<%= product.id %>" class="text-decoration-none"><%= product.name %></a></td>
-                <td class="text-center">
-                  <span class="badge <%= product.quantity <= 5 ? 'bg-danger' : 'bg-warning' %>">
-                    <%= product.quantity %>
-                  </span>
-                </td>
-                <td class="text-end">Rs. <%= product.saleprice.toFixed(2) %></td>
-                <td class="text-center">
-                  <% if (product.quantity <= 5) { %>
-                    <span class="badge bg-danger">Critical</span>
-                  <% } else { %>
-                    <span class="badge bg-warning">Low</span>
-                  <% } %>
-                </td>
-              </tr>
-              <% }); %>
-            </tbody>
-          </table>
+  <% if ((!dashboardConfig.low_stock_alert || dashboardConfig.low_stock_alert !=='hidden' )) { %>
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="bx bx-error-circle text-warning"></i> Low Stock Alert
+          </h5>
         </div>
-        <% } else { %>
-        <div class="text-center text-muted py-3">
-          <i class="bx bx-check-circle fs-1 text-success"></i>
-          <p class="mb-0">All products are well stocked!</p>
+        <div class="card-body">
+          <% if (dashboardConfig.low_stock_alert==='partial' && lowStockProducts && lowStockProducts.length> 0) { %>
+            <!-- Show generic alert or limited info -->
+            <div class="text-center text-muted py-3">
+              <i class="bx bx-error-circle fs-1 text-warning"></i>
+              <p class="mb-0">There are <%= lowStockProducts.length %> items with low stock.</p>
+            </div>
+            <% } else if (lowStockProducts && lowStockProducts.length> 0) { %>
+              <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Product Name</th>
+                      <th class="text-center">Current Stock</th>
+                      <th class="text-end">Sale Price</th>
+                      <th class="text-center">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% lowStockProducts.forEach(product=> { %>
+                      <tr>
+                        <td><a href="/product/<%= product.id %>" class="text-decoration-none">
+                            <%= product.name %>
+                          </a></td>
+                        <td class="text-center">
+                          <span class="badge <%= product.quantity <= 5 ? 'bg-danger' : 'bg-warning' %>">
+                            <%= product.quantity %>
+                          </span>
+                        </td>
+                        <td class="text-end">Rs. <%= product.saleprice.toFixed(2) %>
+                        </td>
+                        <td class="text-center">
+                          <% if (product.quantity <=5) { %>
+                            <span class="badge bg-danger">Critical</span>
+                            <% } else { %>
+                              <span class="badge bg-warning">Low</span>
+                              <% } %>
+                        </td>
+                      </tr>
+                      <% }); %>
+                  </tbody>
+                </table>
+              </div>
+              <% } else { %>
+                <div class="text-center text-muted py-3">
+                  <i class="bx bx-check-circle fs-1 text-success"></i>
+                  <p class="mb-0">All products are well stocked!</p>
+                </div>
+                <% } %>
         </div>
-        <% } %>
       </div>
     </div>
-  </div>
-  <% } %>
+    <% } %>
 </div>
 
 <!-- Hidden data containers -->
-<div id="products-data" data-products='<%- JSON.stringify(topFiveSoldProductsWithSoldQuantity).replace(/'/g, "&#39;") %>' style="display: none;"></div>
-<div id="sales-data" data-sales='<%- JSON.stringify(salesCountByDay).replace(/'/g, "&#39;") %>' style="display: none;"></div>
+<div id="products-data" data-products='<%- JSON.stringify(topFiveSoldProductsWithSoldQuantity).replace(/' /g, "&#39;" )
+  %>' style="display: none;"></div>
+<div id="sales-data" data-sales='<%- JSON.stringify(salesCountByDay).replace(/' /g, "&#39;" ) %>' style="display:
+  none;"></div>
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
@@ -386,7 +392,7 @@
       },
       series: topProducts_chartData.data.length > 0 ? topProducts_chartData.data : [1],
       labels: topProducts_chartData.labels.length > 0 ? topProducts_chartData.labels : ['No Data'],
-      colors: ['#7084C7', '#4CAF50', '#FF9800', '#F44336', '#9C27B0'],
+      colors: ['#A9B5E1', '#8FD192', '#FFCC80', '#EF9A9A', '#CE93D8'],
       legend: {
         position: 'bottom'
       },
@@ -399,7 +405,7 @@
       },
       dataLabels: {
         enabled: true,
-        formatter: function(val, opts) {
+        formatter: function (val, opts) {
           return opts.w.config.series[opts.seriesIndex]
         }
       }
@@ -429,17 +435,23 @@
         type: 'area',
         data: salesTrend_chartData.revenues
       }],
+      plotOptions: {
+        bar: {
+          columnWidth: '10%',
+          borderRadius: 4
+        }
+      },
       xaxis: {
         categories: salesTrend_chartData.dates,
         labels: {
           rotate: -45,
           rotateAlways: true,
-          formatter: function(val) {
+          formatter: function (val) {
             if (!val) return '';
             // Format date as MM-DD
             const date = new Date(val);
             return (date.getMonth() + 1).toString().padStart(2, '0') + '-' +
-                   date.getDate().toString().padStart(2, '0');
+              date.getDate().toString().padStart(2, '0');
           }
         }
       },
@@ -448,7 +460,7 @@
           text: 'Orders'
         },
         labels: {
-          formatter: function(val) {
+          formatter: function (val) {
             return Math.round(val);
           }
         }
@@ -458,12 +470,12 @@
           text: 'Revenue (Rs.)'
         },
         labels: {
-          formatter: function(val) {
+          formatter: function (val) {
             return 'Rs. ' + val.toFixed(0);
           }
         }
       }],
-      colors: ['#7084C7', '#4CAF50'],
+      colors: ['#A9B5E1', '#4CAF50'],
       fill: {
         type: ['solid', 'gradient'],
         gradient: {
