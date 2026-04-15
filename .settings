@@ -1,9 +1,0 @@
-install_date=2026-01-22T15:23:13.303Z
-update_url=https://gitlab.com/api/v4/projects/62990895/packages/generic/openmenu/release
-CI_PROJECT_ID=62990895
-SERVER_IP=localhost
-port=5783
-logging=false
-logger=file
-env=development
-printer={"printer":"Default","paper":"58mm","width":58,"height":200,"fontSize":12,"silentPrinting":false,"numberOfPrints":1}
