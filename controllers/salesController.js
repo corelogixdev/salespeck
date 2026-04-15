@@ -24,9 +24,13 @@ exports.index = async (req, res) => {
   const limit = pageSize;
   const offset = (page - 1) * limit;
 
+  const sortBy = query.sortBy || 'createdAt';
+  const sortOrder = query.sortOrder || 'desc';
+  const allowedSortColumns = ['createdAt', 'discountpercentage', 'totalprice', 'totalpayment'];
+  const sortColumn = allowedSortColumns.includes(sortBy) ? sortBy : 'createdAt';
+  const sortDir = sortOrder.toLowerCase() === 'asc' ? 'ASC' : 'DESC';
+
   try {
-    // Optimized count query - use raw SQL for better performance
-    // Use COUNT(*) which is generally faster than COUNT(DISTINCT id) for primary keys
     let countQuery = 'SELECT COUNT(*) as count FROM sale s';
     const replacements = [];
     
@@ -55,9 +59,6 @@ exports.index = async (req, res) => {
       replacements.push(productId);
     }
     
-    // Build optimized sales query with raw SQL - much faster than Sequelize includes
-    // Get sales with pagination first, then fetch product names separately for only these sales
-    // SQL_CALC_FOUND_ROWS is deprecated in MySQL 8, so we use separate count query
     let salesQuery = `
       SELECT 
         s.id,
@@ -98,12 +99,11 @@ exports.index = async (req, res) => {
     
     salesQuery += `
       GROUP BY s.id, s.invoicenum, s.discountpercentage, s.totalprice, s.totalpayment, s.createdAt
-      ORDER BY s.createdAt DESC
+      ORDER BY s.${sortColumn} ${sortDir}
       LIMIT ? OFFSET ?
     `;
     salesReplacements.push(limit, offset);
     
-    // Parallelize count and sales queries
     const [countResult, salesResult] = await Promise.all([
       db.sequelize.query(countQuery, {
         replacements,
@@ -117,7 +117,6 @@ exports.index = async (req, res) => {
     
     const count = parseInt(countResult[0]?.count || 0);
     
-    // Fetch product names separately for only the paginated sales (much faster)
     let productNamesMap = {};
     if (salesResult.length > 0) {
       const saleIds = salesResult.map(s => s.id);
@@ -142,7 +141,6 @@ exports.index = async (req, res) => {
       });
     }
     
-    // Transform raw SQL results to match expected format
     const sales = salesResult.map(sale => ({
       id: sale.id,
       invoicenum: sale.invoicenum,
@@ -167,12 +165,40 @@ exports.index = async (req, res) => {
     res.render("sales/index", {
       sales,
       title: "Sales Report",
-      searchquery: { ...req.body, ...req.query },
-      pagination
+      query,
+      pagination,
+      sortBy,
+      sortOrder
     });
   } catch (error) {
     console.error("Error fetching sales:", error);
     res.status(500).send("Internal Server Error");
+  }
+};
+
+exports.getSale = async (req, res) => {
+  try {
+    const sale = await db.sale.findOne({
+      where: { id: req.params.id },
+      include: [
+        { model: db.user, as: "Customer", attributes: ["id", "firstname", "lastname", "phone"], required: false },
+        { model: db.user, as: "User", attributes: ["id", "firstname", "lastname"], required: false },
+        {
+          model: db.soldproducts,
+          as: "SoldPoducts",
+          include: [{ model: db.product, as: "Product", attributes: ["id", "name"] }]
+        }
+      ]
+    });
+
+    if (!sale) {
+      return res.status(404).json({ success: false, message: "Sale not found" });
+    }
+
+    res.json({ success: true, sale });
+  } catch (error) {
+    console.error("Error fetching sale:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
 

@@ -2,6 +2,7 @@ const router = require("express").Router();
 const controller = require("../controllers/purchaseController");
 
 router.get("/", controller.index);
+router.get("/api/:id", controller.getPurchase);
 router.get("/view/:id", controller.purchaseview);
 router.get("/details/:id", controller.purchaseDetails);
 router.post("/save", controller.save);

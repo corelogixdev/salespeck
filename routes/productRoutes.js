@@ -5,6 +5,7 @@ const { allowed } = require('../middleware/isAllowed.js');
 
 router.get('/', allowed(['productsList']), productController.index);
 router.post('/', allowed(['productsList']), productController.index); // for search
+router.get('/api/:id', allowed(['productsList', 'productsView']), productController.getProduct);
 router.post('/get', allowed(['productsList', 'productsView']), productController.get);
 router.get('/form', allowed(['productsCreate']), productController.form);
 router.post('/save', allowed(['productsCreate']), productController.save);

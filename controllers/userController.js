@@ -120,6 +120,24 @@ exports.form = async (req, res) => {
   res.render('users/form', { title: formTitle, data, role, groupedPermissions: {} });
 };
 
+exports.getUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await db.user.findByPk(id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    const data = user.toJSON();
+    if (data.password) {
+      data.password = encrypt.decrypt(data.password);
+    }
+    res.json({ success: true, user: data });
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+};
+
 exports.save = async (req, res) => {
   var { id, firstname, lastname, email, phone, username, role, password, address } = req.body;
   var password = password;

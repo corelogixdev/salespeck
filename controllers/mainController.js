@@ -4,6 +4,7 @@ const moment = require("moment");
 const logi = require("../utils/logi");
 const { Op } = require("sequelize");
 const config = require("../installEnv");
+const { getPaginationMeta, buildSortClause } = require('../utils/paginationHelper');
 
 const index = (req, res) => {
   if (!req.session.user_id) {
@@ -362,24 +363,63 @@ const exportDb = async (req, res) => {
 
 const inventorylogs = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const pageSize = parseInt(req.query.pageSize) || 25;
+    const query = req.query;
+    const page = parseInt(query.page) || 1;
+    const pageSize = parseInt(query.pageSize) || 25;
     const offset = (page - 1) * pageSize;
 
+    const sortBy = query.sortBy || 'createdAt';
+    const sortOrder = query.sortOrder || 'desc';
+    const order = buildSortClause(sortBy, sortOrder, 'createdAt');
+
+    const { dateRange, product, createdBy } = query;
+    let whereClause = {};
+    let includeOptions = [
+      {
+        model: db.product,
+        as: "Product",
+        attributes: ["id", "name"],
+        where: {},
+      },
+      {
+        model: db.user,
+        as: "User",
+        attributes: ["id", "firstname", "lastname"],
+        where: {},
+      },
+    ];
+
+    if (dateRange) {
+      const [startDate, endDate] = dateRange.split(" to ").map((date) => date.trim());
+      if (startDate && endDate) {
+        whereClause.createdAt = {
+          [Op.between]: [
+            moment(startDate).startOf("day").toDate(),
+            moment(endDate).endOf("day").toDate(),
+          ],
+        };
+      }
+    }
+
+    if (product) {
+      if (!isNaN(product)) {
+        includeOptions[0].where.id = product;
+      } else {
+        includeOptions[0].where.name = { [Op.like]: `%${product}%` };
+      }
+    }
+
+    if (createdBy) {
+      includeOptions[1].where[Op.or] = [
+        { firstname: { [Op.like]: `%${createdBy}%` } },
+        { lastname: { [Op.like]: `%${createdBy}%` } },
+      ];
+    }
+
     const { count, rows: logs } = await db.inventorylogs.findAndCountAll({
-      include: [
-        {
-          model: db.product,
-          as: "Product",
-          attributes: ["id", "name"],
-        },
-        {
-          model: db.user,
-          as: "User",
-          attributes: ["id", "firstname", "lastname"],
-        },
-      ],
-      order: [["createdAt", "DESC"]],
+      where: whereClause,
+      include: includeOptions,
+      order,
       limit: pageSize,
       offset: offset,
     });
@@ -393,17 +433,7 @@ const inventorylogs = async (req, res) => {
       };
     });
 
-    const totalPages = Math.ceil(count / pageSize);
-    const pagination = {
-      currentPage: page,
-      totalPages: totalPages,
-      pageSize: pageSize,
-      totalCount: count,
-      startRecord: offset + 1,
-      endRecord: Math.min(offset + pageSize, count),
-      hasPrevious: page > 1,
-      hasNext: page < totalPages,
-    };
+    const pagination = getPaginationMeta(page, pageSize, count);
 
     if (req.query.partial) {
         return res.render("inventory_logs/_table_rows", {
@@ -416,7 +446,9 @@ const inventorylogs = async (req, res) => {
       inventoryLogs: processedLogs,
       searchParams: {},
       pagination,
-      query: req.query,
+      query,
+      sortBy,
+      sortOrder,
     });
   } catch (error) {
     console.error("Error fetching inventory logs:", error);

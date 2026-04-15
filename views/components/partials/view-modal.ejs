@@ -1,0 +1,52 @@
+<div class="modal fade" id="<%= id %>" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-gradient-info text-white">
+        <h5 class="modal-title"><i class="ri-eye-line me-2"></i><%= typeof title !== 'undefined' ? title : 'Details' %></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="view-modal-body" id="<%= id %>Body">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .view-modal-body .row {
+    margin-bottom: 0.75rem;
+  }
+  .view-modal-body .label {
+    font-weight: 600;
+    color: var(--vz-gray-600);
+    font-size: 0.875rem;
+  }
+  .view-modal-body .value {
+    color: var(--vz-body-color);
+    font-size: 0.9375rem;
+  }
+</style>
+
+<script>
+  (function() {
+    if (window.renderViewModal) return;
+    window.renderViewModal = function(modalId, fields) {
+      const container = document.getElementById(modalId + 'Body');
+      if (!container) return;
+      let html = '<div class="row gy-3">';
+      fields.forEach(function(field) {
+        html += '<div class="col-md-6">' +
+                '<div class="label">' + (field.label || '') + '</div>' +
+                '<div class="value">' + (field.value || '-') + '</div>' +
+                '</div>';
+      });
+      html += '</div>';
+      container.innerHTML = html;
+    };
+  })();
+</script>

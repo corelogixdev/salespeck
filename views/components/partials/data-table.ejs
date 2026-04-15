@@ -1,21 +1,22 @@
-<% /** * Reusable Data Table Component * * Usage: * <%-
-include('../components/partials/data-table', { * columns: [ * { key: 'name',
-label: 'Name', sortable: true }, * { key: 'description', label: 'Description',
-sortable: false }, * { key: 'status', label: 'Status', type: 'badge', sortable:
-true } * ], * data: brands, * actions: [ * { label: 'Edit', icon:
-'ri-pencil-fill', class: 'btn-warning', onclick: 'editRecord' }, * { label:
-'Delete', icon: 'ri-delete-bin-fill', class: 'btn-danger', onclick:
-'deleteRecord' } * ], * sortBy: req.query.sortBy, * sortOrder:
-req.query.sortOrder, * baseUrl: '/brands' * }) %> */ const currentSort = typeof
-sortBy !== 'undefined' ? sortBy : ''; const currentOrder = typeof sortOrder !==
-'undefined' ? sortOrder : 'asc'; function getSortUrl(column) { const params =
-new URLSearchParams(typeof query !== 'undefined' ? query : {}); if (currentSort
-=== column && currentOrder === 'asc') { params.set('sortOrder', 'desc'); } else
-{ params.set('sortOrder', 'asc'); } params.set('sortBy', column);
-params.delete('page'); // Reset to first page when sorting return
-`${baseUrl}?${params.toString()}`; } function getSortIcon(column) { if
-(currentSort !== column) return 'ri-arrow-up-down-line'; return currentOrder ===
-'asc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'; } %>
+<%
+const currentSort = typeof sortBy !== 'undefined' ? sortBy : '';
+const currentOrder = typeof sortOrder !== 'undefined' ? sortOrder : 'asc';
+function getSortUrl(column) {
+  const params = new URLSearchParams(typeof query !== 'undefined' ? query : {});
+  if (currentSort === column && currentOrder === 'asc') {
+    params.set('sortOrder', 'desc');
+  } else {
+    params.set('sortOrder', 'asc');
+  }
+  params.set('sortBy', column);
+  params.delete('page'); // Reset to first page when sorting
+  return `${baseUrl}?${params.toString()}`;
+}
+function getSortIcon(column) {
+  if (currentSort !== column) return 'ri-arrow-up-down-line';
+  return currentOrder === 'asc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line';
+}
+%>
 
 <div class="table-responsive">
   <table class="table table-striped table-hover align-middle mb-0 data-table">
@@ -30,7 +31,7 @@ params.delete('page'); // Reset to first page when sorting return
           </a>
           <% } else { %> <%= col.label %> <% } %>
         </th>
-        <% }) %> <% if (actions && actions.length> 0) { %>
+        <% }) %> <% if (typeof actions !== 'undefined' && actions && actions.length > 0) { %>
         <th scope="col" class="text-end">Actions</th>
         <% } %>
       </tr>
@@ -39,7 +40,7 @@ params.delete('page'); // Reset to first page when sorting return
       <% if (!data || data.length===0) { %>
       <tr>
         <td
-          colspan="<%= columns.length + (actions && actions.length > 0 ? 1 : 0) %>"
+          colspan="<%= columns.length + (typeof actions !== 'undefined' && actions && actions.length > 0 ? 1 : 0) %>"
           class="text-center py-4"
         >
           <div class="empty-state">
@@ -60,20 +61,27 @@ params.delete('page'); // Reset to first page when sorting return
           <% } else if (col.render) { %> <%- col.render(row) %> <% } else { %>
           <%= row[col.key] || '-' %> <% } %>
         </td>
-        <% }) %> <% if (actions && actions.length> 0) { %>
+        <% }) %> <% if (typeof actions !== 'undefined' && actions && actions.length > 0) { %>
         <td class="text-end">
-          <div class="btn-group btn-group-sm" role="group">
-            <% actions.forEach(action=> { %> <% const rowId=row.id ||
-            row[action.idKey || 'id' ]; %>
-            <button
-              type="button"
-              class="btn <%= action.class %> action-btn"
-              data-action="<%= action.onclick %>"
-              data-row-id="<%= rowId %>"
-              title="<%= action.label %>"
-            >
-              <i class="<%= action.icon %>"></i>
-            </button>
+          <div class="btn-group btn-group-sm action-group" role="group">
+            <% actions.forEach(action => { %> <% const rowId = row.id || row[action.idKey || 'id']; %>
+              <% if (action.type === 'view') { %>
+                <button type="button" class="btn <%= action.class || 'btn-soft-info' %> action-btn" onclick="openViewModal('<%= rowId %>')" title="<%= action.label || 'View' %>">
+                  <i class="<%= action.icon || 'ri-eye-line' %>"></i>
+                </button>
+              <% } else if (action.type === 'edit') { %>
+                <button type="button" class="btn <%= action.class || 'btn-soft-warning' %> action-btn" onclick="openEditModal('<%= rowId %>')" title="<%= action.label || 'Edit' %>">
+                  <i class="<%= action.icon || 'ri-pencil-fill' %>"></i>
+                </button>
+              <% } else if (action.type === 'delete') { %>
+                <button type="button" class="btn <%= action.class || 'btn-soft-danger' %> action-btn" onclick="deleteRecord('<%= rowId %>')" title="<%= action.label || 'Delete' %>">
+                  <i class="<%= action.icon || 'ri-delete-bin-fill' %>"></i>
+                </button>
+              <% } else { %>
+                <button type="button" class="btn <%= action.class %> action-btn" data-action="<%= action.onclick %>" data-row-id="<%= rowId %>" title="<%= action.label %>">
+                  <i class="<%= action.icon %>"></i>
+                </button>
+              <% } %>
             <% }) %>
           </div>
         </td>

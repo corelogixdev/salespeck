@@ -1,20 +1,14 @@
-<% /** * Reusable Filter Section Component * * Usage: * <%- include('../components/partials/filter-section', { *
-    filters: [ * { name: 'name' , label: 'Name' , type: 'text' , placeholder: 'Search by name...' }, * { name: 'status'
-    , label: 'Status' , type: 'select' , options: [{value: 'true' , label: 'Active' }, {value: 'false' ,
-    label: 'Inactive' }] }, * { name: 'date_from' , label: 'From Date' , type: 'date' } * ], * values: req.query, *
-    action: '/brands' * }) %>
-    */
+<% const filterValues = values || {}; %>
 
-    const filterValues = values || {};
-    %>
-
-    <div class="filter-section">
-        <form id="filterForm" method="GET" action="<%= action %>" class="row g-3">
-            <% filters.forEach(filter=> {
-                const value = filterValues[filter.name] || '';
-                %>
+<div class="filter-section">
+    <form id="filterForm" method="GET" action="<%= action %>" class="row g-3">
+        <% filters.forEach(filter => {
+            const value = filterValues[filter.name] || '';
+            if (filter.type === 'hidden') { %>
+                <input type="hidden" id="<%= filter.name %>" name="<%= filter.name %>" value="<%= value %>">
+            <% } else { %>
                 <div class="col-lg-<%= filter.colSize || 3 %>">
-                    <% if (filter.type==='text' ) { %>
+                    <% if (filter.type === 'text') { %>
                         <div class="search-box">
                             <label for="<%= filter.name %>" class="form-label">
                                 <%= filter.label %>
@@ -23,133 +17,279 @@
                                 placeholder="<%= filter.placeholder || filter.label %>" value="<%= value %>">
                             <i class="<%= filter.icon || 'ri-search-line' %> search-icon"></i>
                         </div>
-                        <% } else if (filter.type==='select' ) { %>
-                            <div class="form-group">
-                                <label for="<%= filter.name %>" class="form-label">
-                                    <%= filter.label %>
-                                </label>
-                                <select class="form-select" id="<%= filter.name %>" name="<%= filter.name %>">
-                                    <option value="">All</option>
-                                    <% (filter.options || []).forEach(opt=> { %>
-                                        <option value="<%= opt.value %>" <%=value==opt.value ? 'selected' : '' %>>
-                                            <%= opt.label %>
-                                        </option>
-                                        <% }) %>
-                                </select>
+                    <% } else if (filter.type === 'select') { %>
+                        <div class="form-group">
+                            <label for="<%= filter.name %>" class="form-label">
+                                <%= filter.label %>
+                            </label>
+                            <select class="form-select" id="<%= filter.name %>" name="<%= filter.name %>">
+                                <option value="">All</option>
+                                <% (filter.options || []).forEach(opt => { %>
+                                    <option value="<%= opt.value %>" <%= value == opt.value ? 'selected' : '' %>>
+                                        <%= opt.label %>
+                                    </option>
+                                <% }) %>
+                            </select>
+                        </div>
+                    <% } else if (filter.type === 'toggle') { %>
+                        <div class="form-group">
+                            <label class="form-label"><%= filter.label %></label>
+                            <div class="btn-group filter-toggle-group w-100" role="group" data-input="<%= filter.name %>">
+                                <button type="button" class="btn btn-sm <%= !value ? 'btn-primary active' : 'btn-light' %>" data-value="">
+                                    All
+                                </button>
+                                <% (filter.options || []).forEach(opt => { %>
+                                    <button type="button" class="btn btn-sm <%= value == opt.value ? 'btn-primary active' : 'btn-light' %>" data-value="<%= opt.value %>">
+                                        <%= opt.label %>
+                                    </button>
+                                <% }) %>
                             </div>
-                            <% } else if (filter.type==='date' ) { %>
-                                <div class="form-group">
-                                    <label for="<%= filter.name %>" class="form-label">
-                                        <%= filter.label %>
-                                    </label>
-                                    <input type="date" class="form-control" id="<%= filter.name %>"
-                                        name="<%= filter.name %>" value="<%= value %>">
-                                </div>
-                                <% } else if (filter.type==='number' ) { %>
-                                    <div class="form-group">
-                                        <label for="<%= filter.name %>" class="form-label">
-                                            <%= filter.label %>
-                                        </label>
-                                        <input type="number" class="form-control" id="<%= filter.name %>"
-                                            name="<%= filter.name %>"
-                                            placeholder="<%= filter.placeholder || filter.label %>" value="<%= value %>"
-                                            <%=filter.min !==undefined ? `min="${filter.min}" ` : '' %>
-                                        <%= filter.max !==undefined ? `max="${filter.max}" ` : '' %>>
-                                    </div>
-                                    <% } %>
+                            <input type="hidden" id="<%= filter.name %>" name="<%= filter.name %>" value="<%= value %>">
+                        </div>
+                    <% } else if (filter.type === 'date') { %>
+                        <div class="form-group">
+                            <label for="<%= filter.name %>" class="form-label">
+                                <%= filter.label %>
+                            </label>
+                            <input type="date" class="form-control" id="<%= filter.name %>"
+                                name="<%= filter.name %>" value="<%= value %>">
+                        </div>
+                    <% } else if (filter.type === 'number') { %>
+                        <div class="form-group">
+                            <label for="<%= filter.name %>" class="form-label">
+                                <%= filter.label %>
+                            </label>
+                            <input type="number" class="form-control" id="<%= filter.name %>"
+                                name="<%= filter.name %>"
+                                placeholder="<%= filter.placeholder || filter.label %>" value="<%= value %>"
+                                <%= filter.min !== undefined ? `min="${filter.min}"` : '' %>
+                                <%= filter.max !== undefined ? `max="${filter.max}"` : '' %>>
+                        </div>
+                    <% } else if (filter.type === 'range') { %>
+                        <div class="form-group">
+                            <label class="form-label"><%= filter.label %></label>
+                            <div class="input-group range-input-group">
+                                <input type="number" class="form-control" id="<%= filter.names[0] %>"
+                                    name="<%= filter.names[0] %>"
+                                    placeholder="<%= filter.placeholders ? filter.placeholders[0] : 'Min' %>"
+                                    value="<%= filterValues[filter.names[0]] || '' %>">
+                                <span class="input-group-text">–</span>
+                                <input type="number" class="form-control" id="<%= filter.names[1] %>"
+                                    name="<%= filter.names[1] %>"
+                                    placeholder="<%= filter.placeholders ? filter.placeholders[1] : 'Max' %>"
+                                    value="<%= filterValues[filter.names[1]] || '' %>">
+                            </div>
+                        </div>
+                    <% } else if (filter.type === 'daterange') { %>
+                        <div class="search-box">
+                            <label for="<%= filter.name %>" class="form-label">
+                                <%= filter.label %>
+                            </label>
+                            <input type="text" class="form-control flatpickr-range" data-provider="flatpickr" data-range="true" data-date-format="Y-m-d"
+                                id="<%= filter.name %>" name="<%= filter.name %>"
+                                placeholder="<%= filter.placeholder || filter.label %>" value="<%= value %>">
+                            <i class="<%= filter.icon || 'ri-calendar-2-line' %> search-icon"></i>
+                        </div>
+                    <% } %>
                 </div>
-                <% }) %>
+            <% }
+        }) %>
 
-                    <!-- Action Buttons -->
-                    <div class="col-lg-<%= filters.length > 3 ? 12 : 3 %> d-flex align-items-end gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="ri-search-line me-1"></i> Search
-                        </button>
-                        <% const hasActiveFilters=Object.keys(filterValues).some(key=>
-                            filterValues[key] && key !== 'page' && key !== 'pageSize'
-                            );
-                            if (hasActiveFilters) { %>
-                            <a href="<%= action %>" class="btn btn-danger">
-                                <i class="ri-close-line me-1"></i> Clear
-                            </a>
-                            <% } %>
-                    </div>
-        </form>
-    </div>
+        <!-- Action Buttons -->
+        <div class="col-lg-<%= typeof buttonColSize !== 'undefined' ? buttonColSize : (filters.length > 3 ? 12 : 3) %> d-flex align-items-end gap-2">
+            <button type="submit" class="btn btn-primary">
+                <i class="ri-search-line me-1"></i> Search
+            </button>
+            <% const hasActiveFilters = Object.keys(filterValues).some(key =>
+                filterValues[key] && key !== 'page' && key !== 'pageSize'
+            );
+            if (hasActiveFilters) { %>
+                <a href="<%= action %>" class="btn btn-danger">
+                    <i class="ri-close-line me-1"></i> Clear
+                </a>
+            <% } %>
+        </div>
+    </form>
+</div>
 
-    <style>
-        .filter-section {
-            background: var(--vz-card-bg-custom);
-            padding: 1.25rem;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--vz-border-color);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
+<style>
+    .filter-section {
+        background: var(--vz-card-bg-custom);
+        padding: 1.25rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--vz-border-color);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
 
-        [data-layout-mode="dark"] .filter-section {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
-            border-color: rgba(102, 126, 234, 0.2);
-        }
+    [data-layout-mode="dark"] .filter-section {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+        border-color: rgba(102, 126, 234, 0.2);
+    }
 
-        .filter-section .form-label {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--vz-body-color);
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+    .filter-section .form-label {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--vz-body-color);
+        margin-bottom: 0.35rem;
+        opacity: 0.85;
+    }
 
-        .filter-section .search-box {
-            position: relative;
-        }
+    .filter-section .search-box {
+        position: relative;
+    }
 
-        .filter-section .search-box .search-icon {
-            position: absolute;
-            right: 12px;
-            bottom: 10px;
-            font-size: 18px;
-            color: var(--vz-gray-600);
-            pointer-events: none;
-        }
+    .filter-section .search-box input {
+        padding-right: 2.5rem;
+    }
 
-        .filter-section .form-control,
-        .filter-section .form-select {
-            border-radius: 8px;
-            border-color: var(--vz-border-color);
-            transition: all 0.2s ease;
-        }
+    .filter-section .search-box .search-icon {
+        position: absolute;
+        right: 12px;
+        top: calc(50% + 0.75rem);
+        transform: translateY(-50%);
+        font-size: 16px;
+        color: var(--vz-gray-600);
+        pointer-events: none;
+    }
 
-        .filter-section .form-control:focus,
-        .filter-section .form-select:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.15rem rgba(102, 126, 234, 0.15);
-        }
+    .filter-section .form-control,
+    .filter-section .form-select,
+    .filter-section .input-group-text {
+        border-radius: 8px;
+        border-color: var(--vz-border-color);
+        transition: all 0.2s ease;
+        font-size: 0.875rem;
+    }
 
-        .filter-section .btn {
-            border-radius: 8px;
-            padding: 0.5rem 1.25rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
+    .filter-section .form-control:focus,
+    .filter-section .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.15rem rgba(102, 126, 234, 0.15);
+    }
 
-        .filter-section .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-        }
+    .filter-section .range-input-group .form-control {
+        border-radius: 8px;
+    }
 
-        .filter-section .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-        }
+    .filter-section .range-input-group .form-control:first-child {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
 
-        .filter-section .btn-danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-        }
+    .filter-section .range-input-group .form-control:last-child {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
 
-        [data-layout-mode="dark"] .filter-section .btn-primary {
-            background: linear-gradient(135deg, #90caf9 0%, #ce93d8 100%);
-        }
-    </style>
+    .filter-section .range-input-group .input-group-text {
+        background: var(--vz-input-bg);
+        border-left: none;
+        border-right: none;
+        border-radius: 0;
+        padding: 0 0.5rem;
+        font-size: 0.875rem;
+        color: var(--vz-gray-500);
+    }
+
+    .filter-section .btn {
+        border-radius: 8px;
+        padding: 0.5rem 1.25rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .filter-section .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+    }
+
+    .filter-section .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .filter-section .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+
+    .filter-section .filter-toggle-group .btn {
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        padding: 0.45rem 0.6rem;
+        border: 1px solid var(--vz-border-color);
+        color: var(--vz-body-color);
+        flex: 1 1 auto;
+        white-space: nowrap;
+    }
+
+    .filter-section .filter-toggle-group .btn:not(:last-child) {
+        margin-right: 0.35rem;
+    }
+
+    .filter-section .filter-toggle-group .btn-light {
+        background: var(--vz-input-bg);
+    }
+
+    .filter-section .filter-toggle-group .btn-light:hover {
+        background: rgba(102, 126, 234, 0.08);
+        border-color: rgba(102, 126, 234, 0.3);
+    }
+
+    .filter-section .filter-toggle-group .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: transparent;
+        color: #fff;
+    }
+
+    .filter-section .filter-toggle-group .btn-primary:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    [data-layout-mode="dark"] .filter-section .filter-toggle-group .btn-light {
+        background: rgba(255,255,255,0.05);
+        border-color: rgba(255,255,255,0.1);
+        color: var(--vz-body-color);
+    }
+
+    [data-layout-mode="dark"] .filter-section .filter-toggle-group .btn-light:hover {
+        background: rgba(102, 126, 234, 0.15);
+        border-color: rgba(102, 126, 234, 0.3);
+    }
+
+    [data-layout-mode="dark"] .filter-section .filter-toggle-group .btn-primary {
+        background: linear-gradient(135deg, #90caf9 0%, #ce93d8 100%);
+        color: #1e1f24;
+    }
+
+    [data-layout-mode="dark"] .filter-section .btn-primary {
+        background: linear-gradient(135deg, #90caf9 0%, #ce93d8 100%);
+    }
+</style>
+
+<script>
+    (function() {
+        if (window.filterToggleInitialized) return;
+        window.filterToggleInitialized = true;
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.filter-toggle-group .btn');
+            if (!btn) return;
+            const group = btn.closest('.filter-toggle-group');
+            if (!group) return;
+            const inputId = group.getAttribute('data-input');
+            const input = document.getElementById(inputId);
+            if (!input) return;
+
+            group.querySelectorAll('.btn').forEach(function(b) {
+                b.classList.remove('btn-primary', 'active');
+                b.classList.add('btn-light');
+            });
+            btn.classList.remove('btn-light');
+            btn.classList.add('btn-primary', 'active');
+            input.value = btn.getAttribute('data-value');
+        });
+    })();
+</script>

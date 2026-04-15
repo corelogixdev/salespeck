@@ -1,391 +1,593 @@
-<div class="row">
-  <div class="col-lg-12">
-    <div class="card">
-      <div class="card-header align-items-center d-flex">
-        <h4 class="card-title mb-0 flex-grow-1">
-          <%= title %>
-        </h4>
-        <div class="d-flex gap-2">
-          <button onclick="window.location.reload()" class="btn btn-soft-success btn-sm" title="Refresh">
-            <i class="ri-refresh-line align-middle"></i> Refresh
-          </button>
-        </div>
+<div class="card">
+  <div class="card-header align-items-center d-flex">
+    <h4 class="card-title mb-0 flex-grow-1">
+      <%= title %>
+    </h4>
+    <div class="d-flex gap-2 align-items-center">
+      <button class="btn btn-soft-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#productFilters" aria-expanded="false" aria-controls="productFilters">
+        <i class="ri-filter-3-line align-bottom me-1"></i> Filters
+      </button>
+      <button onclick="window.location.reload()" class="btn btn-soft-success btn-sm" title="Refresh">
+        <i class="ri-refresh-line align-middle"></i> Refresh
+      </button>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <div class="collapse mb-3" id="productFilters">
+      <%
+        const categoryOptions = categories.map(c => ({ value: c.id, label: c.name }));
+        const brandOptions = brands.map(b => ({ value: b.id, label: b.name }));
+      %>
+      <%- include('../components/partials/filter-section', {
+        filters: [
+          { name: 'name', label: 'Product Name', type: 'text', placeholder: 'Search by name...', icon: 'ri-search-line', colSize: 2 },
+          { name: 'barcode', label: 'Barcode', type: 'text', placeholder: 'Barcode...', icon: 'ri-barcode-line', colSize: 2 },
+          { name: 'category', label: 'Category', type: 'select', options: categoryOptions, colSize: 2 },
+          { name: 'brand', label: 'Brand', type: 'select', options: brandOptions, colSize: 2 },
+          { name: 'stock_status', label: 'Stock Status', type: 'toggle', options: [
+            { value: 'in_stock', label: 'In Stock' },
+            { value: 'low_stock', label: 'Low Stock' },
+            { value: 'out_of_stock', label: 'Out of Stock' }
+          ], colSize: 3 },
+          { label: 'Price Range', type: 'range', names: ['price_min', 'price_max'], placeholders: ['Min', 'Max'], colSize: 2 },
+          { name: 'sale_active', label: 'Sale Active', type: 'toggle', options: [{ value: '1', label: 'Yes' }, { value: '0', label: 'No' }], colSize: 2 },
+          { name: 'purchase_active', label: 'Purchase Active', type: 'toggle', options: [{ value: '1', label: 'Yes' }, { value: '0', label: 'No' }], colSize: 2 }
+        ],
+        values: query,
+        action: '/products',
+        buttonColSize: 2
+      }) %>
+    </div>
+
+    <%
+      const brandMap = {};
+      brands.forEach(b => brandMap[b.id] = b.name);
+      const categoryMap = {};
+      categories.forEach(c => categoryMap[c.id] = c.name);
+
+      const tableColumns = [
+        { key: 'barcode', label: 'Barcode', sortable: true },
+        { key: 'name', label: 'Name', sortable: true, render: (row) => `<h6 class="fs-14 mb-0">${row.name}</h6>` },
+        { key: 'category', label: 'Category', sortable: true, render: (row) => categoryMap[row.category] || '-' },
+        { key: 'discount', label: 'Discount', sortable: true, render: (row) => `${row.discount || 0}%` },
+        { key: 'purchaseprice', label: 'Purchase Price', sortable: true, render: (row) => typeof row.purchaseprice === 'number' ? row.purchaseprice.toFixed(2) : row.purchaseprice },
+        { key: 'purchaseactive', label: 'Purchase Active', sortable: true, render: (row) => row.purchaseactive ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>' },
+        { 
+          key: 'quantity', 
+          label: 'Quantity', 
+          sortable: true, 
+          render: (row) => {
+            let badge = '';
+            if (row.quantity === 0) badge = '<span class="badge bg-danger">Out of Stock</span>';
+            else if (row.quantity < 10) badge = `<span class="badge bg-warning">${row.quantity} (Low)</span>`;
+            else badge = `<span class="badge bg-success">${row.quantity}</span>`;
+            return badge + ` <button type="button" class="btn btn-sm btn-ghost-primary waves-effect waves-light p-0 ms-1" onclick="updateQuantity('${row.id}', '${row.name.replace(/'/g, "\\'")}', '${row.quantity}')" title="Add Quantity"><i class="ri-add-circle-line fs-16 align-middle"></i></button>`;
+          }
+        },
+        { key: 'saleprice', label: 'Sale Price', sortable: true, render: (row) => typeof row.saleprice === 'number' ? row.saleprice.toFixed(2) : row.saleprice },
+        { key: 'saleactive', label: 'Sale Active', sortable: true, render: (row) => row.saleactive ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>' },
+        {
+          key: 'actions',
+          label: 'Actions',
+          sortable: false,
+          class: 'text-end',
+          render: (row) => {
+            return `<div class="btn-group btn-group-sm action-group" role="group">
+              <button type="button" class="btn btn-soft-info action-btn" onclick="openViewModal('${row.id}')" title="View"><i class="ri-eye-line"></i></button>
+              <button type="button" class="btn btn-soft-warning action-btn" onclick="openEditModal('${row.id}')" title="Edit"><i class="ri-pencil-fill"></i></button>
+              <button type="button" class="btn btn-soft-danger action-btn" onclick="deleteRecord('${row.id}')" title="Delete"><i class="ri-delete-bin-fill"></i></button>
+            </div>`;
+          }
+        }
+      ];
+    %>
+
+    <%- include('../components/partials/data-table', {
+      columns: tableColumns,
+      data: data,
+      sortBy: sortBy,
+      sortOrder: sortOrder,
+      baseUrl: '/products',
+      query: query
+    }) %>
+
+    <%- include('../components/partials/pagination', {
+      pagination: pagination,
+      baseUrl: '/products',
+      query: query
+    }) %>
+  </div>
+</div>
+
+<% if (permissions.productsCreate) { %>
+<%- include('../components/partials/floating-action-btn', {
+  targetModal: '#addProductModal',
+  icon: 'ri-add-line',
+  tooltip: 'New Product',
+  colorClass: 'btn-primary',
+  show: true
+}) %>
+<% } %>
+
+<!-- Add Product Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-gradient-primary text-white">
+        <h5 class="modal-title">Create Product</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="card-body">
-        <!-- Comprehensive Filter Section -->
-        <div class="filter-section">
-          <form id="filterForm" method="GET" action="/products">
-            <div class="row g-3">
-              <!-- Product Name with Debounce -->
-              <div class="col-lg-3">
-                <div class="search-box">
-                  <label for="name" class="form-label">Product Name</label>
-                  <input type="text" class="form-control" id="name" name="name" placeholder="Search by name..."
-                    value="<%= query.name || '' %>">
-                  <i class="ri-search-line search-icon"></i>
-                </div>
-              </div>
-
-              <!-- Barcode -->
-              <div class="col-lg-2">
-                <div class="form-group">
-                  <label for="barcode" class="form-label">Barcode</label>
-                  <input type="text" class="form-control" id="barcode" name="barcode" placeholder="Barcode"
-                    value="<%= query.barcode || '' %>">
-                </div>
-              </div>
-
-              <!-- Category -->
-              <div class="col-lg-2">
-                <div class="form-group">
-                  <label for="category" class="form-label">Category</label>
-                  <select class="form-select" id="category" name="category">
-                    <option value="">All</option>
-                    <% categories.forEach(cat=> { %>
-                      <option value="<%= cat.category %>" <%=query.category===cat.category ? 'selected' : '' %>>
-                        <%= cat.name %>
-                      </option>
-                      <% }) %>
-                  </select>
-                </div>
-              </div>
-
-              <!-- Brand -->
-              <div class="col-lg-2">
-                <div class="form-group">
-                  <label for="brand" class="form-label">Brand</label>
-                  <select class="form-select" id="brand" name="brand">
-                    <option value="">All</option>
-                    <% brands.forEach(b=> { %>
-                      <option value="<%= b.brand %>" <%=query.brand===b.brand ? 'selected' : '' %>>
-                        <%= b.name %>
-                      </option>
-                      <% }) %>
-                  </select>
-                </div>
-              </div>
-
-              <!-- Stock Status -->
-              <div class="col-lg-3">
-                <div class="form-group">
-                  <label for="stock_status" class="form-label">Stock Status</label>
-                  <select class="form-select" id="stock_status" name="stock_status">
-                    <option value="">All</option>
-                    <option value="in_stock" <%=query.stock_status==='in_stock' ? 'selected' : '' %>>In Stock (≥10)
-                    </option>
-                    <option value="low_stock" <%=query.stock_status==='low_stock' ? 'selected' : '' %>>Low Stock (1-9)
-                    </option>
-                    <option value="out_of_stock" <%=query.stock_status==='out_of_stock' ? 'selected' : '' %>>Out of
-                      Stock</option>
-                  </select>
-                </div>
-              </div>
-
-              <!-- Price Range -->
-              <div class="col-lg-2">
-                <div class="form-group">
-                  <label for="price_min" class="form-label">Min Price</label>
-                  <input type="number" class="form-control" id="price_min" name="price_min" placeholder="Min"
-                    value="<%= query.price_min || '' %>" min="0">
-                </div>
-              </div>
-
-              <div class="col-lg-2">
-                <div class="form-group">
-                  <label for="price_max" class="form-label">Max Price</label>
-                  <input type="number" class="form-control" id="price_max" name="price_max" placeholder="Max"
-                    value="<%= query.price_max || '' %>" min="0">
-                </div>
-              </div>
-
-              <!-- Sale Active -->
-              <div class="col-lg-2">
-                <div class="form-group">
-                  <label for="sale_active" class="form-label">Sale Active</label>
-                  <select class="form-select" id="sale_active" name="sale_active">
-                    <option value="">All</option>
-                    <option value="1" <%=query.sale_active==='1' ? 'selected' : '' %>>Yes</option>
-                    <option value="0" <%=query.sale_active==='0' ? 'selected' : '' %>>No</option>
-                  </select>
-                </div>
-              </div>
-
-              <!-- Purchase Active -->
-              <div class="col-lg-2">
-                <div class="form-group">
-                  <label for="purchase_active" class="form-label">Purchase Active</label>
-                  <select class="form-select" id="purchase_active" name="purchase_active">
-                    <option value="">All</option>
-                    <option value="1" <%=query.purchase_active==='1' ? 'selected' : '' %>>Yes</option>
-                    <option value="0" <%=query.purchase_active==='0' ? 'selected' : '' %>>No</option>
-                  </select>
-                </div>
-              </div>
-
-              <!-- Action Buttons -->
-              <div class="col-lg-4 d-flex align-items-end gap-2">
-                <button type="submit" class="btn btn-primary">
-                  <i class="ri-search-line me-1"></i> Search
-                </button>
-                <% if (Object.keys(query).some(key=> query[key] && key !== 'page' && key !== 'pageSize' && key !==
-                  'sortBy' && key !== 'sortOrder')) { %>
-                  <a href="/products" class="btn btn-danger">
-                    <i class="ri-close-line me-1"></i> Clear
-                  </a>
-                  <% } %>
+      <div class="modal-body">
+        <form id="addProductForm" class="needs-validation" novalidate>
+          <div class="row gy-3">
+            <div class="col-md-6">
+              <label for="addName" class="form-label">Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="addName" name="name" required>
+            </div>
+            <div class="col-md-6">
+              <label for="addBarcode" class="form-label">Barcode</label>
+              <div class="input-group">
+                <input type="text" class="form-control" id="addBarcode" name="barcode" placeholder="Scan or enter barcode">
+                <button class="btn btn-outline-secondary" type="button" id="addBarcodeManual">Manual</button>
+                <button class="btn btn-outline-primary active" type="button" id="addBarcodeScan">Barcode</button>
               </div>
             </div>
-          </form>
-        </div>
-
-        <!-- Data Table -->
-        <div class="table-responsive">
-          <table class="table table-striped table-nowrap align-middle mb-0">
-            <thead class="table-light">
-              <tr>
-                <th scope="col">Barcode</th>
-                <th scope="col">Name</th>
-                <th scope="col">Category</th>
-                <th scope="col">Discount</th>
-                <th scope="col">Purchase Price</th>
-                <th scope="col">Purchase Active</th>
-                <th scope="col">Quantity</th>
-                <th scope="col">Sale Price</th>
-                <th scope="col">Sale Active</th>
-                <th scope="col" style="text-align: end;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <%- include('_table_rows') %>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Pagination -->
-        <!-- Enhanced Pagination -->
-        <% if (pagination && pagination.totalPages > 0) { %>
-          <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-3">
-            <!-- Records Info -->
-            <div class="text-muted">
-              Showing <strong><%= pagination.startRecord %></strong> to 
-              <strong><%= pagination.endRecord %></strong> of 
-              <strong><%= pagination.totalCount %></strong> entries
-            </div>
-
-            <!-- Page Size Selector -->
-            <div class="d-flex align-items-center gap-2">
-              <label for="pageSize" class="text-muted mb-0">Show:</label>
-              <select id="pageSize" class="form-select form-select-sm" style="width: 80px;"
-                onchange="window.handlePageSizeChange(this, '/products?<%= new URLSearchParams({...query, page: 1}).toString() %>', <%= pagination.totalCount %>)">
-                <option value="10" <%= (pagination.pageSize || 10) == 10 ? 'selected' : '' %>>10</option>
-                <option value="25" <%= (pagination.pageSize || 10) == 25 ? 'selected' : '' %>>25</option>
-                <option value="50" <%= (pagination.pageSize || 10) == 50 ? 'selected' : '' %>>50</option>
-                <option value="100" <%= (pagination.pageSize || 10) == 100 ? 'selected' : '' %>>100</option>
-                <option value="200" <%= (pagination.pageSize || 10) == 200 ? 'selected' : '' %>>200</option>
-                <option value="500" <%= (pagination.pageSize || 10) == 500 ? 'selected' : '' %>>500</option>
-                <option value="1000" <%= (pagination.pageSize || 10) == 1000 ? 'selected' : '' %>>1000</option>
-                <option value="9999" <%= (pagination.pageSize || 10) == 9999 ? 'selected' : '' %>>All</option>
+            <div class="col-md-6">
+              <label for="addTaxid" class="form-label">Tax Type</label>
+              <select class="form-select" id="addTaxid" name="taxid">
+                <option value="">Select Tax Type</option>
+                <% taxes.forEach(tax => { %>
+                  <option value="<%= tax.id %>"><%= tax.name.toUpperCase() %> (<%= tax.percentage %>%)</option>
+                <% }); %>
               </select>
             </div>
-
-            <!-- Pagination Controls -->
-            <% if (pagination.totalPages > 1) { %>
-              <nav aria-label="Page navigation">
-                <ul class="pagination mb-0">
-                  <!-- First Page -->
-                  <li class="page-item <%= pagination.currentPage === 1 ? 'disabled' : '' %>">
-                    <a class="page-link" href="<%= pagination.currentPage === 1 ? '#' : '/products?' + new URLSearchParams(Object.assign({}, query, {page: 1})).toString() %>" title="First">
-                      <i class="ri-arrow-left-double-line"></i>
-                    </a>
-                  </li>
-
-                  <!-- Previous Page -->
-                  <li class="page-item <%= pagination.currentPage === 1 ? 'disabled' : '' %>">
-                    <a class="page-link" href="<%= pagination.currentPage === 1 ? '#' : '/products?' + new URLSearchParams(Object.assign({}, query, {page: pagination.currentPage - 1})).toString() %>" title="Previous">
-                      <i class="mdi mdi-chevron-left"></i>
-                    </a>
-                  </li>
-
-                  <!-- Page Numbers -->
-                  <% for(let i = 1; i <= pagination.totalPages; i++) { %>
-                    <% if (i === 1 || i === pagination.totalPages || (i >= pagination.currentPage - 1 && i <= pagination.currentPage + 1)) { %>
-                      <li class="page-item <%= i === pagination.currentPage ? 'active' : '' %>">
-                        <a class="page-link" href="/products?<%= new URLSearchParams(Object.assign({}, query, {page: i})).toString() %>">
-                          <%= i %>
-                        </a>
-                      </li>
-                    <% } else if (i === 2 || i === pagination.totalPages - 1) { %>
-                      <li class="page-item disabled"><a class="page-link">...</a></li>
-                    <% } %>
-                  <% } %>
-
-                  <!-- Next Page -->
-                  <li class="page-item <%= pagination.currentPage === pagination.totalPages ? 'disabled' : '' %>">
-                    <a class="page-link" href="<%= pagination.currentPage === pagination.totalPages ? '#' : '/products?' + new URLSearchParams(Object.assign({}, query, {page: pagination.currentPage + 1})).toString() %>" title="Next">
-                      <i class="mdi mdi-chevron-right"></i>
-                    </a>
-                  </li>
-
-                  <!-- Last Page -->
-                  <li class="page-item <%= pagination.currentPage === pagination.totalPages ? 'disabled' : '' %>">
-                    <a class="page-link" href="<%= pagination.currentPage === pagination.totalPages ? '#' : '/products?' + new URLSearchParams(Object.assign({}, query, {page: pagination.totalPages})).toString() %>" title="Last">
-                      <i class="ri-arrow-right-double-line"></i>
-                    </a>
-                  </li>
-                </ul>
-              </nav>
-            <% } %>
+            <div class="col-md-6">
+              <label for="addCategory" class="form-label">Category</label>
+              <select class="form-select" id="addCategory" name="category">
+                <option value="">Select Category</option>
+                <% categories.forEach(cat => { %>
+                  <option value="<%= cat.id %>"><%= cat.name %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="addBrand" class="form-label">Brand</label>
+              <select class="form-select" id="addBrand" name="brand">
+                <option value="">Select Brand</option>
+                <% brands.forEach(brand => { %>
+                  <option value="<%= brand.id %>"><%= brand.name %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="addCarrycost" class="form-label">Carry Cost</label>
+              <input type="number" step="0.01" class="form-control" id="addCarrycost" name="carrycost">
+            </div>
+            <div class="col-md-6">
+              <label for="addDiscount" class="form-label">Discount</label>
+              <input type="number" step="0.01" class="form-control" id="addDiscount" name="discount">
+            </div>
+            <div class="col-md-6">
+              <label for="addPurchaseprice" class="form-label">Purchase Price</label>
+              <input type="number" step="0.01" class="form-control" id="addPurchaseprice" name="purchaseprice">
+            </div>
+            <div class="col-md-6">
+              <label for="addQuantity" class="form-label">Quantity</label>
+              <input type="number" step="0.01" class="form-control" id="addQuantity" name="quantity">
+            </div>
+            <div class="col-md-6">
+              <label for="addSaleprice" class="form-label">Sale Price</label>
+              <input type="number" step="0.01" class="form-control" id="addSaleprice" name="saleprice">
+            </div>
+            <div class="col-md-12">
+              <div class="d-flex gap-4 align-items-center mt-2">
+                <div class="form-check form-switch">
+                  <input type="checkbox" class="form-check-input" id="addSaleactive" name="saleactive" checked>
+                  <label class="form-check-label" for="addSaleactive">Sale Active</label>
+                </div>
+                <div class="form-check form-switch">
+                  <input type="checkbox" class="form-check-input" id="addPurchaseactive" name="purchaseactive" checked>
+                  <label class="form-check-label" for="addPurchaseactive">Purchase Active</label>
+                </div>
+              </div>
+            </div>
           </div>
-        <% } %>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="saveProduct()">Save Product</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Product Modal -->
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-gradient-warning text-white">
+        <h5 class="modal-title">Edit Product</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editProductForm" class="needs-validation" novalidate>
+          <input type="hidden" id="editProductId" name="id">
+          <div class="row gy-3">
+            <div class="col-md-6">
+              <label for="editName" class="form-label">Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="editName" name="name" required>
+            </div>
+            <div class="col-md-6">
+              <label for="editBarcode" class="form-label">Barcode</label>
+              <div class="input-group">
+                <input type="text" class="form-control" id="editBarcode" name="barcode" placeholder="Scan or enter barcode">
+                <button class="btn btn-outline-secondary" type="button" id="editBarcodeManual">Manual</button>
+                <button class="btn btn-outline-primary active" type="button" id="editBarcodeScan">Barcode</button>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="editTaxid" class="form-label">Tax Type</label>
+              <select class="form-select" id="editTaxid" name="taxid">
+                <option value="">Select Tax Type</option>
+                <% taxes.forEach(tax => { %>
+                  <option value="<%= tax.id %>"><%= tax.name.toUpperCase() %> (<%= tax.percentage %>%)</option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="editCategory" class="form-label">Category</label>
+              <select class="form-select" id="editCategory" name="category">
+                <option value="">Select Category</option>
+                <% categories.forEach(cat => { %>
+                  <option value="<%= cat.id %>"><%= cat.name %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="editBrand" class="form-label">Brand</label>
+              <select class="form-select" id="editBrand" name="brand">
+                <option value="">Select Brand</option>
+                <% brands.forEach(brand => { %>
+                  <option value="<%= brand.id %>"><%= brand.name %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="editCarrycost" class="form-label">Carry Cost</label>
+              <input type="number" step="0.01" class="form-control" id="editCarrycost" name="carrycost">
+            </div>
+            <div class="col-md-6">
+              <label for="editDiscount" class="form-label">Discount</label>
+              <input type="number" step="0.01" class="form-control" id="editDiscount" name="discount">
+            </div>
+            <div class="col-md-6">
+              <label for="editPurchaseprice" class="form-label">Purchase Price</label>
+              <input type="number" step="0.01" class="form-control" id="editPurchaseprice" name="purchaseprice">
+            </div>
+            <div class="col-md-6">
+              <label for="editQuantity" class="form-label">Quantity</label>
+              <input type="number" step="0.01" class="form-control" id="editQuantity" name="quantity">
+            </div>
+            <div class="col-md-6">
+              <label for="editSaleprice" class="form-label">Sale Price</label>
+              <input type="number" step="0.01" class="form-control" id="editSaleprice" name="saleprice">
+            </div>
+            <div class="col-md-12">
+              <div class="d-flex gap-4 align-items-center mt-2">
+                <div class="form-check form-switch">
+                  <input type="checkbox" class="form-check-input" id="editSaleactive" name="saleactive">
+                  <label class="form-check-label" for="editSaleactive">Sale Active</label>
+                </div>
+                <div class="form-check form-switch">
+                  <input type="checkbox" class="form-check-input" id="editPurchaseactive" name="purchaseactive">
+                  <label class="form-check-label" for="editPurchaseactive">Purchase Active</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-warning" onclick="updateProduct()">Update Product</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View Modal -->
+<%- include('../components/partials/view-modal', {
+  id: 'viewProductModal',
+  title: 'Product Details'
+}) %>
+
+<!-- Quantity Update Modal -->
+<div class="modal fade" id="quantityModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-gradient-info text-white">
+        <h5 class="modal-title">Update Product Quantity</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="quantityForm" class="needs-validation" novalidate>
+          <input type="hidden" id="quantityProductId" name="id">
+          <div class="row gy-3">
+            <div class="col-md-6">
+              <label for="quantityProductName" class="form-label">Product Name</label>
+              <input type="text" class="form-control" id="quantityProductName" name="name" readonly>
+            </div>
+            <div class="col-md-6">
+              <label for="quantityCurrent" class="form-label">Current Quantity</label>
+              <input type="number" step="0.01" class="form-control" id="quantityCurrent" name="currentQuantity">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Adjustment Type</label>
+              <div class="btn-group w-100" role="group" id="quantityTypeGroup">
+                <button type="button" class="btn btn-sm btn-primary active" data-value="increase" id="qtyTypeIncrease">Increase</button>
+                <button type="button" class="btn btn-sm btn-light" data-value="decrease" id="qtyTypeDecrease">Decrease</button>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="quantityAdjust" class="form-label">Quantity to Adjust <span class="text-danger">*</span></label>
+              <input type="number" step="0.01" class="form-control" id="quantityAdjust" name="quantity" min="0" required>
+              <div class="invalid-feedback">Please enter a valid quantity.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="quantityExpiry" class="form-label">Expiry Date</label>
+              <input type="date" class="form-control" id="quantityExpiry" name="expirydate" min="<%= new Date().toISOString().split('T')[0] %>">
+            </div>
+            <div class="col-md-12">
+              <label for="quantityNote" class="form-label">Note <span class="text-danger">*</span></label>
+              <textarea class="form-control" id="quantityNote" name="note" rows="3" required placeholder="Enter a note for this quantity change"></textarea>
+              <div class="invalid-feedback">Please enter a note.</div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="saveQuantity()">Save Changes</button>
       </div>
     </div>
   </div>
 </div>
 
 <style>
-  .filter-section {
-    background: var(--vz-card-bg-custom);
-    padding: 1.25rem;
-    border-radius: 12px;
-    margin-bottom: 1.5rem;
-    border: 1px solid var(--vz-border-color);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  }
-
-  [data-layout-mode="dark"] .filter-section {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
-    border-color: rgba(102, 126, 234, 0.2);
-  }
-
-  .filter-section .form-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--vz-body-color);
-    margin-bottom: 0.5rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .filter-section .search-box {
-    position: relative;
-  }
-
-  .filter-section .search-box .form-label {
-    display: block;
-    margin-bottom: 0.5rem;
-  }
-
-  .filter-section .search-box .form-control {
-    padding-right: 40px;
-  }
-
-  .filter-section .search-box .search-icon {
-    position: absolute;
-    right: 12px;
-    top: calc(1.5rem + 0.5rem + 1.25rem);
-    transform: translateY(-50%);
-    font-size: 18px;
-    color: var(--vz-gray-600);
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .filter-section .form-control,
-  .filter-section .form-select {
-    border-radius: 8px;
-    border-color: var(--vz-border-color);
-    transition: all 0.2s ease;
-  }
-
-  .filter-section .form-control:focus,
-  .filter-section .form-select:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.15rem rgba(102, 126, 234, 0.15);
-  }
-
-  .filter-section .btn {
-    border-radius: 8px;
-    padding: 0.5rem 1.25rem;
-    font-weight: 600;
-    transition: all 0.2s ease;
-  }
-
-  .filter-section .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  .btn-ghost-primary {
+    color: #667eea;
+    background: transparent;
     border: none;
   }
-
-  .filter-section .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-  }
-
-  .filter-section .btn-danger:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-  }
-
-  [data-layout-mode="dark"] .filter-section .btn-primary {
-    background: linear-gradient(135deg, #90caf9 0%, #ce93d8 100%);
-  }
-
-  .limit-text {
-    max-width: 150px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  tr[data-bg] td {
-    background-color: inherit !important;
+  .btn-ghost-primary:hover {
+    color: #764ba2;
+    background: rgba(102, 126, 234, 0.1);
   }
 </style>
 
 <script>
-  let debounceTimer;
+  function setupBarcodeToggle(prefix) {
+    const manualBtn = document.getElementById(prefix + 'BarcodeManual');
+    const scanBtn = document.getElementById(prefix + 'BarcodeScan');
+    const input = document.getElementById(prefix + 'Barcode');
 
-  // Debounced search on product name
-  document.getElementById('name').addEventListener('input', function () {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      document.getElementById('filterForm').submit();
-    }, 500); // 500ms delay
-  });
+    manualBtn.addEventListener('click', () => {
+      manualBtn.classList.add('active');
+      scanBtn.classList.remove('active');
+      input.placeholder = 'Enter barcode manually';
+    });
+    scanBtn.addEventListener('click', () => {
+      scanBtn.classList.add('active');
+      manualBtn.classList.remove('active');
+      input.placeholder = 'Scan or enter barcode';
+    });
+  }
 
-  // Apply color coding based on stock
-  $(document).ready(function () {
-    $('tr').each(function () {
-      const qtyCell = $(this).find('td').eq(6); // Quantity column
-      if (qtyCell.length) {
-        const qty = parseInt(qtyCell.text());
-        if (qty === 0) {
-          $(this).css('background-color', 'var(--vz-danger-bg-subtle)');
-        } else if (qty < 10) {
-          $(this).css('background-color', 'var(--vz-warning-bg-subtle)');
+  document.addEventListener('DOMContentLoaded', () => {
+    setupBarcodeToggle('add');
+    setupBarcodeToggle('edit');
+
+    // Stock color coding
+    document.querySelectorAll('.data-table tbody tr').forEach(row => {
+      const qtyCell = row.querySelector('td:nth-child(7)');
+      if (qtyCell) {
+        const text = qtyCell.textContent.trim();
+        const qty = parseFloat(text);
+        if (!isNaN(qty)) {
+          if (qty === 0) row.style.backgroundColor = 'var(--vz-danger-bg-subtle)';
+          else if (qty < 10) row.style.backgroundColor = 'var(--vz-warning-bg-subtle)';
         }
       }
     });
   });
 
-  // Action functions
-  function increaseQty(id) {
-    window.location.href = `/products/quantity/form/${id}?type=increase`;
+  function updateQuantity(id, name, quantity) {
+    document.getElementById('quantityProductId').value = id;
+    document.getElementById('quantityProductName').value = name;
+    document.getElementById('quantityCurrent').value = quantity;
+    document.getElementById('quantityAdjust').value = '';
+    document.getElementById('quantityExpiry').value = '';
+    document.getElementById('quantityNote').value = '';
+    // Default to increase
+    document.getElementById('qtyTypeIncrease').classList.add('btn-primary', 'active');
+    document.getElementById('qtyTypeIncrease').classList.remove('btn-light');
+    document.getElementById('qtyTypeDecrease').classList.remove('btn-primary', 'active');
+    document.getElementById('qtyTypeDecrease').classList.add('btn-light');
+
+    const modal = new bootstrap.Modal(document.getElementById('quantityModal'));
+    modal.show();
   }
 
-  function reduceQty(id) {
-    window.location.href = `/products/quantity/form/${id}?type=decrease`;
+  document.getElementById('qtyTypeIncrease').addEventListener('click', function () {
+    this.classList.add('btn-primary', 'active');
+    this.classList.remove('btn-light');
+    document.getElementById('qtyTypeDecrease').classList.remove('btn-primary', 'active');
+    document.getElementById('qtyTypeDecrease').classList.add('btn-light');
+  });
+  document.getElementById('qtyTypeDecrease').addEventListener('click', function () {
+    this.classList.add('btn-primary', 'active');
+    this.classList.remove('btn-light');
+    document.getElementById('qtyTypeIncrease').classList.remove('btn-primary', 'active');
+    document.getElementById('qtyTypeIncrease').classList.add('btn-light');
+  });
+
+  function saveQuantity() {
+    const form = document.getElementById('quantityForm');
+    if (!form.checkValidity()) {
+      form.classList.add('was-validated');
+      return;
+    }
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    data.quantity = parseFloat(data.quantity) || 0;
+    const isDecrease = document.getElementById('qtyTypeDecrease').classList.contains('active');
+    if (isDecrease && data.quantity > 0) {
+      data.quantity = data.quantity * -1;
+    }
+    data.currentQuantity = parseFloat(data.currentQuantity) || 0;
+
+    fetch('/products/quantity/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(result => {
+      if (result.success) {
+        toastr.success(result.message || 'Quantity updated successfully');
+        const modal = bootstrap.Modal.getInstance(document.getElementById('quantityModal'));
+        if (modal) modal.hide();
+        setTimeout(() => window.location.reload(), 800);
+      } else {
+        toastr.error(result.message || 'Error updating quantity');
+      }
+    })
+    .catch(e => { console.error(e); toastr.error('Failed to update quantity'); });
   }
 
-  function viewLogs(id) {
-    window.location.href = `/inventorylogs/${id}`;
+  function validateForm(formId) {
+    const form = document.getElementById(formId);
+    if (!form.checkValidity()) {
+      form.classList.add('was-validated');
+      return null;
+    }
+    const name = form.querySelector('[name="name"]').value;
+    if (name.length < 2) {
+      toastr.error('Product name must be at least 2 characters');
+      return null;
+    }
+    const data = {};
+    new FormData(form).forEach((value, key) => {
+      data[key] = value;
+    });
+    data.saleactive = form.querySelector('[name="saleactive"]').checked ? 'on' : 'off';
+    data.purchaseactive = form.querySelector('[name="purchaseactive"]').checked ? 'on' : 'off';
+    // Ensure numeric fields are sent as numbers when possible
+    ['carrycost', 'discount', 'purchaseprice', 'quantity', 'saleprice'].forEach(k => {
+      if (data[k] !== undefined && data[k] !== '') data[k] = parseFloat(data[k]);
+    });
+    return data;
   }
 
-  function editProduct(id) {
-    window.location.href = `/products/form?id=${id}`;
+  function saveProduct() {
+    const data = validateForm('addProductForm');
+    if (!data) return;
+    fetch('/products/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(result => {
+      if (result.success) {
+        toastr.success(result.message);
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
+        if (modal) modal.hide();
+        setTimeout(() => window.location.reload(), 800);
+      } else {
+        toastr.error(result.message || 'Error saving product');
+      }
+    })
+    .catch(e => { console.error(e); toastr.error('Failed to save product'); });
   }
 
-  async function deleteProduct(id) {
-    $.alert({
+  function openEditModal(id) {
+    fetch('/products/api/' + id)
+      .then(r => r.json())
+      .then(result => {
+        if (!result.success) return toastr.error('Failed to load product');
+        const p = result.product;
+        document.getElementById('editProductId').value = p.id;
+        document.getElementById('editName').value = p.name || '';
+        document.getElementById('editBarcode').value = p.barcode || '';
+        document.getElementById('editTaxid').value = p.taxid || '';
+        document.getElementById('editCategory').value = p.category || '';
+        document.getElementById('editBrand').value = p.brand || '';
+        document.getElementById('editCarrycost').value = p.carrycost || '';
+        document.getElementById('editDiscount').value = p.discount || '';
+        document.getElementById('editPurchaseprice').value = p.purchaseprice || '';
+        document.getElementById('editQuantity').value = p.quantity || '';
+        document.getElementById('editSaleprice').value = p.saleprice || '';
+        document.getElementById('editSaleactive').checked = p.saleactive;
+        document.getElementById('editPurchaseactive').checked = p.purchaseactive;
+
+        const modal = new bootstrap.Modal(document.getElementById('editProductModal'));
+        modal.show();
+      })
+      .catch(e => { console.error(e); toastr.error('Error loading product'); });
+  }
+
+  function updateProduct() {
+    const data = validateForm('editProductForm');
+    if (!data) return;
+    fetch('/products/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(result => {
+      if (result.success) {
+        toastr.success(result.message);
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editProductModal'));
+        if (modal) modal.hide();
+        setTimeout(() => window.location.reload(), 800);
+      } else {
+        toastr.error(result.message || 'Error updating product');
+      }
+    })
+    .catch(e => { console.error(e); toastr.error('Failed to update product'); });
+  }
+
+  function openViewModal(id) {
+    fetch('/products/api/' + id)
+      .then(r => r.json())
+      .then(result => {
+        if (!result.success) return toastr.error('Failed to load details');
+        const p = result.product;
+        renderViewModal('viewProductModal', [
+          { label: 'Name', value: p.name },
+          { label: 'Barcode', value: p.barcode || '-' },
+          { label: 'Category', value: p.Category ? p.Category.name : '-' },
+          { label: 'Brand', value: p.Brand ? p.Brand.name : '-' },
+          { label: 'Purchase Price', value: typeof p.purchaseprice === 'number' ? p.purchaseprice.toFixed(2) : p.purchaseprice },
+          { label: 'Sale Price', value: typeof p.saleprice === 'number' ? p.saleprice.toFixed(2) : p.saleprice },
+          { label: 'Quantity', value: p.quantity || 0 },
+          { label: 'Discount', value: (p.discount || 0) + '%' },
+          { label: 'Carry Cost', value: p.carrycost || 0 },
+          { label: 'Sale Active', value: p.saleactive ? 'Yes' : 'No' },
+          { label: 'Purchase Active', value: p.purchaseactive ? 'Yes' : 'No' }
+        ]);
+        const modal = new bootstrap.Modal(document.getElementById('viewProductModal'));
+        modal.show();
+      })
+      .catch(e => { console.error(e); toastr.error('Error loading details'); });
+  }
+
+  function deleteRecord(id) {
+    $.confirm({
       title: 'Confirm!',
       content: 'Are you sure you want to delete this product?',
       theme: 'material',
@@ -396,37 +598,13 @@
           text: 'Yes',
           btnClass: 'btn-danger',
           action: async function () {
-            const response = await fetch(`/products/${id}/delete`, {
-              method: 'POST',
-            });
+            const response = await fetch(`/products/${id}/delete`, { method: 'POST' });
             let result = await response.json();
             if (result.success === true) {
-              $.alert({
-                title: 'Success!',
-                content: result.message,
-                boxWidth: '30%',
-                theme: 'material',
-                useBootstrap: false,
-                type: 'green',
-                buttons: {
-                  confirm: {
-                    text: 'OK',
-                    btnClass: 'btn-primary',
-                    action: function () {
-                      window.location.href = result.redirectUrl;
-                    }
-                  }
-                }
-              });
+              toastr.success(result.message);
+              setTimeout(() => window.location.reload(), 800);
             } else {
-              $.alert({
-                title: 'Error!',
-                boxWidth: '30%',
-                content: result.message,
-                theme: 'material',
-                useBootstrap: false,
-                type: 'red',
-              });
+              toastr.error(result.message || 'Error deleting product');
             }
           }
         },

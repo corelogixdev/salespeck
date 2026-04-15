@@ -56,6 +56,31 @@ exports.listCategories = async (req, res) => {
     }
 };
 
+exports.getCategory = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const category = await db.category.findByPk(id);
+        
+        if (!category) {
+            return res.status(404).json({
+                success: false,
+                message: 'Category not found'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            category: category
+        });
+    } catch (error) {
+        console.error('Error fetching category:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal Server Error'
+        });
+    }
+};
+
 exports.saveCategory = async (req, res) => {
     try {
         const { name, description } = req.body;

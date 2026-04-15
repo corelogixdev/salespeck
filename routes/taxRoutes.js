@@ -8,11 +8,17 @@ router.get("/", async (req, res) => {
     const page = parseInt(query.page) || 1;
     const pageSize = parseInt(query.pageSize) || 10;
 
-    const sortBy = query.sortBy || 'id';
+    const sortBy = query.sortBy || 'name';
     const sortOrder = query.sortOrder || 'asc';
-    const order = buildSortClause(sortBy, sortOrder, 'id');
+    const order = buildSortClause(sortBy, sortOrder, 'name');
+
+    const where = {};
+    if (query.name_like) {
+      where.name = { [db.Sequelize.Op.like]: `%${query.name_like}%` };
+    }
 
     const { count, rows: taxes } = await db.taxes.findAndCountAll({
+      where,
       order,
       limit: pageSize,
       offset: (page - 1) * pageSize
@@ -34,6 +40,19 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/:id", async (req, res) => {
+  try {
+    const tax = await db.taxes.findByPk(req.params.id);
+    if (!tax) {
+      return res.status(404).json({ success: false, message: 'Tax not found' });
+    }
+    res.json({ success: true, tax });
+  } catch (error) {
+    console.error('Error fetching tax:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
 router.post("/save", async (req, res) => {
   try {
     let id = req.body.id;
@@ -48,19 +67,19 @@ router.post("/save", async (req, res) => {
         percentage: req.body.percentage,
       });
     }
-    res.send({ status: "success", message: "Tax saved successfully" });
+    res.json({ success: true, message: "Tax saved successfully" });
   } catch (e) {
-    res.send({ status: "error", message: "Error saving tax" });
+    res.json({ success: false, message: "Error saving tax" });
   }
 });
 
-router.get("/delete/:id", async (req, res) => {
+router.post("/:id/delete", async (req, res) => {
   try {
     let tax = await db.taxes.findByPk(req.params.id);
     await tax.destroy();
-    res.send({ status: "success", message: "Tax deleted successfully" });
+    res.json({ success: true, message: "Tax deleted successfully" });
   } catch (e) {
-    res.send({ status: "error", message: "Error deleting tax" });
+    res.json({ success: false, message: "Error deleting tax" });
   }
 });
 

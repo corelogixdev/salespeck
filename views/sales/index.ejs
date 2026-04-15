@@ -1,215 +1,176 @@
-<div class="row">
-  <div class="col-lg-12">
-    <div class="card">
-      <div class="card-header align-items-center d-flex">
-        <h4 class="card-title mb-0 flex-grow-1">
-          <%= title %>
-        </h4>
-        <div class="d-flex gap-2">
-          <button onclick="window.location.reload()" class="btn btn-soft-success btn-sm" title="Refresh">
-            <i class="ri-refresh-line align-middle"></i> Refresh
-          </button>
-        </div>
-      </div>
-
-      <div class="card-body">
-        <div class="live-preview">
-          <!-- Search Form -->
-          <% if (permissions.salesSearch) { %>
-            <form id="search-form" method="POST" action="/sales" class="row g-3 mb-4">
-              <div class="col-xxl-3 col-sm-4">
-                <div class="search-box">
-                  <input type="text" class="form-control search flatpickr-range" data-provider="flatpickr"
-                    data-range="true" data-date-format="Y-m-d" name="daterange" placeholder="Filter by date range..."
-                    value="<%= searchquery?.daterange || '' %>">
-                  <i class="ri-calendar-2-line search-icon"></i>
-                </div>
-              </div>
-              <div class="col-xxl-3 col-sm-3">
-                <div class="search-box">
-                  <input type="text" class="form-control search" name="customer" placeholder="Search by customer..."
-                    value="<%= searchquery?.customer || '' %>">
-                  <i class="ri-user-line search-icon"></i>
-                </div>
-              </div>
-              <div class="col-xxl-3 col-sm-3">
-                <div class="search-box">
-                  <input type="number" class="form-control search" name="productId"
-                    placeholder="Search by product ID..." value="<%= searchquery?.productId || '' %>">
-                  <i class="ri-shopping-basket-2-line search-icon"></i>
-                </div>
-              </div>
-              <div class="col-xxl-2 col-sm-2 d-flex align-items-center justify-content-end">
-                <div class="d-flex gap-2">
-                  <button type="submit" class="btn btn-sm btn-primary">
-                    <i class="ri-search-line me-1 align-bottom"></i> Search
-                  </button>
-                  <% if (searchquery?.daterange || searchquery?.customer || searchquery?.productId) { %>
-                    <button type="button" id="reset" class="btn btn-sm btn-danger">
-                      <i class="ri-close-line align-bottom me-1"></i> Clear
-                    </button>
-                    <% } %>
-                </div>
-              </div>
-            </form>
-            <% } %>
-
-              <!-- Table -->
-              <div class="table-responsive">
-                <table class="table table-striped table-nowrap align-middle mb-0">
-                  <thead>
-                    <tr>
-                      <th scope="col">Product</th>
-                      <th scope="col">Discount %</th>
-                      <th scope="col">Total</th>
-                      <th scope="col">Created At</th>
-                      <th scope="col" style="text-align: end;">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <%- include('_table_rows') %>
-                  </tbody>
-                </table>
-              </div>
-
-              <% if (pagination && pagination.totalPages > 0) { %>
-                <div class="d-flex justify-content-between align-items-center mt-4">
-                    <!-- Records Info -->
-                    <div class="text-muted">
-                        Showing <strong><%= pagination.startRecord %></strong> to 
-                        <strong><%= pagination.endRecord %></strong> of 
-                        <strong><%= pagination.totalCount %></strong> entries
-                    </div>
-
-                    <!-- Page Size Selector -->
-                    <div class="d-flex align-items-center gap-2">
-                        <label for="pageSize" class="text-muted mb-0">Show:</label>
-                        <select id="pageSize" class="form-select form-select-sm" style="width: 80px;"
-                            onchange="window.handlePageSizeChange(this, '/sales?<%= new URLSearchParams({...searchquery, page: 1}).toString() %>', <%= pagination.totalCount %>)">
-                            <option value="10" <%= (pagination.pageSize || 10) == 10 ? 'selected' : '' %>>10</option>
-                            <option value="25" <%= (pagination.pageSize || 10) == 25 ? 'selected' : '' %>>25</option>
-                            <option value="50" <%= (pagination.pageSize || 10) == 50 ? 'selected' : '' %>>50</option>
-                            <option value="100" <%= (pagination.pageSize || 10) == 100 ? 'selected' : '' %>>100</option>
-                            <option value="200" <%= (pagination.pageSize || 10) == 200 ? 'selected' : '' %>>200</option>
-                            <option value="500" <%= (pagination.pageSize || 10) == 500 ? 'selected' : '' %>>500</option>
-                            <option value="1000" <%= (pagination.pageSize || 10) == 1000 ? 'selected' : '' %>>1000</option>
-                            <option value="9999" <%= (pagination.pageSize || 10) == 9999 ? 'selected' : '' %>>All</option>
-                        </select>
-                    </div>
-
-                    <!-- Pagination Controls -->
-                    <% if (pagination.totalPages > 1) { %>
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination mb-0">
-                                <!-- First Page -->
-                                <li class="page-item <%= pagination.currentPage === 1 ? 'disabled' : '' %>">
-                                    <a class="page-link" href="<%= pagination.currentPage === 1 ? '#' : '/sales?' + new URLSearchParams({...searchquery, page: 1}).toString() %>" title="First">
-                                        <i class="ri-arrow-left-double-line"></i>
-                                    </a>
-                                </li>
-
-                                <!-- Previous Page -->
-                                <li class="page-item <%= pagination.currentPage === 1 ? 'disabled' : '' %>">
-                                    <a class="page-link" href="<%= pagination.currentPage === 1 ? '#' : '/sales?' + new URLSearchParams({...searchquery, page: pagination.currentPage - 1}).toString() %>" title="Previous">
-                                        <i class="mdi mdi-chevron-left"></i>
-                                    </a>
-                                </li>
-
-                                <!-- Page Numbers -->
-                                <% for(let i = 1; i <= pagination.totalPages; i++) { %>
-                                    <% if (i === 1 || i === pagination.totalPages || (i >= pagination.currentPage - 1 && i <= pagination.currentPage + 1)) { %>
-                                        <li class="page-item <%= i === pagination.currentPage ? 'active' : '' %>">
-                                            <a class="page-link" href="/sales?<%= new URLSearchParams({...searchquery, page: i}).toString() %>">
-                                                <%= i %>
-                                            </a>
-                                        </li>
-                                    <% } else if (i === 2 || i === pagination.totalPages - 1) { %>
-                                        <li class="page-item disabled"><a class="page-link">...</a></li>
-                                    <% } %>
-                                <% } %>
-
-                                <!-- Next Page -->
-                                <li class="page-item <%= pagination.currentPage === pagination.totalPages ? 'disabled' : '' %>">
-                                    <a class="page-link" href="<%= pagination.currentPage === pagination.totalPages ? '#' : '/sales?' + new URLSearchParams({...searchquery, page: pagination.currentPage + 1}).toString() %>" title="Next">
-                                        <i class="mdi mdi-chevron-right"></i>
-                                    </a>
-                                </li>
-
-                                <!-- Last Page -->
-                                <li class="page-item <%= pagination.currentPage === pagination.totalPages ? 'disabled' : '' %>">
-                                    <a class="page-link" href="<%= pagination.currentPage === pagination.totalPages ? '#' : '/sales?' + new URLSearchParams({...searchquery, page: pagination.totalPages}).toString() %>" title="Last">
-                                        <i class="ri-arrow-right-double-line"></i>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
-                    <% } %>
-                </div>
-              <% } %>
-        </div>
-      </div>
+<div class="card">
+  <div class="card-header align-items-center d-flex">
+    <h4 class="card-title mb-0 flex-grow-1">
+      <%= title %>
+    </h4>
+    <div class="d-flex gap-2 align-items-center">
+      <% if (permissions.salesSearch) { %>
+        <button class="btn btn-soft-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#salesFilters" aria-expanded="false" aria-controls="salesFilters">
+          <i class="ri-filter-3-line align-bottom me-1"></i> Filters
+        </button>
+      <% } %>
+      <button onclick="window.location.reload()" class="btn btn-soft-success btn-sm" title="Refresh">
+        <i class="ri-refresh-line align-middle"></i> Refresh
+      </button>
     </div>
+  </div>
+
+  <div class="card-body">
+    <% if (permissions.salesSearch) { %>
+      <div class="collapse mb-3" id="salesFilters">
+        <%- include('../components/partials/filter-section', {
+          filters: [
+            { name: 'daterange', label: 'Date Range', type: 'daterange', placeholder: 'Filter by date range...', icon: 'ri-calendar-2-line', colSize: 3 },
+            { name: 'customer', label: 'Customer', type: 'text', placeholder: 'Search by customer...', icon: 'ri-user-line', colSize: 3 },
+            { name: 'productId', label: 'Product ID', type: 'text', placeholder: 'Search by product ID...', icon: 'ri-shopping-basket-2-line', colSize: 3 }
+          ],
+          values: query,
+          action: '/sales'
+        }) %>
+      </div>
+    <% } %>
+
+    <%
+    const tableColumns = [
+      { 
+        key: 'SoldPoducts', 
+        label: 'Product', 
+        sortable: false,
+        render: (row) => {
+          const products = row.SoldPoducts ? row.SoldPoducts.map(({Product}) => Product.name).join(', ') : '';
+          const short = products.length > 40 ? products.substring(0, 40) + '...' : products;
+          return `<span class="limited-text" title="${products}">${short || '-'}</span>`;
+        }
+      },
+      { 
+        key: 'discountpercentage', 
+        label: 'Discount %', 
+        sortable: true,
+        render: (row) => `${row.discountpercentage || 0}%`
+      },
+      { 
+        key: 'totalprice', 
+        label: 'Total', 
+        sortable: true,
+        render: (row) => {
+          const total = parseFloat(row.totalprice || 0) - (parseFloat(row.totalprice || 0) * ((row.discountpercentage || 0) / 100));
+          return `Rs. ${total.toFixed(2)}`;
+        }
+      },
+      { 
+        key: 'createdAt', 
+        label: 'Created At', 
+        sortable: true,
+        render: (row) => moment(row.createdAt).format('D MMM, YYYY')
+      },
+      {
+        key: 'actions',
+        label: 'Actions',
+        sortable: false,
+        class: 'text-end',
+        render: (row) => {
+          return `<div class="btn-group btn-group-sm action-group" role="group">
+            <a href="/sales/${row.id}" target="_blank" class="btn btn-soft-info action-btn" title="Receipt"><i class="ri-file-text-line"></i></a>
+            <button type="button" class="btn btn-soft-primary action-btn" onclick="openViewModal('${row.id}')" title="Quick View"><i class="ri-eye-line"></i></button>
+          </div>`;
+        }
+      }
+    ];
+    %>
+
+    <%- include('../components/partials/data-table', {
+      columns: tableColumns,
+      data: sales,
+      sortBy: sortBy,
+      sortOrder: sortOrder,
+      baseUrl: '/sales',
+      query: query
+    }) %>
+
+    <%- include('../components/partials/pagination', {
+      pagination: pagination,
+      baseUrl: '/sales',
+      query: query
+    }) %>
   </div>
 </div>
 
+<%- include('../components/partials/floating-action-btn', {
+  targetModal: null,
+  icon: 'ri-add-line',
+  tooltip: 'New Sale',
+  colorClass: 'btn-primary',
+  show: permissions.salesCreate
+}) %>
+
+<script>
+  (function() {
+    const fab = document.querySelector('.floating-action-btn');
+    if (fab && !fab.getAttribute('data-bs-target')) {
+      fab.addEventListener('click', function() {
+        window.location.href = '/sales/form';
+      });
+    }
+  })();
+</script>
+
+<!-- View Modal -->
+<%- include('../components/partials/view-modal', {
+  id: 'viewSaleModal',
+  title: 'Sale Details'
+}) %>
+
 <style>
-  .limit-text {
+  .limited-text {
+    display: inline-block;
+    vertical-align: middle;
     max-width: 250px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
-  /* Search box styling */
-  .search-box {
-    position: relative;
-  }
-
-  .search-box .search-icon {
-    position: absolute;
-    left: 13px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 18px;
-    color: var(--vz-gray-600);
-  }
-
-  .search-box .form-control {
-    padding-left: 35px;
-    background-color: var(--vz-card-bg-custom);
-    border-color: var(--vz-border-color);
-  }
-
-  .search-box .form-control:focus {
-    border-color: var(--vz-primary);
-  }
-
-  .search-box .flatpickr-range {
-    background-color: var(--vz-card-bg-custom);
-  }
 </style>
 
-<script src="/assets/js/jquery.min.js"></script>
-<script src="/assets/js/moment.min.js"></script>
-<script src="/assets/js/daterangepicker.min.js"></script>
 <script>
-  $(document).ready(function () {
-    // Initialize flatpickr
+  function openViewModal(id) {
+    fetch('/sales/api/' + id)
+      .then(r => r.json())
+      .then(result => {
+        if (!result.success) return toastr.error('Failed to load details');
+        const s = result.sale;
+        const customer = s.Customer ? `${s.Customer.firstname} ${s.Customer.lastname}` : 'Walk-in';
+        const cashier = s.User ? `${s.User.firstname} ${s.User.lastname}` : 'Unknown';
+        const items = (s.SoldPoducts || []).map(item => {
+          const prod = item.Product ? item.Product.name : 'Unknown';
+          return `${prod} (Qty: ${item.quantity || 0})`;
+        }).join('<br>');
+        const total = parseFloat(s.totalprice || 0);
+        const discount = parseFloat(s.discountpercentage || 0);
+        const afterDiscount = total - (total * (discount / 100));
+
+        renderViewModal('viewSaleModal', [
+          { label: 'Invoice #', value: s.invoicenum || '-' },
+          { label: 'Date', value: s.createdAt ? moment(s.createdAt).format('D MMM, YYYY HH:mm') : '-' },
+          { label: 'Cashier', value: cashier },
+          { label: 'Customer', value: customer },
+          { label: 'Discount', value: discount + '%' },
+          { label: 'Total', value: 'Rs. ' + afterDiscount.toFixed(2) },
+          { label: 'Paid', value: 'Rs. ' + (parseFloat(s.totalpayment || 0)).toFixed(2) },
+          { label: 'Products', value: items || '-' }
+        ]);
+
+        const modal = new bootstrap.Modal(document.getElementById('viewSaleModal'));
+        modal.show();
+      })
+      .catch(e => { console.error(e); toastr.error('Error loading details'); });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
     flatpickr(".flatpickr-range", {
       mode: "range",
       placeholder: "Filter by date range",
-      dateFormat: "Y-m-d"
-    });
-
-    // Format dates
-    $('.date').each(function () {
-      let date = new Date($(this).text());
-      $(this).text(moment(date).format('D MMM, YYYY'));
-    });
-
-    // Reset form
-    $('#reset').click(function () {
-      window.location.href = '/sales';
+      dateFormat: "Y-m-d",
+      defaultDate: "<%= query?.daterange?.split(' to ') || '' %>"
     });
   });
 </script>

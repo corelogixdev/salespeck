@@ -1,37 +1,108 @@
 const db = require("../models");
 const { Op } = require("sequelize");
 const moment = require("moment");
-const { getPagination, getPagingData } = require('../utils/pagination');
+const { getPaginationMeta, buildSortClause } = require('../utils/paginationHelper');
 
 exports.index = async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const { limit, offset } = getPagination(page, 10);
-  
   try {
+    const query = req.query;
+    const page = parseInt(query.page) || 1;
+    const pageSize = parseInt(query.pageSize) || parseInt(query.limit) || 10;
+
+    const sortBy = query.sortBy || 'createdAt';
+    const sortOrder = query.sortOrder || 'desc';
+    const order = buildSortClause(sortBy, sortOrder, 'createdAt');
+
+    const { daterange, vendor, invoicenum } = query;
+    let whereClause = {};
+    let includeOptions = [
+      {
+        model: db.user,
+        as: "Vendor",
+        attributes: ["id", "firstname", "lastname"],
+        where: {},
+      },
+      {
+        model: db.user,
+        as: "Creator",
+        attributes: ["id", "firstname", "lastname"],
+        where: {},
+      },
+    ];
+
+    if (daterange) {
+      const [start, end] = daterange.split(" to ").map(d => d.trim());
+      if (start && end) {
+        whereClause.createdAt = {
+          [Op.between]: [
+            moment(new Date(start)).startOf("day").toDate(),
+            moment(new Date(end)).endOf("day").toDate(),
+          ],
+        };
+      }
+    }
+
+    if (vendor) {
+      const vendorSearch = vendor.trim();
+      includeOptions[0].where[Op.or] = [
+        { firstname: { [Op.like]: `%${vendorSearch}%` } },
+        { lastname: { [Op.like]: `%${vendorSearch}%` } },
+      ];
+    }
+
+    if (invoicenum) {
+      whereClause.invoicenum = { [Op.like]: `%${invoicenum.trim()}%` };
+    }
+
     const { count, rows: purchases } = await db.purchase.findAndCountAll({
-      include: [
-        {
-          model: db.user,
-          as: "Vendor",
-          attributes: ["firstname", "lastname"]
-        }
-      ],
-      order: [["createdAt", "DESC"]],
-      limit,
-      offset
+      where: whereClause,
+      include: includeOptions,
+      order,
+      limit: pageSize,
+      offset: (page - 1) * pageSize,
+      distinct: true,
+      col: 'id'
     });
-    
-    const pagination = getPagingData(count, page, limit);
-    
+
+    const pagination = getPaginationMeta(page, pageSize, count);
+
     res.render("accounting/purchase/index", {
       title: "Purchases",
       purchases,
-      searchquery: {},
-      pagination
+      query,
+      pagination,
+      sortBy,
+      sortOrder
     });
   } catch (error) {
     console.error("Error fetching purchases:", error);
     res.status(500).send("Internal Server Error");
+  }
+};
+
+exports.getPurchase = async (req, res) => {
+  try {
+    const purchase = await db.purchase.findOne({
+      where: { id: req.params.id },
+      include: [
+        { model: db.user, as: "Vendor", attributes: ["id", "firstname", "lastname"] },
+        { model: db.user, as: "Creator", attributes: ["id", "firstname", "lastname"] },
+        {
+          model: db.purchasedproducts,
+          as: "PurchasedItems",
+          include: [{ model: db.product, as: "Product", attributes: ["id", "name"] }]
+        }
+      ]
+    });
+
+    if (!purchase) {
+      return res.status(404).json({ success: false, message: "Purchase not found" });
+    }
+
+    res.json({ success: true, purchase });
+  } catch (error) {
+    console.error("Error fetching purchase:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
 
@@ -185,88 +256,12 @@ exports.save = async (req, res) => {
 };
 
 exports.search = async (req, res) => {
-  let { vendor, daterange, invoicenum } = req.body;
-  vendor = vendor ? vendor.trim() : '';
-  daterange = daterange ? daterange.trim() : '';
-  invoicenum = invoicenum ? invoicenum.trim() : '';
-  
-  const page = parseInt(req.query.page) || parseInt(req.body.page) || 1;
-  const { limit, offset } = getPagination(page, 10);
-  
-  try {
-    let queryOptions = {
-      include: [
-        {
-          model: db.user,
-          as: "Vendor",
-        },
-        {
-          model: db.purchasedproducts,
-          as: "PurchasedItems",
-          include: [
-            {
-              model: db.product,
-              as: "Product",
-            },
-          ],
-        },
-      ],
-      limit,
-      offset,
-      order: [["createdAt", "DESC"]]
-    };
-
-    if (vendor) {
-      queryOptions.include[0].where = {
-        [Op.or]: [
-          { firstname: { [Op.like]: `%${vendor}%` } },
-          { lastname: { [Op.like]: `%${vendor}%` } },
-        ],
-      };
-    }
-
-    if (daterange) {
-      let [start, end] = daterange.split(" to ");
-      start = moment(new Date(start)).startOf("day").toDate();
-      end = moment(new Date(end)).endOf("day").toDate();
-      queryOptions.where = {
-        ...queryOptions.where,
-        createdAt: {
-          [Op.between]: [start, end],
-        },
-      };
-    }
-
-    if (invoicenum) {
-      queryOptions.where = {
-        ...queryOptions.where,
-        invoicenum: {
-          [Op.like]: `%${invoicenum}%`,
-        },
-      };
-    }
-
-    const { count } = await db.purchase.findAndCountAll({
-      ...queryOptions,
-      limit: undefined,
-      offset: undefined,
-      distinct: true,
-      col: 'id'
-    });
-    
-    const purchases = await db.purchase.findAll(queryOptions);
-    
-    const pagination = getPagingData(count, page, limit);
-
-    res.render("accounting/purchase/index", {
-      title: "Purchases",
-      purchases,
-      searchquery: req.body,
-      pagination
-    });
-  } catch (error) {
-    res.status(500).send({ status: "error", message: "Internal Server Error" });
-  }
+  const { vendor, daterange, invoicenum } = req.body;
+  const params = new URLSearchParams();
+  if (vendor) params.set('vendor', vendor.trim());
+  if (daterange) params.set('daterange', daterange.trim());
+  if (invoicenum) params.set('invoicenum', invoicenum.trim());
+  res.redirect('/accounting/purchase?' + params.toString());
 };
 
 exports.form = async (_, res) => {

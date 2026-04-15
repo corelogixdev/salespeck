@@ -1,275 +1,164 @@
-<div class="row">
-    <div class="col-lg-12">
-        <div class="card">
-            <div class="card-header align-items-center d-flex">
-                <h4 class="card-title mb-0 flex-grow-1">Purchase List</h4>
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-primary btn-sm" onclick="window.location.href='/accounting/purchase/form'">
-                        <i class="bx bx-plus me-1"></i> New Purchase
-                    </button>
-                    <button onclick="window.location.reload()" class="btn btn-soft-success btn-sm" title="Refresh">
-                        <i class="ri-refresh-line align-middle"></i> Refresh
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <!-- Search Form -->
-                <form id="search-form" class="row g-3 mb-4" action="/accounting/purchase/search" method="POST">
-                    <div class="col-xxl-3 col-sm-3">
-                        <div class="search-box">
-                            <input type="text" 
-                                   class="form-control search flatpickr-range"
-                                   data-provider="flatpickr" 
-                                   data-range="true"
-                                   data-date-format="Y-m-d"
-                                   name="daterange" 
-                                   placeholder="Filter by date range..."
-                                   value="<%= searchquery ? searchquery.daterange : '' %>">
-                            <i class="ri-calendar-2-line search-icon"></i>
-                        </div>
-                    </div>
-                    <div class="col-xxl-3 col-sm-3">
-                        <div class="search-box">
-                            <input type="text" 
-                                   class="form-control search" 
-                                   name="vendor"
-                                   placeholder="Search by vendor name..."
-                                   value="<%= searchquery ? searchquery.vendor : '' %>">
-                            <i class="ri-user-line search-icon"></i>
-                        </div>
-                    </div>
-                    <div class="col-xxl-3 col-sm-3">
-                        <div class="search-box">
-                            <input type="text" 
-                                   class="form-control search" 
-                                   name="invoicenum"
-                                   placeholder="Search by invoice number..."
-                                   value="<%= searchquery ? searchquery.invoicenum : '' %>">
-                            <i class="ri-file-list-line search-icon"></i>
-                        </div>
-                    </div>
-                    <div class="col-xxl-3 col-sm-3 d-flex align-items-center justify-content-end">
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-sm btn-primary">
-                                <i class="ri-search-line me-1 align-bottom"></i> Search
-                            </button>
-                            <% if (searchquery?.daterange || searchquery?.vendor || searchquery?.invoicenum) { %>
-                                <button type="button" id="reset" class="btn btn-sm btn-danger">
-                                    <i class="ri-close-line align-bottom me-1"></i> Clear
-                                </button>
-                            <% } %>
-                        </div>
-                    </div>
-                </form>
-
-                <!-- Purchase List Table -->
-                <div class="table-responsive">
-                    <table class="table table-striped table-nowrap align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th scope="col">ID</th>
-                                <th scope="col">Date</th>
-                                <th scope="col">Creator</th>
-                                <th scope="col">Vendor</th>
-                                <th scope="col">Amount</th>
-                                <th scope="col">Invoice ID</th>
-                                <th scope="col" style="text-align: end;">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% if (!purchases || purchases.length === 0) { %>
-                                <tr>
-                                    <td colspan="7" class="text-center">
-                                        <i class="ri-error-warning-line align-middle me-1"></i> No purchases found
-                                    </td>
-                                </tr>
-                            <% } else { %>
-                                <% purchases.forEach(purchase => { %>
-                                    <tr>
-                                        <td class="fw-medium"><%= purchase.id %></td>
-                                        <td class="date"><%= purchase.createdAt %></td>
-                                        <td><%= purchase.createdby %></td>
-                                        <td><%= purchase.vendor ? purchase.vendor : "None" %></td>
-                                        <td>Rs. <%= formatNumber(purchase.totalAmount) %></td>
-                                        <td><%= purchase.invoicenum %></td>
-                                        <td style="text-align: end;">
-                                            <div class="d-flex gap-1 justify-content-end">
-                                                <button class="btn btn-soft-info btn-sm" onclick="viewPurchase('<%= purchase.id %>')" title="View Invoice">
-                                                    <i class="ri-file-text-line align-middle"></i> Invoice
-                                                </button>
-                                                <button class="btn btn-soft-primary btn-sm" onclick="viewPurchaseDetails('<%= purchase.id %>')" title="View Details">
-                                                    <i class="ri-eye-line align-middle"></i> Details
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                <% }) %>
-                            <% } %>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Pagination at Bottom -->
-                <div class="d-flex justify-content-between align-items-center mt-4">
-                    <% if (pagination && pagination.totalCount > 0) { %>
-                        <div class="text-muted">
-                            Showing <strong><%= pagination.startRecord %></strong> to 
-                            <strong><%= pagination.endRecord %></strong> of 
-                            <strong><%= pagination.totalCount %></strong> entries
-                        </div>
-                    <% } else { %>
-                        <div class="text-muted">
-                            Showing 0 entries
-                        </div>
-                    <% } %>
-
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <label class="mb-0 text-muted">Show:</label>
-                            <select id="perPageSelect" class="form-select form-select-sm" style="width: auto;">
-                                <option value="10" <%= pagination?.limit === 10 ? 'selected' : '' %>>10</option>
-                                <option value="25" <%= pagination?.limit === 25 ? 'selected' : '' %>>25</option>
-                                <option value="50" <%= pagination?.limit === 50 ? 'selected' : '' %>>50</option>
-                                <option value="100" <%= pagination?.limit === 100 ? 'selected' : '' %>>100</option>
-                                <option value="250" <%= pagination?.limit === 250 ? 'selected' : '' %>>250</option>
-                                <option value="500" <%= pagination?.limit === 500 ? 'selected' : '' %>>500</option>
-                                <option value="1000" <%= pagination?.limit === 1000 ? 'selected' : '' %>>1000</option>
-                                <option value="all" <%= pagination?.limit === 'all' ? 'selected' : '' %>>All</option>
-                            </select>
-                        </div>
-
-                        <% if (pagination && pagination.totalPages > 1) { %>
-                            <nav aria-label="Page navigation">
-                                <ul class="pagination mb-0">
-                                    <li class="page-item <%= pagination.currentPage === 1 ? 'disabled' : '' %>">
-                                        <a class="page-link" href="<%= pagination.currentPage === 1 ? '#' : buildPageUrl(pagination.currentPage - 1) %>">
-                                            <i class="mdi mdi-chevron-left"></i>
-                                        </a>
-                                    </li>
-                                    <% for(let i = 1; i <= pagination.totalPages; i++) { %>
-                                        <% if (i === 1 || i === pagination.totalPages || (i >= pagination.currentPage - 1 && i <= pagination.currentPage + 1)) { %>
-                                            <li class="page-item <%= i === pagination.currentPage ? 'active' : '' %>">
-                                                <a class="page-link" href="<%= buildPageUrl(i) %>"><%= i %></a>
-                                            </li>
-                                        <% } else if (i === 2 || i === pagination.totalPages - 1) { %>
-                                            <li class="page-item disabled"><a class="page-link">...</a></li>
-                                        <% } %>
-                                    <% } %>
-                                    <li class="page-item <%= pagination.currentPage === pagination.totalPages ? 'disabled' : '' %>">
-                                        <a class="page-link" href="<%= pagination.currentPage === pagination.totalPages ? '#' : buildPageUrl(pagination.currentPage + 1) %>">
-                                            <i class="mdi mdi-chevron-right"></i>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </nav>
-                        <% } %>
-                    </div>
-                </div>
-            </div>
+<div class="card">
+    <div class="card-header align-items-center d-flex">
+        <h4 class="card-title mb-0 flex-grow-1">Purchase List</h4>
+        <div class="d-flex gap-2 align-items-center">
+            <button class="btn btn-soft-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#purchaseFilters" aria-expanded="false" aria-controls="purchaseFilters">
+                <i class="ri-filter-3-line align-bottom me-1"></i> Filters
+            </button>
+            <button onclick="window.location.reload()" class="btn btn-soft-success btn-sm" title="Refresh">
+                <i class="ri-refresh-line align-middle"></i> Refresh
+            </button>
         </div>
+    </div>
+
+    <div class="card-body">
+        <div class="collapse mb-3" id="purchaseFilters">
+            <%- include('../../components/partials/filter-section', {
+                filters: [
+                    { name: 'daterange', label: 'Date Range', type: 'daterange', placeholder: 'Filter by date range...', icon: 'ri-calendar-2-line', colSize: 3 },
+                    { name: 'vendor', label: 'Vendor', type: 'text', placeholder: 'Search by vendor name...', icon: 'ri-user-line', colSize: 3 },
+                    { name: 'invoicenum', label: 'Invoice #', type: 'text', placeholder: 'Search by invoice number...', icon: 'ri-file-list-line', colSize: 3 }
+                ],
+                values: query,
+                action: '/accounting/purchase'
+            }) %>
+        </div>
+
+        <%
+        const tableColumns = [
+            { 
+                key: 'createdAt', 
+                label: 'Date', 
+                sortable: true, 
+                render: (row) => moment(row.createdAt).format('D MMM, YYYY')
+            },
+            { 
+                key: 'Creator', 
+                label: 'Creator', 
+                sortable: false, 
+                render: (row) => {
+                    const name = row.Creator ? `${row.Creator.firstname} ${row.Creator.lastname}` : 'Unknown';
+                    return name;
+                }
+            },
+            { 
+                key: 'Vendor', 
+                label: 'Vendor', 
+                sortable: false, 
+                render: (row) => {
+                    const name = row.Vendor ? `${row.Vendor.firstname} ${row.Vendor.lastname}` : 'None';
+                    return name;
+                }
+            },
+            { 
+                key: 'totalAmount', 
+                label: 'Amount', 
+                sortable: true, 
+                render: (row) => `Rs. ${formatNumber(row.totalAmount || 0)}`
+            },
+            { 
+                key: 'invoicenum', 
+                label: 'Invoice ID', 
+                sortable: true,
+                render: (row) => row.invoicenum || '-'
+            },
+            {
+                key: 'actions',
+                label: 'Actions',
+                sortable: false,
+                class: 'text-end',
+                render: (row) => {
+                    return `<div class="btn-group btn-group-sm action-group" role="group">
+                        <button type="button" class="btn btn-soft-info action-btn" onclick="viewPurchase('${row.id}')" title="Invoice"><i class="ri-file-text-line"></i></button>
+                        <button type="button" class="btn btn-soft-primary action-btn" onclick="openViewModal('${row.id}')" title="Quick View"><i class="ri-eye-line"></i></button>
+                    </div>`;
+                }
+            }
+        ];
+        %>
+
+        <%- include('../../components/partials/data-table', {
+            columns: tableColumns,
+            data: purchases,
+            sortBy: sortBy,
+            sortOrder: sortOrder,
+            baseUrl: '/accounting/purchase',
+            query: query
+        }) %>
+
+        <%- include('../../components/partials/pagination', {
+            pagination: pagination,
+            baseUrl: '/accounting/purchase',
+            query: query
+        }) %>
     </div>
 </div>
 
-<style>
-    .search-box {
-        position: relative;
-    }
-
-    .search-box .search-icon {
-        position: absolute;
-        left: 13px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 18px;
-        color: var(--vz-gray-600);
-    }
-
-    .search-box .form-control {
-        padding-left: 35px;
-        background-color: var(--vz-card-bg-custom);
-        border-color: var(--vz-border-color);
-    }
-
-    .search-box .form-control:focus {
-        border-color: var(--vz-primary);
-    }
-
-    .search-box .flatpickr-range {
-        background-color: var(--vz-card-bg-custom);
-    }
-</style>
+<%- include('../../components/partials/floating-action-btn', {
+    targetModal: null,
+    icon: 'ri-add-line',
+    tooltip: 'New Purchase',
+    colorClass: 'btn-primary',
+    show: true
+}) %>
 
 <script>
-// Helper function to build page URLs
-function buildPageUrl(page) {
-    const params = new URLSearchParams(window.location.search);
-    params.set('page', page);
-    
-    // Get limit if it exists
-    const limit = document.getElementById('perPageSelect')?.value;
-    if (limit) {
-        params.set('limit', limit);
-    }
-    
-    return '?' + params.toString();
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Per page selector change
-    $('#perPageSelect').on('change', function() {
-        const limit = $(this).val();
-        const params = new URLSearchParams(window.location.search);
-        params.set('limit', limit);
-        params.set('page', '1'); // Reset to first page
-        window.location.search = params.toString();
-    });
-
-    // Reset button
-    $('#reset').click(function () {
-        window.location.href = '/accounting/purchase';
-    });
-
-    // Initialize flatpickr
-    flatpickr(".flatpickr-range", {
-        mode: "range",
-        dateFormat: "Y-m-d",
-        placeholder: "Filter by date range..."
-    });
-
-    // Format dates
-    $('.date').each(function () {
-        let date = new Date($(this).text());
-        if (!isNaN(date.getTime())) {
-            $(this).text(moment(date).format('D MMM, YYYY'));
+    (function() {
+        const fab = document.querySelector('.floating-action-btn');
+        if (fab && !fab.getAttribute('data-bs-target')) {
+            fab.addEventListener('click', function() {
+                window.location.href = '/accounting/purchase/form';
+            });
         }
-    });
-});
-
-function viewPurchase(id) {
-    window.location.href = `/accounting/purchase/view/${id}`;
-}
-
-function viewPurchaseDetails(id) {
-    window.location.href = `/accounting/purchase/details/${id}`;
-}
+    })();
 </script>
 
-<%
-// Helper function for building pagination URLs in EJS
-function buildPageUrl(page) {
-    const searchParams = searchquery || {};
-    const params = new URLSearchParams();
-    
-    params.set('page', page);
-    
-    if (pagination && pagination.limit) {
-        params.set('limit', pagination.limit);
+<!-- View Modal -->
+<%- include('../../components/partials/view-modal', {
+    id: 'viewPurchaseModal',
+    title: 'Purchase Details'
+}) %>
+
+<script>
+    function viewPurchase(id) {
+        window.open('/accounting/purchase/view/' + id, '_blank');
     }
-    
-    if (searchParams.daterange) params.set('daterange', searchParams.daterange);
-    if (searchParams.vendor) params.set('vendor', searchParams.vendor);
-    if (searchParams.invoicenum) params.set('invoicenum', searchParams.invoicenum);
-    
-    return '?' + params.toString();
-}
-%>
+
+    function openViewModal(id) {
+        fetch('/accounting/purchase/api/' + id)
+            .then(r => r.json())
+            .then(result => {
+                if (!result.success) return toastr.error('Failed to load details');
+                const p = result.purchase;
+                const vendor = p.Vendor ? `${p.Vendor.firstname} ${p.Vendor.lastname}` : 'None';
+                const creator = p.Creator ? `${p.Creator.firstname} ${p.Creator.lastname}` : 'Unknown';
+                const items = (p.PurchasedItems || []).map(item => {
+                    const prod = item.Product ? item.Product.name : 'Unknown Product';
+                    return `${prod} (Qty: ${item.quantity || 0})`;
+                }).join('<br>');
+
+                renderViewModal('viewPurchaseModal', [
+                    { label: 'Invoice ID', value: p.invoicenum || '-' },
+                    { label: 'Date', value: p.createdAt ? moment(p.createdAt).format('D MMM, YYYY HH:mm') : '-' },
+                    { label: 'Creator', value: creator },
+                    { label: 'Vendor', value: vendor },
+                    { label: 'Total Amount', value: `Rs. ${(p.totalAmount || 0).toLocaleString()}` },
+                    { label: 'Total Payment', value: `Rs. ${(p.totalPayment || 0).toLocaleString()}` },
+                    { label: 'Products', value: items || '-' }
+                ]);
+
+                const modal = new bootstrap.Modal(document.getElementById('viewPurchaseModal'));
+                modal.show();
+            })
+            .catch(e => { console.error(e); toastr.error('Error loading details'); });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        flatpickr(".flatpickr-range", {
+            mode: "range",
+            dateFormat: "Y-m-d",
+            placeholder: "Filter by date range...",
+            defaultDate: "<%= query?.daterange?.split(' to ') || '' %>"
+        });
+    });
+</script>

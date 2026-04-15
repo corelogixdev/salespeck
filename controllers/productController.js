@@ -79,7 +79,7 @@ exports.index = async (req, res) => {
     // Generate pagination metadata
     const pagination = getPaginationMeta(page, pageSize, count);
 
-    // Get brands and categories for filters
+    // Get brands, categories and taxes for filters and modals
     const brands = await db.brand.findAll({
       where: { status: true },
       attributes: ['id', 'name'],
@@ -89,6 +89,11 @@ exports.index = async (req, res) => {
     const categories = await db.category.findAll({
       where: { status: true },
       attributes: ['id', 'name'],
+      order: [['name', 'ASC']]
+    });
+
+    const taxes = await db.taxes.findAll({
+      attributes: ['id', 'name', 'percentage'],
       order: [['name', 'ASC']]
     });
 
@@ -109,7 +114,8 @@ exports.index = async (req, res) => {
       sortBy,
       sortOrder,
       brands,
-      categories
+      categories,
+      taxes
     });
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -118,6 +124,24 @@ exports.index = async (req, res) => {
       text: "An error occurred while fetching products."
     };
     res.redirect("/dashboard");
+  }
+};
+
+exports.getProduct = async (req, res) => {
+  try {
+    const product = await db.product.findByPk(req.params.id, {
+      include: [
+        { model: db.brand, as: 'Brand' },
+        { model: db.category, as: 'Category' }
+      ]
+    });
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+    res.json({ success: true, product });
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 };
 

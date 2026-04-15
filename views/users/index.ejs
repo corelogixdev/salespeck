@@ -3,221 +3,390 @@
         <h4 class="card-title mb-0 flex-grow-1">
             <%= role==='user' ? 'Users' : (role==='vendor' ? 'Vendors' : 'Customers' ) %> List
         </h4>
-        <div class="d-flex gap-2">
-            <% if ((role=='user' && permissions.usersCreate) || (role=='vendor' && permissions.vendorsCreate) ||
-                (role=='customer' && permissions.customersCreate)) { %>
-                <a href="/users/form?role=<%= role %>" class="btn btn-primary btn-sm">
-                    <i class="ri-add-line align-bottom me-1"></i> Create New <%= role==='user' ? 'User' :
-                        (role==='vendor' ? 'Vendor' : 'Customer' ) %>
-                </a>
-                <% } %>
-                    <button onclick="window.location.reload()" class="btn btn-soft-success btn-sm" title="Refresh">
-                        <i class="ri-refresh-line align-middle"></i> Refresh
-                    </button>
+        <div class="d-flex gap-2 align-items-center">
+            <% if ((role=='user' && permissions.usersSearch) || (role=='vendor' && permissions.vendorsSearch) ||
+                (role=='customer' && permissions.customersSearch)) { %>
+                <button class="btn btn-soft-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#partyFilters" aria-expanded="false" aria-controls="partyFilters">
+                    <i class="ri-filter-3-line align-bottom me-1"></i> Filters
+                </button>
+            <% } %>
+            <button onclick="window.location.reload()" class="btn btn-soft-success btn-sm" title="Refresh">
+                <i class="ri-refresh-line align-middle"></i> Refresh
+            </button>
         </div>
     </div>
 
     <div class="card-body">
-        <!-- Search Filter -->
         <% if ((role=='user' && permissions.usersSearch) || (role=='vendor' && permissions.vendorsSearch) ||
             (role=='customer' && permissions.customersSearch)) { %>
-            <form action="/users" method="GET" class="row g-2 mb-4 justify-content-end">
-                <input type="hidden" name="role" value="<%= role %>">
-                <div class="col-sm-3">
-                    <div class="search-box">
-                        <input type="text" class="form-control search" name="search"
-                            placeholder="Search by name, username or phone" value="<%= query.search || '' %>">
-                        <i class="ri-search-line search-icon"></i>
-                    </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="search-box">
-                        <input type="text" class="form-control search flatpickr-range" data-provider="flatpickr"
-                            data-range="true" data-date-format="Y-m-d" name="daterange" placeholder="Filter by date range..."
-                            value="<%= query.daterange || '' %>">
-                         <i class="ri-calendar-2-line search-icon"></i>
-                    </div>
-                </div>
-                <div class="col-auto d-flex gap-2 align-items-center">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="ri-search-line me-1 align-bottom"></i> Search
-                    </button>
-                    <% if (query.search) { %>
-                        <a href="/users?role=<%= role %>" class="btn btn-danger">
-                            <i class="ri-close-line align-bottom me-1"></i> Clear
-                        </a>
-                        <% } %>
-                </div>
-            </form>
-            <% } %>
+            <div class="collapse mb-3" id="partyFilters">
+                <%- include('../components/partials/filter-section', {
+                    filters: [
+                        { name: 'role', type: 'hidden' },
+                        { name: 'search', label: 'Search', type: 'text', placeholder: 'Search by name, username or phone', icon: 'ri-search-line', colSize: 4 },
+                        { name: 'daterange', label: 'Date Range', type: 'daterange', placeholder: 'Filter by date range...', colSize: 4 }
+                    ],
+                    values: query,
+                    action: '/users'
+                }) %>
+            </div>
+        <% } %>
 
-                <!-- Data Table -->
-                <div class="table-responsive">
-                    <table class="table table-striped table-nowrap align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th scope="col">ID</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Phone</th>
-                                <th scope="col">Email</th>
-                                <% if (role==='user' ) { %>
-                                    <th scope="col">Username</th>
-                                    <th scope="col">Role</th>
-                                    <% } %>
-                                        <% if ((role=='user' && (permissions.usersUpdate || permissions.usersDelete)) ||
-                                            (role=='vendor' && (permissions.vendorsUpdate || permissions.vendorsDelete))
-                                            || (role=='customer' && (permissions.customersUpdate ||
-                                            permissions.customersDelete))) { %>
-                                            <th scope="col" style="text-align: end;">Actions</th>
-                                            <% } %>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <%- include('_table_rows') %>
-                        </tbody>
-                    </table>
-                </div>
+        <% 
+        let tableColumns = [
+            { key: 'firstname', label: 'Name', sortable: true, render: (row) => `${row.firstname} ${row.lastname}` },
+            { key: 'phone', label: 'Phone', sortable: true },
+            { key: 'email', label: 'Email', sortable: true }
+        ];
 
-                <!-- Enhanced Pagination -->
-                <% if (pagination && pagination.totalPages > 0) { %>
-                    <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-3">
-                        <!-- Records Info -->
-                        <div class="text-muted">
-                            Showing <strong><%= pagination.startRecord %></strong> to 
-                            <strong><%= pagination.endRecord %></strong> of 
-                            <strong><%= pagination.totalCount %></strong> entries
-                        </div>
-                        
-                        <!-- Page Size Selector -->
-                        <div class="d-flex align-items-center gap-2">
-                            <label for="pageSize" class="text-muted mb-0">Show:</label>
-                            <select id="pageSize" class="form-select form-select-sm" style="width: 80px;"
-                onchange="window.handlePageSizeChange(this, '/users?<%= new URLSearchParams({...query, role: role, page: 1}).toString() %>', <%= pagination.totalCount %>)">
-                                <option value="10" <%= (pagination.pageSize || 10) == 10 ? 'selected' : '' %>>10</option>
-                                <option value="25" <%= (pagination.pageSize || 10) == 25 ? 'selected' : '' %>>25</option>
-                                <option value="50" <%= (pagination.pageSize || 10) == 50 ? 'selected' : '' %>>50</option>
-                                <option value="100" <%= (pagination.pageSize || 10) == 100 ? 'selected' : '' %>>100</option>
-                                <option value="200" <%= (pagination.pageSize || 10) == 200 ? 'selected' : '' %>>200</option>
-                                <option value="500" <%= (pagination.pageSize || 10) == 500 ? 'selected' : '' %>>500</option>
-                                <option value="1000" <%= (pagination.pageSize || 10) == 1000 ? 'selected' : '' %>>1000</option>
-                                <option value="9999" <%= (pagination.pageSize || 10) == 9999 ? 'selected' : '' %>>All</option>
-                            </select>
-                        </div>
+        if (role === 'user') {
+            tableColumns.push({ key: 'username', label: 'Username', sortable: true });
+            tableColumns.push({ key: 'role', label: 'Role', sortable: true, type: 'badge', badgeMap: { branchmanager: 'warning', user: 'primary', admin: 'danger', superadmin: 'dark' } });
+        }
 
-                        <!-- Pagination Controls -->
-                        <% if (pagination.totalPages > 1) { %>
-                            <nav aria-label="Page navigation">
-                                <ul class="pagination mb-0">
-                                    <!-- First Page -->
-                                    <li class="page-item <%= pagination.currentPage === 1 ? 'disabled' : '' %>">
-                                        <a class="page-link"
-                                            href="<%= pagination.currentPage === 1 ? '#' : '/users?' + new URLSearchParams(Object.assign({}, query, {role: role, page: 1})).toString() %>" title="First">
-                                            <i class="ri-arrow-left-double-line"></i>
-                                        </a>
-                                    </li>
+        const canUpdateAny = (role=='user' && permissions.usersUpdate) || (role=='vendor' && permissions.vendorsUpdate) || (role=='customer' && permissions.customersUpdate);
+        const canDeleteAny = (role=='user' && permissions.usersDelete) || (role=='vendor' && permissions.vendorsDelete) || (role=='customer' && permissions.customersDelete);
 
-                                    <!-- Previous Page -->
-                                    <li class="page-item <%= pagination.currentPage === 1 ? 'disabled' : '' %>">
-                                        <a class="page-link"
-                                            href="<%= pagination.currentPage === 1 ? '#' : '/users?' + new URLSearchParams(Object.assign({}, query, {role: role, page: pagination.currentPage - 1})).toString() %>" title="Previous">
-                                            <i class="mdi mdi-chevron-left"></i>
-                                        </a>
-                                    </li>
+        if (canUpdateAny || canDeleteAny) {
+            tableColumns.push({
+                key: 'actions',
+                label: 'Actions',
+                sortable: false,
+                class: 'text-end',
+                render: (row) => {
+                    const isBranchManager = row.role == 'branchmanager';
+                    let html = '<div class="btn-group btn-group-sm action-group" role="group">';
+                    html += `<button type="button" class="btn btn-soft-info action-btn" onclick="openViewModal('${row.id}')" title="View"><i class="ri-eye-line"></i></button>`;
+                    if (canUpdateAny) {
+                        html += `<button type="button" class="btn btn-soft-warning action-btn ${isBranchManager ? 'custom_disabled' : ''}" onclick="openEditModal('${row.id}')" title="Edit"><i class="ri-pencil-fill"></i></button>`;
+                    }
+                    if (canDeleteAny) {
+                        html += `<button type="button" class="btn btn-soft-danger action-btn" onclick="deleteRecord('${row.id}')" ${isBranchManager ? 'disabled' : ''} title="Delete"><i class="ri-delete-bin-fill"></i></button>`;
+                    }
+                    html += '</div>';
+                    return html;
+                }
+            });
+        }
+        %>
 
-                                    <!-- Page Numbers -->
-                                    <% for(let i=1; i <=pagination.totalPages; i++) { %>
-                                        <% if (i===1 || i===pagination.totalPages || (i>= pagination.currentPage - 1 && i <=
-                                                pagination.currentPage + 1)) { %>
-                                                <li class="page-item <%= i === pagination.currentPage ? 'active' : '' %>">
-                                                    <a class="page-link"
-                                                        href="/users?<%= new URLSearchParams(Object.assign({}, query, {role: role, page: i})).toString() %>">
-                                                        <%= i %>
-                                                    </a>
-                                                </li>
-                                        <% } else if (i===2 || i===pagination.totalPages - 1) { %>
-                                            <li class="page-item disabled"><a class="page-link">...</a></li>
-                                        <% } %>
-                                    <% } %>
+        <%- include('../components/partials/data-table', {
+            columns: tableColumns,
+            data: data,
+            sortBy: sortBy,
+            sortOrder: sortOrder,
+            baseUrl: '/users',
+            query: query
+        }) %>
 
-                                    <!-- Next Page -->
-                                    <li class="page-item <%= pagination.currentPage === pagination.totalPages ? 'disabled' : '' %>">
-                                        <a class="page-link"
-                                            href="<%= pagination.currentPage === pagination.totalPages ? '#' : '/users?' + new URLSearchParams(Object.assign({}, query, {role: role, page: pagination.currentPage + 1})).toString() %>" title="Next">
-                                            <i class="mdi mdi-chevron-right"></i>
-                                        </a>
-                                    </li>
-
-                                    <!-- Last Page -->
-                                    <li class="page-item <%= pagination.currentPage === pagination.totalPages ? 'disabled' : '' %>">
-                                        <a class="page-link"
-                                            href="<%= pagination.currentPage === pagination.totalPages ? '#' : '/users?' + new URLSearchParams(Object.assign({}, query, {role: role, page: pagination.totalPages})).toString() %>" title="Last">
-                                            <i class="ri-arrow-right-double-line"></i>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </nav>
-                        <% } %>
-                    </div>
-                <% } %>
+        <%- include('../components/partials/pagination', {
+            pagination: pagination,
+            baseUrl: '/users',
+            query: query
+        }) %>
     </div>
 </div>
 
+<% 
+const canCreate = (role=='user' && permissions.usersCreate) || (role=='vendor' && permissions.vendorsCreate) || (role=='customer' && permissions.customersCreate);
+%>
+
+<%- include('../components/partials/floating-action-btn', {
+    targetModal: '#addUserModal',
+    icon: 'ri-add-line',
+    tooltip: 'Create New ' + (role==='user' ? 'User' : (role==='vendor' ? 'Vendor' : 'Customer')),
+    colorClass: 'btn-primary',
+    show: canCreate
+}) %>
+
+<!-- Create Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-primary text-white">
+                <h5 class="modal-title">Create <%= role==='user' ? 'User' : (role==='vendor' ? 'Vendor' : 'Customer') %></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addUserForm" class="needs-validation" novalidate>
+                    <div class="row gy-3">
+                        <div class="col-md-6">
+                            <label for="addFirstName" class="form-label">First Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="addFirstName" name="firstname" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="addLastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="addLastName" name="lastname" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="addEmail" class="form-label">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="addEmail" name="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="addUsername" class="form-label">Username <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="addUsername" name="username" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="addPhone" class="form-label">Phone <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="addPhone" name="phone" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="addAddress" class="form-label">Address <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="addAddress" name="address" rows="1" required></textarea>
+                        </div>
+                        <% if (role !== 'customer' && role !== 'vendor') { %>
+                        <div class="col-md-6 position-relative">
+                            <label for="addPassword" class="form-label">Password <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="addPassword" name="password" autocomplete="on" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('addPassword', this)">
+                                    <i class="ri-eye-line"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <% } %>
+                        <input type="hidden" name="role" value="<%= role %>">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveUser()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-warning text-white">
+                <h5 class="modal-title">Edit <%= role==='user' ? 'User' : (role==='vendor' ? 'Vendor' : 'Customer') %></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editUserForm" class="needs-validation" novalidate>
+                    <input type="hidden" id="editUserId" name="id">
+                    <div class="row gy-3">
+                        <div class="col-md-6">
+                            <label for="editFirstName" class="form-label">First Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editFirstName" name="firstname" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editLastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editLastName" name="lastname" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editEmail" class="form-label">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="editEmail" name="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editUsername" class="form-label">Username <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editUsername" name="username" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editPhone" class="form-label">Phone <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editPhone" name="phone" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editAddress" class="form-label">Address <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="editAddress" name="address" rows="1" required></textarea>
+                        </div>
+                        <% if (role !== 'customer' && role !== 'vendor') { %>
+                        <div class="col-md-6 position-relative">
+                            <label for="editPassword" class="form-label">Password <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="editPassword" name="password" autocomplete="on" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('editPassword', this)">
+                                    <i class="ri-eye-line"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <% } %>
+                        <input type="hidden" name="role" value="<%= role %>">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-warning" onclick="updateUser()">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View Modal -->
+<%- include('../components/partials/view-modal', {
+    id: 'viewUserModal',
+    title: (role==='user' ? 'User' : (role==='vendor' ? 'Vendor' : 'Customer')) + ' Details'
+}) %>
+
+<style>
+    .custom_disabled {
+        opacity: 0.5;
+        pointer-events: none;
+        cursor: not-allowed;
+    }
+</style>
+
 <script>
-    async function deleteRecord(id) {
-        $.alert({
-            title: 'Confirm!',
+    function togglePassword(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('ri-eye-line');
+            icon.classList.add('ri-eye-off-line');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('ri-eye-off-line');
+            icon.classList.add('ri-eye-line');
+        }
+    }
+
+    function openViewModal(id) {
+        fetch('/users/' + id)
+            .then(r => r.json())
+            .then(result => {
+                if (!result.success) return toastr.error('Failed to load details');
+                const u = result.user;
+                const fields = [
+                    { label: 'First Name', value: u.firstname },
+                    { label: 'Last Name', value: u.lastname },
+                    { label: 'Email', value: u.email },
+                    { label: 'Phone', value: u.phone },
+                    { label: 'Address', value: u.address || '-' }
+                ];
+                <% if (role === 'user') { %>
+                fields.push({ label: 'Username', value: u.username || '-' });
+                fields.push({ label: 'Role', value: u.role || '-' });
+                <% } %>
+                renderViewModal('viewUserModal', fields);
+                const modal = new bootstrap.Modal(document.getElementById('viewUserModal'));
+                modal.show();
+            })
+            .catch(e => { console.error(e); toastr.error('Error loading details'); });
+    }
+
+    function openEditModal(id) {
+        fetch('/users/' + id)
+            .then(r => r.json())
+            .then(result => {
+                if (!result.success) return toastr.error('Failed to load record');
+                const u = result.user;
+                document.getElementById('editUserId').value = u.id;
+                document.getElementById('editFirstName').value = u.firstname || '';
+                document.getElementById('editLastName').value = u.lastname || '';
+                document.getElementById('editEmail').value = u.email || '';
+                document.getElementById('editUsername').value = u.username || '';
+                document.getElementById('editPhone').value = u.phone || '';
+                document.getElementById('editAddress').value = u.address || '';
+                <% if (role !== 'customer' && role !== 'vendor') { %>
+                document.getElementById('editPassword').value = u.password || '';
+                // reset eye icon
+                const btn = document.querySelector('#editPassword').nextElementSibling;
+                if (btn) {
+                    btn.querySelector('i').classList.remove('ri-eye-off-line');
+                    btn.querySelector('i').classList.add('ri-eye-line');
+                }
+                <% } %>
+                const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+                modal.show();
+            })
+            .catch(e => { console.error(e); toastr.error('Error loading record'); });
+    }
+
+    function validateForm(formId) {
+        const form = document.getElementById(formId);
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return null;
+        }
+        const phone = form.querySelector('input[name="phone"]').value;
+        if (phone.length < 8) {
+            toastr.error('Phone number must be at least 8 characters');
+            form.querySelector('input[name="phone"]').focus();
+            return null;
+        }
+        const data = {};
+        new FormData(form).forEach((value, key) => { data[key] = value; });
+        return data;
+    }
+
+    function saveUser() {
+        const data = validateForm('addUserForm');
+        if (!data) return;
+        fetch('/users/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(r => r.json())
+        .then(result => {
+            if (result.success) {
+                toastr.success(result.message);
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
+                if (modal) modal.hide();
+                setTimeout(() => window.location.reload(), 800);
+            } else {
+                toastr.error(result.message || 'Error saving record');
+            }
+        })
+        .catch(e => { console.error(e); toastr.error('Failed to save record'); });
+    }
+
+    function updateUser() {
+        const data = validateForm('editUserForm');
+        if (!data) return;
+        fetch('/users/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(r => r.json())
+        .then(result => {
+            if (result.success) {
+                toastr.success(result.message);
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
+                if (modal) modal.hide();
+                setTimeout(() => window.location.reload(), 800);
+            } else {
+                toastr.error(result.message || 'Error updating record');
+            }
+        })
+        .catch(e => { console.error(e); toastr.error('Failed to update record'); });
+    }
+
+    function deleteRecord(id) {
+        $.confirm({
+            title: 'Confirm Delete',
             content: 'Are you sure you want to delete this record?',
             theme: 'material',
             useBootstrap: false,
             boxWidth: '30%',
+            type: 'red',
             buttons: {
                 confirm: {
-                    text: 'Yes',
+                    text: 'Yes, Delete',
                     btnClass: 'btn-danger',
-                    action: async function () {
-                        const response = await fetch(`/users/${id}/delete`, {
-                            method: 'POST'
-                        });
-                        let result = await response.json();
-                        if (result.success === true) {
-                            $.alert({
-                                title: 'Success!',
-                                content: result.message,
-                                boxWidth: '30%',
-                                theme: 'material',
-                                useBootstrap: false,
-                                type: 'green',
-                                buttons: {
-                                    confirm: {
-                                        text: 'OK',
-                                        btnClass: 'btn-success',
-                                        action: function () {
-                                            location.reload();
-                                        }
-                                    }
+                    action: function () {
+                        fetch('/users/' + id + '/delete', { method: 'POST' })
+                            .then(r => r.json())
+                            .then(result => {
+                                if (result.success) {
+                                    toastr.success(result.message);
+                                    setTimeout(() => window.location.reload(), 800);
+                                } else {
+                                    toastr.error(result.message || 'Error deleting record');
                                 }
-                            });
-                        } else {
-                            $.alert({
-                                title: 'Error!',
-                                content: result.message,
-                                boxWidth: '30%',
-                                theme: 'material',
-                                useBootstrap: false,
-                                type: 'red',
-                                buttons: {
-                                    confirm: {
-                                        text: 'OK',
-                                        btnClass: 'btn-danger',
-                                    }
-                                }
-                            });
-                        }
+                            })
+                            .catch(e => { console.error(e); toastr.error('Failed to delete record'); });
                     }
                 },
                 cancel: {
                     text: 'No',
-                    btnClass: 'btn-primary',
+                    btnClass: 'btn-primary'
                 }
             }
         });
