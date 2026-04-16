@@ -27,17 +27,43 @@ function deleteOldLogs(logDir) {
   }
 }
 
+function stringifyMessagePart(part) {
+  if (typeof part === 'string') {
+    return part;
+  }
+
+  if (
+    typeof part === 'number'
+    || typeof part === 'boolean'
+    || typeof part === 'bigint'
+    || typeof part === 'symbol'
+    || part === null
+    || part === undefined
+  ) {
+    return String(part);
+  }
+
+  if (part instanceof Error) {
+    return part.stack || part.message || String(part);
+  }
+
+  try {
+    return JSON.stringify(part, null, 2);
+  } catch {
+    return String(part);
+  }
+}
+
+function formatMessages(message) {
+  return message.map(stringifyMessagePart).join(' ');
+}
+
 // Receive a message like console.log, can call it with comma-separated values
 function log(...message) {
   // In dev, always show logs in console for fast debugging.
   if (config.env === 'development') {
-    if (message.length === 1 && typeof message[0] === 'object') {
-      // eslint-disable-next-line no-console
-      console.log(JSON.stringify(message[0], null, 2));
-      return;
-    }
     // eslint-disable-next-line no-console
-    console.log(message.join(' '));
+    console.log(formatMessages(message));
     return;
   }
 
@@ -62,7 +88,7 @@ function log(...message) {
       if (message.length === 1 && typeof message[0] === 'object') {
         message = [JSON.stringify(message[0], null, 2)];
       }
-      const messages = message.join(' ');
+      const messages = formatMessages(message);
       const logMessage = `${timestamp} - ${messages}\n`;
 
       // Append log to file
@@ -72,11 +98,11 @@ function log(...message) {
       deleteOldLogs(logDir);
     } catch {
       // eslint-disable-next-line no-console
-      console.log(message.join(' '));
+      console.log(formatMessages(message));
     }
   } else {
     // eslint-disable-next-line no-console
-    console.log(message.join(' '));
+    console.log(formatMessages(message));
   }
 }
 

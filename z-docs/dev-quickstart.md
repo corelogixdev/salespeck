@@ -9,6 +9,21 @@ npm run prisma:generate
 npm run dev
 ```
 
+## Fresh Setup Note
+On a fresh machine or fresh workspace, the generated `desktop/.settings` file may start with:
+
+```ini
+env=production
+```
+
+After the first `npm run dev`, open `desktop/.settings` and change it to:
+
+```ini
+env=development
+```
+
+This keeps `logi` output in the console and makes local development behavior match dev mode expectations.
+
 
 
 ## Apply Schema Changes (dev)
