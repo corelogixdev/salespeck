@@ -146,6 +146,20 @@ exports.Prisma.CashclosingScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.Delivery_queueScalarFieldEnum = {
+  id: 'id',
+  sale: 'sale',
+  customer: 'customer',
+  deliveryuser: 'deliveryuser',
+  queueno: 'queueno',
+  status: 'status',
+  address: 'address',
+  note: 'note',
+  source: 'source',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.CategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -357,6 +371,7 @@ exports.Prisma.ModelName = {
   SequelizeMeta: 'SequelizeMeta',
   brand: 'brand',
   cashclosing: 'cashclosing',
+  delivery_queue: 'delivery_queue',
   category: 'category',
   financeaccount: 'financeaccount',
   financetransaction: 'financetransaction',

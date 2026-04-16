@@ -36,6 +36,20 @@ model cashclosing {
   updatedAt              DateTime  @default(now())
 }
 
+model delivery_queue {
+  id           String   @id
+  sale         String?
+  customer     String?
+  deliveryuser String?
+  queueno      Int?
+  status       String?  @default("pending")
+  address      String?
+  note         String?
+  source       String?  @default("desktop")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+}
+
 model category {
   id          String                     @id
   name        String

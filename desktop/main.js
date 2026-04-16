@@ -223,8 +223,8 @@ app.whenReady().then(async () => {
   }
 
   // Get update URL from .settings file (runtime config)
-  const updateUrl = config.update_url;
-  //const updateUrl = "http://localhost:8000"; //local update server
+  //const updateUrl = config.update_url;
+  const updateUrl = "http://localhost:8000"; //local update server
 
   if (!updateUrl) {
     logi('Warning: Update URL not configured. Auto-updates disabled.');
