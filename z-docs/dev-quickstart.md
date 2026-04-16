@@ -9,6 +9,9 @@ npm run prisma:generate
 npm run dev
 ```
 
+In development mode, startup bootstrap does **not** create database backups and does **not** run automatic `prisma migrate deploy`.
+For dev schema work, run Prisma commands manually.
+
 ## Fresh Setup Note
 On a fresh machine or fresh workspace, the generated `desktop/.settings` file may start with:
 

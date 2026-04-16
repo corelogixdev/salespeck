@@ -9,6 +9,10 @@ const { requirePrismaClient } = require("./prismaClient");
 
 const SEED_MARKER = "prisma_seed_v1";
 
+function isPackagedRuntime() {
+  return __dirname.includes("app.asar");
+}
+
 function resolveCliExecutable() {
   if (process.execPath && fs.existsSync(process.execPath)) {
     return process.execPath;
@@ -42,7 +46,7 @@ function runPrismaCli(args) {
   };
 
   let result;
-  if (!__dirname.includes("app.asar")) {
+  if (!isPackagedRuntime()) {
     const npxCommand = process.platform === "win32" ? "npx.cmd" : "npx";
     result = spawnSync(
       npxCommand,
@@ -115,12 +119,16 @@ async function prismaStartupBootstrap() {
   ensureDatabaseDirectory();
   process.env.DATABASE_URL = process.env.DATABASE_URL || resolveDatabaseUrl();
 
-  backupDatabaseIfExists();
-  try {
-    runPrismaCli(["migrate", "deploy"]);
-  } catch (error) {
-    // Keep startup resilient on packaged edge-cases; app can still run with existing schema.
-    logi("Prisma migrate deploy skipped:", error.message || error);
+  if (isPackagedRuntime()) {
+    backupDatabaseIfExists();
+    try {
+      runPrismaCli(["migrate", "deploy"]);
+    } catch (error) {
+      // Keep startup resilient on packaged edge-cases; app can still run with existing schema.
+      logi("Prisma migrate deploy skipped:", error.message || error);
+    }
+  } else {
+    logi("Dev mode detected: skipping automatic backup and migrate deploy.");
   }
 
   const prisma = requirePrismaClient();

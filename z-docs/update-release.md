@@ -11,6 +11,9 @@
 
 Result: schema changes and required must-data are applied automatically on app startup.
 
+This automatic backup + `migrate deploy` flow is for installed/packaged app updates.
+It is intentionally skipped during `npm run dev`.
+
 ## Release Steps (Operators / CI)
 1. Update the desktop version in `desktop/package.json`.
 2. Generate the Prisma client:
