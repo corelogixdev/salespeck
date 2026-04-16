@@ -9,6 +9,8 @@ npm run prisma:generate
 npm run dev
 ```
 
+
+
 ## Apply Schema Changes (dev)
 After editing `desktop/prisma/schema.prisma`:
 

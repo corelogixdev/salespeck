@@ -25,6 +25,13 @@ module.exports = async (req, res, next) => {
         res.locals.user = null;
         res.locals.appVersion = appVersion;
 
+        // Flash messages (e.g. registration success) should display on unauthenticated pages too.
+        // atta@2026-04-16
+        if (req.session?.message) {
+            res.locals.message = req.session.message;
+            delete req.session.message;
+        }
+
         if (!req.session?.user_id) {
             return next();
         }
@@ -93,11 +100,6 @@ module.exports = async (req, res, next) => {
             categoriesList: true,
             categoriesView: true
         };
-
-        if (req.session.message) {
-            res.locals.message = req.session.message;
-            delete req.session.message;
-        }
 
         next();
     } catch (error) {
