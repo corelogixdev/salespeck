@@ -71,7 +71,8 @@
     },
     "nsis": {
       "oneClick": false,
-      "allowElevation": true
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true
     },
     "portable": {
       "requestExecutionLevel": "admin"
