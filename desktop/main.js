@@ -2,7 +2,6 @@ const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
-require('./server/app'); // DON'T REMOVE THIS. THIS LINKS TO THE EXPRESS APP
 // Defer autoUpdater requirement to after app is ready or inside a try-catch
 let autoUpdater;
 try {
@@ -12,6 +11,7 @@ try {
 }
 const config = require('./installEnv.js'); // Link to the Express app
 const logi = require('./utils/logi.js');
+const prismaStartupBootstrap = require('./utils/prismaStartupBootstrap');
 
 // app.setAppLogsPath();
 //log starting app and date time to log file
@@ -31,6 +31,20 @@ process.env.npm_package_version = packageJson.version;
 // });
 
 let mainWindow = null;
+const singleInstanceLock = app.requestSingleInstanceLock();
+
+if (!singleInstanceLock) {
+  app.quit();
+}
+
+app.on('second-instance', () => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    if (mainWindow.isMinimized()) {
+      mainWindow.restore();
+    }
+    mainWindow.focus();
+  }
+});
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -154,8 +168,17 @@ ipcMain.on('maximize-window', (event) => {
   mainWindow.maximize();
 });
 
-app.whenReady().then(() => {
-  createWindow();
+app.whenReady().then(async () => {
+  try {
+    await prismaStartupBootstrap();
+    require('./server/app'); // Keep server startup after DB bootstrap.
+    createWindow();
+  } catch (error) {
+    const message = error?.message || String(error);
+    logi('Startup bootstrap failed:', message);
+    dialog.showErrorBox('Startup Failed', `OpenMenu could not start.\n\n${message}`);
+    app.quit();
+  }
 
   // Get update URL from .settings file (runtime config)
   const updateUrl = config.update_url;

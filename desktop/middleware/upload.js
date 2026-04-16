@@ -1,9 +1,22 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
+
+function getUploadsBaseDir() {
+    if (__dirname.includes('app.asar')) {
+        const appDataPath = process.env.APPDATA
+            || (process.platform === 'darwin'
+                ? path.join(os.homedir(), 'Library', 'Application Support')
+                : path.join(os.homedir(), '.config'));
+        return path.join(appDataPath, 'openmenu', 'uploads');
+    }
+
+    return path.join(__dirname, '..', 'uploads');
+}
 
 // Create uploads directory if it doesn't exist
-const uploadDir = path.join(__dirname, '..', 'uploads', 'profile-images');
+const uploadDir = path.join(getUploadsBaseDir(), 'profile-images');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }

@@ -1,0 +1,233 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma-client"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model SequelizeMeta {
+  name String @id
+}
+
+model brand {
+  id          String   @id
+  name        String
+  description String?
+  status      Boolean? @default(true)
+  createdby   String?
+  updatedby   String?
+  source      String?  @default("desktop")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+}
+
+model cashclosing {
+  id                     String    @id
+  closingbalance         Float?
+  date                   DateTime?
+  expence                Float?
+  note                   String?
+  sale                   Float?
+  fk_user_in_cashclosing String?
+  source                 String?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @default(now())
+}
+
+model category {
+  id          String   @id
+  name        String
+  description String?
+  status      Boolean? @default(true)
+  createdby   String?
+  updatedby   String?
+  source      String?  @default("desktop")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+}
+
+model financeaccount {
+  id                          String   @id
+  name                        String?
+  type                        String?
+  fk_parent_in_financeaccount String?
+  createdby                   String?
+  updatedby                   String?
+  source                      String?
+  value                       Decimal?
+  isDefault                   Boolean?
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @default(now())
+}
+
+model financetransaction {
+  id                                      String    @id
+  name                                    String?
+  amount                                  Float?
+  status                                  String?
+  date                                    DateTime? @default(now())
+  details                                 String?
+  source                                  String?
+  fk_user_targetto_in_financetransaction  String?
+  fk_financeaccount_in_financetransaction String?
+  createdby                               String?
+  updatedby                               String?
+  createdAt                               DateTime  @default(now())
+  updatedAt                               DateTime  @default(now())
+}
+
+model inventorylogs {
+  id         String   @id
+  product_id String
+  quantity   Int
+  note       String?
+  createdby  String
+  type       String
+  vendor     String?
+  source     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+}
+
+model product {
+  id             String   @id
+  barcode        String?
+  brand          String?
+  carrycost      Float?
+  category       String?
+  discount       Float?
+  ispurchaseable Boolean?
+  issaleable     Boolean?
+  name           String?
+  purchaseactive Boolean?
+  purchaseprice  Float?
+  quantity       Float?
+  saleactive     Boolean?
+  saleprice      Float?
+  taxid          String?
+  createdby      String?
+  updatedby      String?
+  source         String?  @default("desktop")
+}
+
+model productbatches {
+  id         String    @id
+  product    String?
+  expirydate DateTime?
+  quantity   Float?
+  source     String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @default(now())
+}
+
+model productsalepurchase {
+  id                                           String   @id
+  price                                        Float?
+  quantity                                     Float?
+  total                                        Float?
+  fk_product_in_productsalepurchase            String?
+  fk_financetransaction_in_productsalepurchase String?
+  source                                       String?
+  createdAt                                    DateTime @default(now())
+  updatedAt                                    DateTime @default(now())
+}
+
+model productsub {
+  id                            String   @id
+  fk_product_main_in_productsub String?
+  fk_product_sub_in_productsub  String?
+  quantity                      Float?
+  source                        String?
+  createdAt                     DateTime @default(now())
+  updatedAt                     DateTime @default(now())
+}
+
+model purchase {
+  id           String   @id
+  createdby    String?
+  updatedby    String?
+  vendor       String?
+  totalAmount  Float?
+  totalPayment Float?
+  invoicenum   String?
+  source       String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+}
+
+model purchasedproducts {
+  id          String   @id
+  purchase    String?
+  product     String?
+  quantity    Int?
+  totalAmount Float?
+  source      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+}
+
+model sale {
+  id                 String   @id
+  user               String?
+  customer           String?
+  deliveryuser       String?
+  invoicenum         String?
+  discountpercentage String?
+  totalprice         String?
+  totalpayment       String?
+  createdby          String?
+  updatedby          String?
+  source             String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now())
+}
+
+model softwaresetting {
+  id     String  @id
+  name   String?
+  value  String?
+  source String?
+}
+
+model soldproducts {
+  id        String   @id
+  sale      String?
+  product   String?
+  quantity  Int?
+  price     Float?
+  source    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model taxes {
+  id         String   @id
+  name       String?
+  percentage Float?
+  source     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+}
+
+model user {
+  id                String   @id
+  address           String?
+  account_key       String?
+  email             String?
+  firstname         String?
+  lastname          String?
+  password          String?
+  username          String?
+  phone             String?
+  phone2            String?
+  role              String?  @default("user")
+  createdby         String?
+  updatedby         String?
+  source            String?  @default("desktop")
+  profile_image_url String?
+  dashboard_config  String?  @default("{}")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now())
+}

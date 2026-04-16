@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const session = require('cookie-session');
 const path = require('path');
+const os = require('os');
 const cors = require('cors');
 const logi = require('../utils/logi');
 const expressLayouts = require('express-ejs-layouts');
@@ -12,6 +13,18 @@ const { formatNumber } = require('../utils/formatNumber');
 const moment = require('moment');
 const app = express();
 const runMigrationsAndSeeders = require('../utils/runMigrationsAndSeeders.js');
+
+function getUploadsBaseDir() {
+  if (__dirname.includes('app.asar')) {
+    const appDataPath = process.env.APPDATA
+      || (process.platform === 'darwin'
+        ? path.join(os.homedir(), 'Library', 'Application Support')
+        : path.join(os.homedir(), '.config'));
+    return path.join(appDataPath, 'openmenu', 'uploads');
+  }
+
+  return path.join(__dirname, '..', 'uploads');
+}
 
 // Make formatNumber and moment available to all views
 app.locals.formatNumber = formatNumber;
@@ -32,7 +45,7 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files from the "public" directory
 app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
 // Serve uploaded files
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+app.use('/uploads', express.static(getUploadsBaseDir()));
 // Serve static files from the "node_modules" directory
 app.use('/node_modules', express.static(path.join(__dirname, '..', 'node_modules')));
 // Set view engine

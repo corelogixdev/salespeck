@@ -69,3 +69,5 @@ dev-app-update.yml
 openmenu.exe
 latest.yml
 .settings
+
+/generated/prisma

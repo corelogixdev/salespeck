@@ -31,6 +31,34 @@ let progress = {
   transactions: 0,
 };
 
+async function ensureUserTableColumns() {
+  try {
+    const queryInterface = db.sequelize.getQueryInterface();
+    const tableDefinition = await queryInterface.describeTable("user");
+
+    if (!tableDefinition.profile_image_url) {
+      await queryInterface.addColumn("user", "profile_image_url", {
+        type: db.Sequelize.STRING(500),
+        allowNull: true,
+        defaultValue: null,
+      });
+      console.log("Added missing column: user.profile_image_url");
+    }
+
+    if (!tableDefinition.dashboard_config) {
+      await queryInterface.addColumn("user", "dashboard_config", {
+        type: db.Sequelize.TEXT,
+        allowNull: true,
+        defaultValue: "{}",
+      });
+      console.log("Added missing column: user.dashboard_config");
+    }
+  } catch (error) {
+    console.error("Failed to validate/update user table columns:", error);
+    throw error;
+  }
+}
+
 function logProgress(entity, current, total) {
   const percent = ((current / total) * 100).toFixed(1);
   process.stdout.write(
@@ -826,6 +854,8 @@ async function seedLargeDemoData() {
   console.log("");
 
   try {
+    await ensureUserTableColumns();
+
     // Create or get admin user
     let adminUser = await db.user.findOne({ where: { username: "test" } });
     if (!adminUser) {

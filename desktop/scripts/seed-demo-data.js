@@ -4,8 +4,38 @@ const encrypt = require('../utils/encrypt');
 const db = require('../models');
 const User = db.user;
 
+async function ensureUserTableColumns() {
+  try {
+    const queryInterface = db.sequelize.getQueryInterface();
+    const tableDefinition = await queryInterface.describeTable('user');
+
+    if (!tableDefinition.profile_image_url) {
+      await queryInterface.addColumn('user', 'profile_image_url', {
+        type: db.Sequelize.STRING(500),
+        allowNull: true,
+        defaultValue: null
+      });
+      console.log('Added missing column: user.profile_image_url');
+    }
+
+    if (!tableDefinition.dashboard_config) {
+      await queryInterface.addColumn('user', 'dashboard_config', {
+        type: db.Sequelize.TEXT,
+        allowNull: true,
+        defaultValue: '{}'
+      });
+      console.log('Added missing column: user.dashboard_config');
+    }
+  } catch (error) {
+    console.error('Failed to validate/update user table columns:', error);
+    throw error;
+  }
+}
+
 async function seedDemoData() {
   try {
+    await ensureUserTableColumns();
+
     var user = await User.findOne({ where: { username: 'test' } });
     if (!user) {
       user = await User.create({
@@ -122,8 +152,8 @@ async function seedDemoData() {
         quantity: 100,
         saleprice: 0,
         saleactive: false,
-        createdby: 1,
-        updatedby: 1,
+        createdby: user.id,
+        updatedby: user.id,
       },
       {
         name: '124',
@@ -137,8 +167,8 @@ async function seedDemoData() {
         quantity: 100,
         saleprice: 2,
         saleactive: true,
-        createdby: 1,
-        updatedby: 1,
+        createdby: user.id,
+        updatedby: user.id,
       },
       {
         name: 'c',
@@ -152,8 +182,8 @@ async function seedDemoData() {
         quantity: 100,
         saleprice: 4,
         saleactive: true,
-        createdby: 1,
-        updatedby: 1,
+        createdby: user.id,
+        updatedby: user.id,
       }
     ];
 

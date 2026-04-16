@@ -1,5 +1,6 @@
 const { Op } = require('sequelize');
 const db = require('../models');
+const { requirePrismaClient } = require('../utils/prismaClient');
 const { findLike } = require('../utils/searchquery');
 const { getPaginationMeta, buildSortClause, sanitizeFilters } = require('../utils/paginationHelper');
 
@@ -129,12 +130,43 @@ exports.index = async (req, res) => {
 
 exports.getProduct = async (req, res) => {
   try {
-    const product = await db.product.findByPk(req.params.id, {
-      include: [
-        { model: db.brand, as: 'Brand' },
-        { model: db.category, as: 'Category' }
-      ]
-    });
+    let product;
+    const prisma = requirePrismaClient();
+
+    try {
+      const prismaProduct = await prisma.product.findUnique({
+        where: { id: req.params.id }
+      });
+
+      if (prismaProduct) {
+        const [brand, category] = await Promise.all([
+          prismaProduct.brand
+            ? prisma.brand.findUnique({
+              where: { id: prismaProduct.brand },
+              select: { id: true, name: true, description: true, status: true }
+            })
+            : Promise.resolve(null),
+          prismaProduct.category
+            ? prisma.category.findUnique({
+              where: { id: prismaProduct.category },
+              select: { id: true, name: true, description: true, status: true }
+            })
+            : Promise.resolve(null)
+        ]);
+
+        product = {
+          ...prismaProduct,
+          Brand: brand,
+          Category: category
+        };
+      } else {
+        product = null;
+      }
+    } catch (prismaError) {
+      console.error('Prisma product read error:', prismaError);
+      throw prismaError;
+    }
+
     if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }

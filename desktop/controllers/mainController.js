@@ -1,4 +1,5 @@
 const db = require("../models");
+const { requirePrismaClient } = require("../utils/prismaClient");
 const encrypt = require("../utils/encrypt");
 const moment = require("moment");
 const logi = require("../utils/logi");
@@ -254,7 +255,15 @@ function calculatePercentageChange(previous = 0, current) {
   return 0;
 }
 const loginGet = async (req, res) => {
-  let user = await db.user.findOne({ where: { role: "branchmanager" } });
+  const prisma = requirePrismaClient();
+  let user = null;
+  try {
+    user = await prisma.user.findFirst({ where: { role: "branchmanager" } });
+  } catch (error) {
+    logi("Prisma loginGet error:", error.message || error);
+    throw error;
+  }
+
   if (!user) {
     logi("User was not found in local database. Redirecting to login...");
     return res.redirect("/register");
@@ -265,14 +274,22 @@ const loginGet = async (req, res) => {
 const loginPost = async (req, res) => {
   logi("Login request received");
   const { username, password } = req.body;
-  logi("Password received:", password);
   try {
-    const user = await db.user.findOne({ where: { username } });
+    let user = null;
+    const prisma = requirePrismaClient();
+
+    try {
+      user = await prisma.user.findFirst({ where: { username } });
+    } catch (prismaError) {
+      logi("Prisma loginPost error:", prismaError.message || prismaError);
+      throw prismaError;
+    }
+
     if (user && encrypt.compare(user.password, password)) {
       logi("User found:", user.firstname);
       logi("Login successful");
       req.session.user_id = user.id;
-      req.session.user = user.get({ plain: true });
+      req.session.user = user;
       req.session.message = { type: "success", text: "Login successful!" };
       res.redirect("/");
     } else {
