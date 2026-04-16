@@ -264,4 +264,8 @@ config.getDefaultSettings = function() {
   return DEFAULT_SETTINGS;
 };
 
+config.getSettingsPath = function() {
+  return settingsPath;
+};
+
 module.exports = config;

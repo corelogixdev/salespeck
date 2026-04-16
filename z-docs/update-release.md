@@ -39,6 +39,8 @@ npm run upload (it will upload the new build on https://gitlab.com/api/v4/projec
 - `desktop/prisma/schema.prisma` and migrations are committed.
 - must-data seed is idempotent (it is).
 - installer builds successfully.
+- installed-app local update test passes using `cd desktop && npm run test-local-installed-update 1.0.8`
+- see `z-docs/test-local-installed-update.md` for the local installed update workflow
 
 ## Post-Release Checks (On a machine with existing data)
 1. App opens normally (no startup dialog).

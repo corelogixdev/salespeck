@@ -112,7 +112,7 @@ Schema bootstrap is currently centered in `desktop/migrations/20260131000000-ini
 - `desktop/views/components/partials/`: Shared table/filter/pagination/modal components.
 - `z-docs/dev-mode.md`: Development mode notes.
 - `z-docs/update-release.md`: Update testing and release guide.
-- `z-docs/local-update-test.md`: Local update testing guide.
+- `z-docs/test-local-installed-update.md`: Local installed-app update testing guide.
 
 ## Local Testing And Publish
 
@@ -123,8 +123,8 @@ Schema bootstrap is currently centered in `desktop/migrations/20260131000000-ini
 - Seed test large dataset (optional): `cd desktop && npm run prisma:seed:test-large`
 - Build desktop app: `cd desktop && npm run build`
 - Upload/publish package: `cd desktop && npm run upload`
-- Release verification helper: `cd desktop && npm run test:update`
-- Local update testing guide: `z-docs/local-update-test.md`
+- Release verification helper: `cd desktop && npm run test-local-installed-update`
+- Local installed-app update testing guide: `z-docs/test-local-installed-update.md`
 - Update testing workflow: `z-docs/update-release.md`
 
 ## Performance And Scalability Principles
