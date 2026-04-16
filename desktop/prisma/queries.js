@@ -693,7 +693,7 @@ const sales = {
       where: { sale: id },
       orderBy: { createdAt: "asc" },
     });
-    const userIds = [...new Set([sale.customer, sale.deliveryuser, sale.user].filter(Boolean))];
+    const userIds = [...new Set([sale.customer, sale.user].filter(Boolean))];
     const productIds = [...new Set(soldItems.map((item) => item.product).filter(Boolean))];
     const [users, products] = await Promise.all([
       userIds.length > 0
@@ -715,7 +715,6 @@ const sales = {
     return {
       ...sale,
       Customer: sale.customer ? userMap.get(sale.customer) || null : null,
-      DeliveryUser: sale.deliveryuser ? userMap.get(sale.deliveryuser) || null : null,
       User: sale.user ? userMap.get(sale.user) || null : null,
       SoldPoducts: soldItems.map((item) => ({
         ...item,

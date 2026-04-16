@@ -152,6 +152,17 @@ Schema bootstrap is currently centered in `desktop/migrations/20260131000000-ini
 
 ## Future Roadmap
 
+- Chart of accounts improvents
+ - Standard flow for sales/returns/purchase/ledger payments/cash closing/Expences
+ - cash payment check in sales
+ 
+
+- Check and database structure for Preformance 
+
+- Change design to simple sleek, remove gradiants, one css files and it should look like pos
+
+- add staff and assign permissions
+
 - Kitchen & Operations:
   - Kitchen Display System (KDS) with live order state tracking.
   - Delivery options with queue management.
@@ -167,7 +178,6 @@ Schema bootstrap is currently centered in `desktop/migrations/20260131000000-ini
   - Customer history and segmentation for better targeting.
   - Repeat customer and basket-size insight dashboards.
 - Platform & Integrations:
-  - Card machine payment integration (bank POS terminals).
   - Settlement and payment reconciliation screens.
   - Website/online reporting for OpenMenu Desktop in `web/`.
 - AI-Focused Enhancements (minimal showcase):
@@ -178,10 +188,6 @@ Schema bootstrap is currently centered in `desktop/migrations/20260131000000-ini
   - Local mobile app for menu display and QR/mobile scan selling.
   - Staff mobile app for table/order handling.
   - Owner mobile dashboard for daily KPIs and alerts.
-- Data Layer Modernization:
-  - Convert from Sequelize to Prisma in phased steps.
-  - Migrate read-heavy modules first, then write-critical flows.
-  - Maintain schema parity and regression checks throughout migration.
 - Features Control:
   - Feature flags to enable/disable modules by business type.
   - Branch-wise feature controls.

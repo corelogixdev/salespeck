@@ -29,11 +29,6 @@ export type brand = $Result.DefaultSelection<Prisma.$brandPayload>
  */
 export type cashclosing = $Result.DefaultSelection<Prisma.$cashclosingPayload>
 /**
- * Model delivery_queue
- * 
- */
-export type delivery_queue = $Result.DefaultSelection<Prisma.$delivery_queuePayload>
-/**
  * Model category
  * 
  */
@@ -259,16 +254,6 @@ export class PrismaClient<
     * ```
     */
   get cashclosing(): Prisma.cashclosingDelegate<ExtArgs, ClientOptions>;
-
-  /**
-   * `prisma.delivery_queue`: Exposes CRUD operations for the **delivery_queue** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more Delivery_queues
-    * const delivery_queues = await prisma.delivery_queue.findMany()
-    * ```
-    */
-  get delivery_queue(): Prisma.delivery_queueDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.category`: Exposes CRUD operations for the **category** model.
@@ -856,7 +841,6 @@ export namespace Prisma {
     SequelizeMeta: 'SequelizeMeta',
     brand: 'brand',
     cashclosing: 'cashclosing',
-    delivery_queue: 'delivery_queue',
     category: 'category',
     financeaccount: 'financeaccount',
     financetransaction: 'financetransaction',
@@ -887,7 +871,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "sequelizeMeta" | "brand" | "cashclosing" | "delivery_queue" | "category" | "financeaccount" | "financetransaction" | "inventorylogs" | "product" | "productbatches" | "productsalepurchase" | "productsub" | "purchase" | "purchasedproducts" | "sale" | "softwaresetting" | "soldproducts" | "taxes" | "user"
+      modelProps: "sequelizeMeta" | "brand" | "cashclosing" | "category" | "financeaccount" | "financetransaction" | "inventorylogs" | "product" | "productbatches" | "productsalepurchase" | "productsub" | "purchase" | "purchasedproducts" | "sale" | "softwaresetting" | "soldproducts" | "taxes" | "user"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1110,80 +1094,6 @@ export namespace Prisma {
           count: {
             args: Prisma.cashclosingCountArgs<ExtArgs>
             result: $Utils.Optional<CashclosingCountAggregateOutputType> | number
-          }
-        }
-      }
-      delivery_queue: {
-        payload: Prisma.$delivery_queuePayload<ExtArgs>
-        fields: Prisma.delivery_queueFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.delivery_queueFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$delivery_queuePayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.delivery_queueFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$delivery_queuePayload>
-          }
-          findFirst: {
-            args: Prisma.delivery_queueFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$delivery_queuePayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.delivery_queueFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$delivery_queuePayload>
-          }
-          findMany: {
-            args: Prisma.delivery_queueFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$delivery_queuePayload>[]
-          }
-          create: {
-            args: Prisma.delivery_queueCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$delivery_queuePayload>
-          }
-          createMany: {
-            args: Prisma.delivery_queueCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.delivery_queueCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$delivery_queuePayload>[]
-          }
-          delete: {
-            args: Prisma.delivery_queueDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$delivery_queuePayload>
-          }
-          update: {
-            args: Prisma.delivery_queueUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$delivery_queuePayload>
-          }
-          deleteMany: {
-            args: Prisma.delivery_queueDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.delivery_queueUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.delivery_queueUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$delivery_queuePayload>[]
-          }
-          upsert: {
-            args: Prisma.delivery_queueUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$delivery_queuePayload>
-          }
-          aggregate: {
-            args: Prisma.Delivery_queueAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateDelivery_queue>
-          }
-          groupBy: {
-            args: Prisma.delivery_queueGroupByArgs<ExtArgs>
-            result: $Utils.Optional<Delivery_queueGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.delivery_queueCountArgs<ExtArgs>
-            result: $Utils.Optional<Delivery_queueCountAggregateOutputType> | number
           }
         }
       }
@@ -2408,7 +2318,6 @@ export namespace Prisma {
     sequelizeMeta?: SequelizeMetaOmit
     brand?: brandOmit
     cashclosing?: cashclosingOmit
-    delivery_queue?: delivery_queueOmit
     category?: categoryOmit
     financeaccount?: financeaccountOmit
     financetransaction?: financetransactionOmit
@@ -5602,1116 +5511,6 @@ export namespace Prisma {
      * Omit specific fields from the cashclosing
      */
     omit?: cashclosingOmit<ExtArgs> | null
-  }
-
-
-  /**
-   * Model delivery_queue
-   */
-
-  export type AggregateDelivery_queue = {
-    _count: Delivery_queueCountAggregateOutputType | null
-    _avg: Delivery_queueAvgAggregateOutputType | null
-    _sum: Delivery_queueSumAggregateOutputType | null
-    _min: Delivery_queueMinAggregateOutputType | null
-    _max: Delivery_queueMaxAggregateOutputType | null
-  }
-
-  export type Delivery_queueAvgAggregateOutputType = {
-    queueno: number | null
-  }
-
-  export type Delivery_queueSumAggregateOutputType = {
-    queueno: number | null
-  }
-
-  export type Delivery_queueMinAggregateOutputType = {
-    id: string | null
-    sale: string | null
-    customer: string | null
-    deliveryuser: string | null
-    queueno: number | null
-    status: string | null
-    address: string | null
-    note: string | null
-    source: string | null
-    createdAt: Date | null
-    updatedAt: Date | null
-  }
-
-  export type Delivery_queueMaxAggregateOutputType = {
-    id: string | null
-    sale: string | null
-    customer: string | null
-    deliveryuser: string | null
-    queueno: number | null
-    status: string | null
-    address: string | null
-    note: string | null
-    source: string | null
-    createdAt: Date | null
-    updatedAt: Date | null
-  }
-
-  export type Delivery_queueCountAggregateOutputType = {
-    id: number
-    sale: number
-    customer: number
-    deliveryuser: number
-    queueno: number
-    status: number
-    address: number
-    note: number
-    source: number
-    createdAt: number
-    updatedAt: number
-    _all: number
-  }
-
-
-  export type Delivery_queueAvgAggregateInputType = {
-    queueno?: true
-  }
-
-  export type Delivery_queueSumAggregateInputType = {
-    queueno?: true
-  }
-
-  export type Delivery_queueMinAggregateInputType = {
-    id?: true
-    sale?: true
-    customer?: true
-    deliveryuser?: true
-    queueno?: true
-    status?: true
-    address?: true
-    note?: true
-    source?: true
-    createdAt?: true
-    updatedAt?: true
-  }
-
-  export type Delivery_queueMaxAggregateInputType = {
-    id?: true
-    sale?: true
-    customer?: true
-    deliveryuser?: true
-    queueno?: true
-    status?: true
-    address?: true
-    note?: true
-    source?: true
-    createdAt?: true
-    updatedAt?: true
-  }
-
-  export type Delivery_queueCountAggregateInputType = {
-    id?: true
-    sale?: true
-    customer?: true
-    deliveryuser?: true
-    queueno?: true
-    status?: true
-    address?: true
-    note?: true
-    source?: true
-    createdAt?: true
-    updatedAt?: true
-    _all?: true
-  }
-
-  export type Delivery_queueAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which delivery_queue to aggregate.
-     */
-    where?: delivery_queueWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of delivery_queues to fetch.
-     */
-    orderBy?: delivery_queueOrderByWithRelationInput | delivery_queueOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: delivery_queueWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` delivery_queues from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` delivery_queues.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned delivery_queues
-    **/
-    _count?: true | Delivery_queueCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to average
-    **/
-    _avg?: Delivery_queueAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: Delivery_queueSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: Delivery_queueMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: Delivery_queueMaxAggregateInputType
-  }
-
-  export type GetDelivery_queueAggregateType<T extends Delivery_queueAggregateArgs> = {
-        [P in keyof T & keyof AggregateDelivery_queue]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateDelivery_queue[P]>
-      : GetScalarType<T[P], AggregateDelivery_queue[P]>
-  }
-
-
-
-
-  export type delivery_queueGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: delivery_queueWhereInput
-    orderBy?: delivery_queueOrderByWithAggregationInput | delivery_queueOrderByWithAggregationInput[]
-    by: Delivery_queueScalarFieldEnum[] | Delivery_queueScalarFieldEnum
-    having?: delivery_queueScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: Delivery_queueCountAggregateInputType | true
-    _avg?: Delivery_queueAvgAggregateInputType
-    _sum?: Delivery_queueSumAggregateInputType
-    _min?: Delivery_queueMinAggregateInputType
-    _max?: Delivery_queueMaxAggregateInputType
-  }
-
-  export type Delivery_queueGroupByOutputType = {
-    id: string
-    sale: string | null
-    customer: string | null
-    deliveryuser: string | null
-    queueno: number | null
-    status: string | null
-    address: string | null
-    note: string | null
-    source: string | null
-    createdAt: Date
-    updatedAt: Date
-    _count: Delivery_queueCountAggregateOutputType | null
-    _avg: Delivery_queueAvgAggregateOutputType | null
-    _sum: Delivery_queueSumAggregateOutputType | null
-    _min: Delivery_queueMinAggregateOutputType | null
-    _max: Delivery_queueMaxAggregateOutputType | null
-  }
-
-  type GetDelivery_queueGroupByPayload<T extends delivery_queueGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<Delivery_queueGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof Delivery_queueGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], Delivery_queueGroupByOutputType[P]>
-            : GetScalarType<T[P], Delivery_queueGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type delivery_queueSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    sale?: boolean
-    customer?: boolean
-    deliveryuser?: boolean
-    queueno?: boolean
-    status?: boolean
-    address?: boolean
-    note?: boolean
-    source?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-  }, ExtArgs["result"]["delivery_queue"]>
-
-  export type delivery_queueSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    sale?: boolean
-    customer?: boolean
-    deliveryuser?: boolean
-    queueno?: boolean
-    status?: boolean
-    address?: boolean
-    note?: boolean
-    source?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-  }, ExtArgs["result"]["delivery_queue"]>
-
-  export type delivery_queueSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    sale?: boolean
-    customer?: boolean
-    deliveryuser?: boolean
-    queueno?: boolean
-    status?: boolean
-    address?: boolean
-    note?: boolean
-    source?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-  }, ExtArgs["result"]["delivery_queue"]>
-
-  export type delivery_queueSelectScalar = {
-    id?: boolean
-    sale?: boolean
-    customer?: boolean
-    deliveryuser?: boolean
-    queueno?: boolean
-    status?: boolean
-    address?: boolean
-    note?: boolean
-    source?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-  }
-
-  export type delivery_queueOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sale" | "customer" | "deliveryuser" | "queueno" | "status" | "address" | "note" | "source" | "createdAt" | "updatedAt", ExtArgs["result"]["delivery_queue"]>
-
-  export type $delivery_queuePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "delivery_queue"
-    objects: {}
-    scalars: $Extensions.GetPayloadResult<{
-      id: string
-      sale: string | null
-      customer: string | null
-      deliveryuser: string | null
-      queueno: number | null
-      status: string | null
-      address: string | null
-      note: string | null
-      source: string | null
-      createdAt: Date
-      updatedAt: Date
-    }, ExtArgs["result"]["delivery_queue"]>
-    composites: {}
-  }
-
-  type delivery_queueGetPayload<S extends boolean | null | undefined | delivery_queueDefaultArgs> = $Result.GetResult<Prisma.$delivery_queuePayload, S>
-
-  type delivery_queueCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<delivery_queueFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: Delivery_queueCountAggregateInputType | true
-    }
-
-  export interface delivery_queueDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['delivery_queue'], meta: { name: 'delivery_queue' } }
-    /**
-     * Find zero or one Delivery_queue that matches the filter.
-     * @param {delivery_queueFindUniqueArgs} args - Arguments to find a Delivery_queue
-     * @example
-     * // Get one Delivery_queue
-     * const delivery_queue = await prisma.delivery_queue.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends delivery_queueFindUniqueArgs>(args: SelectSubset<T, delivery_queueFindUniqueArgs<ExtArgs>>): Prisma__delivery_queueClient<$Result.GetResult<Prisma.$delivery_queuePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find one Delivery_queue that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {delivery_queueFindUniqueOrThrowArgs} args - Arguments to find a Delivery_queue
-     * @example
-     * // Get one Delivery_queue
-     * const delivery_queue = await prisma.delivery_queue.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends delivery_queueFindUniqueOrThrowArgs>(args: SelectSubset<T, delivery_queueFindUniqueOrThrowArgs<ExtArgs>>): Prisma__delivery_queueClient<$Result.GetResult<Prisma.$delivery_queuePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first Delivery_queue that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {delivery_queueFindFirstArgs} args - Arguments to find a Delivery_queue
-     * @example
-     * // Get one Delivery_queue
-     * const delivery_queue = await prisma.delivery_queue.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends delivery_queueFindFirstArgs>(args?: SelectSubset<T, delivery_queueFindFirstArgs<ExtArgs>>): Prisma__delivery_queueClient<$Result.GetResult<Prisma.$delivery_queuePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first Delivery_queue that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {delivery_queueFindFirstOrThrowArgs} args - Arguments to find a Delivery_queue
-     * @example
-     * // Get one Delivery_queue
-     * const delivery_queue = await prisma.delivery_queue.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends delivery_queueFindFirstOrThrowArgs>(args?: SelectSubset<T, delivery_queueFindFirstOrThrowArgs<ExtArgs>>): Prisma__delivery_queueClient<$Result.GetResult<Prisma.$delivery_queuePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find zero or more Delivery_queues that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {delivery_queueFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all Delivery_queues
-     * const delivery_queues = await prisma.delivery_queue.findMany()
-     * 
-     * // Get first 10 Delivery_queues
-     * const delivery_queues = await prisma.delivery_queue.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const delivery_queueWithIdOnly = await prisma.delivery_queue.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends delivery_queueFindManyArgs>(args?: SelectSubset<T, delivery_queueFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$delivery_queuePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a Delivery_queue.
-     * @param {delivery_queueCreateArgs} args - Arguments to create a Delivery_queue.
-     * @example
-     * // Create one Delivery_queue
-     * const Delivery_queue = await prisma.delivery_queue.create({
-     *   data: {
-     *     // ... data to create a Delivery_queue
-     *   }
-     * })
-     * 
-     */
-    create<T extends delivery_queueCreateArgs>(args: SelectSubset<T, delivery_queueCreateArgs<ExtArgs>>): Prisma__delivery_queueClient<$Result.GetResult<Prisma.$delivery_queuePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many Delivery_queues.
-     * @param {delivery_queueCreateManyArgs} args - Arguments to create many Delivery_queues.
-     * @example
-     * // Create many Delivery_queues
-     * const delivery_queue = await prisma.delivery_queue.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends delivery_queueCreateManyArgs>(args?: SelectSubset<T, delivery_queueCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many Delivery_queues and returns the data saved in the database.
-     * @param {delivery_queueCreateManyAndReturnArgs} args - Arguments to create many Delivery_queues.
-     * @example
-     * // Create many Delivery_queues
-     * const delivery_queue = await prisma.delivery_queue.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many Delivery_queues and only return the `id`
-     * const delivery_queueWithIdOnly = await prisma.delivery_queue.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends delivery_queueCreateManyAndReturnArgs>(args?: SelectSubset<T, delivery_queueCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$delivery_queuePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Delete a Delivery_queue.
-     * @param {delivery_queueDeleteArgs} args - Arguments to delete one Delivery_queue.
-     * @example
-     * // Delete one Delivery_queue
-     * const Delivery_queue = await prisma.delivery_queue.delete({
-     *   where: {
-     *     // ... filter to delete one Delivery_queue
-     *   }
-     * })
-     * 
-     */
-    delete<T extends delivery_queueDeleteArgs>(args: SelectSubset<T, delivery_queueDeleteArgs<ExtArgs>>): Prisma__delivery_queueClient<$Result.GetResult<Prisma.$delivery_queuePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Update one Delivery_queue.
-     * @param {delivery_queueUpdateArgs} args - Arguments to update one Delivery_queue.
-     * @example
-     * // Update one Delivery_queue
-     * const delivery_queue = await prisma.delivery_queue.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends delivery_queueUpdateArgs>(args: SelectSubset<T, delivery_queueUpdateArgs<ExtArgs>>): Prisma__delivery_queueClient<$Result.GetResult<Prisma.$delivery_queuePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Delete zero or more Delivery_queues.
-     * @param {delivery_queueDeleteManyArgs} args - Arguments to filter Delivery_queues to delete.
-     * @example
-     * // Delete a few Delivery_queues
-     * const { count } = await prisma.delivery_queue.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends delivery_queueDeleteManyArgs>(args?: SelectSubset<T, delivery_queueDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more Delivery_queues.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {delivery_queueUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many Delivery_queues
-     * const delivery_queue = await prisma.delivery_queue.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends delivery_queueUpdateManyArgs>(args: SelectSubset<T, delivery_queueUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more Delivery_queues and returns the data updated in the database.
-     * @param {delivery_queueUpdateManyAndReturnArgs} args - Arguments to update many Delivery_queues.
-     * @example
-     * // Update many Delivery_queues
-     * const delivery_queue = await prisma.delivery_queue.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more Delivery_queues and only return the `id`
-     * const delivery_queueWithIdOnly = await prisma.delivery_queue.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends delivery_queueUpdateManyAndReturnArgs>(args: SelectSubset<T, delivery_queueUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$delivery_queuePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Create or update one Delivery_queue.
-     * @param {delivery_queueUpsertArgs} args - Arguments to update or create a Delivery_queue.
-     * @example
-     * // Update or create a Delivery_queue
-     * const delivery_queue = await prisma.delivery_queue.upsert({
-     *   create: {
-     *     // ... data to create a Delivery_queue
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the Delivery_queue we want to update
-     *   }
-     * })
-     */
-    upsert<T extends delivery_queueUpsertArgs>(args: SelectSubset<T, delivery_queueUpsertArgs<ExtArgs>>): Prisma__delivery_queueClient<$Result.GetResult<Prisma.$delivery_queuePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-
-    /**
-     * Count the number of Delivery_queues.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {delivery_queueCountArgs} args - Arguments to filter Delivery_queues to count.
-     * @example
-     * // Count the number of Delivery_queues
-     * const count = await prisma.delivery_queue.count({
-     *   where: {
-     *     // ... the filter for the Delivery_queues we want to count
-     *   }
-     * })
-    **/
-    count<T extends delivery_queueCountArgs>(
-      args?: Subset<T, delivery_queueCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], Delivery_queueCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a Delivery_queue.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {Delivery_queueAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends Delivery_queueAggregateArgs>(args: Subset<T, Delivery_queueAggregateArgs>): Prisma.PrismaPromise<GetDelivery_queueAggregateType<T>>
-
-    /**
-     * Group by Delivery_queue.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {delivery_queueGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends delivery_queueGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: delivery_queueGroupByArgs['orderBy'] }
-        : { orderBy?: delivery_queueGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, delivery_queueGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDelivery_queueGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the delivery_queue model
-   */
-  readonly fields: delivery_queueFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for delivery_queue.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__delivery_queueClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the delivery_queue model
-   */
-  interface delivery_queueFieldRefs {
-    readonly id: FieldRef<"delivery_queue", 'String'>
-    readonly sale: FieldRef<"delivery_queue", 'String'>
-    readonly customer: FieldRef<"delivery_queue", 'String'>
-    readonly deliveryuser: FieldRef<"delivery_queue", 'String'>
-    readonly queueno: FieldRef<"delivery_queue", 'Int'>
-    readonly status: FieldRef<"delivery_queue", 'String'>
-    readonly address: FieldRef<"delivery_queue", 'String'>
-    readonly note: FieldRef<"delivery_queue", 'String'>
-    readonly source: FieldRef<"delivery_queue", 'String'>
-    readonly createdAt: FieldRef<"delivery_queue", 'DateTime'>
-    readonly updatedAt: FieldRef<"delivery_queue", 'DateTime'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * delivery_queue findUnique
-   */
-  export type delivery_queueFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the delivery_queue
-     */
-    select?: delivery_queueSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the delivery_queue
-     */
-    omit?: delivery_queueOmit<ExtArgs> | null
-    /**
-     * Filter, which delivery_queue to fetch.
-     */
-    where: delivery_queueWhereUniqueInput
-  }
-
-  /**
-   * delivery_queue findUniqueOrThrow
-   */
-  export type delivery_queueFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the delivery_queue
-     */
-    select?: delivery_queueSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the delivery_queue
-     */
-    omit?: delivery_queueOmit<ExtArgs> | null
-    /**
-     * Filter, which delivery_queue to fetch.
-     */
-    where: delivery_queueWhereUniqueInput
-  }
-
-  /**
-   * delivery_queue findFirst
-   */
-  export type delivery_queueFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the delivery_queue
-     */
-    select?: delivery_queueSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the delivery_queue
-     */
-    omit?: delivery_queueOmit<ExtArgs> | null
-    /**
-     * Filter, which delivery_queue to fetch.
-     */
-    where?: delivery_queueWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of delivery_queues to fetch.
-     */
-    orderBy?: delivery_queueOrderByWithRelationInput | delivery_queueOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for delivery_queues.
-     */
-    cursor?: delivery_queueWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` delivery_queues from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` delivery_queues.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of delivery_queues.
-     */
-    distinct?: Delivery_queueScalarFieldEnum | Delivery_queueScalarFieldEnum[]
-  }
-
-  /**
-   * delivery_queue findFirstOrThrow
-   */
-  export type delivery_queueFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the delivery_queue
-     */
-    select?: delivery_queueSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the delivery_queue
-     */
-    omit?: delivery_queueOmit<ExtArgs> | null
-    /**
-     * Filter, which delivery_queue to fetch.
-     */
-    where?: delivery_queueWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of delivery_queues to fetch.
-     */
-    orderBy?: delivery_queueOrderByWithRelationInput | delivery_queueOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for delivery_queues.
-     */
-    cursor?: delivery_queueWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` delivery_queues from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` delivery_queues.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of delivery_queues.
-     */
-    distinct?: Delivery_queueScalarFieldEnum | Delivery_queueScalarFieldEnum[]
-  }
-
-  /**
-   * delivery_queue findMany
-   */
-  export type delivery_queueFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the delivery_queue
-     */
-    select?: delivery_queueSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the delivery_queue
-     */
-    omit?: delivery_queueOmit<ExtArgs> | null
-    /**
-     * Filter, which delivery_queues to fetch.
-     */
-    where?: delivery_queueWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of delivery_queues to fetch.
-     */
-    orderBy?: delivery_queueOrderByWithRelationInput | delivery_queueOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing delivery_queues.
-     */
-    cursor?: delivery_queueWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` delivery_queues from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` delivery_queues.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of delivery_queues.
-     */
-    distinct?: Delivery_queueScalarFieldEnum | Delivery_queueScalarFieldEnum[]
-  }
-
-  /**
-   * delivery_queue create
-   */
-  export type delivery_queueCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the delivery_queue
-     */
-    select?: delivery_queueSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the delivery_queue
-     */
-    omit?: delivery_queueOmit<ExtArgs> | null
-    /**
-     * The data needed to create a delivery_queue.
-     */
-    data: XOR<delivery_queueCreateInput, delivery_queueUncheckedCreateInput>
-  }
-
-  /**
-   * delivery_queue createMany
-   */
-  export type delivery_queueCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many delivery_queues.
-     */
-    data: delivery_queueCreateManyInput | delivery_queueCreateManyInput[]
-  }
-
-  /**
-   * delivery_queue createManyAndReturn
-   */
-  export type delivery_queueCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the delivery_queue
-     */
-    select?: delivery_queueSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the delivery_queue
-     */
-    omit?: delivery_queueOmit<ExtArgs> | null
-    /**
-     * The data used to create many delivery_queues.
-     */
-    data: delivery_queueCreateManyInput | delivery_queueCreateManyInput[]
-  }
-
-  /**
-   * delivery_queue update
-   */
-  export type delivery_queueUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the delivery_queue
-     */
-    select?: delivery_queueSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the delivery_queue
-     */
-    omit?: delivery_queueOmit<ExtArgs> | null
-    /**
-     * The data needed to update a delivery_queue.
-     */
-    data: XOR<delivery_queueUpdateInput, delivery_queueUncheckedUpdateInput>
-    /**
-     * Choose, which delivery_queue to update.
-     */
-    where: delivery_queueWhereUniqueInput
-  }
-
-  /**
-   * delivery_queue updateMany
-   */
-  export type delivery_queueUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update delivery_queues.
-     */
-    data: XOR<delivery_queueUpdateManyMutationInput, delivery_queueUncheckedUpdateManyInput>
-    /**
-     * Filter which delivery_queues to update
-     */
-    where?: delivery_queueWhereInput
-    /**
-     * Limit how many delivery_queues to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * delivery_queue updateManyAndReturn
-   */
-  export type delivery_queueUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the delivery_queue
-     */
-    select?: delivery_queueSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the delivery_queue
-     */
-    omit?: delivery_queueOmit<ExtArgs> | null
-    /**
-     * The data used to update delivery_queues.
-     */
-    data: XOR<delivery_queueUpdateManyMutationInput, delivery_queueUncheckedUpdateManyInput>
-    /**
-     * Filter which delivery_queues to update
-     */
-    where?: delivery_queueWhereInput
-    /**
-     * Limit how many delivery_queues to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * delivery_queue upsert
-   */
-  export type delivery_queueUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the delivery_queue
-     */
-    select?: delivery_queueSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the delivery_queue
-     */
-    omit?: delivery_queueOmit<ExtArgs> | null
-    /**
-     * The filter to search for the delivery_queue to update in case it exists.
-     */
-    where: delivery_queueWhereUniqueInput
-    /**
-     * In case the delivery_queue found by the `where` argument doesn't exist, create a new delivery_queue with this data.
-     */
-    create: XOR<delivery_queueCreateInput, delivery_queueUncheckedCreateInput>
-    /**
-     * In case the delivery_queue was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<delivery_queueUpdateInput, delivery_queueUncheckedUpdateInput>
-  }
-
-  /**
-   * delivery_queue delete
-   */
-  export type delivery_queueDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the delivery_queue
-     */
-    select?: delivery_queueSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the delivery_queue
-     */
-    omit?: delivery_queueOmit<ExtArgs> | null
-    /**
-     * Filter which delivery_queue to delete.
-     */
-    where: delivery_queueWhereUniqueInput
-  }
-
-  /**
-   * delivery_queue deleteMany
-   */
-  export type delivery_queueDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which delivery_queues to delete
-     */
-    where?: delivery_queueWhereInput
-    /**
-     * Limit how many delivery_queues to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * delivery_queue without action
-   */
-  export type delivery_queueDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the delivery_queue
-     */
-    select?: delivery_queueSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the delivery_queue
-     */
-    omit?: delivery_queueOmit<ExtArgs> | null
   }
 
 
@@ -17723,7 +16522,6 @@ export namespace Prisma {
     id: string | null
     user: string | null
     customer: string | null
-    deliveryuser: string | null
     invoicenum: string | null
     discountpercentage: string | null
     totalprice: string | null
@@ -17739,7 +16537,6 @@ export namespace Prisma {
     id: string | null
     user: string | null
     customer: string | null
-    deliveryuser: string | null
     invoicenum: string | null
     discountpercentage: string | null
     totalprice: string | null
@@ -17755,7 +16552,6 @@ export namespace Prisma {
     id: number
     user: number
     customer: number
-    deliveryuser: number
     invoicenum: number
     discountpercentage: number
     totalprice: number
@@ -17773,7 +16569,6 @@ export namespace Prisma {
     id?: true
     user?: true
     customer?: true
-    deliveryuser?: true
     invoicenum?: true
     discountpercentage?: true
     totalprice?: true
@@ -17789,7 +16584,6 @@ export namespace Prisma {
     id?: true
     user?: true
     customer?: true
-    deliveryuser?: true
     invoicenum?: true
     discountpercentage?: true
     totalprice?: true
@@ -17805,7 +16599,6 @@ export namespace Prisma {
     id?: true
     user?: true
     customer?: true
-    deliveryuser?: true
     invoicenum?: true
     discountpercentage?: true
     totalprice?: true
@@ -17894,7 +16687,6 @@ export namespace Prisma {
     id: string
     user: string | null
     customer: string | null
-    deliveryuser: string | null
     invoicenum: string | null
     discountpercentage: string | null
     totalprice: string | null
@@ -17927,7 +16719,6 @@ export namespace Prisma {
     id?: boolean
     user?: boolean
     customer?: boolean
-    deliveryuser?: boolean
     invoicenum?: boolean
     discountpercentage?: boolean
     totalprice?: boolean
@@ -17943,7 +16734,6 @@ export namespace Prisma {
     id?: boolean
     user?: boolean
     customer?: boolean
-    deliveryuser?: boolean
     invoicenum?: boolean
     discountpercentage?: boolean
     totalprice?: boolean
@@ -17959,7 +16749,6 @@ export namespace Prisma {
     id?: boolean
     user?: boolean
     customer?: boolean
-    deliveryuser?: boolean
     invoicenum?: boolean
     discountpercentage?: boolean
     totalprice?: boolean
@@ -17975,7 +16764,6 @@ export namespace Prisma {
     id?: boolean
     user?: boolean
     customer?: boolean
-    deliveryuser?: boolean
     invoicenum?: boolean
     discountpercentage?: boolean
     totalprice?: boolean
@@ -17987,7 +16775,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type saleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user" | "customer" | "deliveryuser" | "invoicenum" | "discountpercentage" | "totalprice" | "totalpayment" | "createdby" | "updatedby" | "source" | "createdAt" | "updatedAt", ExtArgs["result"]["sale"]>
+  export type saleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user" | "customer" | "invoicenum" | "discountpercentage" | "totalprice" | "totalpayment" | "createdby" | "updatedby" | "source" | "createdAt" | "updatedAt", ExtArgs["result"]["sale"]>
 
   export type $salePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "sale"
@@ -17996,7 +16784,6 @@ export namespace Prisma {
       id: string
       user: string | null
       customer: string | null
-      deliveryuser: string | null
       invoicenum: string | null
       discountpercentage: string | null
       totalprice: string | null
@@ -18432,7 +17219,6 @@ export namespace Prisma {
     readonly id: FieldRef<"sale", 'String'>
     readonly user: FieldRef<"sale", 'String'>
     readonly customer: FieldRef<"sale", 'String'>
-    readonly deliveryuser: FieldRef<"sale", 'String'>
     readonly invoicenum: FieldRef<"sale", 'String'>
     readonly discountpercentage: FieldRef<"sale", 'String'>
     readonly totalprice: FieldRef<"sale", 'String'>
@@ -23132,23 +21918,6 @@ export namespace Prisma {
   export type CashclosingScalarFieldEnum = (typeof CashclosingScalarFieldEnum)[keyof typeof CashclosingScalarFieldEnum]
 
 
-  export const Delivery_queueScalarFieldEnum: {
-    id: 'id',
-    sale: 'sale',
-    customer: 'customer',
-    deliveryuser: 'deliveryuser',
-    queueno: 'queueno',
-    status: 'status',
-    address: 'address',
-    note: 'note',
-    source: 'source',
-    createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
-  };
-
-  export type Delivery_queueScalarFieldEnum = (typeof Delivery_queueScalarFieldEnum)[keyof typeof Delivery_queueScalarFieldEnum]
-
-
   export const CategoryScalarFieldEnum: {
     id: 'id',
     name: 'name',
@@ -23315,7 +22084,6 @@ export namespace Prisma {
     id: 'id',
     user: 'user',
     customer: 'customer',
-    deliveryuser: 'deliveryuser',
     invoicenum: 'invoicenum',
     discountpercentage: 'discountpercentage',
     totalprice: 'totalprice',
@@ -23440,16 +22208,16 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Int'
+   * Reference to a field of type 'Decimal'
    */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+  export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
     
 
 
   /**
-   * Reference to a field of type 'Decimal'
+   * Reference to a field of type 'Int'
    */
-  export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
     
   /**
    * Deep Input Types
@@ -23637,90 +22405,6 @@ export namespace Prisma {
     source?: StringNullableWithAggregatesFilter<"cashclosing"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"cashclosing"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"cashclosing"> | Date | string
-  }
-
-  export type delivery_queueWhereInput = {
-    AND?: delivery_queueWhereInput | delivery_queueWhereInput[]
-    OR?: delivery_queueWhereInput[]
-    NOT?: delivery_queueWhereInput | delivery_queueWhereInput[]
-    id?: StringFilter<"delivery_queue"> | string
-    sale?: StringNullableFilter<"delivery_queue"> | string | null
-    customer?: StringNullableFilter<"delivery_queue"> | string | null
-    deliveryuser?: StringNullableFilter<"delivery_queue"> | string | null
-    queueno?: IntNullableFilter<"delivery_queue"> | number | null
-    status?: StringNullableFilter<"delivery_queue"> | string | null
-    address?: StringNullableFilter<"delivery_queue"> | string | null
-    note?: StringNullableFilter<"delivery_queue"> | string | null
-    source?: StringNullableFilter<"delivery_queue"> | string | null
-    createdAt?: DateTimeFilter<"delivery_queue"> | Date | string
-    updatedAt?: DateTimeFilter<"delivery_queue"> | Date | string
-  }
-
-  export type delivery_queueOrderByWithRelationInput = {
-    id?: SortOrder
-    sale?: SortOrderInput | SortOrder
-    customer?: SortOrderInput | SortOrder
-    deliveryuser?: SortOrderInput | SortOrder
-    queueno?: SortOrderInput | SortOrder
-    status?: SortOrderInput | SortOrder
-    address?: SortOrderInput | SortOrder
-    note?: SortOrderInput | SortOrder
-    source?: SortOrderInput | SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type delivery_queueWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    AND?: delivery_queueWhereInput | delivery_queueWhereInput[]
-    OR?: delivery_queueWhereInput[]
-    NOT?: delivery_queueWhereInput | delivery_queueWhereInput[]
-    sale?: StringNullableFilter<"delivery_queue"> | string | null
-    customer?: StringNullableFilter<"delivery_queue"> | string | null
-    deliveryuser?: StringNullableFilter<"delivery_queue"> | string | null
-    queueno?: IntNullableFilter<"delivery_queue"> | number | null
-    status?: StringNullableFilter<"delivery_queue"> | string | null
-    address?: StringNullableFilter<"delivery_queue"> | string | null
-    note?: StringNullableFilter<"delivery_queue"> | string | null
-    source?: StringNullableFilter<"delivery_queue"> | string | null
-    createdAt?: DateTimeFilter<"delivery_queue"> | Date | string
-    updatedAt?: DateTimeFilter<"delivery_queue"> | Date | string
-  }, "id">
-
-  export type delivery_queueOrderByWithAggregationInput = {
-    id?: SortOrder
-    sale?: SortOrderInput | SortOrder
-    customer?: SortOrderInput | SortOrder
-    deliveryuser?: SortOrderInput | SortOrder
-    queueno?: SortOrderInput | SortOrder
-    status?: SortOrderInput | SortOrder
-    address?: SortOrderInput | SortOrder
-    note?: SortOrderInput | SortOrder
-    source?: SortOrderInput | SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-    _count?: delivery_queueCountOrderByAggregateInput
-    _avg?: delivery_queueAvgOrderByAggregateInput
-    _max?: delivery_queueMaxOrderByAggregateInput
-    _min?: delivery_queueMinOrderByAggregateInput
-    _sum?: delivery_queueSumOrderByAggregateInput
-  }
-
-  export type delivery_queueScalarWhereWithAggregatesInput = {
-    AND?: delivery_queueScalarWhereWithAggregatesInput | delivery_queueScalarWhereWithAggregatesInput[]
-    OR?: delivery_queueScalarWhereWithAggregatesInput[]
-    NOT?: delivery_queueScalarWhereWithAggregatesInput | delivery_queueScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"delivery_queue"> | string
-    sale?: StringNullableWithAggregatesFilter<"delivery_queue"> | string | null
-    customer?: StringNullableWithAggregatesFilter<"delivery_queue"> | string | null
-    deliveryuser?: StringNullableWithAggregatesFilter<"delivery_queue"> | string | null
-    queueno?: IntNullableWithAggregatesFilter<"delivery_queue"> | number | null
-    status?: StringNullableWithAggregatesFilter<"delivery_queue"> | string | null
-    address?: StringNullableWithAggregatesFilter<"delivery_queue"> | string | null
-    note?: StringNullableWithAggregatesFilter<"delivery_queue"> | string | null
-    source?: StringNullableWithAggregatesFilter<"delivery_queue"> | string | null
-    createdAt?: DateTimeWithAggregatesFilter<"delivery_queue"> | Date | string
-    updatedAt?: DateTimeWithAggregatesFilter<"delivery_queue"> | Date | string
   }
 
   export type categoryWhereInput = {
@@ -24528,7 +23212,6 @@ export namespace Prisma {
     id?: StringFilter<"sale"> | string
     user?: StringNullableFilter<"sale"> | string | null
     customer?: StringNullableFilter<"sale"> | string | null
-    deliveryuser?: StringNullableFilter<"sale"> | string | null
     invoicenum?: StringNullableFilter<"sale"> | string | null
     discountpercentage?: StringNullableFilter<"sale"> | string | null
     totalprice?: StringNullableFilter<"sale"> | string | null
@@ -24544,7 +23227,6 @@ export namespace Prisma {
     id?: SortOrder
     user?: SortOrderInput | SortOrder
     customer?: SortOrderInput | SortOrder
-    deliveryuser?: SortOrderInput | SortOrder
     invoicenum?: SortOrderInput | SortOrder
     discountpercentage?: SortOrderInput | SortOrder
     totalprice?: SortOrderInput | SortOrder
@@ -24563,7 +23245,6 @@ export namespace Prisma {
     NOT?: saleWhereInput | saleWhereInput[]
     user?: StringNullableFilter<"sale"> | string | null
     customer?: StringNullableFilter<"sale"> | string | null
-    deliveryuser?: StringNullableFilter<"sale"> | string | null
     invoicenum?: StringNullableFilter<"sale"> | string | null
     discountpercentage?: StringNullableFilter<"sale"> | string | null
     totalprice?: StringNullableFilter<"sale"> | string | null
@@ -24579,7 +23260,6 @@ export namespace Prisma {
     id?: SortOrder
     user?: SortOrderInput | SortOrder
     customer?: SortOrderInput | SortOrder
-    deliveryuser?: SortOrderInput | SortOrder
     invoicenum?: SortOrderInput | SortOrder
     discountpercentage?: SortOrderInput | SortOrder
     totalprice?: SortOrderInput | SortOrder
@@ -24601,7 +23281,6 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"sale"> | string
     user?: StringNullableWithAggregatesFilter<"sale"> | string | null
     customer?: StringNullableWithAggregatesFilter<"sale"> | string | null
-    deliveryuser?: StringNullableWithAggregatesFilter<"sale"> | string | null
     invoicenum?: StringNullableWithAggregatesFilter<"sale"> | string | null
     discountpercentage?: StringNullableWithAggregatesFilter<"sale"> | string | null
     totalprice?: StringNullableWithAggregatesFilter<"sale"> | string | null
@@ -25103,104 +23782,6 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     sale?: NullableFloatFieldUpdateOperationsInput | number | null
     fk_user_in_cashclosing?: NullableStringFieldUpdateOperationsInput | string | null
-    source?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type delivery_queueCreateInput = {
-    id: string
-    sale?: string | null
-    customer?: string | null
-    deliveryuser?: string | null
-    queueno?: number | null
-    status?: string | null
-    address?: string | null
-    note?: string | null
-    source?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type delivery_queueUncheckedCreateInput = {
-    id: string
-    sale?: string | null
-    customer?: string | null
-    deliveryuser?: string | null
-    queueno?: number | null
-    status?: string | null
-    address?: string | null
-    note?: string | null
-    source?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type delivery_queueUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    sale?: NullableStringFieldUpdateOperationsInput | string | null
-    customer?: NullableStringFieldUpdateOperationsInput | string | null
-    deliveryuser?: NullableStringFieldUpdateOperationsInput | string | null
-    queueno?: NullableIntFieldUpdateOperationsInput | number | null
-    status?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    note?: NullableStringFieldUpdateOperationsInput | string | null
-    source?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type delivery_queueUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    sale?: NullableStringFieldUpdateOperationsInput | string | null
-    customer?: NullableStringFieldUpdateOperationsInput | string | null
-    deliveryuser?: NullableStringFieldUpdateOperationsInput | string | null
-    queueno?: NullableIntFieldUpdateOperationsInput | number | null
-    status?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    note?: NullableStringFieldUpdateOperationsInput | string | null
-    source?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type delivery_queueCreateManyInput = {
-    id: string
-    sale?: string | null
-    customer?: string | null
-    deliveryuser?: string | null
-    queueno?: number | null
-    status?: string | null
-    address?: string | null
-    note?: string | null
-    source?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type delivery_queueUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    sale?: NullableStringFieldUpdateOperationsInput | string | null
-    customer?: NullableStringFieldUpdateOperationsInput | string | null
-    deliveryuser?: NullableStringFieldUpdateOperationsInput | string | null
-    queueno?: NullableIntFieldUpdateOperationsInput | number | null
-    status?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    note?: NullableStringFieldUpdateOperationsInput | string | null
-    source?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type delivery_queueUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    sale?: NullableStringFieldUpdateOperationsInput | string | null
-    customer?: NullableStringFieldUpdateOperationsInput | string | null
-    deliveryuser?: NullableStringFieldUpdateOperationsInput | string | null
-    queueno?: NullableIntFieldUpdateOperationsInput | number | null
-    status?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    note?: NullableStringFieldUpdateOperationsInput | string | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26134,7 +24715,6 @@ export namespace Prisma {
     id: string
     user?: string | null
     customer?: string | null
-    deliveryuser?: string | null
     invoicenum?: string | null
     discountpercentage?: string | null
     totalprice?: string | null
@@ -26150,7 +24730,6 @@ export namespace Prisma {
     id: string
     user?: string | null
     customer?: string | null
-    deliveryuser?: string | null
     invoicenum?: string | null
     discountpercentage?: string | null
     totalprice?: string | null
@@ -26166,7 +24745,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     user?: NullableStringFieldUpdateOperationsInput | string | null
     customer?: NullableStringFieldUpdateOperationsInput | string | null
-    deliveryuser?: NullableStringFieldUpdateOperationsInput | string | null
     invoicenum?: NullableStringFieldUpdateOperationsInput | string | null
     discountpercentage?: NullableStringFieldUpdateOperationsInput | string | null
     totalprice?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26182,7 +24760,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     user?: NullableStringFieldUpdateOperationsInput | string | null
     customer?: NullableStringFieldUpdateOperationsInput | string | null
-    deliveryuser?: NullableStringFieldUpdateOperationsInput | string | null
     invoicenum?: NullableStringFieldUpdateOperationsInput | string | null
     discountpercentage?: NullableStringFieldUpdateOperationsInput | string | null
     totalprice?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26198,7 +24775,6 @@ export namespace Prisma {
     id: string
     user?: string | null
     customer?: string | null
-    deliveryuser?: string | null
     invoicenum?: string | null
     discountpercentage?: string | null
     totalprice?: string | null
@@ -26214,7 +24790,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     user?: NullableStringFieldUpdateOperationsInput | string | null
     customer?: NullableStringFieldUpdateOperationsInput | string | null
-    deliveryuser?: NullableStringFieldUpdateOperationsInput | string | null
     invoicenum?: NullableStringFieldUpdateOperationsInput | string | null
     discountpercentage?: NullableStringFieldUpdateOperationsInput | string | null
     totalprice?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26230,7 +24805,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     user?: NullableStringFieldUpdateOperationsInput | string | null
     customer?: NullableStringFieldUpdateOperationsInput | string | null
-    deliveryuser?: NullableStringFieldUpdateOperationsInput | string | null
     invoicenum?: NullableStringFieldUpdateOperationsInput | string | null
     discountpercentage?: NullableStringFieldUpdateOperationsInput | string | null
     totalprice?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26834,83 +25408,6 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
-  export type IntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type delivery_queueCountOrderByAggregateInput = {
-    id?: SortOrder
-    sale?: SortOrder
-    customer?: SortOrder
-    deliveryuser?: SortOrder
-    queueno?: SortOrder
-    status?: SortOrder
-    address?: SortOrder
-    note?: SortOrder
-    source?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type delivery_queueAvgOrderByAggregateInput = {
-    queueno?: SortOrder
-  }
-
-  export type delivery_queueMaxOrderByAggregateInput = {
-    id?: SortOrder
-    sale?: SortOrder
-    customer?: SortOrder
-    deliveryuser?: SortOrder
-    queueno?: SortOrder
-    status?: SortOrder
-    address?: SortOrder
-    note?: SortOrder
-    source?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type delivery_queueMinOrderByAggregateInput = {
-    id?: SortOrder
-    sale?: SortOrder
-    customer?: SortOrder
-    deliveryuser?: SortOrder
-    queueno?: SortOrder
-    status?: SortOrder
-    address?: SortOrder
-    note?: SortOrder
-    source?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type delivery_queueSumOrderByAggregateInput = {
-    queueno?: SortOrder
-  }
-
-  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
   export type categoryCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -27406,6 +25903,17 @@ export namespace Prisma {
     totalPayment?: SortOrder
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type purchasedproductsCountOrderByAggregateInput = {
     id?: SortOrder
     purchase?: SortOrder
@@ -27449,11 +25957,26 @@ export namespace Prisma {
     totalAmount?: SortOrder
   }
 
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
   export type saleCountOrderByAggregateInput = {
     id?: SortOrder
     user?: SortOrder
     customer?: SortOrder
-    deliveryuser?: SortOrder
     invoicenum?: SortOrder
     discountpercentage?: SortOrder
     totalprice?: SortOrder
@@ -27469,7 +25992,6 @@ export namespace Prisma {
     id?: SortOrder
     user?: SortOrder
     customer?: SortOrder
-    deliveryuser?: SortOrder
     invoicenum?: SortOrder
     discountpercentage?: SortOrder
     totalprice?: SortOrder
@@ -27485,7 +26007,6 @@ export namespace Prisma {
     id?: SortOrder
     user?: SortOrder
     customer?: SortOrder
-    deliveryuser?: SortOrder
     invoicenum?: SortOrder
     discountpercentage?: SortOrder
     totalprice?: SortOrder
@@ -27687,14 +26208,6 @@ export namespace Prisma {
     set?: Date | string | null
   }
 
-  export type NullableIntFieldUpdateOperationsInput = {
-    set?: number | null
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
-  }
-
   export type NullableDecimalFieldUpdateOperationsInput = {
     set?: Decimal | DecimalJsLike | number | string | null
     increment?: Decimal | DecimalJsLike | number | string
@@ -27705,6 +26218,14 @@ export namespace Prisma {
 
   export type IntFieldUpdateOperationsInput = {
     set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
     increment?: number
     decrement?: number
     multiply?: number
@@ -27885,22 +26406,6 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
-  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
   export type NestedDecimalNullableFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
     in?: Decimal[] | DecimalJsLike[] | number[] | string[] | null
@@ -27953,6 +26458,22 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
 

@@ -41,7 +41,7 @@ The helper script updates the installed app `.settings` file for you and restore
 Also confirm:
 - the upgraded database does not crash on startup
 - must-data still exists
-- the new table exists, for example `delivery_queue`
+- the upgraded schema matches the changes in your new version
 
 ## Restore After Test
 After finishing local update testing:

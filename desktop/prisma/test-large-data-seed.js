@@ -199,7 +199,6 @@ async function seedLargeData() {
       id: saleId,
       user: admin.id,
       customer: customerId,
-      deliveryuser: null,
       invoicenum,
       discountpercentage: "0",
       totalprice: String(product.saleprice ?? 0),
