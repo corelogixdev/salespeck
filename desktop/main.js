@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 // Defer autoUpdater requirement to after app is ready or inside a try-catch
 let autoUpdater;
 try {
@@ -11,6 +11,7 @@ try {
 }
 const config = require('./installEnv.js'); // Link to the Express app
 const logi = require('./utils/logi.js');
+const { getLogDirectory } = require('./utils/logi.js');
 const prismaStartupBootstrap = require('./utils/prismaStartupBootstrap');
 
 // app.setAppLogsPath();
@@ -32,6 +33,49 @@ process.env.npm_package_version = packageJson.version;
 
 let mainWindow = null;
 const singleInstanceLock = app.requestSingleInstanceLock();
+
+function buildStartupErrorDetail(error) {
+  const rawMessage = error?.message || String(error);
+  const compactMessage = rawMessage.replace(/\s+/g, ' ').trim();
+
+  if (compactMessage.includes('no such table')) {
+    return `Database setup failed.\n\n${compactMessage}\n\nTry opening the logs folder for the full startup trace.`;
+  }
+
+  if (compactMessage.includes('Database migration failed')) {
+    return `Database migration failed during startup.\n\n${compactMessage}\n\nTry opening the logs folder for the full startup trace.`;
+  }
+
+  return compactMessage;
+}
+
+async function showStartupErrorDialog(error) {
+  const rawMessage = error?.message || String(error);
+  const logDir = getLogDirectory();
+  const detail = buildStartupErrorDetail(error);
+
+  logi('Startup bootstrap failed:', rawMessage);
+
+  const result = await dialog.showMessageBox({
+    type: 'error',
+    title: 'Startup Failed',
+    message: 'OpenMenu could not start.',
+    detail: `${detail}\n\nLogs folder:\n${logDir}`,
+    buttons: ['Open Logs Folder', 'Close'],
+    defaultId: 0,
+    cancelId: 1,
+    noLink: true,
+  });
+
+  if (result.response === 0) {
+    try {
+      fs.mkdirSync(logDir, { recursive: true });
+      await shell.openPath(logDir);
+    } catch (openError) {
+      logi('Failed to open logs folder:', openError.message || openError);
+    }
+  }
+}
 
 if (!singleInstanceLock) {
   app.quit();
@@ -174,9 +218,7 @@ app.whenReady().then(async () => {
     require('./server/app'); // Keep server startup after DB bootstrap.
     createWindow();
   } catch (error) {
-    const message = error?.message || String(error);
-    logi('Startup bootstrap failed:', message);
-    dialog.showErrorBox('Startup Failed', `OpenMenu could not start.\n\n${message}`);
+    await showStartupErrorDialog(error);
     app.quit();
   }
 

@@ -58,6 +58,13 @@ function formatMessages(message) {
   return message.map(stringifyMessagePart).join(' ');
 }
 
+function getLogDirectory() {
+  return (
+    (electronApp && typeof electronApp.getPath === 'function' ? electronApp.getPath('userData') : null) ||
+    path.join(os.homedir(), '.openmenu', 'logs')
+  );
+}
+
 // Receive a message like console.log, can call it with comma-separated values
 function log(...message) {
   // In dev, always show logs in console for fast debugging.
@@ -73,9 +80,7 @@ function log(...message) {
 
   if (config.logger === 'file') {
     try {
-      const logDir =
-        (electronApp && typeof electronApp.getPath === 'function' ? electronApp.getPath('userData') : null) ||
-        path.join(os.homedir(), '.openmenu', 'logs');
+      const logDir = getLogDirectory();
 
       if (!fs.existsSync(logDir)) {
         fs.mkdirSync(logDir, { recursive: true });
@@ -107,3 +112,4 @@ function log(...message) {
 }
 
 module.exports = log;
+module.exports.getLogDirectory = getLogDirectory;
