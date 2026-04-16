@@ -1,6 +1,4 @@
-const { Op } = require('sequelize');
-const db = require('../models');
-const { requirePrismaClient } = require('../utils/prismaClient');
+const queries = require('../prisma/queries');
 const { findLike } = require('../utils/searchquery');
 const { getPaginationMeta, buildSortClause, sanitizeFilters } = require('../utils/paginationHelper');
 
@@ -17,7 +15,7 @@ exports.index = async (req, res) => {
 
     // Name filter (partial match)
     if (query.name) {
-      whereClause.name = { [Op.like]: `%${query.name}%` };
+      whereClause.name = { contains: query.name };
     }
 
     // Barcode filter (exact match recommended for performance)
@@ -27,22 +25,22 @@ exports.index = async (req, res) => {
 
     // Category filter
     if (query.category) {
-      whereClause.category = { [Op.like]: `%${query.category}%` };
+      whereClause.category = { contains: query.category };
     }
 
     // Brand filter
     if (query.brand) {
-      whereClause.brand = { [Op.like]: `%${query.brand}%` };
+      whereClause.brand = { contains: query.brand };
     }
 
     // Price range filters
     if (query.price_min) {
       whereClause.saleprice = whereClause.saleprice || {};
-      whereClause.saleprice[Op.gte] = parseFloat(query.price_min);
+      whereClause.saleprice.gte = parseFloat(query.price_min);
     }
     if (query.price_max) {
       whereClause.saleprice = whereClause.saleprice || {};
-      whereClause.saleprice[Op.lte] = parseFloat(query.price_max);
+      whereClause.saleprice.lte = parseFloat(query.price_max);
     }
 
     // Stock status filter
@@ -50,9 +48,9 @@ exports.index = async (req, res) => {
       if (query.stock_status === 'out_of_stock') {
         whereClause.quantity = 0;
       } else if (query.stock_status === 'low_stock') {
-        whereClause.quantity = { [Op.gt]: 0, [Op.lt]: 10 };
+        whereClause.quantity = { gt: 0, lt: 10 };
       } else if (query.stock_status === 'in_stock') {
-        whereClause.quantity = { [Op.gte]: 10 };
+        whereClause.quantity = { gte: 10 };
       }
     }
 
@@ -67,36 +65,23 @@ exports.index = async (req, res) => {
     // Sort parameters
     const sortBy = query.sortBy || 'id';
     const sortOrder = query.sortOrder || 'desc';
-    const order = buildSortClause(sortBy, sortOrder, 'id');
-
-    // Get total count and paginated data
-    const { count, rows: data } = await db.product.findAndCountAll({
+    const { count, rows: data } = await queries.products.list({
+      page,
+      pageSize,
       where: whereClause,
-      order,
-      limit: pageSize,
-      offset: (page - 1) * pageSize
+      sortBy,
+      sortOrder
     });
 
     // Generate pagination metadata
     const pagination = getPaginationMeta(page, pageSize, count);
 
     // Get brands, categories and taxes for filters and modals
-    const brands = await db.brand.findAll({
-      where: { status: true },
-      attributes: ['id', 'name'],
-      order: [['name', 'ASC']]
-    });
-
-    const categories = await db.category.findAll({
-      where: { status: true },
-      attributes: ['id', 'name'],
-      order: [['name', 'ASC']]
-    });
-
-    const taxes = await db.taxes.findAll({
-      attributes: ['id', 'name', 'percentage'],
-      order: [['name', 'ASC']]
-    });
+    const [brands, categories, taxes] = await Promise.all([
+      queries.common.listBrandsForSelect(),
+      queries.common.listCategoriesForSelect(),
+      queries.common.listTaxes()
+    ]);
 
     if (query.partial) {
       return res.render('products/_table_rows', {
@@ -130,42 +115,7 @@ exports.index = async (req, res) => {
 
 exports.getProduct = async (req, res) => {
   try {
-    let product;
-    const prisma = requirePrismaClient();
-
-    try {
-      const prismaProduct = await prisma.product.findUnique({
-        where: { id: req.params.id }
-      });
-
-      if (prismaProduct) {
-        const [brand, category] = await Promise.all([
-          prismaProduct.brand
-            ? prisma.brand.findUnique({
-              where: { id: prismaProduct.brand },
-              select: { id: true, name: true, description: true, status: true }
-            })
-            : Promise.resolve(null),
-          prismaProduct.category
-            ? prisma.category.findUnique({
-              where: { id: prismaProduct.category },
-              select: { id: true, name: true, description: true, status: true }
-            })
-            : Promise.resolve(null)
-        ]);
-
-        product = {
-          ...prismaProduct,
-          Brand: brand,
-          Category: category
-        };
-      } else {
-        product = null;
-      }
-    } catch (prismaError) {
-      console.error('Prisma product read error:', prismaError);
-      throw prismaError;
-    }
+    const product = await queries.products.findById(req.params.id);
 
     if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found' });
@@ -179,36 +129,29 @@ exports.getProduct = async (req, res) => {
 
 exports.get = async (req, res) => {
   let body = req.body;
-  const data = await db.product.findAll({
+  const data = await queries.products.list({
+    page: 1,
+    pageSize: 1000,
     where: {
       ...findLike(body),
-      quantity: { [Op.gt]: 0 }
+      quantity: { gt: 0 }
     }
   });
-  res.json(data);
+  res.json(data.rows);
 }
 
 exports.form = async (req, res) => {
   try {
-    const taxes = await db.taxes.findAll();
-    const brands = await db.brand.findAll({
-      where: { status: true },
-      order: [['name', 'ASC']]
-    });
-    const categories = await db.category.findAll({
-      where: { status: true },
-      order: [['name', 'ASC']]
-    });
+    const [taxes, brands, categories] = await Promise.all([
+      queries.common.listTaxes(),
+      queries.common.listBrandsForSelect(),
+      queries.common.listCategoriesForSelect()
+    ]);
 
     const productId = req.query.id;
     let data = null;
     if (productId) {
-      data = await db.product.findByPk(productId, {
-        include: [
-          { model: db.brand, as: 'Brand' },
-          { model: db.category, as: 'Category' }
-        ]
-      });
+      data = await queries.products.findById(productId);
     }
 
     res.render('products/form', {
@@ -228,11 +171,11 @@ exports.save = async (req, res) => {
   let id = body.id;
 
   try {
-    const product = await db.product.findOne({ where: { name: body.name } });
+    const product = await queries.products.findByName(body.name);
     if (product && product.id != id) {
       return res.status(400).json({ success: false, message: 'Product with this name already exists' });
     }
-    const barcode = await db.product.findOne({ where: { barcode: body.barcode } });
+    const barcode = await queries.products.findByBarcode(body.barcode);
     if (barcode && barcode.id != id && body.barcode.trim()) {
       return res.status(400).json({ success: false, message: 'Product with this barcode already exists' });
     }
@@ -256,9 +199,9 @@ exports.save = async (req, res) => {
 
     if (id) {
       // delete data.quantity;
-      await db.product.update(data, { where: { id } });
+      await queries.products.update(id, data);
     } else {
-      await db.product.create(data);
+      await queries.products.create(data);
     }
 
     res.send({ success: true, message: 'Product saved successfully' });
@@ -270,11 +213,7 @@ exports.save = async (req, res) => {
 
 exports.delete = async (req, res) => {
   try {
-    let alreadyInSale = await db.soldproducts.findOne({ where: { product: req.params.id } });
-    if (alreadyInSale) {
-      return res.status(400).json({ success: false, message: 'You cannot delete a product that is already in sale' });
-    }
-    await db.product.destroy({ where: { id: req.params.id } });
+    await queries.products.remove(req.params.id);
     res.send({ success: true, redirectUrl: `/products` });
   } catch (error) {
     return res.status(500).json({ success: false, message: 'Internal Server Error' });
@@ -286,12 +225,7 @@ exports.search = async (req, res) => {
   if (!searchdata) {
     return res.json({ success: false, data: [] });
   }
-  const data = await db.product.findAll({
-    where: {
-      name: { [Op.like]: `%${searchdata}%` }
-    },
-    attributes: ['id', 'name', 'saleprice']
-  });
+  const data = await queries.products.searchByName(searchdata);
   res.json({ success: true, data });
 }
 
@@ -300,7 +234,7 @@ exports.quantityForm = async (req, res) => {
     const productId = req.params.id;
     // get type from search params 
     let type = req.query.type;
-    const product = await db.product.findByPk(productId);
+    const product = await queries.products.findById(productId);
     if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
@@ -327,7 +261,7 @@ exports.saveQuantity = async (req, res) => {
   }
 
   try {
-    const product = await db.product.findByPk(id);
+    const product = await queries.products.findById(id);
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -351,14 +285,14 @@ exports.saveQuantity = async (req, res) => {
       updateData.name = name;
     }
 
-    await product.update(updateData);
+    await queries.products.update(id, updateData);
 
     // Create inventory log
     // We log the adjustment specified in the 'quantity' field, 
     // plus any correction made to 'currentQuantity'
     const totalAdjustment = finalQuantity - oldQuantity;
 
-    await db.inventorylogs.create({
+    await queries.inventory.createLog({
       product_id: id,
       quantity: totalAdjustment,
       note: note,
@@ -368,26 +302,23 @@ exports.saveQuantity = async (req, res) => {
 
     // create or update productbatches
     if (quantity > 0) {
-      await db.productbatches.create({
+      await queries.batches.create({
         product: id,
         quantity: quantity,
         expirydate: expirydate
       });
     } else {
-      let batches = await db.productbatches.findAll({
-        where: { product: id },
-        order: [['createdAt', 'ASC']]
-      });
+      let batches = await queries.batches.listByProduct(id);
       let iteration = 0, reducedQuantity = 0, absquantity = Math.abs(quantity);
       while (reducedQuantity !== absquantity && iteration < batches.length) {
         let batch = batches[iteration];
         if (batch.quantity > absquantity) {
-          batch.quantity -= absquantity;
+          const nextQuantity = batch.quantity - absquantity;
           reducedQuantity += absquantity;
-          await batch.save();
+          await queries.batches.updateQuantity(batch.id, nextQuantity);
         } else {
           reducedQuantity += batch.quantity;
-          await batch.destroy();
+          await queries.batches.remove(batch.id);
         }
         iteration++;
       }

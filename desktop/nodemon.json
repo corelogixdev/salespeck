@@ -10,11 +10,11 @@
   "watch": [
     "*.js",
     "controllers/**/*.js",
-    "models/**/*.js",
     "routes/**/*.js",
     "server/**/*.js",
     "utils/**/*.js",
-    "middleware/**/*.js"
+    "middleware/**/*.js",
+    "prisma/**/*.js"
   ],
   "ext": "js,json"
 }

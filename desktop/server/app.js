@@ -12,7 +12,6 @@ const routes = require('../routes');
 const { formatNumber } = require('../utils/formatNumber');
 const moment = require('moment');
 const app = express();
-const runMigrationsAndSeeders = require('../utils/runMigrationsAndSeeders.js');
 
 function getUploadsBaseDir() {
   if (__dirname.includes('app.asar')) {
@@ -74,17 +73,6 @@ app.get('/api/verify-server', (req, res) => {
   res.status(200).json({ status: "success", message: 'Server is running' });
 });
 
-// Add a new endpoint to trigger demo data seeding
-app.get('/api/seed-demo-data', async (req, res) => {
-  try {
-    await seedDemoData();
-    res.status(200).json({ status: "success", message: 'Demo data seeded successfully' });
-  } catch (error) {
-    console.error('Error seeding demo data:', error);
-    res.status(500).json({ status: "error", message: 'Failed to seed demo data' });
-  }
-});
-
 // Routes
 app.use('/', routes.mainRoutes);
 app.use('/products', routes.productRoutes);
@@ -103,7 +91,6 @@ app.use('/', require('../routes/profile')); // Profile routes
 //   res.redirect('/');
 // });
 
-runMigrationsAndSeeders(); // Uncomment to run migrations and seeders
 app.listen(config.port, () => {
   logi('Express server listening on http://localhost:' + config.port);
 });

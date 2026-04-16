@@ -39,7 +39,7 @@ The desktop application follows a layered MVC-style structure in `desktop/`:
 - `utils/`: Shared services (`pagination`, permissions, formatting, search query helpers, cache, encryption, id generation).
 - `assets/`: CSS/JS/images/fonts/vendors.
 - `build/`: Build and package upload utilities.
-- `zothers/`: Local development and update testing notes.
+- `z-docs/`: Local development and update testing notes.
 
 ## Existing Features (Current State)
 
@@ -101,28 +101,31 @@ Schema bootstrap is currently centered in `desktop/migrations/20260131000000-ini
 
 - `desktop/main.js`: Electron runtime entry point.
 - `desktop/routes/index.js`: Auto-loads route modules.
-- `desktop/models/index.js`: Sequelize initialization and model loading.
+- `desktop/prisma/queries.js`: Centralized Prisma query-layer for all controllers.
+- `desktop/utils/prismaStartupBootstrap.js`: Prisma migrate+seed startup bootstrap for installed/packaged runs.
+- `desktop/prisma/seed.js`: Default Prisma seeding (startup-safe).
 - `desktop/migrations/20260131000000-init-all-tables.js`: Primary schema migration.
 - `desktop/middleware/isAuthenticated.js`: Session authentication middleware.
 - `desktop/utils/permissions.js`: Permission validation helpers.
 - `desktop/utils/pagination.js` and `desktop/utils/paginationHelper.js`: Pagination utilities.
 - `desktop/controllers/`: Domain logic for each module.
 - `desktop/views/components/partials/`: Shared table/filter/pagination/modal components.
-- `desktop/zothers/dev_mode.md`: Development mode notes.
-- `desktop/zothers/update_test.md`: Update testing reference.
-- `desktop/zothers/Locally_update_test.md`: Local update testing guide.
+- `z-docs/dev-mode.md`: Development mode notes.
+- `z-docs/update-release.md`: Update testing and release guide.
+- `z-docs/local-update-test.md`: Local update testing guide.
 
 ## Local Testing And Publish
 
 - Run in local development mode: `cd desktop && npm run dev`
-- Run migration scripts: `cd desktop && npm run migrate`
-- Seed demo data (optional): `cd desktop && npm run seed:demo`
-- Seed larger demo dataset (optional): `cd desktop && npm run seed:large`
+- Run migration scripts: `cd desktop && npm run prisma:migrate`
+- Seed default data (optional): `cd desktop && npm run prisma:seed`
+- Seed test small dataset (optional): `cd desktop && npm run prisma:seed:test-small`
+- Seed test large dataset (optional): `cd desktop && npm run prisma:seed:test-large`
 - Build desktop app: `cd desktop && npm run build`
 - Upload/publish package: `cd desktop && npm run upload`
 - Release verification helper: `cd desktop && npm run test:update`
-- Local update testing guide: `desktop/zothers/Locally_update_test.md`
-- Update testing workflow: `desktop/zothers/update_test.md`
+- Local update testing guide: `z-docs/local-update-test.md`
+- Update testing workflow: `z-docs/update-release.md`
 
 ## Performance And Scalability Principles
 

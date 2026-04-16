@@ -3,7 +3,7 @@ const fs = require("fs");
 const { spawnSync } = require("child_process");
 const logi = require("./logi");
 const { generateId } = require("./idGenerator");
-const seedPrisma = require("../scripts/prisma-seed");
+const seedMustData = require("../prisma/seed-must-data");
 const { resolveDatabasePath, resolveDatabaseUrl, ensureDatabaseDirectory } = require("./prismaDbConfig");
 const { requirePrismaClient } = require("./prismaClient");
 
@@ -111,7 +111,7 @@ async function prismaStartupBootstrap() {
 
   if (!seedMarker) {
     try {
-      await seedPrisma({ disconnect: false });
+      await seedMustData({ disconnect: false });
       await prisma.softwaresetting.create({
         data: {
           id: generateId(32),
@@ -124,6 +124,22 @@ async function prismaStartupBootstrap() {
     } catch (error) {
       logi("Prisma seed step skipped:", error.message || error);
     }
+  }
+
+  // Even when the seed marker exists, ensure must-have data is present.
+  // This protects already-installed databases that may have seeded earlier before financeaccount/chart-of-accounts existed.
+  try {
+    const [companySetting, hasFinanceAccounts] = await Promise.all([
+      prisma.softwaresetting.findFirst({ where: { name: "company" } }),
+      prisma.financeaccount.findFirst({ select: { id: true } }),
+    ]);
+
+    if (!companySetting || !hasFinanceAccounts) {
+      await seedMustData({ disconnect: false });
+      logi("Prisma must-data seed applied.");
+    }
+  } catch (error) {
+    logi("Prisma must-data check skipped:", error.message || error);
   }
 }
 

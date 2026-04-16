@@ -1,5 +1,4 @@
-const db = require("../models");
-const { Op } = require("sequelize");
+const queries = require("../prisma/queries");
 const moment = require("moment");
 const { getPaginationMeta, buildSortClause } = require('../utils/paginationHelper');
 
@@ -14,54 +13,14 @@ exports.index = async (req, res) => {
     const order = buildSortClause(sortBy, sortOrder, 'createdAt');
 
     const { daterange, vendor, invoicenum } = query;
-    let whereClause = {};
-    let includeOptions = [
-      {
-        model: db.user,
-        as: "Vendor",
-        attributes: ["id", "firstname", "lastname"],
-        where: {},
-      },
-      {
-        model: db.user,
-        as: "Creator",
-        attributes: ["id", "firstname", "lastname"],
-        where: {},
-      },
-    ];
-
-    if (daterange) {
-      const [start, end] = daterange.split(" to ").map(d => d.trim());
-      if (start && end) {
-        whereClause.createdAt = {
-          [Op.between]: [
-            moment(new Date(start)).startOf("day").toDate(),
-            moment(new Date(end)).endOf("day").toDate(),
-          ],
-        };
-      }
-    }
-
-    if (vendor) {
-      const vendorSearch = vendor.trim();
-      includeOptions[0].where[Op.or] = [
-        { firstname: { [Op.like]: `%${vendorSearch}%` } },
-        { lastname: { [Op.like]: `%${vendorSearch}%` } },
-      ];
-    }
-
-    if (invoicenum) {
-      whereClause.invoicenum = { [Op.like]: `%${invoicenum.trim()}%` };
-    }
-
-    const { count, rows: purchases } = await db.purchase.findAndCountAll({
-      where: whereClause,
-      include: includeOptions,
-      order,
-      limit: pageSize,
-      offset: (page - 1) * pageSize,
-      distinct: true,
-      col: 'id'
+    const { count, rows: purchases } = await queries.purchases.list({
+      page,
+      pageSize,
+      daterange,
+      vendor: vendor?.trim(),
+      invoicenum: invoicenum?.trim(),
+      sortBy,
+      sortOrder
     });
 
     const pagination = getPaginationMeta(page, pageSize, count);
@@ -82,18 +41,7 @@ exports.index = async (req, res) => {
 
 exports.getPurchase = async (req, res) => {
   try {
-    const purchase = await db.purchase.findOne({
-      where: { id: req.params.id },
-      include: [
-        { model: db.user, as: "Vendor", attributes: ["id", "firstname", "lastname"] },
-        { model: db.user, as: "Creator", attributes: ["id", "firstname", "lastname"] },
-        {
-          model: db.purchasedproducts,
-          as: "PurchasedItems",
-          include: [{ model: db.product, as: "Product", attributes: ["id", "name"] }]
-        }
-      ]
-    });
+    const purchase = await queries.purchases.getById(req.params.id);
 
     if (!purchase) {
       return res.status(404).json({ success: false, message: "Purchase not found" });
@@ -107,33 +55,9 @@ exports.getPurchase = async (req, res) => {
 };
 
 exports.purchaseview = async (req, res) => {
-  let purchase = await db.purchase.findOne({
-    where: {
-      id: req.params.id,
-    },
-    include: [
-      {
-        model: db.user,
-        as: "Vendor",
-      },
-      {
-        model: db.purchasedproducts,
-        as: "PurchasedItems",
-        include: [
-          {
-            model: db.product,
-            as: "Product",
-          },
-        ],
-      },
-    ],
-  });
+  let purchase = await queries.purchases.getById(req.params.id);
   purchase.balance = purchase.totalPayment - purchase.totalAmount;
-  let companySettings = await db.softwaresetting.findOne({
-    where: {
-      name: "company",
-    },
-  });
+  let companySettings = await queries.common.getCompanySetting();
   res.render("accounting/purchase/view", {
     title: "Purchase Details",
     purchase,
@@ -143,33 +67,9 @@ exports.purchaseview = async (req, res) => {
 };
 
 exports.purchaseDetails = async (req, res) => {
-  let purchase = await db.purchase.findOne({
-    where: {
-      id: req.params.id,
-    },
-    include: [
-      {
-        model: db.user,
-        as: "Vendor",
-      },
-      {
-        model: db.purchasedproducts,
-        as: "PurchasedItems",
-        include: [
-          {
-            model: db.product,
-            as: "Product",
-          },
-        ],
-      },
-    ],
-  });
+  let purchase = await queries.purchases.getById(req.params.id);
   purchase.balance = purchase.totalAmount - purchase.totalPayment;
-  let companySettings = await db.softwaresetting.findOne({
-    where: {
-      name: "company",
-    },
-  });
+  let companySettings = await queries.common.getCompanySetting();
   res.render("accounting/purchase/details", {
     title: "Purchase Details",
     purchase,
@@ -193,7 +93,7 @@ exports.save = async (req, res) => {
     const source = 'desktop';
     
     // Save purchase with vendor as optional
-    let purchase = await db.purchase.create({
+    let purchase = await queries.purchases.create({
       createdby: user,
       vendor,      // Can be null or undefined
       totalAmount,
@@ -206,7 +106,7 @@ exports.save = async (req, res) => {
       let products = data.products;
       for (let i = 0; i < products.length; i++) {
         let product = products[i];
-        let purchasedProduct = await db.purchasedproducts.create({
+        let purchasedProduct = await queries.purchases.createPurchasedProduct({
           purchase: purchase.id,
           product: product.productId,
           quantity: product.quantity,
@@ -216,7 +116,7 @@ exports.save = async (req, res) => {
 
         // save the purchased batch
         if (product.expiryDate) {
-          await db.productbatches.create({
+          await queries.batches.create({
             product: product.productId,
             quantity: product.quantity,
             expirydate: product.expiryDate,
@@ -225,18 +125,9 @@ exports.save = async (req, res) => {
         }
 
         if (purchasedProduct) {
-          await db.product.update(
-            {
-              quantity: db.sequelize.literal(`quantity + ${product.quantity}`),
-            },
-            {
-              where: {
-                id: product.productId,
-              },
-            }
-          );
+          await queries.products.incrementQuantity(product.productId, product.quantity);
           // Log inventory
-          await db.inventorylogs.create({
+          await queries.inventory.createLog({
             product_id: product.productId,
             quantity: product.quantity,
             note: vendor ? "Purchased from vendor" : "Purchased",
@@ -265,11 +156,7 @@ exports.search = async (req, res) => {
 };
 
 exports.form = async (_, res) => {
-  let vendors = await db.user.findAll({
-    where: {
-      role: "vendor",
-    },
-  });
+  let vendors = await queries.users.listByRole("vendor");
   res.render("accounting/purchase/form", {
     title: "Save Purchase",
     vendors,
@@ -284,12 +171,7 @@ exports.productsget = async (req, res) => {
   if (req.body.barcode) {
     search = { ...search, barcode: req.body.barcode };
   }
-  const data = await db.product.findAll({
-    where: {
-      ...search,
-      purchaseactive: true,
-    },
-  });
+  const data = await queries.products.findForPurchase(search);
   res.json(data);
 };
 
@@ -297,16 +179,7 @@ exports.searchVendors = async (req, res) => {
   try {
     let { search } = req.query;
     search = search.trim();
-    const vendors = await db.user.findAll({
-      where: {
-        role: 'vendor', // Changed from "user" to "vendor"
-        [Op.or]: [
-          { firstname: { [Op.like]: `%${search}%` } },
-          { lastname: { [Op.like]: `%${search}%` } },
-        ]
-      },
-      limit: 10
-    });
+    const vendors = await queries.users.searchByRole('vendor', search, 10);
     res.json(vendors);
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });

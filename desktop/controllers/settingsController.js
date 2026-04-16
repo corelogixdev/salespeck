@@ -1,11 +1,11 @@
-const { softwaresetting, user } = require("../models");
+const queries = require("../prisma/queries");
 const config = require("../installEnv");
 const fs = require('fs');
 const path = require('path');
 
 exports.index = async (req, res) => {
   // Get database settings
-  let dbSettings = await softwaresetting.findAll({});
+  let dbSettings = await queries.settings.getAllSoftwareSettings();
   let dbSettingsObj = {};
   dbSettings.forEach((setting) => {
     dbSettingsObj[setting.name] = JSON.parse(setting.value);
@@ -93,7 +93,7 @@ exports.index = async (req, res) => {
   // Get dashboard config for current user
   let dashboardConfig = {};
   if (req.session.user_id) {
-    const currentUser = await user.findOne({ where: { id: req.session.user_id } });
+    const currentUser = await queries.users.findById(req.session.user_id);
     if (currentUser && currentUser.dashboard_config) {
         try {
             dashboardConfig = JSON.parse(currentUser.dashboard_config);
@@ -209,27 +209,22 @@ exports.save = async (req, res) => {
   } else if (tabType === 'db' && settingName) {
     // Save database settings
     let values = JSON.stringify(req.body);
-    await softwaresetting.update({ value: values }, { where: { name: settingName } });
+    await queries.settings.updateSettingByName(settingName, values);
   } else if (tabType === 'dashboard') {
     // Save dashboard settings to User model
-    console.log('Saving dashboard settings:', req.body);
     const userId = req.session.user_id; // Use session user_id
     
     if (userId) {
       try {
-        await user.update({ dashboard_config: JSON.stringify(req.body) }, { where: { id: userId } });
-        console.log('Dashboard settings saved to database for user:', userId);
+        await queries.settings.updateUserDashboardConfig(userId, req.body);
         
         // Update session user to reflect changes immediately
         if (req.session.user) {
            req.session.user.dashboard_config = JSON.stringify(req.body); 
-           console.log('Session user updated with new dashboard config');
         }
       } catch (error) {
         console.error('Error saving dashboard settings:', error);
       }
-    } else {
-        console.log('No user session found in request to save settings');
     }
   }
   

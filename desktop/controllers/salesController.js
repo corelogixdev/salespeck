@@ -1,5 +1,4 @@
-const { Op, where } = require("sequelize");
-var db = require("../models");
+const queries = require("../prisma/queries");
 var moment = require("moment");
 const { findLike } = require("../utils/searchquery");
 const { getPaginationMeta } = require('../utils/paginationHelper');
@@ -31,127 +30,15 @@ exports.index = async (req, res) => {
   const sortDir = sortOrder.toLowerCase() === 'asc' ? 'ASC' : 'DESC';
 
   try {
-    let countQuery = 'SELECT COUNT(*) as count FROM sale s';
-    const replacements = [];
-    
-    if (customer) {
-      countQuery += ' INNER JOIN user u ON s.customer = u.id';
-      countQuery += ' WHERE (u.firstname LIKE ? OR u.lastname LIKE ?)';
-      const customerSearch = `%${customer}%`;
-      replacements.push(customerSearch, customerSearch);
-    }
-    
-    if (daterange) {
-      const [start, end] = daterange.split(" to ");
-      const startDate = moment(new Date(start)).startOf("day").toISOString();
-      const endDate = moment(new Date(end)).endOf("day").toISOString();
-      if (customer) {
-        countQuery += ' AND s.createdAt >= ? AND s.createdAt <= ?';
-      } else {
-        countQuery += ' WHERE s.createdAt >= ? AND s.createdAt <= ?';
-      }
-      replacements.push(startDate, endDate);
-    }
-    
-    if (productId) {
-      countQuery += customer || daterange ? ' AND' : ' WHERE';
-      countQuery += ' EXISTS (SELECT 1 FROM soldproducts sp WHERE sp.sale = s.id AND sp.product = ?)';
-      replacements.push(productId);
-    }
-    
-    let salesQuery = `
-      SELECT 
-        s.id,
-        s.invoicenum,
-        s.discountpercentage,
-        s.totalprice,
-        s.totalpayment,
-        s.createdAt
-      FROM sale s
-    `;
-    
-    const salesReplacements = [];
-    const whereConditions = [];
-    
-    if (customer) {
-      salesQuery += ' INNER JOIN user u ON s.customer = u.id';
-      whereConditions.push('(u.firstname LIKE ? OR u.lastname LIKE ?)');
-      const customerSearch = `%${customer}%`;
-      salesReplacements.push(customerSearch, customerSearch);
-    }
-    
-    if (daterange) {
-      const [start, end] = daterange.split(" to ");
-      const startDate = moment(new Date(start)).startOf("day").toISOString();
-      const endDate = moment(new Date(end)).endOf("day").toISOString();
-      whereConditions.push('s.createdAt >= ? AND s.createdAt <= ?');
-      salesReplacements.push(startDate, endDate);
-    }
-    
-    if (productId) {
-      whereConditions.push('EXISTS (SELECT 1 FROM soldproducts sp2 WHERE sp2.sale = s.id AND sp2.product = ?)');
-      salesReplacements.push(productId);
-    }
-    
-    if (whereConditions.length > 0) {
-      salesQuery += ' WHERE ' + whereConditions.join(' AND ');
-    }
-    
-    salesQuery += `
-      GROUP BY s.id, s.invoicenum, s.discountpercentage, s.totalprice, s.totalpayment, s.createdAt
-      ORDER BY s.${sortColumn} ${sortDir}
-      LIMIT ? OFFSET ?
-    `;
-    salesReplacements.push(limit, offset);
-    
-    const [countResult, salesResult] = await Promise.all([
-      db.sequelize.query(countQuery, {
-        replacements,
-        type: db.sequelize.QueryTypes.SELECT
-      }),
-      db.sequelize.query(salesQuery, {
-        replacements: salesReplacements,
-        type: db.sequelize.QueryTypes.SELECT
-      })
-    ]);
-    
-    const count = parseInt(countResult[0]?.count || 0);
-    
-    let productNamesMap = {};
-    if (salesResult.length > 0) {
-      const saleIds = salesResult.map(s => s.id);
-      const placeholders = saleIds.map(() => '?').join(',');
-      const productQuery = `
-        SELECT 
-          sp.sale,
-          GROUP_CONCAT(DISTINCT p.name) as product_names
-        FROM soldproducts sp
-        INNER JOIN product p ON sp.product = p.id
-        WHERE sp.sale IN (${placeholders})
-        GROUP BY sp.sale
-      `;
-      
-      const productResult = await db.sequelize.query(productQuery, {
-        replacements: saleIds,
-        type: db.sequelize.QueryTypes.SELECT
-      });
-      
-      productResult.forEach(row => {
-        productNamesMap[row.sale] = row.product_names ? row.product_names.split(',').map(n => n.trim()) : [];
-      });
-    }
-    
-    const sales = salesResult.map(sale => ({
-      id: sale.id,
-      invoicenum: sale.invoicenum,
-      discountpercentage: sale.discountpercentage,
-      totalprice: sale.totalprice,
-      totalpayment: sale.totalpayment,
-      createdAt: sale.createdAt,
-      SoldPoducts: (productNamesMap[sale.id] || []).slice(0, 5).map(name => ({
-        Product: { name: name }
-      }))
-    }));
+    const { count, rows: sales } = await queries.sales.listIndex({
+      page,
+      pageSize: limit,
+      customer,
+      daterange,
+      productId,
+      sortBy: sortColumn,
+      sortOrder: sortDir.toLowerCase()
+    });
     
     const pagination = getPaginationMeta(page, limit, count);
 
@@ -178,18 +65,7 @@ exports.index = async (req, res) => {
 
 exports.getSale = async (req, res) => {
   try {
-    const sale = await db.sale.findOne({
-      where: { id: req.params.id },
-      include: [
-        { model: db.user, as: "Customer", attributes: ["id", "firstname", "lastname", "phone"], required: false },
-        { model: db.user, as: "User", attributes: ["id", "firstname", "lastname"], required: false },
-        {
-          model: db.soldproducts,
-          as: "SoldPoducts",
-          include: [{ model: db.product, as: "Product", attributes: ["id", "name"] }]
-        }
-      ]
-    });
+    const sale = await queries.sales.getById(req.params.id);
 
     if (!sale) {
       return res.status(404).json({ success: false, message: "Sale not found" });
@@ -217,151 +93,16 @@ exports.save = async (req, res) => {
     return res.status(400).send({ status: "error", message: "Invalid total payment" });
   }
 
-  const transaction = await db.sequelize.transaction();
-
   try {
-    // 1. First fetch all products and validate quantities in one pass
-    const allProductIds = products.map(product => product.productId);
-    const allProducts = await db.product.findAll({
-      where: { id: allProductIds },
-      transaction
-    });
-
-    // Validate all products before making any changes
-    const saleProductsData = [];
-    const inventoryUpdates = [];
     const { user } = res.locals;
-
-    // OPTIMIZED: Fetch all batches for all products in one query instead of N queries
-    const allBatches = await db.productbatches.findAll({
-      where: { product: allProductIds },
-      order: [["product", "ASC"], ["createdAt", "ASC"]],
-      transaction
-    });
-
-    // Group batches by product ID for efficient lookup
-    const batchesByProduct = {};
-    allBatches.forEach(batch => {
-      if (!batchesByProduct[batch.product]) {
-        batchesByProduct[batch.product] = [];
-      }
-      batchesByProduct[batch.product].push(batch);
-    });
-
-    // Prepare batch operations
-    const batchUpdates = [];
-    const batchDeletes = [];
-
-    for (const orderProduct of products) {
-      const dbProduct = allProducts.find(p => p.id === orderProduct.productId);
-      if (!dbProduct) {
-        await transaction.rollback();
-        return res.status(400).send({
-          status: "error",
-          message: `Product with ID ${orderProduct.productId} not found`
-        });
-      }
-      if (orderProduct.quantity > dbProduct.quantity) {
-        await transaction.rollback();
-        return res.status(400).send({
-          status: "error",
-          message: `Insufficient stock for ${dbProduct.name}. Available: ${dbProduct.quantity}, Requested: ${orderProduct.quantity}`
-        });
-      }
-
-      // Prepare data for bulk operations
-      saleProductsData.push({
-        product: dbProduct.id,
-        quantity: orderProduct.quantity,
-        price: orderProduct.price
-      });
-
-      inventoryUpdates.push({
-        id: dbProduct.id,
-        quantity: dbProduct.quantity - orderProduct.quantity
-      });
-
-      // Get batches for this product from grouped data
-      let batches = batchesByProduct[orderProduct.productId] || [];
-
-      let reducedQuantity = 0;
-      let iteration = 0;
-      while (reducedQuantity !== orderProduct.quantity && iteration < batches.length) {
-        let batch = batches[iteration];
-        if (batch.quantity > orderProduct.quantity - reducedQuantity) {
-          batchUpdates.push({
-            id: batch.id,
-            quantityToReduce: orderProduct.quantity - reducedQuantity
-          });
-          reducedQuantity = orderProduct.quantity;
-        } else {
-          batchDeletes.push(batch.id);
-          reducedQuantity += batch.quantity;
-        }
-        iteration++;
-      }
-    }
-
-    // Execute batch updates and deletes
-    if (batchUpdates.length > 0) {
-      await Promise.all(batchUpdates.map(update =>
-        db.productbatches.update(
-          { quantity: db.sequelize.literal(`quantity - ${update.quantityToReduce}`) },
-          {
-            where: { id: update.id },
-            transaction
-          }
-        )
-      ));
-    }
-
-    if (batchDeletes.length > 0) {
-      await db.productbatches.destroy({
-        where: { id: batchDeletes },
-        transaction
-      });
-    }
-
-    // 2. Create sale record
-    const sale = await db.sale.create({
-      user: user.id,
-      customer: customer || null,
+    const sale = await queries.sales.createSaleTransaction({
+      userId: user.id,
+      customer,
       discountpercentage,
-      totalpayment: totalPayment,
-      totalprice: totalPrice,
-      invoicenum: "INV-" + Math.floor(Math.random() * 1000000),
-      createdby: user.id
-    }, { transaction });
-
-    // 3. Create all related records in bulk
-    const soldProducts = saleProductsData.map(product => ({
-      ...product,
-      sale: sale.id
-    }));
-
-    await db.soldproducts.bulkCreate(soldProducts, { transaction });
-
-    // 4. Update product quantities in bulk
-    await Promise.all(inventoryUpdates.map(update => 
-      db.product.update(
-        { quantity: update.quantity },
-        { where: { id: update.id }, transaction }
-      )
-    ));
-
-    // 5. Create inventory logs in bulk
-    await db.inventorylogs.bulkCreate(
-      soldProducts.map(product => ({
-        product_id: product.product,
-        quantity: -product.quantity,
-        note: "Sold",
-        createdby: user.id,
-        type: "sale"
-      })),
-      { transaction }
-    );
-
-    await transaction.commit();
+      totalPayment,
+      totalPrice,
+      products
+    });
 
     res.send({
       status: "success",
@@ -370,9 +111,8 @@ exports.save = async (req, res) => {
     });
 
   } catch (error) {
-    await transaction.rollback();
     console.error("Sale creation error:", error);
-    res.status(500).send({ status: "error", message: "Internal Server Error" });
+    res.status(500).send({ status: "error", message: error.message || "Internal Server Error" });
   }
 };
 
@@ -387,43 +127,7 @@ exports.saleview = async (req, res) => {
     }
     
     // Sale ID is STRING(32), not integer - don't use parseInt
-    const sale = await db.sale.findOne({
-      where: {
-        id: id, // Use string ID directly
-      },
-      include: [
-        {
-          model: db.user,
-          as: "Customer",
-          attributes: ["id", "firstname", "lastname", "phone", "address"],
-          required: false, // Left join in case customer is null
-        },
-        {
-          model: db.user,
-          as: "DeliveryUser",
-          attributes: ["id", "firstname", "lastname", "phone", "address"],
-          required: false, // Left join in case delivery user is null
-        },
-        {
-          model: db.user,
-          as: "User",
-          attributes: ["id", "firstname", "lastname", "phone", "address"],
-          required: false, // Left join in case user is null
-        },
-        {
-          model: db.soldproducts,
-          as: "SoldPoducts",
-          required: false,
-          include: [
-            {
-              model: db.product,
-              as: "Product",
-              required: false,
-            },
-          ],
-        },
-      ],
-    });
+    const sale = await queries.sales.getById(id);
     
     if (!sale) {
       return res.status(404).send({ status: "error", message: "Sale not found" });
@@ -445,11 +149,7 @@ exports.saleview = async (req, res) => {
     result.balance = balance.toFixed(2);
     result.change = change.toFixed(2);
 
-    let companySettings = await db.softwaresetting.findOne({
-      where: {
-        name: "company",
-      },
-    });
+    let companySettings = await queries.common.getCompanySetting();
     
     if (!companySettings) {
       // Default company settings if not found
@@ -488,23 +188,13 @@ exports.productsget = async (req, res) => {
     search = { ...search, barcode: req.body.barcode };
   }
   // OPTIMIZED: Limit to 5 products for faster search results
-  let data = await db.product.findAll({
-    where: {
-      ...search,
-      quantity: { [Op.gt]: 0 },
-      saleactive: true,
-    },
-    // include the related batch
-    include: [
-      {
-        model: db.productbatches,
-        as: "Batch",
-        attributes: ["id", "expirydate", "quantity", "createdAt"],
-      },
-    ],
-    limit: 5, // Limit results to 5 products for faster performance
-    order: [["name", "ASC"]] // Order by name for consistent results
-  });
+  let data = await queries.products.findForSale(search, 5);
+  const productIds = data.map((product) => product.id);
+  const allBatches = await Promise.all(productIds.map((id) => queries.batches.listByProduct(id)));
+  data = data.map((product, index) => ({
+    ...product,
+    Batch: allBatches[index]
+  }));
   let today = new Date();
   today.setHours(0, 0, 0, 0);
   // get the plain object of data
@@ -525,17 +215,7 @@ exports.searchCustomers = async (req, res) => {
   try {
     let { search } = req.query;
     search = search.trim();
-    const customers = await db.user.findAll({
-      where: {
-        role: 'customer',
-        [Op.or]: [
-          { firstname: { [Op.like]: `%${search}%` } },
-          { lastname: { [Op.like]: `%${search}%` } },
-          { phone: { [Op.like]: `%${search}%` } }
-        ]
-      },
-      limit: 10
-    });
+    const customers = await queries.users.searchByRole('customer', search, 10);
     res.json(customers);
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });

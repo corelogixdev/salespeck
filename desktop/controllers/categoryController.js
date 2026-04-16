@@ -1,5 +1,4 @@
-const { Op } = require('sequelize');
-const db = require('../models');
+const queries = require('../prisma/queries');
 const { getPaginationMeta, buildSortClause, buildFilterClause, sanitizeFilters } = require('../utils/paginationHelper');
 
 exports.listCategories = async (req, res) => {
@@ -11,21 +10,18 @@ exports.listCategories = async (req, res) => {
         const pageSize = parseInt(query.pageSize) || 10;
 
         // Filter parameters
-        const allowedFilters = ['name_like', 'status'];
-        const filters = sanitizeFilters(query, allowedFilters);
-        const where = buildFilterClause(filters, Op);
-
         // Sort parameters
         const sortBy = query.sortBy || 'name';
         const sortOrder = query.sortOrder || 'asc';
-        const order = buildSortClause(sortBy, sortOrder, 'name');
 
         // Get total count and paginated data
-        const { count, rows } = await db.category.findAndCountAll({
-            where,
-            order,
-            limit: pageSize,
-            offset: (page - 1) * pageSize
+        const { count, rows } = await queries.categories.list({
+            page,
+            pageSize,
+            sortBy,
+            sortOrder,
+            search: query.name_like,
+            status: query.status
         });
 
         // Generate pagination metadata
@@ -59,7 +55,7 @@ exports.listCategories = async (req, res) => {
 exports.getCategory = async (req, res) => {
     try {
         const { id } = req.params;
-        const category = await db.category.findByPk(id);
+        const category = await queries.categories.findById(id);
         
         if (!category) {
             return res.status(404).json({
@@ -86,9 +82,7 @@ exports.saveCategory = async (req, res) => {
         const { name, description } = req.body;
 
         // Check if category already exists
-        const existingCategory = await db.category.findOne({
-            where: { name: name }
-        });
+        const existingCategory = await queries.categories.findByName(name);
 
         if (existingCategory) {
             return res.status(400).json({
@@ -97,7 +91,7 @@ exports.saveCategory = async (req, res) => {
             });
         }
 
-        const newCategory = await db.category.create({
+        const newCategory = await queries.categories.create({
             name,
             description,
             status: true,
@@ -123,7 +117,7 @@ exports.updateCategory = async (req, res) => {
         const { id, name, description, status } = req.body;
 
         // Check if category exists
-        const category = await db.category.findByPk(id);
+        const category = await queries.categories.findById(id);
         if (!category) {
             return res.status(404).json({
                 success: false,
@@ -132,12 +126,7 @@ exports.updateCategory = async (req, res) => {
         }
 
         // Check if name is already taken by another category
-        const existingCategory = await db.category.findOne({
-            where: {
-                name: name,
-                id: { [Op.ne]: id }
-            }
-        });
+        const existingCategory = await queries.categories.findByNameExceptId(name, id);
 
         if (existingCategory) {
             return res.status(400).json({
@@ -146,13 +135,11 @@ exports.updateCategory = async (req, res) => {
             });
         }
 
-        await db.category.update({
+        await queries.categories.update(id, {
             name,
             description,
             status,
             updatedby: req.session.user.id
-        }, {
-            where: { id }
         });
 
         res.status(200).json({
@@ -173,22 +160,22 @@ exports.deleteCategory = async (req, res) => {
         const { id } = req.body;
 
         // Check if category is being used by any products
-        const productsUsingCategory = await db.product.findOne({
+        const productsUsingCategory = await queries.products.list({
+            page: 1,
+            pageSize: 1,
             where: { category: id }
         });
 
-        if (productsUsingCategory) {
+        if (productsUsingCategory.count > 0) {
             return res.status(400).json({
                 success: false,
                 message: 'Cannot delete category as it is being used by products'
             });
         }
 
-        await db.category.update({
+        await queries.categories.update(id, {
             status: false,
             updatedby: req.session.user.id
-        }, {
-            where: { id }
         });
 
         res.status(200).json({
@@ -211,14 +198,7 @@ exports.searchCategories = async (req, res) => {
             return res.json({ success: false, data: [] });
         }
 
-        const categories = await db.category.findAll({
-            where: {
-                status: true,
-                name: { [Op.like]: `%${search}%` }
-            },
-            order: [['name', 'ASC']],
-            limit: 20 // Limit search results for better performance
-        });
+        const categories = await queries.categories.search(search, 20);
 
         res.status(200).json({
             success: true,

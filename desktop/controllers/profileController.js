@@ -1,4 +1,4 @@
-const db = require('../models');
+const queries = require('../prisma/queries');
 const path = require('path');
 const fs = require('fs');
 
@@ -12,9 +12,7 @@ const profileController = {
                 return res.status(401).json({ error: 'Unauthorized' });
             }
             const userId = req.session.user.id;
-            const user = await db.user.findByPk(userId, {
-                attributes: ['id', 'username', 'firstname', 'lastname', 'email', 'phone', 'phone2', 'address', 'profile_image_url', 'role']
-            });
+            const user = await queries.profile.getProfileById(userId);
 
             if (!user) {
                 return res.status(404).json({ error: 'User not found' });
@@ -37,7 +35,7 @@ const profileController = {
             }
 
             // Delete old profile image if exists
-            const user = await db.user.findByPk(userId);
+            const user = await queries.users.findById(userId);
             if (user.profile_image_url) {
                 const oldImagePath = path.join(__dirname, '..', user.profile_image_url);
                 if (fs.existsSync(oldImagePath)) {
@@ -47,10 +45,7 @@ const profileController = {
 
             // Update user with new image URL
             const imageUrl = `/uploads/profile-images/${req.file.filename}`;
-            await db.user.update(
-                { profile_image_url: imageUrl },
-                { where: { id: userId } }
-            );
+            await queries.profile.updateProfileImage(userId, imageUrl);
 
             // Update session
             req.session.user.profile_image_url = imageUrl;
@@ -74,18 +69,15 @@ const profileController = {
             }
 
             // Update user
-            await db.user.update(
-                {
-                    firstname,
-                    lastname,
-                    email: email || null,
-                    phone: phone || null,
-                    phone2: phone2 || null,
-                    address: address || null,
-                    updatedby: userId
-                },
-                { where: { id: userId } }
-            );
+            await queries.profile.updateProfile(userId, {
+                firstname,
+                lastname,
+                email: email || null,
+                phone: phone || null,
+                phone2: phone2 || null,
+                address: address || null,
+                updatedby: userId
+            });
 
             // Update session
             req.session.user.firstname = firstname;
@@ -118,7 +110,7 @@ const profileController = {
             }
 
             // Get user
-            const user = await db.user.findByPk(userId);
+            const user = await queries.users.findById(userId);
 
             // Verify current password
             if (!encrypt.compare(user.password, currentPassword)) {
@@ -127,10 +119,7 @@ const profileController = {
 
             // Update password
             const hashedNewPassword = encrypt.encrypt(newPassword);
-            await db.user.update(
-                { password: hashedNewPassword, updatedby: userId },
-                { where: { id: userId } }
-            );
+            await queries.users.update(userId, { password: hashedNewPassword, updatedby: userId });
 
             res.json({ success: true, message: 'Password changed successfully' });
         } catch (error) {
@@ -143,7 +132,7 @@ const profileController = {
     deleteProfileImage: async (req, res) => {
         try {
             const userId = req.session.user.id;
-            const user = await db.user.findByPk(userId);
+            const user = await queries.users.findById(userId);
 
             if (user.profile_image_url) {
                 // Delete file from filesystem
@@ -153,10 +142,7 @@ const profileController = {
                 }
 
                 // Update database
-                await db.user.update(
-                    { profile_image_url: null },
-                    { where: { id: userId } }
-                );
+                await queries.profile.updateProfileImage(userId, null);
 
                 // Update session
                 req.session.user.profile_image_url = null;

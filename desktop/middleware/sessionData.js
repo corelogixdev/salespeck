@@ -1,4 +1,4 @@
-const { user: User } = require('../models');
+const queries = require('../prisma/queries');
 const SimpleCache = require('../utils/cache');
 const fs = require('fs');
 const path = require('path');
@@ -33,11 +33,7 @@ module.exports = async (req, res, next) => {
         let userData = userCache.get(req.session.user_id);
 
         if (!userData) {
-            userData = await User.findOne({
-                where: { id: req.session.user_id },
-                attributes: ['id', 'firstname', 'lastname', 'username', 'role', 'profile_image_url'],
-                raw: true
-            });
+            userData = await queries.users.findSessionUserById(req.session.user_id);
 
             if (!userData) {
                 req.session = null;

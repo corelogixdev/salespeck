@@ -1,5 +1,4 @@
-const { Op } = require('sequelize');
-const db = require('../models');
+const queries = require('../prisma/queries');
 const encrypt = require('../utils/encrypt');
 const { getPaginationMeta, buildSortClause } = require('../utils/paginationHelper');
 const moment = require("moment");
@@ -23,41 +22,16 @@ exports.index = async (req, res) => {
     const pageSize = parseInt(query.pageSize) || 10;
 
     // Filters
-    const whereClause = { role };
-
-    if (daterange) {
-        const [start, end] = daterange.split(" to ");
-        if(start && end) { // Basic validation
-             const startDate = moment(new Date(start)).startOf("day").toISOString();
-             const endDate = moment(new Date(end)).endOf("day").toISOString();
-             whereClause.createdAt = {
-                 [Op.gte]: startDate,
-                 [Op.lte]: endDate
-             };
-        }
-    }
-
-    if (query.search) {
-      const search = query.search.trim();
-      whereClause[Op.or] = [
-        { username: { [Op.like]: `%${search}%` } },
-        { phone: { [Op.like]: `%${search}%` } },
-        { firstname: { [Op.like]: `%${search}%` } },
-        { lastname: { [Op.like]: `%${search}%` } },
-        { email: { [Op.like]: `%${search}%` } }
-      ];
-    }
-
-    // Sorting
     const sortBy = query.sortBy || 'id';
     const sortOrder = query.sortOrder || 'desc';
-    const order = buildSortClause(sortBy, sortOrder, 'id');
-
-    const { count, rows: data } = await db.user.findAndCountAll({
-      where: whereClause,
-      order,
-      limit: pageSize,
-      offset: (page - 1) * pageSize
+    const { count, rows: data } = await queries.users.list({
+      role,
+      page,
+      pageSize,
+      search: query.search?.trim(),
+      daterange,
+      sortBy,
+      sortOrder
     });
 
     const pagination = getPaginationMeta(page, pageSize, count);
@@ -104,7 +78,7 @@ exports.form = async (req, res) => {
   const role = req.query.role || 'user'; // Default role to 'user' if not provided
   let data = null;
   if (userId) {
-    data = await db.user.findByPk(userId);
+    data = await queries.users.findById(userId);
     if (data.password) {
       data.password = encrypt.decrypt(data.password);
     }
@@ -123,11 +97,11 @@ exports.form = async (req, res) => {
 exports.getUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await db.user.findByPk(id);
+    const user = await queries.users.findById(id);
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
-    const data = user.toJSON();
+    const data = { ...user };
     if (data.password) {
       data.password = encrypt.decrypt(data.password);
     }
@@ -151,7 +125,7 @@ exports.save = async (req, res) => {
   }
   try {
     // check if email is duplicate
-    let user = await db.user.findOne({ where: { email } });
+    let user = await queries.users.findByEmail(email);
     if (user && user.id != id) {
       return res.status(400).json({ success: false, message: 'User with this email already exists' });
     }
@@ -170,9 +144,9 @@ exports.save = async (req, res) => {
     };
 
     if (id) {
-      await db.user.update(userData, { where: { id } });
+      await queries.users.update(id, userData);
     } else {
-      await db.user.create(userData);
+      await queries.users.create(userData);
     }
 
     res.json({ success: true, message: `${role.charAt(0).toUpperCase() + role.slice(1)} saved successfully` });
@@ -184,12 +158,12 @@ exports.save = async (req, res) => {
 
 exports.delete = async (req, res) => {
   try {
-    const user = await db.user.findByPk(req.params.id);
+    const user = await queries.users.findById(req.params.id);
     var role = user.role;
     if (role === 'branchmanager') {
       role = "user";
     }
-    await db.user.destroy({ where: { id: req.params.id } });
+    await queries.users.remove(req.params.id);
     res.send({ success: true, message: `${role.charAt(0).toUpperCase() + role.slice(1)} deleted successfully`, redirect: '/users?role=' + role });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Internal Server Error' });
@@ -197,20 +171,12 @@ exports.delete = async (req, res) => {
 };
 
 exports.getCustomers = async (req, res) => {
-  const data = await db.user.findAll({
-    where: {
-      role: 'customer'
-    }
-  });
+  const data = await queries.users.listByRole('customer');
   res.json(data);
 };
 
 exports.getVendors = async (req, res) => {
-  const data = await db.user.findAll({
-    where: {
-      role: 'vendor'
-    }
-  });
+  const data = await queries.users.listByRole('vendor');
   res.json(data);
 };
 
@@ -218,16 +184,7 @@ exports.searchVendors = async (req, res) => {
   try {
     let { search } = req.query;
     search = search ? search.trim() : '';
-    const vendors = await db.user.findAll({
-      where: {
-        role: 'vendor',
-        [Op.or]: [
-          { firstname: { [Op.like]: `%${search}%` } },
-          { lastname: { [Op.like]: `%${search}%` } },
-        ]
-      },
-      limit: 10
-    });
+    const vendors = await queries.users.searchByRole('vendor', search, 10);
     res.json(vendors);
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });

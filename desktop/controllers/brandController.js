@@ -1,5 +1,4 @@
-const { Op } = require('sequelize');
-const db = require('../models');
+const queries = require('../prisma/queries');
 const { getPaginationMeta, buildSortClause, buildFilterClause, sanitizeFilters } = require('../utils/paginationHelper');
 
 exports.listBrands = async (req, res) => {
@@ -11,21 +10,18 @@ exports.listBrands = async (req, res) => {
         const pageSize = parseInt(query.pageSize) || 10;
 
         // Filter parameters
-        const allowedFilters = ['name_like', 'status'];
-        const filters = sanitizeFilters(query, allowedFilters);
-        const where = buildFilterClause(filters, Op);
-
         // Sort parameters
         const sortBy = query.sortBy || 'name';
         const sortOrder = query.sortOrder || 'asc';
-        const order = buildSortClause(sortBy, sortOrder, 'name');
 
         // Get total count and paginated data
-        const { count, rows } = await db.brand.findAndCountAll({
-            where,
-            order,
-            limit: pageSize,
-            offset: (page - 1) * pageSize
+        const { count, rows } = await queries.brands.list({
+            page,
+            pageSize,
+            sortBy,
+            sortOrder,
+            search: query.name_like,
+            status: query.status
         });
 
         // Generate pagination metadata
@@ -59,7 +55,7 @@ exports.listBrands = async (req, res) => {
 exports.getBrand = async (req, res) => {
     try {
         const { id } = req.params;
-        const brand = await db.brand.findByPk(id);
+        const brand = await queries.brands.findById(id);
         
         if (!brand) {
             return res.status(404).json({
@@ -86,9 +82,7 @@ exports.saveBrand = async (req, res) => {
         const { name, description } = req.body;
 
         // Check if brand already exists
-        const existingBrand = await db.brand.findOne({
-            where: { name: name }
-        });
+        const existingBrand = await queries.brands.findByName(name);
 
         if (existingBrand) {
             return res.status(400).json({
@@ -97,7 +91,7 @@ exports.saveBrand = async (req, res) => {
             });
         }
 
-        const newBrand = await db.brand.create({
+        const newBrand = await queries.brands.create({
             name,
             description,
             status: true,
@@ -123,7 +117,7 @@ exports.updateBrand = async (req, res) => {
         const { id, name, description, status } = req.body;
 
         // Check if brand exists
-        const brand = await db.brand.findByPk(id);
+        const brand = await queries.brands.findById(id);
         if (!brand) {
             return res.status(404).json({
                 success: false,
@@ -132,12 +126,7 @@ exports.updateBrand = async (req, res) => {
         }
 
         // Check if name is already taken by another brand
-        const existingBrand = await db.brand.findOne({
-            where: {
-                name: name,
-                id: { [Op.ne]: id }
-            }
-        });
+        const existingBrand = await queries.brands.findByNameExceptId(name, id);
 
         if (existingBrand) {
             return res.status(400).json({
@@ -146,13 +135,11 @@ exports.updateBrand = async (req, res) => {
             });
         }
 
-        await db.brand.update({
+        await queries.brands.update(id, {
             name,
             description,
             status,
             updatedby: req.session.user.id
-        }, {
-            where: { id }
         });
 
         res.status(200).json({
@@ -173,22 +160,22 @@ exports.deleteBrand = async (req, res) => {
         const { id } = req.body;
 
         // Check if brand is being used by any products
-        const productsUsingBrand = await db.product.findOne({
+        const productsUsingBrand = await queries.products.list({
+            page: 1,
+            pageSize: 1,
             where: { brand: id }
         });
 
-        if (productsUsingBrand) {
+        if (productsUsingBrand.count > 0) {
             return res.status(400).json({
                 success: false,
                 message: 'Cannot delete brand as it is being used by products'
             });
         }
 
-        await db.brand.update({
+        await queries.brands.update(id, {
             status: false,
             updatedby: req.session.user.id
-        }, {
-            where: { id }
         });
 
         res.status(200).json({
@@ -211,14 +198,7 @@ exports.searchBrands = async (req, res) => {
             return res.json({ success: false, data: [] });
         }
 
-        const brands = await db.brand.findAll({
-            where: {
-                status: true,
-                name: { [Op.like]: `%${search}%` }
-            },
-            order: [['name', 'ASC']],
-            limit: 20 // Limit search results for better performance
-        });
+        const brands = await queries.brands.search(search, 20);
 
         res.status(200).json({
             success: true,

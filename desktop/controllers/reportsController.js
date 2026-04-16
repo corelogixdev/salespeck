@@ -1,5 +1,4 @@
-const { Op } = require("sequelize");
-const db = require("../models");
+const queries = require("../prisma/queries");
 const moment = require("moment");
 
 // Reports index page
@@ -19,45 +18,7 @@ exports.salesReport = async (req, res) => {
   try {
     const { startDate, endDate, customer, format } = req.query;
     
-    let whereClause = {};
-    let includeOptions = [
-      {
-        model: db.user,
-        as: "Customer",
-        attributes: ["id", "firstname", "lastname", "phone"],
-        required: false
-      },
-      {
-        model: db.soldproducts,
-        as: "SoldPoducts",
-        include: [{
-          model: db.product,
-          as: "Product",
-          attributes: ["id", "name", "barcode"]
-        }]
-      }
-    ];
-
-    // Date range filter
-    if (startDate && endDate) {
-      whereClause.createdAt = {
-        [Op.between]: [
-          moment(startDate).startOf("day").toISOString(),
-          moment(endDate).endOf("day").toISOString()
-        ]
-      };
-    }
-
-    // Customer filter
-    if (customer) {
-      whereClause.customer = customer;
-    }
-
-    const sales = await db.sale.findAll({
-      where: whereClause,
-      include: includeOptions,
-      order: [["createdAt", "DESC"]]
-    });
+    const sales = await queries.reports.getSalesReport({ startDate, endDate, customer });
 
     // Calculate totals
     const totals = {
@@ -102,43 +63,7 @@ exports.purchasesReport = async (req, res) => {
   try {
     const { startDate, endDate, vendor, format } = req.query;
     
-    let whereClause = {};
-    let includeOptions = [
-      {
-        model: db.user,
-        as: "Vendor",
-        attributes: ["id", "firstname", "lastname", "phone"],
-        required: false
-      },
-      {
-        model: db.purchasedproducts,
-        as: "PurchasedItems",
-        include: [{
-          model: db.product,
-          as: "Product",
-          attributes: ["id", "name", "barcode"]
-        }]
-      }
-    ];
-
-    if (startDate && endDate) {
-      whereClause.createdAt = {
-        [Op.between]: [
-          moment(startDate).startOf("day").toISOString(),
-          moment(endDate).endOf("day").toISOString()
-        ]
-      };
-    }
-
-    if (vendor) {
-      whereClause.vendor = vendor;
-    }
-
-    const purchases = await db.purchase.findAll({
-      where: whereClause,
-      include: includeOptions,
-      order: [["createdAt", "DESC"]]
-    });
+    const purchases = await queries.reports.getPurchasesReport({ startDate, endDate, vendor });
 
     const totals = {
       totalPurchases: purchases.length,
@@ -176,41 +101,7 @@ exports.inventoryReport = async (req, res) => {
   try {
     const { category, brand, lowStock, format } = req.query;
     
-    let whereClause = {};
-    let includeOptions = [
-      {
-        model: db.category,
-        as: "Category",
-        attributes: ["id", "name"],
-        required: false
-      },
-      {
-        model: db.brand,
-        as: "Brand",
-        attributes: ["id", "name"],
-        required: false
-      }
-    ];
-
-    if (category) {
-      whereClause.category = category;
-    }
-
-    if (brand) {
-      whereClause.brand = brand;
-    }
-
-    if (lowStock === 'true') {
-      whereClause.quantity = {
-        [Op.lte]: 10 // Low stock threshold
-      };
-    }
-
-    const products = await db.product.findAll({
-      where: whereClause,
-      include: includeOptions,
-      order: [["name", "ASC"]]
-    });
+    const products = await queries.reports.getInventoryReport({ category, brand, lowStock });
 
     const totals = {
       totalProducts: products.length,
@@ -252,44 +143,7 @@ exports.customerReport = async (req, res) => {
   try {
     const { startDate, endDate, format } = req.query;
     
-    let whereClause = { role: 'customer' };
-    
-    const customers = await db.user.findAll({
-      where: whereClause,
-      attributes: ["id", "firstname", "lastname", "phone", "email", "address", "createdAt"],
-      order: [["firstname", "ASC"]]
-    });
-
-    // Get sales data for each customer
-    const customersWithSales = await Promise.all(
-      customers.map(async (customer) => {
-        let saleWhere = { customer: customer.id };
-        
-        if (startDate && endDate) {
-          saleWhere.createdAt = {
-            [Op.between]: [
-              moment(startDate).startOf("day").toISOString(),
-              moment(endDate).endOf("day").toISOString()
-            ]
-          };
-        }
-
-        const sales = await db.sale.findAll({
-          where: saleWhere,
-          attributes: ["id", "totalprice", "totalpayment", "createdAt"]
-        });
-
-        const totalPurchases = sales.length;
-        const totalSpent = sales.reduce((sum, s) => sum + parseFloat(s.totalpayment || 0), 0);
-
-        return {
-          ...customer.toJSON(),
-          totalPurchases,
-          totalSpent,
-          lastPurchaseDate: sales.length > 0 ? sales[sales.length - 1].createdAt : null
-        };
-      })
-    );
+    const customersWithSales = await queries.reports.getCustomerReport({ startDate, endDate });
 
     const totals = {
       totalCustomers: customersWithSales.length,

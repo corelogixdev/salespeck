@@ -12,7 +12,7 @@ function run(command) {
 
 function bootstrapPrisma() {
   run("npx prisma migrate deploy");
-  run("node scripts/prisma-seed.js");
+  run("node prisma/seed-must-data.js");
 }
 
 if (require.main === module) {

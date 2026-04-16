@@ -1,5 +1,5 @@
 const router = require("express").Router();
-let db = require("../models");
+const queries = require("../prisma/queries");
 const { getPaginationMeta, buildSortClause } = require('../utils/paginationHelper');
 
 router.get("/", async (req, res) => {
@@ -10,18 +10,12 @@ router.get("/", async (req, res) => {
 
     const sortBy = query.sortBy || 'name';
     const sortOrder = query.sortOrder || 'asc';
-    const order = buildSortClause(sortBy, sortOrder, 'name');
-
-    const where = {};
-    if (query.name_like) {
-      where.name = { [db.Sequelize.Op.like]: `%${query.name_like}%` };
-    }
-
-    const { count, rows: taxes } = await db.taxes.findAndCountAll({
-      where,
-      order,
-      limit: pageSize,
-      offset: (page - 1) * pageSize
+    const { count, rows: taxes } = await queries.taxes.list({
+      page,
+      pageSize,
+      sortBy,
+      sortOrder,
+      search: query.name_like
     });
 
     const pagination = getPaginationMeta(page, pageSize, count);
@@ -42,7 +36,7 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
-    const tax = await db.taxes.findByPk(req.params.id);
+    const tax = await queries.taxes.findById(req.params.id);
     if (!tax) {
       return res.status(404).json({ success: false, message: 'Tax not found' });
     }
@@ -57,12 +51,12 @@ router.post("/save", async (req, res) => {
   try {
     let id = req.body.id;
     if (id) {
-      let tax = await db.taxes.findByPk(id);
-      tax.name = req.body.name;
-      tax.percentage = req.body.percentage;
-      await tax.save();
+      await queries.taxes.update(id, {
+        name: req.body.name,
+        percentage: req.body.percentage,
+      });
     } else {
-      await db.taxes.create({
+      await queries.taxes.create({
         name: req.body.name,
         percentage: req.body.percentage,
       });
@@ -75,8 +69,7 @@ router.post("/save", async (req, res) => {
 
 router.post("/:id/delete", async (req, res) => {
   try {
-    let tax = await db.taxes.findByPk(req.params.id);
-    await tax.destroy();
+    await queries.taxes.remove(req.params.id);
     res.json({ success: true, message: "Tax deleted successfully" });
   } catch (e) {
     res.json({ success: false, message: "Error deleting tax" });
