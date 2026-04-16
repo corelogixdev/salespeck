@@ -1,4 +1,4 @@
-# Update Release Guide (Prisma-First)
+# Update Release Guide
 
 ## What Happens When the App Starts After an Update
 1. The app resolves the writable SQLite DB path in user data.

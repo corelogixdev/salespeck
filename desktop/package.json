@@ -23,8 +23,6 @@
     "postbuild": "rimraf dist/win-unpacked",
     "upload": "node build/upload.js",
     "test-local-installed-update": "node test-local-installed-update.js",
-    "local-update:installed": "node test-local-installed-update.js",
-    "test:update": "node test-local-installed-update.js"
   },
   "build": {
     "appId": "io.openmenu.app",
