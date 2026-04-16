@@ -34,26 +34,45 @@ function resolveSpawnCwd() {
 }
 
 function runPrismaCli(args) {
-  const prismaCliPath = require.resolve("prisma/build/index.js");
   const schemaPath = path.join(__dirname, "..", "prisma", "schema.prisma");
-  const runtimeExecutable = resolveCliExecutable();
   const spawnCwd = resolveSpawnCwd();
+  const env = {
+    ...process.env,
+    DATABASE_URL: process.env.DATABASE_URL || resolveDatabaseUrl(),
+  };
 
-  const result = spawnSync(
-    runtimeExecutable,
-    [prismaCliPath, ...args, "--schema", schemaPath],
-    {
-      cwd: spawnCwd,
-      env: {
-        ...process.env,
-        DATABASE_URL: process.env.DATABASE_URL || resolveDatabaseUrl(),
-        ELECTRON_RUN_AS_NODE: "1",
-      },
-      stdio: "pipe",
-      encoding: "utf8",
-      timeout: 120000,
-    }
-  );
+  let result;
+  if (!__dirname.includes("app.asar")) {
+    const npxCommand = process.platform === "win32" ? "npx.cmd" : "npx";
+    result = spawnSync(
+      npxCommand,
+      ["prisma", ...args, "--schema", schemaPath],
+      {
+        cwd: spawnCwd,
+        env,
+        stdio: "pipe",
+        encoding: "utf8",
+        timeout: 120000,
+      }
+    );
+  } else {
+    const prismaCliPath = require.resolve("prisma/build/index.js");
+    const runtimeExecutable = resolveCliExecutable();
+    result = spawnSync(
+      runtimeExecutable,
+      [prismaCliPath, ...args, "--schema", schemaPath],
+      {
+        cwd: spawnCwd,
+        env: {
+          ...env,
+          ELECTRON_RUN_AS_NODE: "1",
+        },
+        stdio: "pipe",
+        encoding: "utf8",
+        timeout: 120000,
+      }
+    );
+  }
 
   if (result.error) {
     throw new Error(`Prisma CLI execution failed: ${result.error.message}`);

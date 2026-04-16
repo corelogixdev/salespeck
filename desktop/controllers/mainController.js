@@ -148,6 +148,7 @@ const registerpost = async (req, res) => {
   try {
     logi("Creating user in local database...");
     const hashedPassword = encrypt.encrypt(req.body.password);
+    const { firstName, lastName, ...restBody } = req.body;
 
     // Handle profile image if uploaded
     let profileImageUrl = null;
@@ -157,9 +158,9 @@ const registerpost = async (req, res) => {
     }
 
     await queries.users.create({
-      ...req.body,
-      firstname: req.body.firstName,
-      lastname: req.body.lastName,
+      ...restBody,
+      firstname: firstName,
+      lastname: lastName,
       password: hashedPassword,
       role: "branchmanager",
       profile_image_url: profileImageUrl,
