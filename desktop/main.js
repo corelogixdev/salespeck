@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 require('dotenv').config();
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 // Defer autoUpdater requirement to after app is ready or inside a try-catch
@@ -210,6 +211,72 @@ ipcMain.on('unlock-window-focus', (event) => {
 ipcMain.on('maximize-window', (event) => {
   if (!mainWindow || mainWindow.isDestroyed()) return;
   mainWindow.maximize();
+});
+
+ipcMain.on('print-preview', async (event) => {
+  const senderWindow = BrowserWindow.fromWebContents(event.sender);
+  if (!senderWindow) return;
+  try {
+    const os = require('os');
+    const pdfPath = path.join(os.tmpdir(), `openmenu-print-${Date.now()}.pdf`);
+    const data = await senderWindow.webContents.printToPDF({
+      marginsType: 1,
+      printBackground: true,
+      preferCSSPageSize: true,
+    });
+    fs.writeFileSync(pdfPath, data);
+    const result = await shell.openPath(pdfPath);
+    if (result) {
+      logi('Print preview open path returned:', result);
+    }
+  } catch (err) {
+    logi('Print preview error:', err.message);
+    dialog.showErrorBox('Print Preview Failed', err.message || 'Could not generate print preview.');
+  }
+});
+
+ipcMain.on('generate-report-pdf', async (event, url) => {
+  let hiddenWin;
+  try {
+    hiddenWin = new BrowserWindow({
+      show: false,
+      width: 1200,
+      height: 800,
+      webPreferences: {
+        contextIsolation: true,
+        nodeIntegration: false,
+      }
+    });
+
+    const serverUrl = `${config.SERVER_IP || 'localhost'}:${config.port || 3000}`;
+    const absoluteUrl = (url && String(url).startsWith('http')) ? url : `http://${serverUrl}${url || ''}`;
+
+    await hiddenWin.loadURL(absoluteUrl);
+    // Give a short delay for fonts/styles to settle
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    const data = await hiddenWin.webContents.printToPDF({
+      marginsType: 1,
+      printBackground: true,
+      preferCSSPageSize: true,
+      pageSize: 'A4',
+    });
+
+    const tempPdfDir = path.join(os.tmpdir(), 'openmenu-pdfs');
+    try { fs.mkdirSync(tempPdfDir, { recursive: true }); } catch (e) {}
+    const fileName = `report-${Date.now()}.pdf`;
+    const pdfPath = path.join(tempPdfDir, fileName);
+    fs.writeFileSync(pdfPath, data);
+
+    event.reply('report-pdf-generated', { success: true, url: `/temp-pdfs/${fileName}` });
+  } catch (err) {
+    logi('Generate report PDF error:', err.message);
+    event.reply('report-pdf-generated', { success: false, error: err.message || 'Could not generate PDF.' });
+  } finally {
+    if (hiddenWin && !hiddenWin.isDestroyed()) {
+      hiddenWin.close();
+    }
+  }
 });
 
 app.whenReady().then(async () => {

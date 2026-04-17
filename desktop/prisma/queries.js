@@ -23,6 +23,18 @@ function toLike(value) {
   return `%${String(value || "").trim()}%`;
 }
 
+async function findManyInChunks(model, field, ids, options = {}) {
+  const chunkSize = 500;
+  const chunks = [];
+  for (let i = 0; i < ids.length; i += chunkSize) {
+    chunks.push(ids.slice(i, i + chunkSize));
+  }
+  const results = await Promise.all(
+    chunks.map((chunk) => model.findMany({ ...options, where: { [field]: { in: chunk } } }))
+  );
+  return results.flat();
+}
+
 const auth = {
   async getBranchManager() {
     const prisma = getPrisma();
@@ -591,9 +603,7 @@ const sales = {
     const count = parseInt(countResult[0]?.count || 0, 10);
     const saleIds = salesResult.map((item) => item.id);
     const soldItems = saleIds.length > 0
-      ? await prisma.soldproducts.findMany({
-          where: { sale: { in: saleIds } },
-        })
+      ? await findManyInChunks(prisma.soldproducts, 'sale', saleIds)
       : [];
     const productIds = [...new Set(soldItems.map((item) => item.product).filter(Boolean))];
     const products = productIds.length > 0
@@ -642,10 +652,7 @@ const sales = {
     const customerIds = [...new Set(saleRows.map((item) => item.customer).filter(Boolean))];
     const saleIds = saleRows.map((item) => item.id);
     const soldItems = saleIds.length > 0
-      ? await prisma.soldproducts.findMany({
-          where: { sale: { in: saleIds } },
-          orderBy: { createdAt: "asc" },
-        })
+      ? await findManyInChunks(prisma.soldproducts, 'sale', saleIds, { orderBy: { createdAt: 'asc' } })
       : [];
     const productIds = [...new Set(soldItems.map((item) => item.product).filter(Boolean))];
 
@@ -852,45 +859,106 @@ const reports = {
     const salesRows = await sales.listReport(filters);
     return salesRows;
   },
+  async getSalesReportPaginated(filters, page = 1, pageSize = 25) {
+    const prisma = getPrisma();
+    const { skip, take } = normalizePagination(page, pageSize);
+    const where = {};
+    if (filters.startDate && filters.endDate) {
+      where.createdAt = { gte: new Date(filters.startDate), lte: new Date(filters.endDate) };
+    }
+    if (filters.customer) where.customer = filters.customer;
+
+    const [count, saleRows] = await Promise.all([
+      prisma.sale.count({ where }),
+      prisma.sale.findMany({ where, orderBy: { createdAt: "desc" }, skip, take }),
+    ]);
+
+    const customerIds = [...new Set(saleRows.map((item) => item.customer).filter(Boolean))];
+    const saleIds = saleRows.map((item) => item.id);
+    const soldItems = saleIds.length > 0
+      ? await findManyInChunks(prisma.soldproducts, 'sale', saleIds, { orderBy: { createdAt: 'asc' } })
+      : [];
+    const productIds = [...new Set(soldItems.map((item) => item.product).filter(Boolean))];
+
+    const [customers, products] = await Promise.all([
+      customerIds.length > 0
+        ? prisma.user.findMany({ where: { id: { in: customerIds } }, select: { id: true, firstname: true, lastname: true, phone: true } })
+        : Promise.resolve([]),
+      productIds.length > 0
+        ? prisma.product.findMany({ where: { id: { in: productIds } }, select: { id: true, name: true, barcode: true } })
+        : Promise.resolve([]),
+    ]);
+
+    const customerMap = new Map(customers.map((item) => [item.id, item]));
+    const productMap = new Map(products.map((item) => [item.id, item]));
+    const itemsBySale = new Map();
+    for (const item of soldItems) {
+      const current = itemsBySale.get(item.sale) || [];
+      current.push({ ...item, Product: item.product ? productMap.get(item.product) || null : null });
+      itemsBySale.set(item.sale, current);
+    }
+
+    const rows = saleRows.map((item) => ({
+      ...item,
+      Customer: item.customer ? customerMap.get(item.customer) || null : null,
+      SoldPoducts: itemsBySale.get(item.id) || [],
+    }));
+    return { count, rows };
+  },
+  async getSalesReportTotals(filters) {
+    const prisma = getPrisma();
+    const where = {};
+    if (filters.startDate && filters.endDate) {
+      where.createdAt = { gte: new Date(filters.startDate), lte: new Date(filters.endDate) };
+    }
+    if (filters.customer) where.customer = filters.customer;
+
+    const count = await prisma.sale.count({ where });
+
+    const conditions = [];
+    const replacements = [];
+    if (filters.startDate && filters.endDate) {
+      conditions.push("createdAt >= ? AND createdAt <= ?");
+      replacements.push(new Date(filters.startDate), new Date(filters.endDate));
+    }
+    if (filters.customer) {
+      conditions.push("customer = ?");
+      replacements.push(filters.customer);
+    }
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    const agg = await prisma.$queryRawUnsafe(
+      `SELECT COALESCE(SUM(CAST(totalprice AS REAL)), 0) as totalAmount, COALESCE(SUM(CAST(totalpayment AS REAL)), 0) as totalPayment FROM sale ${whereClause}`,
+      ...replacements
+    );
+
+    const totalAmount = parseFloat(agg[0]?.totalAmount || 0);
+    const totalPayment = parseFloat(agg[0]?.totalPayment || 0);
+    return { totalSales: count, totalAmount, totalPayment, totalDiscount: totalAmount - totalPayment };
+  },
+
   async getPurchasesReport({ startDate, endDate, vendor }) {
     const prisma = getPrisma();
     const where = {};
     if (startDate && endDate) {
-      where.createdAt = {
-        gte: new Date(startDate),
-        lte: new Date(endDate),
-      };
+      where.createdAt = { gte: new Date(startDate), lte: new Date(endDate) };
     }
-    if (vendor) {
-      where.vendor = vendor;
-    }
-    const purchaseRows = await prisma.purchase.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-    });
+    if (vendor) where.vendor = vendor;
+    const purchaseRows = await prisma.purchase.findMany({ where, orderBy: { createdAt: "desc" } });
 
     const purchaseIds = purchaseRows.map((item) => item.id);
     const vendorIds = [...new Set(purchaseRows.map((item) => item.vendor).filter(Boolean))];
     const purchasedItems = purchaseIds.length > 0
-      ? await prisma.purchasedproducts.findMany({
-          where: { purchase: { in: purchaseIds } },
-          orderBy: { createdAt: "asc" },
-        })
+      ? await findManyInChunks(prisma.purchasedproducts, 'purchase', purchaseIds, { orderBy: { createdAt: 'asc' } })
       : [];
     const productIds = [...new Set(purchasedItems.map((item) => item.product).filter(Boolean))];
 
     const [vendors, products] = await Promise.all([
       vendorIds.length > 0
-        ? prisma.user.findMany({
-            where: { id: { in: vendorIds } },
-            select: { id: true, firstname: true, lastname: true, phone: true },
-          })
+        ? prisma.user.findMany({ where: { id: { in: vendorIds } }, select: { id: true, firstname: true, lastname: true, phone: true } })
         : Promise.resolve([]),
       productIds.length > 0
-        ? prisma.product.findMany({
-            where: { id: { in: productIds } },
-            select: { id: true, name: true, barcode: true },
-          })
+        ? prisma.product.findMany({ where: { id: { in: productIds } }, select: { id: true, name: true, barcode: true } })
         : Promise.resolve([]),
     ]);
 
@@ -899,10 +967,7 @@ const reports = {
     const itemsByPurchase = new Map();
     for (const item of purchasedItems) {
       const current = itemsByPurchase.get(item.purchase) || [];
-      current.push({
-        ...item,
-        Product: item.product ? productMap.get(item.product) || null : null,
-      });
+      current.push({ ...item, Product: item.product ? productMap.get(item.product) || null : null });
       itemsByPurchase.set(item.purchase, current);
     }
 
@@ -912,6 +977,72 @@ const reports = {
       PurchasedItems: itemsByPurchase.get(item.id) || [],
     }));
   },
+  async getPurchasesReportPaginated(filters, page = 1, pageSize = 25) {
+    const prisma = getPrisma();
+    const { skip, take } = normalizePagination(page, pageSize);
+    const where = {};
+    if (filters.startDate && filters.endDate) {
+      where.createdAt = { gte: new Date(filters.startDate), lte: new Date(filters.endDate) };
+    }
+    if (filters.vendor) where.vendor = filters.vendor;
+
+    const [count, purchaseRows] = await Promise.all([
+      prisma.purchase.count({ where }),
+      prisma.purchase.findMany({ where, orderBy: { createdAt: "desc" }, skip, take }),
+    ]);
+
+    const purchaseIds = purchaseRows.map((item) => item.id);
+    const vendorIds = [...new Set(purchaseRows.map((item) => item.vendor).filter(Boolean))];
+    const purchasedItems = purchaseIds.length > 0
+      ? await findManyInChunks(prisma.purchasedproducts, 'purchase', purchaseIds, { orderBy: { createdAt: 'asc' } })
+      : [];
+    const productIds = [...new Set(purchasedItems.map((item) => item.product).filter(Boolean))];
+
+    const [vendors, products] = await Promise.all([
+      vendorIds.length > 0
+        ? prisma.user.findMany({ where: { id: { in: vendorIds } }, select: { id: true, firstname: true, lastname: true, phone: true } })
+        : Promise.resolve([]),
+      productIds.length > 0
+        ? prisma.product.findMany({ where: { id: { in: productIds } }, select: { id: true, name: true, barcode: true } })
+        : Promise.resolve([]),
+    ]);
+
+    const vendorMap = new Map(vendors.map((item) => [item.id, item]));
+    const productMap = new Map(products.map((item) => [item.id, item]));
+    const itemsByPurchase = new Map();
+    for (const item of purchasedItems) {
+      const current = itemsByPurchase.get(item.purchase) || [];
+      current.push({ ...item, Product: item.product ? productMap.get(item.product) || null : null });
+      itemsByPurchase.set(item.purchase, current);
+    }
+
+    const rows = purchaseRows.map((item) => ({
+      ...item,
+      Vendor: item.vendor ? vendorMap.get(item.vendor) || null : null,
+      PurchasedItems: itemsByPurchase.get(item.id) || [],
+    }));
+    return { count, rows };
+  },
+  async getPurchasesReportTotals(filters) {
+    const prisma = getPrisma();
+    const where = {};
+    if (filters.startDate && filters.endDate) {
+      where.createdAt = { gte: new Date(filters.startDate), lte: new Date(filters.endDate) };
+    }
+    if (filters.vendor) where.vendor = filters.vendor;
+
+    const [count, agg] = await Promise.all([
+      prisma.purchase.count({ where }),
+      prisma.purchase.aggregate({ where, _sum: { totalAmount: true, totalPayment: true } }),
+    ]);
+
+    return {
+      totalPurchases: count,
+      totalAmount: parseFloat(agg._sum.totalAmount || 0),
+      totalPayment: parseFloat(agg._sum.totalPayment || 0),
+    };
+  },
+
   async getInventoryReport({ category, brand, lowStock }) {
     const prisma = getPrisma();
     const where = {};
@@ -919,10 +1050,7 @@ const reports = {
     if (brand) where.brand = brand;
     if (lowStock === "true") where.quantity = { lte: 10 };
 
-    const products = await prisma.product.findMany({
-      where,
-      orderBy: { name: "asc" },
-    });
+    const products = await prisma.product.findMany({ where, orderBy: { name: "asc" } });
 
     const categoryIds = [...new Set(products.map((item) => item.category).filter(Boolean))];
     const brandIds = [...new Set(products.map((item) => item.brand).filter(Boolean))];
@@ -939,29 +1067,65 @@ const reports = {
       Brand: item.brand ? brandMap.get(item.brand) || null : null,
     }));
   },
+  async getInventoryReportPaginated(filters, page = 1, pageSize = 25) {
+    const prisma = getPrisma();
+    const { skip, take } = normalizePagination(page, pageSize);
+    const where = {};
+    if (filters.category) where.category = filters.category;
+    if (filters.brand) where.brand = filters.brand;
+    if (filters.lowStock === "true") where.quantity = { lte: 10 };
+
+    const [count, products] = await Promise.all([
+      prisma.product.count({ where }),
+      prisma.product.findMany({ where, orderBy: { name: "asc" }, skip, take }),
+    ]);
+
+    const categoryIds = [...new Set(products.map((item) => item.category).filter(Boolean))];
+    const brandIds = [...new Set(products.map((item) => item.brand).filter(Boolean))];
+    const [categories, brands] = await Promise.all([
+      categoryIds.length > 0 ? prisma.category.findMany({ where: { id: { in: categoryIds } } }) : Promise.resolve([]),
+      brandIds.length > 0 ? prisma.brand.findMany({ where: { id: { in: brandIds } } }) : Promise.resolve([]),
+    ]);
+    const categoryMap = new Map(categories.map((item) => [item.id, item]));
+    const brandMap = new Map(brands.map((item) => [item.id, item]));
+
+    const rows = products.map((item) => ({
+      ...item,
+      Category: item.category ? categoryMap.get(item.category) || null : null,
+      Brand: item.brand ? brandMap.get(item.brand) || null : null,
+    }));
+    return { count, rows };
+  },
+  async getInventoryReportTotals(filters) {
+    const prisma = getPrisma();
+    const where = {};
+    if (filters.category) where.category = filters.category;
+    if (filters.brand) where.brand = filters.brand;
+    if (filters.lowStock === "true") where.quantity = { lte: 10 };
+
+    const totalProducts = await prisma.product.count({ where });
+    const lowStockItems = await prisma.product.count({ where: { ...where, quantity: { lte: 10 } } });
+
+    // Compute total stock value. Prisma aggregate does not support computed expressions,
+    // so we load only the two required fields and sum in JS.
+    const allProducts = await prisma.product.findMany({ where, select: { quantity: true, purchaseprice: true } });
+    const totalValue = allProducts.reduce((sum, p) => sum + (parseFloat(p.quantity || 0) * parseFloat(p.purchaseprice || 0)), 0);
+
+    return { totalProducts, totalValue, lowStockItems };
+  },
+
   async getCustomerReport({ startDate, endDate }) {
     const prisma = getPrisma();
     const customers = await prisma.user.findMany({
       where: { role: "customer" },
       orderBy: { firstname: "asc" },
-      select: {
-        id: true,
-        firstname: true,
-        lastname: true,
-        phone: true,
-        email: true,
-        address: true,
-        createdAt: true,
-      },
+      select: { id: true, firstname: true, lastname: true, phone: true, email: true, address: true, createdAt: true },
     });
 
     const customerIds = customers.map((item) => item.id);
     const saleWhere = { customer: { in: customerIds } };
     if (startDate && endDate) {
-      saleWhere.createdAt = {
-        gte: new Date(startDate),
-        lte: new Date(endDate),
-      };
+      saleWhere.createdAt = { gte: new Date(startDate), lte: new Date(endDate) };
     }
     const salesRows = customerIds.length > 0 ? await prisma.sale.findMany({ where: saleWhere }) : [];
     const salesByCustomer = new Map();
@@ -980,6 +1144,72 @@ const reports = {
         lastPurchaseDate: customerSales.length > 0 ? customerSales[customerSales.length - 1].createdAt : null,
       };
     });
+  },
+  async getCustomerReportPaginated(filters, page = 1, pageSize = 25) {
+    const prisma = getPrisma();
+    const { skip, take } = normalizePagination(page, pageSize);
+    const customerWhere = { role: "customer" };
+
+    const [count, customers] = await Promise.all([
+      prisma.user.count({ where: customerWhere }),
+      prisma.user.findMany({
+        where: customerWhere,
+        orderBy: { firstname: "asc" },
+        select: { id: true, firstname: true, lastname: true, phone: true, email: true, address: true, createdAt: true },
+        skip,
+        take,
+      }),
+    ]);
+
+    const customerIds = customers.map((item) => item.id);
+    const saleWhere = { customer: { in: customerIds } };
+    if (filters.startDate && filters.endDate) {
+      saleWhere.createdAt = { gte: new Date(filters.startDate), lte: new Date(filters.endDate) };
+    }
+
+    const salesRows = customerIds.length > 0
+      ? await prisma.sale.findMany({ where: saleWhere, select: { customer: true, totalpayment: true, createdAt: true } })
+      : [];
+    const salesByCustomer = new Map();
+    for (const sale of salesRows) {
+      const current = salesByCustomer.get(sale.customer) || [];
+      current.push(sale);
+      salesByCustomer.set(sale.customer, current);
+    }
+
+    const rows = customers.map((customer) => {
+      const customerSales = salesByCustomer.get(customer.id) || [];
+      return {
+        ...customer,
+        totalPurchases: customerSales.length,
+        totalSpent: customerSales.reduce((sum, item) => sum + parseFloat(item.totalpayment || 0), 0),
+        lastPurchaseDate: customerSales.length > 0 ? customerSales[customerSales.length - 1].createdAt : null,
+      };
+    });
+    return { count, rows };
+  },
+  async getCustomerReportTotals(filters) {
+    const prisma = getPrisma();
+    const totalCustomers = await prisma.user.count({ where: { role: "customer" } });
+
+    const conditions = ["customer IS NOT NULL"];
+    const replacements = [];
+    if (filters.startDate && filters.endDate) {
+      conditions.push("createdAt >= ? AND createdAt <= ?");
+      replacements.push(new Date(filters.startDate), new Date(filters.endDate));
+    }
+    const whereClause = `WHERE ${conditions.join(" AND ")}`;
+
+    const [totalSalesAgg, totalRevenueAgg] = await Promise.all([
+      prisma.$queryRawUnsafe(`SELECT COUNT(*) as totalSales FROM sale ${whereClause}`, ...replacements),
+      prisma.$queryRawUnsafe(`SELECT COALESCE(SUM(CAST(totalpayment AS REAL)), 0) as totalRevenue FROM sale ${whereClause}`, ...replacements),
+    ]);
+
+    return {
+      totalCustomers,
+      totalSales: parseInt(totalSalesAgg[0]?.totalSales || 0, 10),
+      totalRevenue: parseFloat(totalRevenueAgg[0]?.totalRevenue || 0),
+    };
   },
 };
 

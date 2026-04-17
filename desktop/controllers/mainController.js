@@ -70,6 +70,10 @@ function calculatePercentageChange(previous = 0, current) {
   return 0;
 }
 const loginGet = async (req, res) => {
+  if (req.session.user_id) {
+    return res.redirect("/dashboard");
+  }
+
   const prisma = requirePrismaClient();
   let user = null;
   try {
@@ -199,55 +203,11 @@ const inventorylogs = async (req, res) => {
     const query = req.query;
     const page = parseInt(query.page) || 1;
     const pageSize = parseInt(query.pageSize) || 25;
-    const offset = (page - 1) * pageSize;
 
     const sortBy = query.sortBy || 'createdAt';
     const sortOrder = query.sortOrder || 'desc';
-    const order = buildSortClause(sortBy, sortOrder, 'createdAt');
 
     const { dateRange, product, createdBy } = query;
-    let whereClause = {};
-    let includeOptions = [
-      {
-        model: db.product,
-        as: "Product",
-        attributes: ["id", "name"],
-        where: {},
-      },
-      {
-        model: db.user,
-        as: "User",
-        attributes: ["id", "firstname", "lastname"],
-        where: {},
-      },
-    ];
-
-    if (dateRange) {
-      const [startDate, endDate] = dateRange.split(" to ").map((date) => date.trim());
-      if (startDate && endDate) {
-        whereClause.createdAt = {
-          [Op.between]: [
-            moment(startDate).startOf("day").toDate(),
-            moment(endDate).endOf("day").toDate(),
-          ],
-        };
-      }
-    }
-
-    if (product) {
-      if (!isNaN(product)) {
-        includeOptions[0].where.id = product;
-      } else {
-        includeOptions[0].where.name = { [Op.like]: `%${product}%` };
-      }
-    }
-
-    if (createdBy) {
-      includeOptions[1].where[Op.or] = [
-        { firstname: { [Op.like]: `%${createdBy}%` } },
-        { lastname: { [Op.like]: `%${createdBy}%` } },
-      ];
-    }
 
     const { count, rows: processedLogs } = await queries.inventory.listLogs({
       page,
@@ -283,6 +243,8 @@ const inventorylogs = async (req, res) => {
       searchParams: {},
       pagination: null,
       query: {},
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
       error: "An error occurred while fetching inventory logs.",
     });
   }
@@ -339,6 +301,8 @@ const searchInventoryLogs = async (req, res) => {
       searchParams: req.body,
       pagination: null,
       query: {},
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
       error: "An error occurred while searching inventory logs.",
     });
   }

@@ -4,21 +4,163 @@
   <meta charset="utf-8">
   <title>Customer Report</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    h1 { color: #333; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-    th { background-color: #f2f2f2; }
+    @page { size: A4 landscape; margin: 15mm; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      color: #1f2937;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .report-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 3px solid #667eea;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+    }
+    .report-header .brand h1 {
+      margin: 0 0 5px;
+      font-size: 22px;
+      color: #4b5563;
+    }
+    .report-header .brand p {
+      margin: 0;
+      color: #6b7280;
+      font-size: 11px;
+    }
+    .report-header .meta {
+      text-align: right;
+    }
+    .report-header .meta .doc-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 4px;
+    }
+    .report-header .meta .doc-date {
+      color: #6b7280;
+      font-size: 11px;
+    }
+    .filters {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin-bottom: 20px;
+    }
+    .filters strong {
+      color: #475569;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .filters .filter-items {
+      margin-top: 8px;
+      display: flex;
+      gap: 30px;
+    }
+    .filters .filter-item {
+      font-size: 11px;
+      color: #334155;
+    }
+    .summary {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .summary .card {
+      flex: 1;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+    .summary .card .label {
+      font-size: 10px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-bottom: 4px;
+    }
+    .summary .card .value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #e2e8f0;
+      padding: 8px 10px;
+      text-align: left;
+    }
+    th {
+      background: #f1f5f9;
+      font-weight: 600;
+      color: #475569;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+    tr:nth-child(even) { background: #f8fafc; }
     .text-end { text-align: right; }
+    tfoot td {
+      background: #f1f5f9;
+      font-weight: 700;
+      color: #334155;
+    }
+    .footer-note {
+      margin-top: 25px;
+      padding-top: 10px;
+      border-top: 1px solid #e2e8f0;
+      font-size: 10px;
+      color: #94a3b8;
+      display: flex;
+      justify-content: space-between;
+    }
   </style>
 </head>
 <body>
-  <h1>Customer Report</h1>
-  <p><strong>Generated:</strong> <%= moment(reportData.generatedAt).format('YYYY-MM-DD HH:mm:ss') %></p>
-  <% if (reportData.filters.startDate || reportData.filters.endDate) { %>
-    <p><strong>Period:</strong> <%= reportData.filters.startDate || 'All' %> to <%= reportData.filters.endDate || 'All' %></p>
-  <% } %>
-  
+  <div class="report-header">
+    <div class="brand">
+      <h1>Corelogix</h1>
+      <p>OpenMenu Business Reports</p>
+    </div>
+    <div class="meta">
+      <div class="doc-title">Customer Report</div>
+      <div class="doc-date">Generated: <%= moment(reportData.generatedAt).format('YYYY-MM-DD HH:mm:ss') %></div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <strong>Applied Filters</strong>
+    <div class="filter-items">
+      <div class="filter-item"><span>Period:</span> <%= reportData.filters.startDate || 'All' %> to <%= reportData.filters.endDate || 'All' %></div>
+    </div>
+  </div>
+
+  <div class="summary">
+    <div class="card">
+      <div class="label">Total Customers</div>
+      <div class="value"><%= reportData.totals.totalCustomers %></div>
+    </div>
+    <div class="card">
+      <div class="label">Total Sales</div>
+      <div class="value"><%= reportData.totals.totalSales %></div>
+    </div>
+    <div class="card">
+      <div class="label">Total Revenue</div>
+      <div class="value"><%= parseFloat(reportData.totals.totalRevenue || 0).toFixed(2) %></div>
+    </div>
+  </div>
+
   <table>
     <thead>
       <tr>
@@ -37,19 +179,24 @@
           <td><%= customer.phone || 'N/A' %></td>
           <td><%= customer.email || 'N/A' %></td>
           <td class="text-end"><%= customer.totalPurchases || 0 %></td>
-          <td class="text-end"><%= customer.totalSpent.toFixed(2) %></td>
+          <td class="text-end"><%= parseFloat(customer.totalSpent || 0).toFixed(2) %></td>
           <td><%= customer.lastPurchaseDate ? moment(customer.lastPurchaseDate).format('YYYY-MM-DD') : 'Never' %></td>
         </tr>
       <% }) %>
     </tbody>
     <tfoot>
-      <tr style="font-weight: bold;">
+      <tr>
         <td colspan="3">TOTAL</td>
         <td class="text-end"><%= reportData.totals.totalSales %></td>
-        <td class="text-end"><%= reportData.totals.totalRevenue.toFixed(2) %></td>
+        <td class="text-end"><%= parseFloat(reportData.totals.totalRevenue || 0).toFixed(2) %></td>
         <td></td>
       </tr>
     </tfoot>
   </table>
+
+  <div class="footer-note">
+    <span>This is a computer generated report.</span>
+    <span>Page 1 of 1</span>
+  </div>
 </body>
 </html>

@@ -47,9 +47,17 @@ app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
 app.use('/uploads', express.static(getUploadsBaseDir()));
 // Serve static files from the "node_modules" directory
 app.use('/node_modules', express.static(path.join(__dirname, '..', 'node_modules')));
+
+// Serve generated report PDFs from temp directory
+const tempPdfDir = path.join(os.tmpdir(), 'openmenu-pdfs');
+try { require('fs').mkdirSync(tempPdfDir, { recursive: true }); } catch (e) {}
+app.use('/temp-pdfs', express.static(tempPdfDir));
 // Set view engine
 app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'ejs');
+if (!__dirname.includes('app.asar')) {
+  app.set('view cache', false);
+}
 app.set('view cache', false);
 
 // Use express-ejs-layouts

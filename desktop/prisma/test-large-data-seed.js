@@ -155,8 +155,6 @@ async function seedLargeData() {
       createdby: admin.id,
       updatedby: admin.id,
       source: "test-large-data-seed",
-      createdAt: new Date(),
-      updatedAt: new Date(),
     };
   });
 
