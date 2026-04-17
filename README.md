@@ -161,6 +161,8 @@ Schema bootstrap is currently centered in `desktop/migrations/20260131000000-ini
 
 - Change design to simple sleek, remove gradiants, one css files and it should look like pos
 
+- country and currency symbols setting for company
+
 - add staff and assign permissions
 
 - Kitchen & Operations:
