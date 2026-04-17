@@ -4,14 +4,15 @@
       <div class="card-header align-items-center d-flex">
         <h4 class="card-title mb-0 flex-grow-1">Inventory Report</h4>
         <div class="d-flex gap-2">
-          <button onclick="window.print()" class="btn btn-soft-info btn-sm">
-            <i class="ri-printer-line"></i> Print
+          <button id="btnViewPdf" class="btn btn-soft-info btn-sm" <%= reportData.generated ? '' : 'disabled' %>>
+            <i class="ri-file-pdf-line"></i> View PDF
           </button>
         </div>
       </div>
       <div class="card-body">
         <!-- Filters -->
         <form method="GET" action="/reports/inventory" class="row g-3 mb-4">
+          <input type="hidden" name="generate" value="1">
           <div class="col-md-3">
             <label class="form-label">Category</label>
             <input type="text" class="form-control" name="category" value="<%= reportData.filters.category || '' %>" placeholder="Category ID">
@@ -29,101 +30,139 @@
           </div>
           <div class="col-md-3 d-flex align-items-end">
             <button type="submit" class="btn btn-primary w-100">
-              <i class="ri-search-line me-1"></i> Filter
+              <i class="ri-bar-chart-line me-1"></i> Generate Report
             </button>
           </div>
         </form>
 
-        <!-- Summary Cards -->
-        <div class="row mb-4">
-          <div class="col-md-4">
-            <div class="card border border-primary">
-              <div class="card-body">
-                <h6 class="text-muted mb-2">Total Products</h6>
-                <h4 class="mb-0"><%= reportData.totals.totalProducts %></h4>
+        <% if (reportData.generated) { %>
+          <!-- Summary Cards -->
+          <div class="row mb-4">
+            <div class="col-md-4">
+              <div class="card border border-primary">
+                <div class="card-body">
+                  <h6 class="text-muted mb-2">Total Products</h6>
+                  <h4 class="mb-0"><%= reportData.totals.totalProducts %></h4>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card border border-success">
+                <div class="card-body">
+                  <h6 class="text-muted mb-2">Total Stock Value</h6>
+                  <h4 class="mb-0"><%= formatNumber(reportData.totals.totalValue) %></h4>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card border border-warning">
+                <div class="card-body">
+                  <h6 class="text-muted mb-2">Low Stock Items</h6>
+                  <h4 class="mb-0"><%= reportData.totals.lowStockItems %></h4>
+                </div>
               </div>
             </div>
           </div>
-          <div class="col-md-4">
-            <div class="card border border-success">
-              <div class="card-body">
-                <h6 class="text-muted mb-2">Total Stock Value</h6>
-                <h4 class="mb-0"><%= formatNumber(reportData.totals.totalValue) %></h4>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card border border-warning">
-              <div class="card-body">
-                <h6 class="text-muted mb-2">Low Stock Items</h6>
-                <h4 class="mb-0"><%= reportData.totals.lowStockItems %></h4>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <!-- Export Buttons -->
-        <div class="d-flex gap-2 mb-3">
-          <a href="/reports/inventory?<%= new URLSearchParams({...reportData.filters, format: 'csv'}).toString() %>" class="btn btn-success btn-sm">
-            <i class="ri-file-excel-line me-1"></i> Export CSV
-          </a>
-          <a href="/reports/inventory?<%= new URLSearchParams({...reportData.filters, format: 'excel'}).toString() %>" class="btn btn-success btn-sm">
-            <i class="ri-file-excel-2-line me-1"></i> Export Excel
-          </a>
-          <a href="/reports/inventory?<%= new URLSearchParams({...reportData.filters, format: 'pdf'}).toString() %>" target="_blank" class="btn btn-danger btn-sm">
-            <i class="ri-file-pdf-line me-1"></i> Export PDF
-          </a>
-        </div>
+          <!-- Export Buttons -->
+          <div class="d-flex gap-2 mb-3">
+            <a href="/reports/inventory?<%= new URLSearchParams({...reportData.filters, generate: '1', format: 'csv'}).toString() %>" class="btn btn-success btn-sm">
+              <i class="ri-file-excel-line me-1"></i> Export CSV
+            </a>
+            <a href="/reports/inventory?<%= new URLSearchParams({...reportData.filters, generate: '1', format: 'excel'}).toString() %>" class="btn btn-success btn-sm">
+              <i class="ri-file-excel-2-line me-1"></i> Export Excel
+            </a>
+            <a href="/reports/inventory?<%= new URLSearchParams({...reportData.filters, generate: '1', format: 'pdf'}).toString() %>" target="_blank" class="btn btn-danger btn-sm">
+              <i class="ri-file-pdf-line me-1"></i> Export PDF
+            </a>
+          </div>
 
-        <!-- Report Table -->
-        <div class="table-responsive">
-          <table class="table table-bordered table-striped">
-            <thead>
-              <tr>
-                <th>Product Name</th>
-                <th>Barcode</th>
-                <th>Category</th>
-                <th>Brand</th>
-                <th class="text-end">Quantity</th>
-                <th class="text-end">Purchase Price</th>
-                <th class="text-end">Sale Price</th>
-                <th class="text-end">Stock Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% reportData.products.forEach(product => { %>
-                <tr class="<%= parseFloat(product.quantity || 0) <= 10 ? 'table-warning' : '' %>">
-                  <td><%= product.name || 'N/A' %></td>
-                  <td><%= product.barcode || 'N/A' %></td>
-                  <td><%= product.Category ? product.Category.name : 'N/A' %></td>
-                  <td><%= product.Brand ? product.Brand.name : 'N/A' %></td>
-                  <td class="text-end"><%= formatNumber(product.quantity) %></td>
-                  <td class="text-end"><%= formatNumber(product.purchaseprice) %></td>
-                  <td class="text-end"><%= formatNumber(product.saleprice) %></td>
-                  <td class="text-end">
-                    <%= formatNumber((parseFloat(product.quantity || 0) * parseFloat(product.purchaseprice || 0))) %>
-                  </td>
-                </tr>
-              <% }) %>
-              <% if (reportData.products.length === 0) { %>
+          <!-- Report Table -->
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+              <thead>
                 <tr>
-                  <td colspan="8" class="text-center">No products found</td>
+                  <th>Product Name</th>
+                  <th>Barcode</th>
+                  <th>Category</th>
+                  <th>Brand</th>
+                  <th class="text-end">Quantity</th>
+                  <th class="text-end">Purchase Price</th>
+                  <th class="text-end">Sale Price</th>
+                  <th class="text-end">Stock Value</th>
                 </tr>
-              <% } %>
-            </tbody>
-            <tfoot>
-              <tr class="fw-bold">
-                <td colspan="7">TOTAL VALUE</td>
-                <td class="text-end"><%= formatNumber(reportData.totals.totalValue) %></td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                <% reportData.products.forEach(product => { %>
+                  <tr class="<%= parseFloat(product.quantity || 0) <= 10 ? 'table-warning' : '' %>">
+                    <td><%= product.name || 'N/A' %></td>
+                    <td><%= product.barcode || 'N/A' %></td>
+                    <td><%= product.Category ? product.Category.name : 'N/A' %></td>
+                    <td><%= product.Brand ? product.Brand.name : 'N/A' %></td>
+                    <td class="text-end"><%= formatNumber(product.quantity) %></td>
+                    <td class="text-end"><%= formatNumber(product.purchaseprice) %></td>
+                    <td class="text-end"><%= formatNumber(product.saleprice) %></td>
+                    <td class="text-end">
+                      <%= formatNumber((parseFloat(product.quantity || 0) * parseFloat(product.purchaseprice || 0))) %>
+                    </td>
+                  </tr>
+                <% }) %>
+                <% if (reportData.products.length === 0) { %>
+                  <tr>
+                    <td colspan="8" class="text-center">No products found</td>
+                  </tr>
+                <% } %>
+              </tbody>
+              <tfoot>
+                <tr class="fw-bold">
+                  <td colspan="7">TOTAL VALUE</td>
+                  <td class="text-end"><%= formatNumber(reportData.totals.totalValue) %></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
 
-        <div class="text-muted mt-3">
-          <small>Report generated on: <%= moment(reportData.generatedAt).format('YYYY-MM-DD HH:mm:ss') %></small>
-        </div>
+          <%- include('../components/partials/pagination', { baseUrl, query, pagination }) %>
+
+          <div class="text-muted mt-3">
+            <small>Report generated on: <%= moment(reportData.generatedAt).format('YYYY-MM-DD HH:mm:ss') %></small>
+          </div>
+        <% } else { %>
+          <div class="text-center py-5">
+            <i class="ri-file-list-3-line fs-1 text-muted mb-3 d-block"></i>
+            <h5 class="text-muted">Configure filters and click Generate Report to view data</h5>
+          </div>
+        <% } %>
       </div>
     </div>
   </div>
 </div>
+
+<% if (reportData.generated) { %>
+<script>
+  (function() {
+    const pdfUrl = '/reports/inventory?<%- new URLSearchParams({...reportData.filters, generate: '1', format: 'pdf'}).toString() %>';
+    const btn = document.getElementById('btnViewPdf');
+    if (btn && window.electron && window.electron.generateReportPdf) {
+      btn.addEventListener('click', function() {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="ri-loader-4-line spin me-1"></i> Generating...';
+        window.electron.generateReportPdf(pdfUrl);
+      });
+      window.electron.onReportPdfGenerated(function(data) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ri-file-pdf-line"></i> View PDF';
+        if (data && data.success && data.url) {
+          window.location.href = '/reports/pdf-viewer?src=' + encodeURIComponent(data.url);
+        } else {
+          alert(data && data.error ? data.error : 'Failed to generate PDF.');
+        }
+      });
+    }
+  })();
+</script>
+<style>
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .spin { display: inline-block; animation: spin 1s linear infinite; }
+</style>
+<% } %>

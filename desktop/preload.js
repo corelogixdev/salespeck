@@ -13,5 +13,14 @@ contextBridge.exposeInMainWorld('electron', {
     },
     receive: (channel, func) => {
         ipcRenderer.on(channel, (event, ...args) => func(...args));
+    },
+    printPreview: () => {
+        ipcRenderer.send('print-preview');
+    },
+    generateReportPdf: (url) => {
+        ipcRenderer.send('generate-report-pdf', url);
+    },
+    onReportPdfGenerated: (func) => {
+        ipcRenderer.on('report-pdf-generated', (event, ...args) => func(...args));
     }
 });
