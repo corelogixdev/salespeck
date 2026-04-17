@@ -1,5 +1,5 @@
 <!doctype html>
-<html data-layout="horizontal" data-topbar="light" data-sidebar="dark" data-sidebar-size="sm-hover"
+<html data-layout="horizontal" data-topbar="light" data-sidebar="light" data-sidebar-size="sm-hover"
     data-sidebar-image="none" data-preloader="disable">
 
 <head>
@@ -32,41 +32,36 @@
         <header id="page-topbar">
             <div class="navbar-header">
                 <% if (typeof user !=='undefined' && user) { %>
-                    <div class="d-flex">
-                        <div class="navbar-brand-box horizontal-logo" style="padding-right: 10px;">
+                    <div class="d-flex align-items-center flex-grow-1">
+                        <div class="navbar-brand-box horizontal-logo" style="padding-right: 15px;">
                             <a href="/" class="logo logo-dark">
                                 <span class="logo-sm">
-                                    <img src="/assets/img/icon.png" alt="" height="22">
+                                    <img src="/assets/img/icon.png" alt="" height="24">
                                 </span>
                                 <span class="logo-lg">
-                                    <img src="/assets/img/icon.png" alt="" height="17">
+                                    <img src="/assets/img/icon.png" alt="" height="24">
                                 </span>
                             </a>
 
                             <a href="/" class="logo logo-light">
                                 <span class="logo-sm">
-                                    <img src="/assets/img/icon.png" alt="" height="22">
+                                    <img src="/assets/img/icon.png" alt="" height="24">
                                 </span>
                                 <span class="logo-lg">
-                                    <img src="/assets/img/icon.png" alt="" height="17">
+                                    <img src="/assets/img/icon.png" alt="" height="24">
                                 </span>
                             </a>
                         </div>
-                    </div>
-                    <% } %>
-                            <a href="/" style="display: block; min-width: fit-content;" class="fs-2 me-2">
-                                Corelogix
-                            </a>
-                                <% var permissions=typeof permissions !=='undefined' ? permissions : {}; %>
-                                    <% if (typeof user !=='undefined' && user) { %>
-                                        <button type="button" class="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger" id="topnav-hamburger-icon">
-                                            <i class="ri-menu-2-line"></i>
-                                        </button>
-                                        <div id="scrollbar" class="navbar-menu"
-                                            style="width: 100%; position: relative; box-shadow: none; margin-top: 0; background-color: transparent; overflow: visible !important;">
+                        <a href="/" style="display: block; min-width: fit-content;" class="fs-2 me-md-4 me-2 d-none d-md-block brand-text">
+                            Corelogix
+                        </a>
+                        <button type="button" class="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger" id="topnav-hamburger-icon">
+                            <i class="ri-menu-2-line"></i>
+                        </button>
+                                        <div id="scrollbar" class="navbar-menu">
                                             <div id="two-column-menu">
                                             </div>
-                                             <ul class="navbar-nav" id="navbar-nav" style="display: flex; flex-direction: row; align-items: center; overflow: visible !important;">
+                                             <ul class="navbar-nav" id="navbar-nav">
                                                 <li class="nav-item">
                                                     <a class="nav-link menu-link pe-0" href="/" role="button">
                                                         <i class="las la-tachometer-alt"></i> <span>Dashboard</span>
@@ -149,7 +144,8 @@
                                                 </li>
                                             </ul>
                                         </div>
-                                    <% } %>
+                    </div>
+<% } %>
 
                                     <div class="d-flex align-items-center ms-auto">
                                         <!-- Theme Toggle -->
