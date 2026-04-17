@@ -1,4 +1,4 @@
-﻿<!-- Tab Bar -->
+<!-- Tab Bar -->
 <div class="tab-bar-container">
     <div class="tab-bar-content">
         <ul class="nav nav-tabs nav-tabs-custom mb-0 border-0" id="purchase-tabs" role="tablist">
@@ -133,21 +133,22 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #667eea;
+        background: var(--pos-accent);
         border: none;
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         flex-shrink: 0;
         transition: all 0.3s ease;
     }
 
     .new-purchase-btn:hover {
         transform: scale(1.1) translateY(-1px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+        background: var(--pos-accent-hover);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .new-purchase-btn i {
         font-size: 18px;
-        color: white;
+        color: var(--pos-accent-text);
     }
 
     /* Tabs Container */
@@ -184,25 +185,23 @@
         font-size: 0.8rem;
         border-radius: 0px;
         margin-right: 10px;
-        background: rgba(255, 255, 255, 0.6);
-        border: 1px solid rgba(0, 0, 0, 0.1);
+        background: var(--pos-bg-main);
+        color: var(--pos-text-muted);
+        border: 1px solid var(--pos-border);
         transition: all 0.2s ease;
     }
 
-    [data-layout-mode="dark"] .nav-tabs .nav-link {
-        background: rgba(42, 47, 52, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
     .nav-tabs .nav-link.active {
-        background: #667eea;
-        color: white;
+        background: var(--pos-accent);
+        color: var(--pos-accent-text) !important;
         border-color: transparent;
-        box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        font-weight: 600;
     }
 
     .nav-tabs .nav-link:hover:not(.active) {
-        background: rgba(102, 126, 234, 0.1);
+        background: var(--pos-bg-hover);
+        color: var(--pos-text-main);
         transform: translateY(-1px);
     }
 
@@ -228,7 +227,7 @@
     }
 
     .nav-link.active .tab-close-btn {
-        color: white;
+        color: var(--pos-accent-text);
     }
 
     .nav-link.active .tab-close-btn:hover {
@@ -356,7 +355,7 @@
         display: block;
         font-size: 2rem;
         font-weight: 700;
-        color: #667eea;
+        color: var(--pos-accent);
         font-family: 'Courier New', monospace;
         letter-spacing: 3px;
         line-height: 1.2;
@@ -394,7 +393,7 @@
     .glowing-bill {
         font-size: 2.5rem;
         font-weight: 800;
-        background: #667eea;
+        background: var(--pos-accent);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;

@@ -115,14 +115,20 @@ exports.save = async (req, res) => {
         });
 
         // save the purchased batch
-        if (product.expiryDate) {
-          await queries.batches.create({
-            product: product.productId,
-            quantity: product.quantity,
-            expirydate: product.expiryDate,
-            source,
-          });
+        let expiry = null;
+        if (product.expiryDate && product.expiryDate.trim()) {
+          const d = new Date(product.expiryDate);
+          if (!isNaN(d.getTime())) {
+            expiry = d;
+          }
         }
+
+        await queries.batches.create({
+          product: product.productId,
+          quantity: product.quantity,
+          expirydate: expiry,
+          source,
+        });
 
         if (purchasedProduct) {
           await queries.products.incrementQuantity(product.productId, product.quantity);

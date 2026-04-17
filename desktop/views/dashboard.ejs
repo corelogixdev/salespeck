@@ -411,28 +411,75 @@
 
     // Top Products Chart (Doughnut Chart)
     const ctxTop = document.getElementById('topProductsChart').getContext('2d');
+    
+    // Custom plugin to draw text in the middle of a doughnut chart
+    const centerTextPlugin = {
+      id: 'centerText',
+      afterDraw: (chart) => {
+        if (chart.config.type !== 'doughnut') return;
+        const { ctx, canvas } = chart;
+        ctx.save();
+        const x = chart.getDatasetMeta(0).data[0]?.x;
+        const y = chart.getDatasetMeta(0).data[0]?.y;
+        if (!x || !y) return;
+
+        const total = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+        
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        // Draw "Total" label
+        ctx.font = '12px Inter, sans-serif';
+        ctx.fillStyle = '#999';
+        ctx.fillText('Total Sold', x, y - 10);
+        
+        // Draw the number
+        ctx.font = 'bold 24px Inter, sans-serif';
+        ctx.fillStyle = '#333';
+        ctx.fillText(total, x, y + 15);
+        ctx.restore();
+      }
+    };
+
     new Chart(ctxTop, {
       type: 'doughnut',
+      plugins: [centerTextPlugin],
       data: {
         labels: topProducts_labels.length > 0 ? topProducts_labels : ['No Data'],
         datasets: [{
-          data: topProducts_data.length > 0 ? topProducts_data : [1],
-          backgroundColor: ['#A9B5E1', '#8FD192', '#FFCC80', '#EF9A9A', '#CE93D8'],
+          data: topProducts_data.length > 0 ? topProducts_data : [0],
+          backgroundColor: ['#405189', '#0ab39c', '#f7b84b', '#f06548', '#299cdb'],
+          hoverOffset: 12,
+          borderRadius: 8,
+          spacing: 4,
           borderWidth: 0
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        cutout: '82%',
         plugins: {
           title: {
             display: true,
             text: 'Top 5 Products (Last 30 Days)',
-            font: { size: 14, weight: '600' }
+            font: { size: 14, weight: '600' },
+            padding: { bottom: 20 }
           },
-          legend: { position: 'bottom' }
-        },
-        cutout: '80%'
+          legend: { 
+            position: 'bottom',
+            labels: {
+              usePointStyle: true,
+              padding: 20,
+              font: { size: 11 }
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            padding: 12,
+            cornerRadius: 8
+          }
+        }
       }
     });
 
@@ -540,25 +587,34 @@
 
     const ctxCategory = document.getElementById('categorySalesChart').getContext('2d');
     new Chart(ctxCategory, {
-      type: 'pie',
+      type: 'doughnut',
       data: {
-        labels: categoryLabels,
+        labels: categoryLabels.length > 0 ? categoryLabels : ['No Data'],
         datasets: [{
-          data: categoryValues,
-          backgroundColor: ['#667eea', '#764ba2', '#8FD192', '#FFCC80', '#EF9A9A'],
+          data: categoryValues.length > 0 ? categoryValues : [0],
+          backgroundColor: ['#405189', '#0ab39c', '#f7b84b', '#f06548', '#299cdb'],
+          borderRadius: 6,
+          spacing: 3,
           borderWidth: 0
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        cutout: '75%',
         plugins: {
           title: {
             display: true,
             text: 'Revenue by Category',
-            font: { size: 14 }
+            font: { size: 14, weight: '600' }
           },
-          legend: { position: 'bottom' }
+          legend: { 
+            position: 'bottom',
+            labels: {
+              usePointStyle: true,
+              padding: 15
+            }
+          }
         }
       }
     });

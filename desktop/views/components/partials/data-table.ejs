@@ -1,4 +1,4 @@
-﻿<%
+<%
 const currentSort = typeof sortBy !== 'undefined' ? sortBy : '';
 const currentOrder = typeof sortOrder !== 'undefined' ? sortOrder : 'asc';
 function getSortUrl(column) {
@@ -101,12 +101,9 @@ function getSortIcon(column) {
     border-spacing: 0;
   }
 
-  .table-header {
-    background: #667eea !important;
-    color: white;
-  }
-
   .table-header th {
+    background-color: var(--pos-accent) !important;
+    color: var(--pos-accent-text) !important;
     border: none;
     padding: 0.95rem 1rem;
     font-weight: 600;
@@ -125,7 +122,7 @@ function getSortIcon(column) {
   }
 
   .table-header .sort-link {
-    color: white;
+    color: var(--pos-accent-text) !important;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -184,10 +181,6 @@ function getSortIcon(column) {
     font-size: 0.875rem;
   }
 
-  /* Dark Mode */
-  [data-layout-mode="dark"] .table-header {
-    background: #1a237e !important;
-  }
 
   [data-layout-mode="dark"] .data-table tbody tr:hover {
     background-color: rgba(144, 202, 249, 0.08);

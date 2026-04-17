@@ -302,10 +302,18 @@ exports.saveQuantity = async (req, res) => {
 
     // create or update productbatches
     if (quantity > 0) {
+      let expiry = null;
+      if (expirydate && expirydate.trim()) {
+        const d = new Date(expirydate);
+        if (!isNaN(d.getTime())) {
+          expiry = d;
+        }
+      }
+
       await queries.batches.create({
         product: id,
         quantity: quantity,
-        expirydate: expirydate
+        expirydate: expiry
       });
     } else {
       let batches = await queries.batches.listByProduct(id);
