@@ -249,7 +249,9 @@
               <p class="text-muted">Chart hidden due to privacy settings</p>
             </div>
             <% } else { %>
-              <div id="salesTrendChart"></div>
+              <div style="height: 350px; position: relative;">
+                <canvas id="salesTrendChart"></canvas>
+              </div>
               <% } %>
         </div>
       </div>
@@ -264,12 +266,41 @@
                   <p class="text-muted">Chart hidden due to privacy settings</p>
                 </div>
                 <% } else { %>
-                  <div id="topProductsChart"></div>
+                   <div style="height: 350px; position: relative;">
+                     <canvas id="topProductsChart"></canvas>
+                   </div>
                   <% } %>
             </div>
           </div>
         </div>
         <% } %>
+</div>
+<!-- Advanced Analytics Row -->
+<div class="row my-3">
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Sales by Hour (Today)</h5>
+            </div>
+            <div class="card-body">
+                 <div style="height: 350px; position: relative;">
+                   <canvas id="hourlySalesChart"></canvas>
+                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Sales by Category (Last 30 Days)</h5>
+            </div>
+            <div class="card-body">
+                 <div style="height: 350px; position: relative;">
+                   <canvas id="categorySalesChart"></canvas>
+                 </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Low Stock Products Table -->
@@ -340,8 +371,9 @@
 <!-- Hidden data containers -->
 <div id="products-data" data-products='<%- JSON.stringify(topFiveSoldProductsWithSoldQuantity).replace(/' /g, "&#39;" )
   %>' style="display: none;"></div>
-<div id="sales-data" data-sales='<%- JSON.stringify(salesCountByDay).replace(/' /g, "&#39;" ) %>' style="display:
-  none;"></div>
+<div id="sales-data" data-sales='<%- JSON.stringify(salesCountByDay).replace(/' /g, "&#39;" ) %>' style="display: none;"></div>
+<div id="hourly-sales-data" data-hourly='<%- JSON.stringify(hourlySales).replace(/' /g, "&#39;" ) %>' style="display: none;"></div>
+<div id="category-sales-data" data-category='<%- JSON.stringify(categorySales).replace(/' /g, "&#39;" ) %>' style="display: none;"></div>
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
@@ -353,160 +385,182 @@
     let salesByDay = JSON.parse(salesData.getAttribute('data-sales'));
 
     // Prepare top products chart data
-    let topProducts_chartData = {
-      labels: [],
-      data: []
-    };
+    let topProducts_labels = [];
+    let topProducts_data = [];
     topProducts.forEach((product, index) => {
       if (index < 5) {
-        topProducts_chartData.labels.push(product?.product_name || 'N/A');
-        topProducts_chartData.data.push(parseInt(product?.total_quantity) || 0);
+        topProducts_labels.push(product?.product_name || 'N/A');
+        topProducts_data.push(parseInt(product?.total_quantity) || 0);
       }
     });
 
     // Prepare sales trend chart data (last 30 days)
-    let salesTrend_chartData = {
-      dates: [],
-      totals: [],
-      revenues: []
-    };
+    let salesTrend_dates = [];
+    let salesTrend_totals = [];
+    let salesTrend_revenues = [];
     salesByDay.forEach(sale => {
-      salesTrend_chartData.dates.push(sale.date);
-      salesTrend_chartData.totals.push(parseInt(sale.total) || 0);
-      salesTrend_chartData.revenues.push(parseFloat(sale.revenue) || 0);
+      // Format date as MM-DD
+      const date = new Date(sale.date);
+      const formattedDate = (date.getMonth() + 1).toString().padStart(2, '0') + '-' +
+        date.getDate().toString().padStart(2, '0');
+      
+      salesTrend_dates.push(formattedDate);
+      salesTrend_totals.push(parseInt(sale.total) || 0);
+      salesTrend_revenues.push(parseFloat(sale.revenue) || 0);
     });
 
-    // Top Products Chart (Donut Chart)
-    const topProductsChart = new ApexCharts(document.getElementById('topProductsChart'), {
-      chart: {
-        type: 'donut',
-        height: 350
+    // Top Products Chart (Doughnut Chart)
+    const ctxTop = document.getElementById('topProductsChart').getContext('2d');
+    new Chart(ctxTop, {
+      type: 'doughnut',
+      data: {
+        labels: topProducts_labels.length > 0 ? topProducts_labels : ['No Data'],
+        datasets: [{
+          data: topProducts_data.length > 0 ? topProducts_data : [1],
+          backgroundColor: ['#A9B5E1', '#8FD192', '#FFCC80', '#EF9A9A', '#CE93D8'],
+          borderWidth: 0
+        }]
       },
-      title: {
-        text: 'Top 5 Products (Last 30 Days)',
-        align: 'center',
-        style: {
-          fontSize: '14px',
-          fontWeight: 600
-        }
-      },
-      series: topProducts_chartData.data.length > 0 ? topProducts_chartData.data : [1],
-      labels: topProducts_chartData.labels.length > 0 ? topProducts_chartData.labels : ['No Data'],
-      colors: ['#A9B5E1', '#8FD192', '#FFCC80', '#EF9A9A', '#CE93D8'],
-      legend: {
-        position: 'bottom'
-      },
-      plotOptions: {
-        pie: {
-          donut: {
-            size: '65%'
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Top 5 Products (Last 30 Days)',
+            font: { size: 14, weight: '600' }
+          },
+          legend: { position: 'bottom' }
+        },
+        cutout: '80%'
+      }
+    });
+
+    // Sales Trend Chart (Combined Bar and Line Chart)
+    const ctxTrend = document.getElementById('salesTrendChart').getContext('2d');
+    new Chart(ctxTrend, {
+      type: 'bar',
+      data: {
+        labels: salesTrend_dates,
+        datasets: [
+          {
+            label: 'Orders',
+            data: salesTrend_totals,
+            backgroundColor: '#A9B5E1',
+            borderRadius: 4,
+            yAxisID: 'y'
+          },
+          {
+            label: 'Revenue (Rs.)',
+            data: salesTrend_revenues,
+            type: 'line',
+            borderColor: '#4CAF50',
+            backgroundColor: 'rgba(76, 175, 80, 0.2)',
+            fill: true,
+            tension: 0.4,
+            yAxisID: 'y1'
           }
-        }
+        ]
       },
-      dataLabels: {
-        enabled: true,
-        formatter: function (val, opts) {
-          return opts.w.config.series[opts.seriesIndex]
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Sales Trend (Last 30 Days)',
+            font: { size: 14, weight: '600' }
+          },
+          legend: { position: 'top' }
+        },
+        scales: {
+          y: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            title: { display: true, text: 'Orders' },
+            beginAtZero: true,
+            ticks: { stepSize: 1 }
+          },
+          y1: {
+            type: 'linear',
+            display: true,
+            position: 'right',
+            title: { display: true, text: 'Revenue (Rs.)' },
+            beginAtZero: true,
+            grid: { drawOnChartArea: false }
+          }
         }
       }
     });
 
-    // Sales Trend Chart (Area Chart with dual axis)
-    const salesTrendChart = new ApexCharts(document.getElementById('salesTrendChart'), {
-      chart: {
-        type: 'area',
-        height: 350,
-        stacked: false
-      },
-      title: {
-        text: 'Sales Trend (Last 30 Days)',
-        align: 'center',
-        style: {
-          fontSize: '14px',
-          fontWeight: 600
-        }
-      },
-      series: [{
-        name: 'Orders',
-        type: 'column',
-        data: salesTrend_chartData.totals
-      }, {
-        name: 'Revenue (Rs.)',
-        type: 'area',
-        data: salesTrend_chartData.revenues
-      }],
-      plotOptions: {
-        bar: {
-          columnWidth: '10%',
+    // Hourly Sales Chart
+    const hourlyData = JSON.parse(document.getElementById('hourly-sales-data').getAttribute('data-hourly'));
+    const hourlyLabels = Array.from({length: 24}, (_, i) => i.toString().padStart(2, '0') + ':00');
+    const hourlyValues = new Array(24).fill(0);
+    
+    hourlyData.forEach(item => {
+        const h = parseInt(item.hour);
+        if (h >= 0 && h < 24) hourlyValues[h] = parseFloat(item.revenue);
+    });
+
+    const ctxHourly = document.getElementById('hourlySalesChart').getContext('2d');
+    new Chart(ctxHourly, {
+      type: 'bar',
+      data: {
+        labels: hourlyLabels,
+        datasets: [{
+          label: 'Revenue',
+          data: hourlyValues,
+          backgroundColor: '#667eea',
           borderRadius: 4
-        }
+        }]
       },
-      xaxis: {
-        categories: salesTrend_chartData.dates,
-        labels: {
-          rotate: -45,
-          rotateAlways: true,
-          formatter: function (val) {
-            if (!val) return '';
-            // Format date as MM-DD
-            const date = new Date(val);
-            return (date.getMonth() + 1).toString().padStart(2, '0') + '-' +
-              date.getDate().toString().padStart(2, '0');
-          }
-        }
-      },
-      yaxis: [{
-        title: {
-          text: 'Orders'
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Today\'s Hourly Performance',
+            font: { size: 14 }
+          },
+          legend: { display: false }
         },
-        labels: {
-          formatter: function (val) {
-            return Math.round(val);
-          }
+        scales: {
+          y: { beginAtZero: true }
         }
-      }, {
-        opposite: true,
-        title: {
-          text: 'Revenue (Rs.)'
-        },
-        labels: {
-          formatter: function (val) {
-            return 'Rs. ' + val.toFixed(0);
-          }
-        }
-      }],
-      colors: ['#A9B5E1', '#4CAF50'],
-      fill: {
-        type: ['solid', 'gradient'],
-        gradient: {
-          shadeIntensity: 1,
-          opacityFrom: 0.7,
-          opacityTo: 0.3,
-          stops: [0, 90, 100]
-        }
-      },
-      stroke: {
-        width: [0, 2],
-        curve: 'smooth'
-      },
-      dataLabels: {
-        enabled: false
-      },
-      legend: {
-        position: 'top'
       }
     });
 
-    topProductsChart.render();
-    salesTrendChart.render();
+    // Category Sales Chart
+    const categoryData = JSON.parse(document.getElementById('category-sales-data').getAttribute('data-category'));
+    const categoryLabels = categoryData.map(item => item.category || 'Uncategorized');
+    const categoryValues = categoryData.map(item => parseFloat(item.total_revenue));
+
+    const ctxCategory = document.getElementById('categorySalesChart').getContext('2d');
+    new Chart(ctxCategory, {
+      type: 'pie',
+      data: {
+        labels: categoryLabels,
+        datasets: [{
+          data: categoryValues,
+          backgroundColor: ['#667eea', '#764ba2', '#8FD192', '#FFCC80', '#EF9A9A'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Revenue by Category',
+            font: { size: 14 }
+          },
+          legend: { position: 'bottom' }
+        }
+      }
+    });
   });
-</script>
-<style>
-  .apexcharts-zoomin-icon,
-  .apexcharts-zoomout-icon,
-  .apexcharts-zoom-icon,
-  .apexcharts-pan-icon,
-  .apexcharts-reset-icon {
-    display: none !important;
-  }
-</style>
+</script>

@@ -1234,6 +1234,8 @@ const dashboard = {
       weeklyMonthlySummaryResult,
       lowStockResult,
       topProductsResult,
+      todayHourlySalesResult,
+      topCategorySalesResult,
     ] = await Promise.all([
       prisma.$queryRawUnsafe(
         `SELECT COALESCE(SUM(CAST(totalprice AS REAL) * (1 - CAST(discountpercentage AS REAL) / 100.0)), 0) as total
@@ -1287,6 +1289,19 @@ const dashboard = {
          WHERE s.createdAt >= ? GROUP BY p.id, p.name ORDER BY total_quantity DESC LIMIT 5`,
         last30DaysISO
       ),
+      prisma.$queryRawUnsafe(
+        `SELECT strftime('%H', createdAt) as hour, 
+         COALESCE(SUM(CAST(totalprice AS REAL) * (1 - CAST(discountpercentage AS REAL) / 100.0)), 0) as revenue
+         FROM sale WHERE createdAt >= ? GROUP BY hour ORDER BY hour ASC`,
+        todayStartDate
+      ),
+      prisma.$queryRawUnsafe(
+        `SELECT p.category, SUM(s.quantity) as total_quantity,
+         SUM(CAST(s.price AS REAL) * s.quantity) as total_revenue
+         FROM soldproducts s INNER JOIN product p ON s.product = p.id
+         WHERE s.createdAt >= ? GROUP BY p.category ORDER BY total_revenue DESC LIMIT 5`,
+        last30DaysISO
+      ),
     ]);
 
     const todaysSalesAmountValue = parseFloat(todaySalesResult[0]?.total || 0);
@@ -1296,6 +1311,8 @@ const dashboard = {
     const totalSalesCount = (salesByDayResult || []).reduce((sum, day) => sum + (parseInt(day.total || 0, 10) || 0), 0);
     const weeklySummaryResult = (weeklyMonthlySummaryResult || []).find((item) => item.period === "weekly") || {};
     const monthlySummaryResult = (weeklyMonthlySummaryResult || []).find((item) => item.period === "monthly") || {};
+    const hourlySalesResult = todayHourlySalesResult || [];
+    const categorySalesResult = topCategorySalesResult || [];
 
     function calculatePercentageChange(previous = 0, current = 0) {
       if (previous > 0) {
@@ -1328,6 +1345,8 @@ const dashboard = {
         avg_order_value: parseFloat(monthlySummaryResult.avg_order_value || 0),
       },
       lowStockProducts: lowStockResult || [],
+      hourlySales: hourlySalesResult,
+      categorySales: categorySalesResult,
     };
   },
 };

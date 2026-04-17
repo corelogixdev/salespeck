@@ -1,4 +1,4 @@
-<%
+﻿<%
 function buildPaginationUrl(page, pageSize) {
     const params = new URLSearchParams(query || {});
     params.set('page', page);
@@ -173,14 +173,14 @@ const currentPageSize = pagination.pageSize || 10;
             }
 
             .pagination .page-link:hover {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: #667eea;
                 color: white;
                 border-color: #667eea;
                 transform: translateY(-1px);
             }
 
             .pagination .page-item.active .page-link {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: #667eea;
                 border-color: #667eea;
                 color: white;
                 box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
@@ -192,12 +192,12 @@ const currentPageSize = pagination.pageSize || 10;
             }
 
             [data-layout-mode="dark"] .pagination .page-link:hover {
-                background: linear-gradient(135deg, #90caf9 0%, #ce93d8 100%);
+                background: #90caf9;
                 border-color: #90caf9;
             }
 
             [data-layout-mode="dark"] .pagination .page-item.active .page-link {
-                background: linear-gradient(135deg, #90caf9 0%, #ce93d8 100%);
+                background: #90caf9;
                 border-color: #90caf9;
                 box-shadow: 0 2px 8px rgba(144, 202, 249, 0.4);
             }
@@ -220,3 +220,4 @@ const currentPageSize = pagination.pageSize || 10;
             }
         </style>
     <% } %>
+

@@ -178,40 +178,99 @@ body {
 
 /* --- OVERRIDES FOR LAYOUT.EJS INLINE STYLES --- */
 
+.user-profile-card {
+    position: relative;
+    z-index: 1001;
+}
+
 .user-profile-trigger {
     background: var(--pos-bg-surface) !important;
     border: 1px solid var(--pos-border) !important;
     box-shadow: var(--pos-shadow) !important;
     border-radius: var(--pos-border-radius) !important;
-    padding: 4px 12px !important;
+    padding: 1px 12px !important;
     min-width: 200px !important;
     color: var(--pos-text-main) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    cursor: pointer !important;
+    height: 40px !important;
+    transition: all 0.2s ease !important;
 }
 
 .user-profile-trigger:hover {
     background: var(--pos-bg-hover) !important;
-    transform: none !important;
+    border-color: var(--pos-accent) !important;
 }
 
 .user-avatar {
     background: var(--pos-accent) !important;
+    color: white !important;
     border: none !important;
     box-shadow: none !important;
-    width: 28px !important;
-    height: 28px !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 4px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    flex-shrink: 0 !important;
 }
 
-.user-name { color: var(--pos-text-main) !important; font-weight: 600 !important; }
-.user-greeting { color: var(--pos-text-muted) !important; }
-.dropdown-arrow { color: var(--pos-text-muted) !important; }
+.user-info {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    text-align: left !important;
+    line-height: 1.2 !important;
+    flex-grow: 1 !important;
+}
+
+.user-name { 
+    color: var(--pos-text-main) !important; 
+    font-weight: 700 !important; 
+    margin: 0 !important;
+    font-size: 13px !important;
+}
+
+.user-greeting { 
+    color: var(--pos-text-muted) !important; 
+    font-size: 11px !important;
+    margin: 0 !important;
+}
+
+.dropdown-arrow { 
+    color: var(--pos-text-muted) !important; 
+    font-size: 18px !important;
+    transition: transform 0.2s ease !important;
+}
+
+.user-profile-card.show .dropdown-arrow {
+    transform: rotate(180deg);
+}
 
 /* User Profile Dropdown Menu */
 .user-profile-menu {
+    position: absolute !important;
+    top: calc(100% + 8px) !important;
+    right: 0 !important;
     background: var(--pos-bg-surface) !important;
     border: 1px solid var(--pos-border) !important;
     border-radius: var(--pos-border-radius) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2) !important;
     padding: 0 !important;
+    width: 100% !important;
+    min-width: 220px !important;
+    display: none !important;
+    z-index: 1050 !important;
+    overflow: hidden !important;
+}
+
+.user-profile-card.show .user-profile-menu {
+    display: block !important;
 }
 
 .user-profile-menu-header {
@@ -256,11 +315,20 @@ body {
 
 /* Global Loader Overrides */
 #global-loader {
-    background: rgba(255, 255, 255, 0.8) !important;
-    backdrop-filter: blur(2px) !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(8px) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 99999 !important;
 }
 [data-bs-theme="dark"] #global-loader {
-    background: rgba(18, 18, 18, 0.8) !important;
+    background: rgba(18, 18, 18, 0.9) !important;
 }
 
 .spinner {

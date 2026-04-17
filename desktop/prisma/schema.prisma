@@ -89,6 +89,9 @@ model inventorylogs {
   source     String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @default(now())
+
+  @@index([product_id])
+  @@index([createdAt])
 }
 
 model product {
@@ -110,6 +113,10 @@ model product {
   createdby      String?
   updatedby      String?
   source         String?                    @default("desktop")
+
+  @@index([barcode])
+  @@index([name])
+  @@index([category])
 }
 
 model productbatches {
@@ -181,6 +188,9 @@ model sale {
   source             String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @default(now())
+
+  @@index([invoicenum])
+  @@index([createdAt])
 }
 
 model softwaresetting {

@@ -1,4 +1,4 @@
-<% const filterValues = values || {}; %>
+﻿<% const filterValues = values || {}; %>
 
 <div class="filter-section">
     <form id="filterForm" method="GET" action="<%= action %>" class="row g-3">
@@ -73,7 +73,7 @@
                                     name="<%= filter.names[0] %>"
                                     placeholder="<%= filter.placeholders ? filter.placeholders[0] : 'Min' %>"
                                     value="<%= filterValues[filter.names[0]] || '' %>">
-                                <span class="input-group-text">–</span>
+                                <span class="input-group-text">â€“</span>
                                 <input type="number" class="form-control" id="<%= filter.names[1] %>"
                                     name="<%= filter.names[1] %>"
                                     placeholder="<%= filter.placeholders ? filter.placeholders[1] : 'Max' %>"
@@ -200,7 +200,7 @@
     }
 
     .filter-section .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #667eea;
         border: none;
     }
 
@@ -239,7 +239,7 @@
     }
 
     .filter-section .filter-toggle-group .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #667eea;
         border-color: transparent;
         color: #fff;
     }
@@ -261,12 +261,12 @@
     }
 
     [data-layout-mode="dark"] .filter-section .filter-toggle-group .btn-primary {
-        background: linear-gradient(135deg, #90caf9 0%, #ce93d8 100%);
+        background: #90caf9;
         color: #1e1f24;
     }
 
     [data-layout-mode="dark"] .filter-section .btn-primary {
-        background: linear-gradient(135deg, #90caf9 0%, #ce93d8 100%);
+        background: #90caf9;
     }
 </style>
 
@@ -293,3 +293,4 @@
         });
     })();
 </script>
+

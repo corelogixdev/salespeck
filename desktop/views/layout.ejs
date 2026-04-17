@@ -53,11 +53,12 @@
                         </div>
                     </div>
                     <% } %>
-                        <% if (typeof user !=='undefined' && user) { %>
                             <a href="/" style="display: block; min-width: fit-content;" class="fs-2 me-2">
                                 Corelogix
                             </a>
-                            <% } %>
+                            <button type="button" class="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger" id="topnav-hamburger-icon">
+                                <i class="ri-menu-2-line"></i>
+                            </button>
                                 <% var permissions=typeof permissions !=='undefined' ? permissions : {}; %>
                                     <% if (typeof user !=='undefined' && user) { %>
                                         <div id="scrollbar" class="navbar-menu"
@@ -1130,7 +1131,7 @@
     <% if (typeof hidenav==='undefined' || hidenav !==true) { %>
         <script src="/assets/js/app.js"></script>
         <% } %>
-            <script src="/assets/libs/apexcharts/apexcharts.min.js"></script>
+            <script src="/assets/libs/chartjs/chart.umd.min.js"></script>
             <script>
                 $(document).ready(function () {
                     setTimeout(() => {
@@ -1330,6 +1331,7 @@
                         });
                     </script>
                     <% } %>
+    <script src="/assets/js/scanner-helper.js"></script>
 </body>
 
 </html>

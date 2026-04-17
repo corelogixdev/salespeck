@@ -1,4 +1,4 @@
-<%
+﻿<%
 const currentSort = typeof sortBy !== 'undefined' ? sortBy : '';
 const currentOrder = typeof sortOrder !== 'undefined' ? sortOrder : 'asc';
 function getSortUrl(column) {
@@ -41,11 +41,14 @@ function getSortIcon(column) {
       <tr>
         <td
           colspan="<%= columns.length + (typeof actions !== 'undefined' && actions && actions.length > 0 ? 1 : 0) %>"
-          class="text-center py-4"
+          class="text-center py-5"
         >
-          <div class="empty-state">
-            <i class="ri-inbox-line"></i>
-            <p class="mb-0">No records found</p>
+          <div class="empty-state-container">
+            <div class="empty-state-icon">
+              <i class="ri-inbox-archive-line"></i>
+            </div>
+            <h5 class="mt-3 fw-semibold">No Records Found</h5>
+            <p class="text-muted mb-0">It looks like there's nothing to show here yet.</p>
           </div>
         </td>
       </tr>
@@ -99,7 +102,7 @@ function getSortIcon(column) {
   }
 
   .table-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #667eea !important;
     color: white;
   }
 
@@ -145,8 +148,6 @@ function getSortIcon(column) {
 
   .data-table tbody tr:hover {
     background-color: rgba(102, 126, 234, 0.05);
-    transform: scale(1.01);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   }
 
   .data-table tbody td {
@@ -154,16 +155,28 @@ function getSortIcon(column) {
     vertical-align: middle;
   }
 
-  .empty-state {
-    padding: 2rem;
-    color: var(--vz-gray-600);
+  .empty-state-container {
+    padding: 3rem 1rem;
+    max-width: 400px;
+    margin: 0 auto;
+    text-align: center;
   }
 
-  .empty-state i {
-    font-size: 3rem;
-    opacity: 0.3;
-    display: block;
-    margin-bottom: 1rem;
+  .empty-state-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+  }
+
+  .empty-state-icon i {
+    font-size: 2.5rem;
+    color: #667eea;
+    opacity: 0.8;
   }
 
   .btn-group-sm > .btn {
@@ -173,7 +186,7 @@ function getSortIcon(column) {
 
   /* Dark Mode */
   [data-layout-mode="dark"] .table-header {
-    background: linear-gradient(135deg, #1a237e 0%, #4a148c 100%);
+    background: #1a237e !important;
   }
 
   [data-layout-mode="dark"] .data-table tbody tr:hover {
@@ -215,3 +228,4 @@ function getSortIcon(column) {
     });
   });
 </script>
+

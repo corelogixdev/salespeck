@@ -1,5 +1,7 @@
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
-const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, Menu } = require('electron');
 // Defer autoUpdater requirement to after app is ready or inside a try-catch
 let autoUpdater;
 try {
@@ -281,6 +283,11 @@ app.whenReady().then(async () => {
     await prismaStartupBootstrap();
     require('./server/app'); // Keep server startup after DB bootstrap.
     createWindow();
+
+    // Conditionally hide menu bar in production
+    if (app.isPackaged) {
+      Menu.setApplicationMenu(null);
+    }
   } catch (error) {
     await showStartupErrorDialog(error);
     app.quit();

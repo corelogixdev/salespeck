@@ -120,24 +120,6 @@
                                         </div>
                                     </div>
 
-                                    <div class="row mb-3">
-                                        <div class="col-md-12">
-                                            <label for="profileImage" class="form-label">
-                                                Profile Picture <span class="text-muted">(Optional)</span>
-                                            </label>
-                                            <input type="file" class="form-control" id="profileImage"
-                                                name="profileImage" accept="image/jpeg,image/jpg,image/png">
-                                            <div class="form-text">Max size: 5MB. Formats: JPG, JPEG, PNG</div>
-                                            <div class="mt-2" id="imagePreview" style="display: none;">
-                                                <img id="previewImg" src="" alt="Preview"
-                                                    style="max-width: 150px; max-height: 150px; border-radius: 8px; border: 2px solid #ddd;">
-                                                <button type="button" class="btn btn-sm btn-danger ms-2"
-                                                    onclick="removeImage()">
-                                                    <i class="ri-delete-bin-line"></i> Remove
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
 
                                     <div class="mt-4">
                                         <button class="btn btn-primary w-100" type="submit">
@@ -186,39 +168,5 @@
             }
         }
 
-        // Image preview functionality
-        document.getElementById('profileImage')?.addEventListener('change', function (e) {
-            const file = e.target.files[0];
-            if (file) {
-                // Validate file type
-                const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-                if (!validTypes.includes(file.type)) {
-                    alert('Please select a valid image file (JPG, JPEG, or PNG)');
-                    e.target.value = '';
-                    return;
-                }
-
-                // Validate file size (5MB)
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('Image size must be less than 5MB');
-                    e.target.value = '';
-                    return;
-                }
-
-                // Show preview
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    document.getElementById('previewImg').src = e.target.result;
-                    document.getElementById('imagePreview').style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        function removeImage() {
-            document.getElementById('profileImage').value = '';
-            document.getElementById('imagePreview').style.display = 'none';
-            document.getElementById('previewImg').src = '';
-        }
     </script>
 </div>
