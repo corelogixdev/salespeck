@@ -56,732 +56,176 @@
                             <a href="/" style="display: block; min-width: fit-content;" class="fs-2 me-2">
                                 Corelogix
                             </a>
-                            <button type="button" class="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger" id="topnav-hamburger-icon">
-                                <i class="ri-menu-2-line"></i>
-                            </button>
                                 <% var permissions=typeof permissions !=='undefined' ? permissions : {}; %>
                                     <% if (typeof user !=='undefined' && user) { %>
+                                        <button type="button" class="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger" id="topnav-hamburger-icon">
+                                            <i class="ri-menu-2-line"></i>
+                                        </button>
                                         <div id="scrollbar" class="navbar-menu"
-                                            style="width: 100%;position: static;box-shadow: none;margin-top: 0; background-color: transparent;">
+                                            style="width: 100%; position: relative; box-shadow: none; margin-top: 0; background-color: transparent; overflow: visible !important;">
                                             <div id="two-column-menu">
                                             </div>
-                                            <ul class="navbar-nav" id="navbar-nav" style="display: flex;
-                            flex-direction: row;
-                            align-items: center;">
-                                                <li class="menu-title"><span data-key="t-menu">Menu</span></li>
+                                             <ul class="navbar-nav" id="navbar-nav" style="display: flex; flex-direction: row; align-items: center; overflow: visible !important;">
                                                 <li class="nav-item">
                                                     <a class="nav-link menu-link pe-0" href="/" role="button">
                                                         <i class="las la-tachometer-alt"></i> <span>Dashboard</span>
                                                     </a>
                                                 </li>
-                                                <li class="nav-item dropdown">
-                                                    <a class="nav-link menu-link" href="#sidebarStock"
-                                                        data-bs-toggle="collapse" role="button">
+                                                 <li class="nav-item dropdown">
+                                                    <a class="nav-link menu-link dropdown-toggle" href="#"
+                                                        data-bs-toggle="dropdown" role="button" aria-expanded="false">
                                                         <i class="las la-box"></i> <span>Stock</span>
                                                     </a>
-                                                    <div class="collapse menu-dropdown" id="sidebarStock">
-                                                        <ul class="nav nav-sm flex-column">
-                                                            <li class="nav-item">
-                                                                <a href="/products"
-                                                                    class="nav-link">Products</a>
-                                                            </li>
-                                                            <li class="nav-item">
-                                                                <a href="/accounting/purchase/form"
-                                                                    class="nav-link">New
-                                                                    Purchase</a>
-                                                            </li>
-                                                            <li class="nav-item">
-                                                                <a href="/inventorylogs"
-                                                                    class="nav-link">Inventory
-                                                                    Logs</a>
-                                                            </li>
-                                                            <li class="nav-item">
-                                                                <a href="/brands"
-                                                                    class="nav-link">Brands</a>
-                                                            </li>
-                                                            <li class="nav-item">
-                                                                <a href="/categories"
-                                                                    class="nav-link">Categories</a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
+                                                    <ul class="dropdown-menu" aria-labelledby="sidebarStock">
+                                                        <li><a href="/products" class="dropdown-item">Products</a></li>
+                                                        <li><a href="/accounting/purchase/form" class="dropdown-item">New Purchase</a></li>
+                                                        <li><a href="/inventorylogs" class="dropdown-item">Inventory Logs</a></li>
+                                                        <li><a href="/brands" class="dropdown-item">Brands</a></li>
+                                                        <li><a href="/categories" class="dropdown-item">Categories</a></li>
+                                                    </ul>
                                                 </li>
-                                                        <li class="nav-item dropdown">
-                                                            <a class="nav-link menu-link" href="#sidebarParties"
-                                                                data-bs-toggle="collapse" role="button">
-                                                                <i class="las la-users"></i> <span>Parties</span>
-                                                            </a>
-                                                            <div class="collapse menu-dropdown" id="sidebarParties">
-                                                                <ul class="nav nav-sm flex-column">
-                                                                    <li class="nav-item">
-                                                                        <a href="/users?role=customer"
-                                                                            class="nav-link">Customers</a>
-                                                                    </li>
-                                                                    <li class="nav-item">
-                                                                        <a href="/users?role=user"
-                                                                            class="nav-link">Users</a>
-                                                                    </li>
-                                                                    <li class="nav-item">
-                                                                        <a href="/users?role=vendor"
-                                                                            class="nav-link">Vendors</a>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
-                                                        </li>
-                                                                    <li class="nav-item dropdown">
-                                                                        <a class="nav-link menu-link"
-                                                                            href="#sidebarSales"
-                                                                            data-bs-toggle="collapse" role="button">
-                                                                            <i class="las la-shopping-cart"></i>
-                                                                            <span>Sales</span>
-                                                                        </a>
-                                                                        <div class="collapse menu-dropdown"
-                                                                            id="sidebarSales">
-                                                                            <ul class="nav nav-sm flex-column">
-                                                                                <li class="nav-item">
-                                                                                    <a href="/sales"
-                                                                                        class="nav-link">POS
-                                                                                        Sales</a>
-                                                                                </li>
-                                                                                <li class="nav-item">
-                                                                                    <a href="/sales/form"
-                                                                                        class="nav-link"
-                                                                                        id="new-sale-menu-link">New
-                                                                                        Sale</a>
-                                                                                </li>
-                                                                                <li class="nav-item">
-                                                                                    <a href="/sales/returns"
-                                                                                        class="nav-link disabled">Returns</a>
-                                                                                </li>
-                                                                            </ul>
-                                                                        </div>
-                                                                    </li>
-                                                                        <li class="nav-item dropdown">
-                                                                            <a class="nav-link menu-link"
-                                                                                href="#sidebarAccounting"
-                                                                                data-bs-toggle="collapse" role="button">
-                                                                                <i class="las la-calculator"></i>
-                                                                                <span>Accounting</span>
-                                                                            </a>
-                                                                            <div class="collapse menu-dropdown"
-                                                                                id="sidebarAccounting">
-                                                                                <ul class="nav nav-sm flex-column">
-                                                                                    <li class="nav-item">
-                                                                                        <a href="/accounting/coa"
-                                                                                            class="nav-link disabled">Chart
-                                                                                            of
-                                                                                            Accounts</a>
-                                                                                    </li>
-                                                                                    <li class="nav-item">
-                                                                                        <a href="/accounting/balance-sheet"
-                                                                                            class="nav-link disabled">Balance
-                                                                                            Sheet</a>
-                                                                                    </li>
-                                                                                    <li class="nav-item">
-                                                                                        <a href="/accounting/purchase"
-                                                                                            class="nav-link">Purchases
-                                                                                            List</a>
-                                                                                    </li>
-                                                                                    <li class="nav-item">
-                                                                                        <a href="/accounting/purchase/form"
-                                                                                            class="nav-link">New
-                                                                                            Purchase</a>
-                                                                                    </li>
-                                                                                            <li class="nav-item">
-                                                                                                <a href="/accounting/expenses"
-                                                                                                    class="nav-link disabled">Expenses</a>
-                                                                                            </li>
-                                                                                            <li class="nav-item">
-                                                                                                <a href="/accounting/transactions"
-                                                                                                    class="nav-link disabled">Transactions</a>
-                                                                                            </li>
-                                                                                            <li class="nav-item">
-                                                                                                <a href="/accounting/cash-closing"
-                                                                                                    class="nav-link disabled">Cash
-                                                                                                    Closing</a>
-                                                                                            </li>
-                                                                                            <li class="nav-item">
-                                                                                                <a href="/accounting/cash-closing-report"
-                                                                                                    class="nav-link disabled">Cash
-                                                                                                    Closing
-                                                                                                    Report</a>
-                                                                                            </li>
-                                                                                            <li class="nav-item">
-                                                                                                <a href="/accounting/taxes"
-                                                                                                    class="nav-link">Taxes</a>
-                                                                                            </li>
-                                                                                </ul>
-                                                                            </div>
-                                                                        </li>
-                                                                        <li class="nav-item dropdown">
-                                                                            <a class="nav-link menu-link"
-                                                                                href="#sidebarReports"
-                                                                                data-bs-toggle="collapse" role="button">
-                                                                                <i class="ri-file-chart-line"></i>
-                                                                                <span>Reports</span>
-                                                                            </a>
-                                                                            <div class="collapse menu-dropdown"
-                                                                                id="sidebarReports">
-                                                                                <ul class="nav nav-sm flex-column">
-                                                                                    <li class="nav-item">
-                                                                                        <a href="/reports"
-                                                                                            class="nav-link">All Reports</a>
-                                                                                    </li>
-                                                                                    <li class="nav-item">
-                                                                                        <a href="/reports/sales"
-                                                                                            class="nav-link">Sales Report</a>
-                                                                                    </li>
-                                                                                    <li class="nav-item">
-                                                                                        <a href="/reports/purchases"
-                                                                                            class="nav-link">Purchases Report</a>
-                                                                                    </li>
-                                                                                    <li class="nav-item">
-                                                                                        <a href="/reports/inventory"
-                                                                                            class="nav-link">Inventory Report</a>
-                                                                                    </li>
-                                                                                    <li class="nav-item">
-                                                                                        <a href="/reports/customers"
-                                                                                            class="nav-link">Customer Report</a>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </div>
-                                                                        </li>
-                                                                        <li class="nav-item dropdown">
-                                                                            <a class="nav-link menu-link"
-                                                                                href="#sidebarOthers"
-                                                                                data-bs-toggle="collapse" role="button">
-                                                                                <span>Others</span>
-                                                                            </a>
-                                                                            <div class="collapse menu-dropdown"
-                                                                                id="sidebarOthers">
-                                                                                <ul class="nav nav-sm flex-column">
-                                                                                    <li class="nav-item">
-                                                                                        <a href="/settings"
-                                                                                            class="nav-link">Settings</a>
-                                                                                    </li>
-                                                                                            <li class="nav-item">
-                                                                                                <a href="/export-db"
-                                                                                                    class="nav-link">Export
-                                                                                                    DB</a>
-                                                                                            </li>
-                                                                                </ul>
-                                                                            </div>
-                                                                        </li>
+                                                <li class="nav-item dropdown">
+                                                    <a class="nav-link menu-link dropdown-toggle" href="#"
+                                                        data-bs-toggle="dropdown" role="button" aria-expanded="false">
+                                                        <i class="las la-users"></i> <span>Parties</span>
+                                                    </a>
+                                                    <ul class="dropdown-menu" aria-labelledby="sidebarParties">
+                                                        <li><a href="/users?role=customer" class="dropdown-item">Customers</a></li>
+                                                        <li><a href="/users?role=user" class="dropdown-item">Users</a></li>
+                                                        <li><a href="/users?role=vendor" class="dropdown-item">Vendors</a></li>
+                                                    </ul>
+                                                </li>
+                                                <li class="nav-item dropdown">
+                                                    <a class="nav-link menu-link dropdown-toggle" href="#"
+                                                        data-bs-toggle="dropdown" role="button" aria-expanded="false">
+                                                        <i class="las la-shopping-cart"></i> <span>Sales</span>
+                                                    </a>
+                                                    <ul class="dropdown-menu" aria-labelledby="sidebarSales">
+                                                        <li><a href="/sales" class="dropdown-item">POS Sales</a></li>
+                                                        <li><a href="/sales/form" class="dropdown-item" id="new-sale-menu-link">New Sale</a></li>
+                                                        <li><a href="/sales/returns" class="dropdown-item disabled">Returns</a></li>
+                                                    </ul>
+                                                </li>
+                                                <li class="nav-item dropdown">
+                                                    <a class="nav-link menu-link dropdown-toggle" href="#"
+                                                        data-bs-toggle="dropdown" role="button" aria-expanded="false">
+                                                        <i class="las la-calculator"></i> <span>Accounting</span>
+                                                    </a>
+                                                    <ul class="dropdown-menu" aria-labelledby="sidebarAccounting">
+                                                        <li><a href="/accounting/coa" class="dropdown-item disabled">Chart of Accounts</a></li>
+                                                        <li><a href="/accounting/balance-sheet" class="dropdown-item disabled">Balance Sheet</a></li>
+                                                        <li><a href="/accounting/purchase" class="dropdown-item">Purchases List</a></li>
+                                                        <li><a href="/accounting/purchase/form" class="dropdown-item">New Purchase</a></li>
+                                                        <li><a href="/accounting/expenses" class="dropdown-item disabled">Expenses</a></li>
+                                                        <li><a href="/accounting/transactions" class="dropdown-item disabled">Transactions</a></li>
+                                                        <li><a href="/accounting/cash-closing" class="dropdown-item disabled">Cash Closing</a></li>
+                                                        <li><a href="/accounting/cash-closing-report" class="dropdown-item disabled">Cash Closing Report</a></li>
+                                                        <li><a href="/accounting/taxes" class="dropdown-item">Taxes</a></li>
+                                                    </ul>
+                                                </li>
+                                                <li class="nav-item dropdown">
+                                                    <a class="nav-link menu-link dropdown-toggle" href="#"
+                                                        data-bs-toggle="dropdown" role="button" aria-expanded="false">
+                                                        <i class="ri-file-chart-line"></i> <span>Reports</span>
+                                                    </a>
+                                                    <ul class="dropdown-menu" aria-labelledby="sidebarReports">
+                                                        <li><a href="/reports" class="dropdown-item">All Reports</a></li>
+                                                        <li><a href="/reports/sales" class="dropdown-item">Sales Report</a></li>
+                                                        <li><a href="/reports/purchases" class="dropdown-item">Purchases Report</a></li>
+                                                        <li><a href="/reports/inventory" class="dropdown-item">Inventory Report</a></li>
+                                                        <li><a href="/reports/customers" class="dropdown-item">Customer Report</a></li>
+                                                    </ul>
+                                                </li>
+                                                <li class="nav-item dropdown">
+                                                    <a class="nav-link menu-link dropdown-toggle" href="#"
+                                                        data-bs-toggle="dropdown" role="button" aria-expanded="false">
+                                                        <span>Others</span>
+                                                    </a>
+                                                    <ul class="dropdown-menu" aria-labelledby="sidebarOthers">
+                                                        <li><a href="/settings" class="dropdown-item">Settings</a></li>
+                                                        <li><a href="/export-db" class="dropdown-item">Export DB</a></li>
+                                                    </ul>
+                                                </li>
                                             </ul>
                                         </div>
-                                        <% } %>
-                                            <div class="d-flex align-items-center ms-auto">
+                                    <% } %>
 
-                                                <div class="ms-1 header-item d-none d-sm-flex">
-                                                    <button type="button" id="themeToggleBtn"
-                                                        class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle light-dark-mode">
-                                                        <i class='bx bx-moon fs-22'></i>
-                                                    </button>
-                                                </div>
+                                    <div class="d-flex align-items-center ms-auto">
+                                        <!-- Theme Toggle -->
+                                        <div class="ms-1 header-item d-none d-sm-flex">
+                                            <button type="button" id="themeToggleBtn"
+                                                class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle light-dark-mode">
+                                                <i class='bx bx-moon fs-22'></i>
+                                            </button>
+                                        </div>
 
-                                                <% if (typeof user !=='undefined' && user) { %>
-
-                                                    <div class="dropdown topbar-head-dropdown ms-1 header-item"
-                                                        id="notificationDropdown">
-                                                        <button type="button"
-                                                            class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"
-                                                            id="page-header-notifications-dropdown"
-                                                            data-bs-toggle="dropdown" data-bs-auto-close="outside"
-                                                            aria-haspopup="true" aria-expanded="false">
-                                                            <i class='bx bx-bell fs-22'></i>
-                                                            <span
-                                                                class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger">3<span
-                                                                    class="visually-hidden">unread
-                                                                    messages</span></span>
-                                                        </button>
-                                                        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
-                                                            aria-labelledby="page-header-notifications-dropdown">
-
-                                                            <div
-                                                                class="dropdown-head bg-primary bg-pattern rounded-top">
-                                                                <div class="p-3">
-                                                                    <div class="row align-items-center">
-                                                                        <div class="col">
-                                                                            <h6
-                                                                                class="m-0 fs-16 fw-semibold text-white">
-                                                                                Notifications
-                                                                            </h6>
-                                                                        </div>
-                                                                        <div class="col-auto dropdown-tabs">
-                                                                            <span
-                                                                                class="badge bg-light-subtle text-body fs-13">
-                                                                                4
-                                                                                New</span>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div class="px-2 pt-2">
-                                                                    <ul class="nav nav-tabs dropdown-tabs nav-tabs-custom"
-                                                                        data-dropdown-tabs="true"
-                                                                        id="notificationItemsTab" role="tablist">
-                                                                        <li class="nav-item waves-effect waves-light">
-                                                                            <a class="nav-link active"
-                                                                                data-bs-toggle="tab"
-                                                                                href="#all-noti-tab" role="tab"
-                                                                                aria-selected="true">
-                                                                                All (4)
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="nav-item waves-effect waves-light">
-                                                                            <a class="nav-link" data-bs-toggle="tab"
-                                                                                href="#messages-tab" role="tab"
-                                                                                aria-selected="false">
-                                                                                Messages
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="nav-item waves-effect waves-light">
-                                                                            <a class="nav-link" data-bs-toggle="tab"
-                                                                                href="#alerts-tab" role="tab"
-                                                                                aria-selected="false">
-                                                                                Alerts
-                                                                            </a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-
+                                        <% if (typeof user !=='undefined' && user) { %>
+                                            <!-- Notifications -->
+                                            <div class="dropdown topbar-head-dropdown ms-1 header-item" id="notificationDropdown">
+                                                <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"
+                                                    id="page-header-notifications-dropdown" data-bs-toggle="dropdown"
+                                                    aria-haspopup="true" aria-expanded="false">
+                                                    <i class='bx bx-bell fs-22'></i>
+                                                    <span class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger">3</span>
+                                                </button>
+                                                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                                                    aria-labelledby="page-header-notifications-dropdown">
+                                                    <div class="dropdown-head bg-primary bg-pattern rounded-top p-3">
+                                                        <div class="row align-items-center">
+                                                            <div class="col">
+                                                                <h6 class="m-0 fs-16 fw-semibold text-white">Notifications</h6>
                                                             </div>
-
-                                                            <div class="tab-content position-relative"
-                                                                id="notificationItemsTabContent">
-                                                                <div class="tab-pane fade show active py-2 ps-2"
-                                                                    id="all-noti-tab" role="tabpanel">
-                                                                    <div data-simplebar style="max-height: 300px;"
-                                                                        class="pe-2">
-                                                                        <div
-                                                                            class="text-reset notification-item d-block dropdown-item position-relative">
-                                                                            <div class="d-flex">
-                                                                                <div
-                                                                                    class="avatar-xs me-3 flex-shrink-0">
-                                                                                    <span
-                                                                                        class="avatar-title bg-info-subtle text-info rounded-circle fs-16">
-                                                                                        <i
-                                                                                            class="bx bx-badge-check"></i>
-                                                                                    </span>
-                                                                                </div>
-                                                                                <div class="flex-grow-1">
-                                                                                    <a href="#!" class="stretched-link">
-                                                                                        <h6 class="mt-0 mb-2 lh-base">
-                                                                                            <b>Low Stock</b>
-                                                                                            Alert: <span
-                                                                                                class="text-secondary">5
-                                                                                                products</span>
-                                                                                            below minimum quantity!
-                                                                                        </h6>
-                                                                                    </a>
-                                                                                    <p
-                                                                                        class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                                                                                        <span><i
-                                                                                                class="mdi mdi-clock-outline"></i>
-                                                                                            Just
-                                                                                            30 sec
-                                                                                            ago</span>
-                                                                                    </p>
-                                                                                </div>
-                                                                                <div class="px-2 fs-15">
-                                                                                    <div
-                                                                                        class="form-check notification-check">
-                                                                                        <input class="form-check-input"
-                                                                                            type="checkbox" value=""
-                                                                                            id="all-notification-check01">
-                                                                                        <label class="form-check-label"
-                                                                                            for="all-notification-check01"></label>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div
-                                                                            class="text-reset notification-item d-block dropdown-item position-relative">
-                                                                            <div class="d-flex">
-                                                                                <img src="/assets/img/avatars/avatar-2.jpg"
-                                                                                    class="me-3 rounded-circle avatar-xs flex-shrink-0"
-                                                                                    alt="user-pic">
-                                                                                <div class="flex-grow-1">
-                                                                                    <a href="#!" class="stretched-link">
-                                                                                        <h6
-                                                                                            class="mt-0 mb-1 fs-13 fw-semibold">
-                                                                                            Sale Completed
-                                                                                        </h6>
-                                                                                    </a>
-                                                                                    <div class="fs-13 text-muted">
-                                                                                        <p class="mb-1">New sale <b>Rs.
-                                                                                                15,250.00</b> completed
-                                                                                            successfully. Invoice
-                                                                                            #INV-0012345 🔔.</p>
-                                                                                    </div>
-                                                                                    <p
-                                                                                        class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                                                                                        <span><i
-                                                                                                class="mdi mdi-clock-outline"></i>
-                                                                                            48
-                                                                                            min
-                                                                                            ago</span>
-                                                                                    </p>
-                                                                                </div>
-                                                                                <div class="px-2 fs-15">
-                                                                                    <div
-                                                                                        class="form-check notification-check">
-                                                                                        <input class="form-check-input"
-                                                                                            type="checkbox" value=""
-                                                                                            id="all-notification-check02">
-                                                                                        <label class="form-check-label"
-                                                                                            for="all-notification-check02"></label>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div
-                                                                            class="text-reset notification-item d-block dropdown-item position-relative">
-                                                                            <div class="d-flex">
-                                                                                <div
-                                                                                    class="avatar-xs me-3 flex-shrink-0">
-                                                                                    <span
-                                                                                        class="avatar-title bg-danger-subtle text-danger rounded-circle fs-16">
-                                                                                        <i
-                                                                                            class='bx bx-message-square-dots'></i>
-                                                                                    </span>
-                                                                                </div>
-                                                                                <div class="flex-grow-1">
-                                                                                    <a href="#!" class="stretched-link">
-                                                                                        <h6
-                                                                                            class="mt-0 mb-2 fs-13 lh-base">
-                                                                                            Purchase Order Received: <b
-                                                                                                class="text-success">Rs.
-                                                                                                45,680.00</b>
-                                                                                            from supplier
-                                                                                        </h6>
-                                                                                    </a>
-                                                                                    <p
-                                                                                        class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                                                                                        <span><i
-                                                                                                class="mdi mdi-clock-outline"></i>
-                                                                                            2
-                                                                                            hrs
-                                                                                            ago</span>
-                                                                                    </p>
-                                                                                </div>
-                                                                                <div class="px-2 fs-15">
-                                                                                    <div
-                                                                                        class="form-check notification-check">
-                                                                                        <input class="form-check-input"
-                                                                                            type="checkbox" value=""
-                                                                                            id="all-notification-check03">
-                                                                                        <label class="form-check-label"
-                                                                                            for="all-notification-check03"></label>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div
-                                                                            class="text-reset notification-item d-block dropdown-item position-relative">
-                                                                            <div class="d-flex">
-                                                                                <img src="/assets/img/avatars/avatar-8.jpg"
-                                                                                    class="me-3 rounded-circle avatar-xs flex-shrink-0"
-                                                                                    alt="user-pic">
-                                                                                <div class="flex-grow-1">
-                                                                                    <a href="#!" class="stretched-link">
-                                                                                        <h6
-                                                                                            class="mt-0 mb-1 fs-13 fw-semibold">
-                                                                                            New Product Added
-                                                                                        </h6>
-                                                                                    </a>
-                                                                                    <div class="fs-13 text-muted">
-                                                                                        <p class="mb-1">Product
-                                                                                            <b>"Premium Widget Pro"</b>
-                                                                                            has been added to inventory
-                                                                                            with quantity 50.
-                                                                                        </p>
-                                                                                    </div>
-                                                                                    <p
-                                                                                        class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                                                                                        <span><i
-                                                                                                class="mdi mdi-clock-outline"></i>
-                                                                                            4
-                                                                                            hrs
-                                                                                            ago</span>
-                                                                                    </p>
-                                                                                </div>
-                                                                                <div class="px-2 fs-15">
-                                                                                    <div
-                                                                                        class="form-check notification-check">
-                                                                                        <input class="form-check-input"
-                                                                                            type="checkbox" value=""
-                                                                                            id="all-notification-check04">
-                                                                                        <label class="form-check-label"
-                                                                                            for="all-notification-check04"></label>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div class="my-3 text-center view-all">
-                                                                            <button type="button"
-                                                                                class="btn btn-soft-success waves-effect waves-light">View
-                                                                                All Notifications <i
-                                                                                    class="ri-arrow-right-line align-middle"></i></button>
-                                                                        </div>
-                                                                    </div>
-
-                                                                </div>
-
-                                                                <div class="tab-pane fade py-2 ps-2" id="messages-tab"
-                                                                    role="tabpanel" aria-labelledby="messages-tab">
-                                                                    <div data-simplebar style="max-height: 300px;"
-                                                                        class="pe-2">
-                                                                        <div
-                                                                            class="text-reset notification-item d-block dropdown-item">
-                                                                            <div class="d-flex">
-                                                                                <img src="/assets/img/avatars/avatar-3.jpg"
-                                                                                    class="me-3 rounded-circle avatar-xs"
-                                                                                    alt="user-pic">
-                                                                                <div class="flex-grow-1">
-                                                                                    <a href="#!" class="stretched-link">
-                                                                                        <h6
-                                                                                            class="mt-0 mb-1 fs-13 fw-semibold">
-                                                                                            Inventory Updated
-                                                                                        </h6>
-                                                                                    </a>
-                                                                                    <div class="fs-13 text-muted">
-                                                                                        <p class="mb-1">Stock quantity
-                                                                                            adjusted for product "Gadget
-                                                                                            Type A". New quantity: 125
-                                                                                            units.
-                                                                                        </p>
-                                                                                    </div>
-                                                                                    <p
-                                                                                        class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                                                                                        <span><i
-                                                                                                class="mdi mdi-clock-outline"></i>
-                                                                                            30
-                                                                                            min
-                                                                                            ago</span>
-                                                                                    </p>
-                                                                                </div>
-                                                                                <div class="px-2 fs-15">
-                                                                                    <div
-                                                                                        class="form-check notification-check">
-                                                                                        <input class="form-check-input"
-                                                                                            type="checkbox" value=""
-                                                                                            id="messages-notification-check01">
-                                                                                        <label class="form-check-label"
-                                                                                            for="messages-notification-check01"></label>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div
-                                                                            class="text-reset notification-item d-block dropdown-item">
-                                                                            <div class="d-flex">
-                                                                                <img src="/assets/img/avatars/avatar-2.jpg"
-                                                                                    class="me-3 rounded-circle avatar-xs"
-                                                                                    alt="user-pic">
-                                                                                <div class="flex-grow-1">
-                                                                                    <a href="#!" class="stretched-link">
-                                                                                        <h6
-                                                                                            class="mt-0 mb-1 fs-13 fw-semibold">
-                                                                                            Daily Sales Report
-                                                                                        </h6>
-                                                                                    </a>
-                                                                                    <div class="fs-13 text-muted">
-                                                                                        <p class="mb-1">Today's total
-                                                                                            sales: <b>Rs. 89,450.00</b>
-                                                                                            from 42 transactions. Great
-                                                                                            day! 🔔.</p>
-                                                                                    </div>
-                                                                                    <p
-                                                                                        class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                                                                                        <span><i
-                                                                                                class="mdi mdi-clock-outline"></i>
-                                                                                            2
-                                                                                            hrs
-                                                                                            ago</span>
-                                                                                    </p>
-                                                                                </div>
-                                                                                <div class="px-2 fs-15">
-                                                                                    <div
-                                                                                        class="form-check notification-check">
-                                                                                        <input class="form-check-input"
-                                                                                            type="checkbox" value=""
-                                                                                            id="messages-notification-check02">
-                                                                                        <label class="form-check-label"
-                                                                                            for="messages-notification-check02"></label>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div
-                                                                            class="text-reset notification-item d-block dropdown-item">
-                                                                            <div class="d-flex">
-                                                                                <img src="/assets/img/avatars/avatar-6.jpg"
-                                                                                    class="me-3 rounded-circle avatar-xs"
-                                                                                    alt="user-pic">
-                                                                                <div class="flex-grow-1">
-                                                                                    <a href="#!" class="stretched-link">
-                                                                                        <h6
-                                                                                            class="mt-0 mb-1 fs-13 fw-semibold">
-                                                                                            Kenneth
-                                                                                            Brown
-                                                                                        </h6>
-                                                                                    </a>
-                                                                                    <div class="fs-13 text-muted">
-                                                                                        <p class="mb-1">Mentionned you
-                                                                                            in his
-                                                                                            comment on
-                                                                                            📃
-                                                                                            invoice
-                                                                                            #12501.
-                                                                                        </p>
-                                                                                    </div>
-                                                                                    <p
-                                                                                        class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                                                                                        <span><i
-                                                                                                class="mdi mdi-clock-outline"></i>
-                                                                                            10
-                                                                                            hrs
-                                                                                            ago</span>
-                                                                                    </p>
-                                                                                </div>
-                                                                                <div class="px-2 fs-15">
-                                                                                    <div
-                                                                                        class="form-check notification-check">
-                                                                                        <input class="form-check-input"
-                                                                                            type="checkbox" value=""
-                                                                                            id="messages-notification-check03">
-                                                                                        <label class="form-check-label"
-                                                                                            for="messages-notification-check03"></label>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div
-                                                                            class="text-reset notification-item d-block dropdown-item">
-                                                                            <div class="d-flex">
-                                                                                <img src="/assets/img/avatars/avatar-8.jpg"
-                                                                                    class="me-3 rounded-circle avatar-xs"
-                                                                                    alt="user-pic">
-                                                                                <div class="flex-grow-1">
-                                                                                    <a href="#!" class="stretched-link">
-                                                                                        <h6
-                                                                                            class="mt-0 mb-1 fs-13 fw-semibold">
-                                                                                            Payment Received
-                                                                                        </h6>
-                                                                                    </a>
-                                                                                    <div class="fs-13 text-muted">
-                                                                                        <p class="mb-1">Payment of
-                                                                                            <b>Rs. 12,500.00</b>
-                                                                                            received for invoice
-                                                                                            #INV-0098765.
-                                                                                        </p>
-                                                                                    </div>
-                                                                                    <p
-                                                                                        class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                                                                                        <span><i
-                                                                                                class="mdi mdi-clock-outline"></i>
-                                                                                            3
-                                                                                            days
-                                                                                            ago</span>
-                                                                                    </p>
-                                                                                </div>
-                                                                                <div class="px-2 fs-15">
-                                                                                    <div
-                                                                                        class="form-check notification-check">
-                                                                                        <input class="form-check-input"
-                                                                                            type="checkbox" value=""
-                                                                                            id="messages-notification-check04">
-                                                                                        <label class="form-check-label"
-                                                                                            for="messages-notification-check04"></label>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div class="my-3 text-center view-all">
-                                                                            <button type="button"
-                                                                                class="btn btn-soft-success waves-effect waves-light">View
-                                                                                All Messages <i
-                                                                                    class="ri-arrow-right-line align-middle"></i></button>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="tab-pane fade p-4" id="alerts-tab"
-                                                                    role="tabpanel" aria-labelledby="alerts-tab"></div>
-
-                                                                <div class="notification-actions"
-                                                                    id="notification-actions">
-                                                                    <div
-                                                                        class="d-flex text-muted justify-content-center">
-                                                                        Select <div id="select-content"
-                                                                            class="text-body fw-semibold px-1">0
-                                                                        </div>
-                                                                        Result <button type="button"
-                                                                            class="btn btn-link link-danger p-0 ms-3"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#removeNotificationModal">Remove</button>
+                                                        </div>
+                                                    </div>
+                                                    <div data-simplebar style="max-height: 300px;" class="pe-2">
+                                                        <div class="text-reset notification-item d-block dropdown-item position-relative">
+                                                            <div class="d-flex align-items-start">
+                                                                <div class="flex-grow-1">
+                                                                    <h6 class="mt-0 mb-1 fs-13 fw-semibold">New Sale Recorded</h6>
+                                                                    <div class="fs-12 text-muted">
+                                                                        <p class="mb-0">A new sale of Rs. 1,500 was completed just now.</p>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <% } %>
-
-                                                        <!-- User Profile Dropdown -->
-                                                        <% if (typeof user !=='undefined' && user !==null) { %>
-                                                            <div class="ms-1 header-item d-none d-sm-flex user-profile-card"
-                                                                id="userProfileDropdown">
-                                                                <div class="user-profile-trigger">
-                                                                    <div class="user-avatar">
-                                                                        <% if (user.profile_image_url) { %>
-                                                                            <img src="<%= user.profile_image_url %>"
-                                                                                alt="User Avatar"
-                                                                                style="width: 100%; height: 100%; object-fit: cover;">
-                                                                            <% } else { %>
-                                                                                <%= user.firstname.charAt(0).toUpperCase()
-                                                                                    +
-                                                                                    user.lastname.charAt(0).toUpperCase()
-                                                                                    %>
-                                                                                    <% } %>
-                                                                    </div>
-                                                                    <div class="user-info">
-                                                                        <p class="user-greeting">Welcome back,</p>
-                                                                        <p class="user-name">
-                                                                            <%= user.firstname %>
-                                                                        </p>
-                                                                    </div>
-                                                                    <i class='bx bx-chevron-down dropdown-arrow'></i>
-                                                                </div>
-                                                                <div class="user-profile-menu">
-                                                                    <div class="user-profile-menu-header">
-                                                                        <p class="menu-user-name">
-                                                                            <%= user.firstname + " " + user.lastname %>
-                                                                        </p>
-                                                                        <p class="menu-user-role">Administrator</p>
-                                                                    </div>
-                                                                    <a href="#profile-modal"
-                                                                        class="user-profile-menu-item">
-                                                                        <i class='bx bx-user'></i>
-                                                                        <span>My Profile</span>
-                                                                    </a>
-                                                                    <a href="/logout"
-                                                                        class="user-profile-menu-item logout-item">
-                                                                        <i class='bx bx-log-out'></i>
-                                                                        <span>Logout</span>
-                                                                    </a>
-                                                                </div>
-                                                            </div>
-                                                            <% } %>
+                                                </div>
                                             </div>
-            </div>
+
+                                            <!-- User Profile -->
+                                            <div class="ms-1 header-item d-none d-sm-flex user-profile-card" id="userProfileDropdown">
+                                                <div class="user-profile-trigger">
+                                                    <div class="user-avatar">
+                                                        <% if (user.profile_image_url) { %>
+                                                            <img src="<%= user.profile_image_url %>" alt="User Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                                                        <% } else { %>
+                                                            <%= user.firstname.charAt(0).toUpperCase() + user.lastname.charAt(0).toUpperCase() %>
+                                                        <% } %>
+                                                    </div>
+                                                    <div class="user-info">
+                                                        <p class="user-greeting">Welcome back,</p>
+                                                        <p class="user-name"><%= user.firstname %></p>
+                                                    </div>
+                                                    <i class='bx bx-chevron-down dropdown-arrow'></i>
+                                                </div>
+                                                <div class="user-profile-menu">
+                                                    <div class="user-profile-menu-header">
+                                                        <p class="menu-user-name"><%= user.firstname + " " + user.lastname %></p>
+                                                        <p class="menu-user-role">Administrator</p>
+                                                    </div>
+                                                    <a href="#profile-modal" class="user-profile-menu-item">
+                                                        <i class='bx bx-user'></i>
+                                                        <span>My Profile</span>
+                                                    </a>
+                                                    <a href="/logout" class="user-profile-menu-item logout-item">
+                                                        <i class='bx bx-log-out'></i>
+                                                        <span>Logout</span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                </div>
         </header>
         <div id="removeNotificationModal" class="modal fade zoomIn" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -870,16 +314,13 @@
 
             window.showLoader = function () {
                 if (loader) {
-                    loader.style.display = 'flex';
-                    loader.style.opacity = '0';
-                    setTimeout(() => loader.style.opacity = '1', 10);
+                    loader.classList.add('active');
                 }
             };
 
             window.hideLoader = function () {
                 if (loader) {
-                    loader.style.opacity = '0';
-                    setTimeout(() => loader.style.display = 'none', 300);
+                    loader.classList.remove('active');
                 }
             };
 
@@ -934,8 +375,7 @@
                 const progressText = document.querySelector('.loader-progress-text');
 
                 if (loader && progressContainer && progressBar && progressText) {
-                    loader.style.display = 'flex';
-                    loader.style.opacity = '1';
+                    loader.classList.add('active');
                     progressContainer.style.display = 'block';
                     document.querySelector('.spinner').style.display = 'none'; // Hide spinner when showing progress
 

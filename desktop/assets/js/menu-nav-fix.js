@@ -16,8 +16,10 @@
 
         if (!link) return;
 
-        // Skip if it's a dropdown toggle (Bootstrap needs to handle these)
-        if (link.hasAttribute('data-bs-toggle') || link.classList.contains('dropdown-toggle')) {
+        // Skip if it's a dropdown toggle, or a form element (inputs, buttons, etc.)
+        if (link.hasAttribute('data-bs-toggle') || 
+            link.classList.contains('dropdown-toggle') ||
+            e.target.closest('input, textarea, select, button')) {
             return;
         }
 
