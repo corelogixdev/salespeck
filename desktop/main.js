@@ -1,6 +1,3 @@
-const path = require('path');
-const fs = require('fs');
-const os = require('os');
 require('dotenv').config();
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 // Defer autoUpdater requirement to after app is ready or inside a try-catch
@@ -93,9 +90,9 @@ app.on('second-instance', () => {
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 800,
+    width: 1000,
     height: 900,
-    icon: path.join(__dirname, 'assets', 'images', 'icon.png'),
+    icon: path.join(__dirname, 'assets', 'img', 'icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false, // Disable Node.js integration in renderer process
@@ -379,25 +376,20 @@ if (!app.isPackaged) {
 }
 
 autoUpdater.on('error', (error) => {
-  // Suppress 404 errors - they're expected when update server is not running
-  if (error.message && (error.message.includes('404') || error.message.includes('Not Found'))) {
-    // Silently ignore - update server might not be running
+  const errorMsg = error.message || String(error);
+  
+  // Suppress common expected network errors
+  if (errorMsg.includes('404') || errorMsg.includes('Not Found') || 
+     (errorMsg.includes('dev-app-update.yml') && errorMsg.includes('ENOENT'))) {
     return;
   }
 
-  // Suppress dev-app-update.yml errors in development - file will be served by update server
-  if (error.message && error.message.includes('dev-app-update.yml') && error.message.includes('ENOENT')) {
-    // Silently ignore - this is expected, the file is served by the update server
-    return;
-  }
-
-  logi('Error in auto-updater:', error);
-  if (error.message && error.message.includes('EPERM')) {
-    logi('Permission error: Please ensure the application has write permissions to the specified directory.');
-  } else if (error.message && error.message.includes('ENOENT')) {
-    logi('File not found error: Please check the file paths and ensure the files exist.');
-  } else {
-    logi('Update check failed:', error.message || error);
+  logi('Auto-updater error:', errorMsg);
+  
+  if (errorMsg.includes('EPERM')) {
+    logi('Permission error: Application lacks write permissions for updates.');
+  } else if (errorMsg.includes('ENOENT')) {
+    logi('File not found during update check.');
   }
 });
 
@@ -474,32 +466,15 @@ autoUpdater.on('update-downloaded', (info) => {
   });
 });
 
-autoUpdater.on('error', (error) => {
-  logi('Update error:');
-  logi(error);
-  dialog.showErrorBox('Update Failed', 'The update could not be installed. Please try again.');
+// Global Safety Nets to prevent silent hangs/crashes
+process.on('uncaughtException', (error) => {
+  logi('CRITICAL: Uncaught Exception:', error.message || error);
+  logi(error.stack);
+  // We don't quit immediately to allow the user to see the hang/error if possible
 });
 
-// Function to delete old files
-function deleteOldFiles(directory) {
-  try {
-    // Get all files in the directory
-    const files = fs.readdirSync(directory);
+process.on('unhandledRejection', (reason, promise) => {
+  logi('CRITICAL: Unhandled Rejection at:', promise, 'reason:', reason);
+});
 
-    // Loop through and remove each file
-    files.forEach((file) => {
-      const filePath = path.join(directory, file);
-      const stats = fs.statSync(filePath);
-      if (stats.isDirectory()) {
-        // If it's a directory, delete recursively
-        deleteOldFiles(filePath);
-      } else {
-        // If it's a file, delete it
-        fs.unlinkSync(filePath);
-        logi(`Deleted file: ${filePath}`);
-      }
-    });
-  } catch (err) {
-    logi('Error deleting old files:', err.message);
-  }
-}
+// Remove redundant error handler on line 477

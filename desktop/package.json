@@ -16,7 +16,7 @@
     "prisma:seed": "node prisma/seed-must-data.js",
     "prisma:seed:test-small": "node prisma/test-small-data-seed.js",
     "prisma:seed:test-large": "node prisma/test-large-data-seed.js",
-    "prisma:bootstrap": "node scripts/prisma-bootstrap.js",
+    "prisma:bootstrap": "node prisma/bootstrap.js",
     "prebuild": "prisma generate",
     "build": "electron-builder",
     "postbuild": "rimraf dist/win-unpacked",

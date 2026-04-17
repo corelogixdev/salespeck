@@ -1,0 +1,316 @@
+/**
+ * OpenMenu POS Desktop Theme
+ * Clean, flat, high-performance design system with desktop-native aesthetics.
+ */
+
+:root {
+    /* System Font Stack */
+    --pos-font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    
+    /* Spacing & Sizing */
+    --pos-control-height: 32px;
+    --pos-border-radius: 4px;
+    --pos-spacing-xs: 4px;
+    --pos-spacing-sm: 8px;
+    --pos-spacing-md: 16px;
+    --pos-spacing-lg: 24px;
+}
+
+/* --- LIGHT MODE --- */
+[data-bs-theme="light"], :root:not([data-bs-theme="dark"]) {
+    --pos-bg-main: #f8f9fa;
+    --pos-bg-surface: #ffffff;
+    --pos-bg-hover: rgba(0, 0, 0, 0.05);
+    --pos-text-main: #212529;
+    --pos-text-muted: #6c757d;
+    --pos-border: #dee2e6;
+    --pos-border-strong: #ced4da;
+    --pos-accent: #0d6efd;
+    --pos-accent-hover: #0b5ed7;
+    --pos-accent-text: #ffffff;
+    
+    /* Status Colors */
+    --pos-success: #198754;
+    --pos-danger: #dc3545;
+    --pos-warning: #ffc107;
+    --pos-info: #0dcaf0;
+
+    /* Shadow (Subtle) */
+    --pos-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* --- DARK MODE --- */
+[data-bs-theme="dark"] {
+    --pos-bg-main: #121212;
+    --pos-bg-surface: #1e1e1e;
+    --pos-bg-hover: rgba(255, 255, 255, 0.08);
+    --pos-text-main: #e0e0e0;
+    --pos-text-muted: #a0a0a0;
+    --pos-border: #333333;
+    --pos-border-strong: #444444;
+    --pos-accent: #3794ff;
+    --pos-accent-hover: #5baaff;
+    --pos-accent-text: #ffffff;
+
+    /* Status Colors */
+    --pos-success: #4ade80;
+    --pos-danger: #f87171;
+    --pos-warning: #fbbf24;
+    --pos-info: #38bdf8;
+
+    /* Shadow (None for flat dark) */
+    --pos-shadow: none;
+}
+
+/* --- BASE STYLES --- */
+body {
+    font-family: var(--pos-font-family);
+    background-color: var(--pos-bg-main);
+    color: var(--pos-text-main);
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+}
+
+/* Remove all focus glows, use crisp 2px borders */
+*:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.btn:focus, .form-control:focus, .form-select:focus, [tabindex]:focus {
+    border-color: var(--pos-accent) !important;
+    border-width: 1px;
+    box-shadow: 0 0 0 1px var(--pos-accent) !important;
+}
+
+/* --- COMPONENTS --- */
+
+/* Navbar & Sidebar */
+.navbar-header {
+    background-color: var(--pos-bg-surface) !important;
+    border-bottom: 1px solid var(--pos-border);
+    height: 50px !important;
+}
+
+.logo img { height: 32px !important; }
+
+/* Cards */
+.card {
+    background-color: var(--pos-bg-surface);
+    border: 1px solid var(--pos-border);
+    border-radius: var(--pos-border-radius);
+    box-shadow: var(--pos-shadow);
+    margin-bottom: var(--pos-spacing-md);
+}
+
+.card-header {
+    background-color: transparent;
+    border-bottom: 1px solid var(--pos-border);
+    padding: var(--pos-spacing-sm) var(--pos-spacing-md);
+    font-weight: 600;
+}
+
+/* Buttons */
+.btn {
+    height: var(--pos-control-height);
+    padding: 0 var(--pos-spacing-md);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: var(--pos-border-radius);
+    transition: background 0.1s ease;
+    border: 1px solid transparent;
+}
+
+.btn-primary { background-color: var(--pos-accent); color: var(--pos-accent-text); }
+.btn-primary:hover { background-color: var(--pos-accent-hover); }
+
+.btn-light {
+    background-color: var(--pos-bg-hover);
+    border-color: var(--pos-border);
+    color: var(--pos-text-main);
+}
+
+/* Form Controls */
+.form-control, .form-select {
+    height: var(--pos-control-height);
+    background-color: var(--pos-bg-surface);
+    border: 1px solid var(--pos-border-strong);
+    color: var(--pos-text-main);
+    font-size: 13px;
+    padding: 0 var(--pos-spacing-sm);
+}
+
+.form-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--pos-text-muted);
+    margin-bottom: 4px;
+}
+
+/* Tables */
+.table {
+    margin-bottom: 0;
+    color: var(--pos-text-main);
+}
+
+.table thead th {
+    background-color: var(--pos-bg-main);
+    border-bottom: 2px solid var(--pos-border);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 8px 12px;
+    font-weight: 700;
+}
+
+.table tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--pos-border);
+    vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--pos-bg-hover);
+}
+
+/* --- OVERRIDES FOR LAYOUT.EJS INLINE STYLES --- */
+
+.user-profile-trigger {
+    background: var(--pos-bg-surface) !important;
+    border: 1px solid var(--pos-border) !important;
+    box-shadow: var(--pos-shadow) !important;
+    border-radius: var(--pos-border-radius) !important;
+    padding: 4px 12px !important;
+    min-width: 200px !important;
+    color: var(--pos-text-main) !important;
+}
+
+.user-profile-trigger:hover {
+    background: var(--pos-bg-hover) !important;
+    transform: none !important;
+}
+
+.user-avatar {
+    background: var(--pos-accent) !important;
+    border: none !important;
+    box-shadow: none !important;
+    width: 28px !important;
+    height: 28px !important;
+}
+
+.user-name { color: var(--pos-text-main) !important; font-weight: 600 !important; }
+.user-greeting { color: var(--pos-text-muted) !important; }
+.dropdown-arrow { color: var(--pos-text-muted) !important; }
+
+/* User Profile Dropdown Menu */
+.user-profile-menu {
+    background: var(--pos-bg-surface) !important;
+    border: 1px solid var(--pos-border) !important;
+    border-radius: var(--pos-border-radius) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    padding: 0 !important;
+}
+
+.user-profile-menu-header {
+    padding: 12px 16px !important;
+    background: var(--pos-bg-main) !important;
+    border-bottom: 1px solid var(--pos-border) !important;
+}
+
+.menu-user-name {
+    color: var(--pos-text-main) !important;
+    font-weight: 700 !important;
+}
+
+.menu-user-role {
+    color: var(--pos-text-muted) !important;
+}
+
+.user-profile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    color: var(--pos-text-main) !important;
+    text-decoration: none;
+    font-size: 13px;
+    border-bottom: 1px solid var(--pos-border);
+}
+
+.user-profile-menu-item:hover {
+    background: var(--pos-bg-hover) !important;
+    color: var(--pos-accent) !important;
+}
+
+.user-profile-menu-item.logout-item {
+    color: var(--pos-danger) !important;
+}
+
+.user-profile-menu-item.logout-item:hover {
+    background: rgba(220, 53, 69, 0.05) !important;
+    color: var(--pos-danger) !important;
+}
+
+/* Global Loader Overrides */
+#global-loader {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(2px) !important;
+}
+[data-bs-theme="dark"] #global-loader {
+    background: rgba(18, 18, 18, 0.8) !important;
+}
+
+.spinner {
+    width: 48px !important;
+    height: 48px !important;
+    border: 3px solid var(--pos-border) !important;
+    border-top-color: var(--pos-accent) !important;
+    border-radius: 50% !important;
+    animation: spin 0.8s linear infinite !important;
+}
+
+.spinner:before, .spinner:after { display: none !important; }
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* --- VENDOR OVERRIDES --- */
+
+/* Toastr */
+#toast-container > div {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    border-radius: var(--pos-border-radius) !important;
+    opacity: 1 !important;
+}
+
+/* Select2 */
+.select2-container--default .select2-selection--single {
+    height: var(--pos-control-height) !important;
+    background-color: var(--pos-bg-surface) !important;
+    border: 1px solid var(--pos-border-strong) !important;
+    display: flex;
+    align-items: center;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: var(--pos-text-main) !important;
+    padding-left: 10px !important;
+}
+
+.select2-dropdown {
+    background-color: var(--pos-bg-surface) !important;
+    border: 1px solid var(--pos-border) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: var(--pos-accent) !important;
+}
+
+.select2-container--default .select2-results__option[aria-selected="true"] {
+    background-color: var(--pos-bg-hover) !important;
+}

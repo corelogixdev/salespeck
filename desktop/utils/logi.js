@@ -11,19 +11,26 @@ try {
 var config = require('../installEnv.js');
 const os = require('os');
 
+let logDirCreated = false;
+
 // Function to delete old log files
 function deleteOldLogs(logDir) {
-  const files = fs.readdirSync(logDir);
-  const logFiles = files.filter(file => file.startsWith('logs-') && file.endsWith('.txt'));
-  logFiles.sort((a, b) => {
-    const aTime = fs.statSync(path.join(logDir, a)).mtime.getTime();
-    const bTime = fs.statSync(path.join(logDir, b)).mtime.getTime();
-    return bTime - aTime;
-  });
+  try {
+    if (!fs.existsSync(logDir)) return;
+    const files = fs.readdirSync(logDir);
+    const logFiles = files.filter(file => file.startsWith('logs-') && file.endsWith('.txt'));
+    logFiles.sort((a, b) => {
+      const aTime = fs.statSync(path.join(logDir, a)).mtime.getTime();
+      const bTime = fs.statSync(path.join(logDir, b)).mtime.getTime();
+      return bTime - aTime;
+    });
 
-  while (logFiles.length > 7) {
-    const fileToDelete = logFiles.pop();
-    fs.unlinkSync(path.join(logDir, fileToDelete));
+    while (logFiles.length > 7) {
+      const fileToDelete = logFiles.pop();
+      fs.unlinkSync(path.join(logDir, fileToDelete));
+    }
+  } catch (err) {
+    console.error('Failed to cleanup old logs:', err);
   }
 }
 
@@ -65,6 +72,12 @@ function getLogDirectory() {
   );
 }
 
+// Perform cleanup once on load
+try {
+  const initialLogDir = getLogDirectory();
+  deleteOldLogs(initialLogDir);
+} catch (e) {}
+
 // Receive a message like console.log, can call it with comma-separated values
 function log(...message) {
   // In dev, always show logs in console for fast debugging.
@@ -82,25 +95,21 @@ function log(...message) {
     try {
       const logDir = getLogDirectory();
 
-      if (!fs.existsSync(logDir)) {
-        fs.mkdirSync(logDir, { recursive: true });
+      if (!logDirCreated) {
+        if (!fs.existsSync(logDir)) {
+          fs.mkdirSync(logDir, { recursive: true });
+        }
+        logDirCreated = true;
       }
 
       const logFilePath = path.join(logDir, `logs-${new Date().toISOString().split('T')[0]}.txt`);
       const timestamp = new Date().toISOString();
 
-      // Message may be object
-      if (message.length === 1 && typeof message[0] === 'object') {
-        message = [JSON.stringify(message[0], null, 2)];
-      }
       const messages = formatMessages(message);
       const logMessage = `${timestamp} - ${messages}\n`;
 
       // Append log to file
       fs.appendFileSync(logFilePath, logMessage);
-
-      // Delete old log files
-      deleteOldLogs(logDir);
     } catch {
       // eslint-disable-next-line no-console
       console.log(formatMessages(message));
@@ -113,3 +122,4 @@ function log(...message) {
 
 module.exports = log;
 module.exports.getLogDirectory = getLogDirectory;
+module.exports.deleteOldLogs = deleteOldLogs;

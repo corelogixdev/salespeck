@@ -6,315 +6,26 @@
     <meta charset="utf-8" />
     <title>OpenMenu v<%= typeof appVersion !=='undefined' ? appVersion : '1.0.0' %>
     </title>
-    <link rel="icon" href="/assets/images/icon.png" type="image/x-icon">
+    <link rel="icon" href="/assets/img/icon.png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script src="/assets/js/layout.js"></script>
-    <link href="/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-    <link href="/assets/css/app.min.css" rel="stylesheet" type="text/css" />
-    <link href="/assets/css/custom.min.css" rel="stylesheet" type="text/css" />
-    <link href="/assets/css/toastr.min.css" rel="stylesheet" type="text/css" />
-    <link href="/assets/css/jquery-confirm.min.css" rel="stylesheet" type="text/css" />
-    <script src="/assets/js/jquery.min.js"></script>
-    <script src="/assets/js/jquery-confirm.min.js"></script>
+    <link href="/assets/css/vendor/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/vendor/icons.min.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/vendor/app.min.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/vendor/toastr.min.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/vendor/jquery-confirm.min.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/vendor/select2.min.css" rel="stylesheet" type="text/css" />
+    <script src="/assets/js/vendor/jquery.min.js"></script>
+    <script src="/assets/js/vendor/jquery-confirm.min.js"></script>
     <script src="/assets/js/theme-manager.js"></script>
-    <script src="/assets/js/select2.min.js"></script>
+    <script src="/assets/js/vendor/select2.min.js"></script>
     <script src="/assets/libs/flatpickr/flatpickr.min.js"></script>
-    <link rel="stylesheet" href="/assets//css/select2.min.css">
-    <link href="/assets/css/enhanced-light-theme.css" rel="stylesheet" type="text/css" />
-    <link href="/assets/css/enhanced-dark-theme.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/pos-theme.css" rel="stylesheet" type="text/css" />
     <link href="/assets/css/profile-modal.css" rel="stylesheet" type="text/css" />
     <script src="/assets/js/user-profile-dropdown.js"></script>
     <script src="/assets/js/menu-nav-fix.js"></script>
 </head>
-<style>
-    .logo img {
-        height: 35px !important;
-        /* Reduced from 50px */
-    }
-
-    .logo-sm img {
-        height: 18px !important;
-        /* Reduced from 22px */
-    }
-
-    .logo-lg img {
-        height: 30px !important;
-        /* Reduced from 17px */
-    }
-
-    .navbar-header .fs-2 {
-        font-size: 1.25rem !important;
-        /* Reduce OpenMenu text size */
-    }
-
-    #navbar-nav {
-        font-size: 0.9rem;
-        /* Reduce navbar menu text size */
-    }
-
-    #navbar-nav .nav-link {
-        padding: 0.4rem 0.9rem;
-    }
-
-
-    .menu-dropdown {
-        font-size: 0.85rem;
-        /* Reduce dropdown menu text size */
-    }
-
-    /* User Profile Dropdown Styles */
-    .user-profile-card {
-        position: relative;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .user-profile-trigger {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 6px 15px;
-        border-radius: 50px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        transition: all 0.3s ease;
-        border: 2px solid rgba(255, 255, 255, 0.2);
-        min-width: 240px;
-    }
-
-    .user-profile-trigger:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-    }
-
-    .user-avatar {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        border: 2px solid #fff;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-        object-fit: cover;
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        color: white;
-        font-size: 14px;
-    }
-
-    .user-info {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .user-greeting {
-        font-size: 10px;
-        color: rgba(255, 255, 255, 0.9);
-        margin: 0;
-        font-weight: 500;
-        letter-spacing: 0.3px;
-        line-height: 1.2;
-    }
-
-    .user-name {
-        font-size: 13px;
-        color: #fff;
-        margin: 0;
-        font-weight: 700;
-        line-height: 1.3;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 140px;
-    }
-
-    .dropdown-arrow {
-        color: #fff;
-        font-size: 18px;
-        transition: transform 0.3s ease;
-        margin-left: auto;
-    }
-
-    .user-profile-card.show .dropdown-arrow {
-        transform: rotate(180deg);
-    }
-
-    .user-profile-menu {
-        position: absolute;
-        top: calc(100% + 10px);
-        right: 0;
-        min-width: 240px;
-        width: 100%;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(-10px);
-        transition: all 0.3s ease;
-        z-index: 1050;
-        overflow: hidden;
-    }
-
-    [data-layout-mode="dark"] .user-profile-menu {
-        background: #2a2f3a;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-    }
-
-    .user-profile-card.show .user-profile-menu {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-    }
-
-    .user-profile-menu-header {
-        padding: 12px 16px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .menu-user-name {
-        color: white;
-        font-weight: 700;
-        font-size: 14px;
-        margin: 0;
-        line-height: 1.3;
-    }
-
-    .menu-user-role {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 11px;
-        margin: 3px 0 0 0;
-        line-height: 1.2;
-    }
-
-    .user-profile-menu-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 16px;
-        color: #495057;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        font-size: 13px;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    }
-
-    [data-layout-mode="dark"] .user-profile-menu-item {
-        color: #e9ecef;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .user-profile-menu-item:last-child {
-        border-bottom: none;
-    }
-
-    .user-profile-menu-item:hover {
-        background: linear-gradient(90deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-        color: #667eea;
-        padding-left: 20px;
-    }
-
-    [data-layout-mode="dark"] .user-profile-menu-item:hover {
-        background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
-        color: #8b9bef;
-    }
-
-    .user-profile-menu-item i {
-        font-size: 18px;
-        width: 20px;
-    }
-
-    .user-profile-menu-item.logout-item {
-        color: #dc3545;
-    }
-
-    [data-layout-mode="dark"] .user-profile-menu-item.logout-item {
-        color: #ff6b7a;
-    }
-
-    .user-profile-menu-item.logout-item:hover {
-        background: linear-gradient(90deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
-        color: #c82333;
-    }
-
-    [data-layout-mode="dark"] .user-profile-menu-item.logout-item:hover {
-        background: linear-gradient(90deg, rgba(255, 107, 122, 0.2) 0%, rgba(255, 107, 122, 0.1) 100%);
-        color: #ff8a95;
-    }
-
-    [data-layout-mode="dark"] .user-profile-menu-item.logout-item:hover {
-        background: linear-gradient(90deg, rgba(255, 107, 122, 0.2) 0%, rgba(255, 107, 122, 0.1) 100%);
-        color: #ff8a95;
-    }
-
-    /* Global Loader */
-    #global-loader {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(255, 255, 255, 0.9);
-        z-index: 9999;
-        display: none;
-        justify-content: center;
-        align-items: center;
-        backdrop-filter: blur(5px);
-        transition: opacity 0.3s ease;
-    }
-
-    [data-layout-mode="dark"] #global-loader {
-        background-color: rgba(30, 31, 36, 0.9);
-    }
-
-    .spinner {
-        width: 60px;
-        height: 60px;
-        position: relative;
-    }
-
-    .spinner:before,
-    .spinner:after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        border: 4px solid transparent;
-        border-top-color: #667eea;
-        /* Primary Color */
-        animation: spin 1s linear infinite;
-    }
-
-    .spinner:after {
-        border-top-color: #764ba2;
-        /* Secondary Color */
-        animation: spin 1.5s linear infinite;
-        width: 40px;
-        height: 40px;
-        top: 10px;
-        left: 10px;
-    }
-
-    @keyframes spin {
-        0% {
-            transform: rotate(0deg);
-        }
-
-        100% {
-            transform: rotate(360deg);
-        }
-    }
-</style>
-
 <body>
     <div id="layout-wrapper">
         <header id="page-topbar">
@@ -324,19 +35,19 @@
                         <div class="navbar-brand-box horizontal-logo" style="padding-right: 10px;">
                             <a href="/" class="logo logo-dark">
                                 <span class="logo-sm">
-                                    <img src="/assets/images/icon.png" alt="" height="22">
+                                    <img src="/assets/img/icon.png" alt="" height="22">
                                 </span>
                                 <span class="logo-lg">
-                                    <img src="/assets/images/icon.png" alt="" height="17">
+                                    <img src="/assets/img/icon.png" alt="" height="17">
                                 </span>
                             </a>
 
                             <a href="/" class="logo logo-light">
                                 <span class="logo-sm">
-                                    <img src="/assets/images/icon.png" alt="" height="22">
+                                    <img src="/assets/img/icon.png" alt="" height="22">
                                 </span>
                                 <span class="logo-lg">
-                                    <img src="/assets/images/icon.png" alt="" height="17">
+                                    <img src="/assets/img/icon.png" alt="" height="17">
                                 </span>
                             </a>
                         </div>
@@ -687,7 +398,7 @@
                                                                         <div
                                                                             class="text-reset notification-item d-block dropdown-item position-relative">
                                                                             <div class="d-flex">
-                                                                                <img src="/assets/images/users/avatar-2.jpg"
+                                                                                <img src="/assets/img/avatars/avatar-2.jpg"
                                                                                     class="me-3 rounded-circle avatar-xs flex-shrink-0"
                                                                                     alt="user-pic">
                                                                                 <div class="flex-grow-1">
@@ -771,7 +482,7 @@
                                                                         <div
                                                                             class="text-reset notification-item d-block dropdown-item position-relative">
                                                                             <div class="d-flex">
-                                                                                <img src="/assets/images/users/avatar-8.jpg"
+                                                                                <img src="/assets/img/avatars/avatar-8.jpg"
                                                                                     class="me-3 rounded-circle avatar-xs flex-shrink-0"
                                                                                     alt="user-pic">
                                                                                 <div class="flex-grow-1">
@@ -827,7 +538,7 @@
                                                                         <div
                                                                             class="text-reset notification-item d-block dropdown-item">
                                                                             <div class="d-flex">
-                                                                                <img src="/assets/images/users/avatar-3.jpg"
+                                                                                <img src="/assets/img/avatars/avatar-3.jpg"
                                                                                     class="me-3 rounded-circle avatar-xs"
                                                                                     alt="user-pic">
                                                                                 <div class="flex-grow-1">
@@ -869,7 +580,7 @@
                                                                         <div
                                                                             class="text-reset notification-item d-block dropdown-item">
                                                                             <div class="d-flex">
-                                                                                <img src="/assets/images/users/avatar-2.jpg"
+                                                                                <img src="/assets/img/avatars/avatar-2.jpg"
                                                                                     class="me-3 rounded-circle avatar-xs"
                                                                                     alt="user-pic">
                                                                                 <div class="flex-grow-1">
@@ -910,7 +621,7 @@
                                                                         <div
                                                                             class="text-reset notification-item d-block dropdown-item">
                                                                             <div class="d-flex">
-                                                                                <img src="/assets/images/users/avatar-6.jpg"
+                                                                                <img src="/assets/img/avatars/avatar-6.jpg"
                                                                                     class="me-3 rounded-circle avatar-xs"
                                                                                     alt="user-pic">
                                                                                 <div class="flex-grow-1">
@@ -955,7 +666,7 @@
                                                                         <div
                                                                             class="text-reset notification-item d-block dropdown-item">
                                                                             <div class="d-flex">
-                                                                                <img src="/assets/images/users/avatar-8.jpg"
+                                                                                <img src="/assets/img/avatars/avatar-8.jpg"
                                                                                     class="me-3 rounded-circle avatar-xs"
                                                                                     alt="user-pic">
                                                                                 <div class="flex-grow-1">
@@ -1137,6 +848,8 @@
     </script>
     <script src="/assets/libs/simplebar/simplebar.min.js"></script>
     <script src="/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/vendor/toastr.min.js"></script>
+    <script src="/assets/js/vendor/sweetalert2.all.min.js"></script>
     <!-- Global Loader Overlay -->
     <div id="global-loader" style="flex-direction: column;">
         <div class="spinner"></div>
@@ -1412,7 +1125,7 @@
     </script>
     <script src="/assets/libs/feather-icons/feather.min.js"></script>
     <script src="/assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
-    <script src="/assets/js/moment.min.js"></script>
+    <script src="/assets/js/vendor/moment.min.js"></script>
     <script src="/assets/js/plugins.js"></script>
     <% if (typeof hidenav==='undefined' || hidenav !==true) { %>
         <script src="/assets/js/app.js"></script>

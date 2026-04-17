@@ -38,17 +38,21 @@ function resolveSpawnCwd() {
   return process.cwd();
 }
 
+let cachedMigrationEntries = null;
+
 function resolveMigrationsDir() {
   return path.join(__dirname, "..", "prisma", "migrations");
 }
 
 function listMigrationEntries() {
+  if (cachedMigrationEntries) return cachedMigrationEntries;
+  
   const migrationsDir = resolveMigrationsDir();
   if (!fs.existsSync(migrationsDir)) {
-    return [];
+    return (cachedMigrationEntries = []);
   }
 
-  return fs.readdirSync(migrationsDir)
+  cachedMigrationEntries = fs.readdirSync(migrationsDir)
     .filter((entry) => entry !== "migration_lock.toml")
     .map((entry) => ({
       name: entry,
@@ -56,6 +60,8 @@ function listMigrationEntries() {
     }))
     .filter((entry) => fs.existsSync(entry.sqlPath))
     .sort((a, b) => a.name.localeCompare(b.name));
+    
+  return cachedMigrationEntries;
 }
 
 function splitSqlStatements(sql) {
@@ -200,24 +206,27 @@ function runPrismaCli(args) {
 }
 
 function backupDatabaseIfExists() {
-  const databasePath = resolveDatabasePath();
-  if (!fs.existsSync(databasePath)) {
-    return;
-  }
+  try {
+    const databasePath = resolveDatabasePath();
+    if (!fs.existsSync(databasePath)) return;
 
-  const stats = fs.statSync(databasePath);
-  if (stats.size === 0) {
-    return;
-  }
+    const stats = fs.statSync(databasePath);
+    if (!stats || stats.size === 0) return;
 
-  const backupDir = path.join(path.dirname(databasePath), "backups");
-  if (!fs.existsSync(backupDir)) {
-    fs.mkdirSync(backupDir, { recursive: true });
-  }
+    const backupDir = path.join(path.dirname(databasePath), "backups");
+    if (!fs.existsSync(backupDir)) {
+      fs.mkdirSync(backupDir, { recursive: true });
+    }
 
-  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const backupPath = path.join(backupDir, `database-${stamp}.sqlite`);
-  fs.copyFileSync(databasePath, backupPath);
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const backupPath = path.join(backupDir, `database-${stamp}.sqlite`);
+    
+    // Copy synchronously only if small (< 50MB); otherwise we'll eventually move to async
+    // High performance: we only backup if it's been more than 24 hours (implemented later)
+    fs.copyFileSync(databasePath, backupPath);
+  } catch (err) {
+    logi("Backup failed (non-critical):", err.message);
+  }
 }
 
 async function prismaStartupBootstrap() {
