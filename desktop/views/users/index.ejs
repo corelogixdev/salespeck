@@ -222,13 +222,7 @@ const canCreate = (role=='user' && permissions.usersCreate) || (role=='vendor' &
     title: (role==='user' ? 'User' : (role==='vendor' ? 'Vendor' : 'Customer')) + ' Details'
 }) %>
 
-<style>
-    .custom_disabled {
-        opacity: 0.5;
-        pointer-events: none;
-        cursor: not-allowed;
-    }
-</style>
+
 
 <script>
     function togglePassword(inputId, btn) {
