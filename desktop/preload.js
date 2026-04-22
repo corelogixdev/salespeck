@@ -22,5 +22,22 @@ contextBridge.exposeInMainWorld('electron', {
     },
     onReportPdfGenerated: (func) => {
         ipcRenderer.on('report-pdf-generated', (event, ...args) => func(...args));
-    }
+    },
+    /**
+     * Generate a PDF preview of the current window.
+     * Returns { success: true, previewUrl: 'app-print://token' }
+     */
+    generatePrintPreview: () => ipcRenderer.invoke('generate-print-preview'),
+    /**
+     * Trigger the native OS print dialog for the current window.
+     */
+    triggerPrint: () => ipcRenderer.invoke('trigger-print'),
+    /**
+     * One-shot: generate PDF preview AND open the dedicated preview window.
+     */
+    openPrintPreviewWindow: () => ipcRenderer.invoke('open-print-preview-window'),
+    /**
+     * Open the given PDF file path in the system's default PDF viewer.
+     */
+    openPdfInViewer: (filePath) => ipcRenderer.invoke('open-pdf-in-viewer', filePath),
 });

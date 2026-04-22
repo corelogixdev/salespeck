@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Print Preview</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f0f2f5;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .toolbar {
+      background: #ffffff;
+      border-bottom: 1px solid #d1d5db;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .toolbar-title { font-size: 15px; font-weight: 600; color: #111827; }
+    .btn {
+      padding: 6px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #374151;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn:hover:not(:disabled) { background: #f9fafb; border-color: #9ca3af; }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn-primary { background: #2563eb; color: #ffffff; border-color: #2563eb; }
+    .btn-primary:hover:not(:disabled) { background: #1d4ed8; border-color: #1d4ed8; }
+    .preview-container {
+      flex: 1;
+      padding: 16px;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      background: #e5e7eb;
+    }
+    .preview-frame {
+      width: 100%;
+      max-width: 850px;
+      height: 100%;
+      border: none;
+      background: white;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <div class="toolbar-title">📄 Print Preview</div>
+    <div>
+      <button id="btnPrint" class="btn btn-primary" disabled>🖨️ Print</button>
+      <button id="btnClose" class="btn">Close</button>
+    </div>
+  </div>
+  <div class="preview-container">
+    <iframe id="pdfFrame" class="preview-frame" hidden></iframe>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      var btnPrint = document.getElementById('btnPrint');
+      var btnClose = document.getElementById('btnClose');
+      var pdfFrame = document.getElementById('pdfFrame');
+      var filePath = null;
+
+      function loadPreview(url, path) {
+        if (pdfFrame) {
+          pdfFrame.src = url;
+          pdfFrame.hidden = false;
+        }
+        if (btnPrint) btnPrint.disabled = false;
+        if (path) filePath = path;
+      }
+
+      // Method 1: query params (set by main process via loadFile)
+      var params = new URLSearchParams(window.location.search);
+      var urlParam = params.get('url');
+      var pathParam = params.get('path');
+      if (urlParam) {
+        loadPreview(urlParam, pathParam);
+      }
+
+      // Method 2: IPC fallback
+      if (window.electron && window.electron.receive) {
+        window.electron.receive('load-preview', function(data) {
+          var url = (typeof data === 'object' && data !== null) ? data.previewUrl : data;
+          var path = (typeof data === 'object' && data !== null) ? data.filePath : null;
+          if (url) loadPreview(url, path);
+        });
+      }
+
+      // Expose globally so main process can call via executeJavaScript
+      window.loadPreview = loadPreview;
+
+      if (btnPrint) {
+        btnPrint.addEventListener('click', function() {
+          if (filePath && window.electron && window.electron.openPdfInViewer) {
+            window.electron.openPdfInViewer(filePath).catch(function(err) {
+              alert('Could not open PDF viewer: ' + (err.message || 'Unknown error'));
+            });
+          } else {
+            alert('PDF path not available');
+          }
+        });
+      }
+
+      if (btnClose) {
+        btnClose.addEventListener('click', function() {
+          if (window.electron && window.electron.send) {
+            window.electron.send('close-preview-window');
+          } else {
+            window.close();
+          }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

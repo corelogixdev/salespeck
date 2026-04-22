@@ -1,7 +1,8 @@
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 require('dotenv').config();
-const { app, BrowserWindow, ipcMain, dialog, shell, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, Menu, protocol } = require('electron');
 // Defer autoUpdater requirement to after app is ready or inside a try-catch
 let autoUpdater;
 try {
@@ -13,6 +14,41 @@ const config = require('./installEnv.js'); // Link to the Express app
 const logi = require('./utils/logi.js');
 const { getLogDirectory } = require('./utils/logi.js');
 const prismaStartupBootstrap = require('./utils/prismaStartupBootstrap');
+
+// ---------------------------------------------------------------------------
+// Custom Print Preview — Protocol & Temp File Tracking
+// ---------------------------------------------------------------------------
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'app-print', privileges: { secure: true, standard: true, supportFetchAPI: true } }
+]);
+
+const previewTokenMap = new Map();
+const printPreviewTempFiles = new Set();
+
+function cleanupTempPdf(filePath) {
+  if (!filePath) return;
+  try {
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+      printPreviewTempFiles.delete(filePath);
+      logi('[PrintPreview] Cleaned up temp PDF:', filePath);
+    }
+  } catch (err) {
+    logi('[PrintPreview] Failed to cleanup temp PDF:', err.message);
+  }
+}
+
+function cleanupAllTempPdfs() {
+  logi(`[PrintPreview] Cleaning up ${printPreviewTempFiles.size} temp PDF(s)...`);
+  for (const filePath of Array.from(printPreviewTempFiles)) {
+    cleanupTempPdf(filePath);
+  }
+  previewTokenMap.clear();
+}
+
+// Aggressive cleanup on app quit
+app.on('before-quit', cleanupAllTempPdfs);
+app.on('will-quit', cleanupAllTempPdfs);
 
 // app.setAppLogsPath();
 //log starting app and date time to log file
@@ -99,6 +135,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false, // Disable Node.js integration in renderer process
       contextIsolation: true, // Enable context isolation
+      // sandbox: false // important for print preview to work properly, as it needs to access the filesystem for temp PDFs
     },
     // remove the menu bar
     //autoHideMenuBar: true,
@@ -110,6 +147,59 @@ function createWindow() {
       mainWindow.loadURL(url);
     }
     return { action: 'deny' }; // Prevent creation of additional BrowserWindows
+  });
+
+  // ---------------------------------------------------------------------------
+  // Custom Print Preview — intercept ALL print attempts reliably
+  // ---------------------------------------------------------------------------
+  // Strategy A: before-input-event (synchronous preventDefault)
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    const isPrintShortcut = (input.control || input.meta) && input.key.toLowerCase() === 'p';
+    if (isPrintShortcut && !input.alt && !input.shift) {
+      event.preventDefault();
+      setImmediate(() => {
+        generateAndShowPreview(mainWindow).catch((err) => {
+          logi('[PrintPreview] Ctrl+P preview failed:', err.message);
+          dialog.showErrorBox('Print Preview Failed', err.message || 'Could not generate preview.');
+        });
+      });
+    }
+  });
+
+  // Strategy B: inject a renderer-side guard on every page load.
+  // This catches window.print() calls and Ctrl+P when before-input-event fails.
+  mainWindow.webContents.on('dom-ready', () => {
+    mainWindow.webContents.executeJavaScript(`
+      (function() {
+        if (window.__printPreviewGuardInstalled) return;
+        window.__printPreviewGuardInstalled = true;
+
+        // Override window.print() so any code that calls it gets our preview
+        var originalPrint = window.print;
+        window.print = function() {
+          if (window.electron && window.electron.openPrintPreviewWindow) {
+            window.electron.openPrintPreviewWindow().catch(function(err) {
+              console.error('Print preview failed:', err);
+            });
+          } else {
+            originalPrint.apply(this, arguments);
+          }
+        };
+
+        // Keyboard guard for Ctrl+P / Cmd+P
+        document.addEventListener('keydown', function(e) {
+          if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
+            e.preventDefault();
+            e.stopPropagation();
+            if (window.electron && window.electron.openPrintPreviewWindow) {
+              window.electron.openPrintPreviewWindow().catch(function(err) {
+                console.error('Print preview failed:', err);
+              });
+            }
+          }
+        }, true);
+      })();
+    `).catch(() => {});
   });
 
   //to open dev tools
@@ -212,25 +302,257 @@ ipcMain.on('maximize-window', (event) => {
   mainWindow.maximize();
 });
 
-ipcMain.on('print-preview', async (event) => {
+/**
+ * IPC: generate-print-preview
+ * Generates a PDF of the sender window, saves it to temp, and returns
+ * a secure app-print:// URL that can be loaded into an iframe.
+ */
+ipcMain.handle('generate-print-preview', async (event) => {
   const senderWindow = BrowserWindow.fromWebContents(event.sender);
-  if (!senderWindow) return;
+  if (!senderWindow || senderWindow.isDestroyed()) {
+    throw new Error('Sender window not available');
+  }
+
   try {
-    const os = require('os');
-    const pdfPath = path.join(os.tmpdir(), `openmenu-print-${Date.now()}.pdf`);
+    const pdfPath = path.join(
+      os.tmpdir(),
+      `openmenu-preview-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.pdf`
+    );
+
     const data = await senderWindow.webContents.printToPDF({
       marginsType: 1,
       printBackground: true,
       preferCSSPageSize: true,
     });
+
     fs.writeFileSync(pdfPath, data);
-    const result = await shell.openPath(pdfPath);
-    if (result) {
-      logi('Print preview open path returned:', result);
-    }
+    printPreviewTempFiles.add(pdfPath);
+
+    const token = `preview-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    previewTokenMap.set(token, pdfPath);
+
+    // Auto-expire after 10 minutes
+    setTimeout(() => {
+      previewTokenMap.delete(token);
+      cleanupTempPdf(pdfPath);
+    }, 10 * 60 * 1000);
+
+    const previewUrl = `app-print://${token}`;
+    logi('[PrintPreview] Generated:', previewUrl);
+    return { success: true, previewUrl };
   } catch (err) {
-    logi('Print preview error:', err.message);
-    dialog.showErrorBox('Print Preview Failed', err.message || 'Could not generate print preview.');
+    logi('[PrintPreview] Generation failed:', err.message);
+    throw new Error(err.message || 'Could not generate print preview.');
+  }
+});
+
+/**
+ * IPC: trigger-print
+ * Opens the native OS print dialog for the sender window.
+ */
+ipcMain.handle('trigger-print', async (event) => {
+  const senderWindow = BrowserWindow.fromWebContents(event.sender);
+  if (!senderWindow || senderWindow.isDestroyed()) {
+    throw new Error('Sender window not available');
+  }
+  try {
+    await senderWindow.webContents.print({
+      silent: false,
+      printBackground: true,
+      preferCSSPageSize: true,
+    });
+    return { success: true };
+  } catch (err) {
+    throw new Error(err.message || 'Print failed or was cancelled.');
+  }
+});
+
+/**
+ * IPC: trigger-print-original
+ * Called from a preview window to print the ORIGINAL content window
+ * (the one that generated the preview), not the preview window itself.
+ */
+ipcMain.handle('trigger-print-original', async (event) => {
+  const previewWin = BrowserWindow.fromWebContents(event.sender);
+  if (!previewWin || previewWin.isDestroyed()) {
+    throw new Error('Preview window not available');
+  }
+
+  const originalId = previewWin._originalWindowId;
+  if (!originalId) {
+    throw new Error('Original window reference not found');
+  }
+
+  const originalWin = BrowserWindow.fromId(originalId);
+  if (!originalWin || originalWin.isDestroyed()) {
+    throw new Error('Original window is no longer available');
+  }
+
+  try {
+    await originalWin.webContents.print({
+      silent: false,
+      printBackground: true,
+      preferCSSPageSize: true,
+    });
+    return { success: true };
+  } catch (err) {
+    throw new Error(err.message || 'Print failed or was cancelled.');
+  }
+});
+
+/**
+ * IPC: close-preview-window
+ * Allows a dedicated preview window to close itself.
+ */
+ipcMain.on('close-preview-window', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (win && !win.isDestroyed()) win.close();
+});
+
+/**
+ * Open a dedicated print-preview window and load the given app-print:// URL.
+ * This is a helper; renderer pages can also call generatePrintPreview()
+ * and then ask the main process to open the window.
+ */
+/**
+ * Shared helper: generate PDF from a window and open the preview window.
+ */
+async function generateAndShowPreview(sourceWindow) {
+  const pdfPath = path.join(
+    os.tmpdir(),
+    `openmenu-preview-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.pdf`
+  );
+
+  logi('[PrintPreview] Generating PDF to:', pdfPath);
+
+  const data = await sourceWindow.webContents.printToPDF({
+    marginsType: 1,
+    printBackground: true,
+    preferCSSPageSize: true,
+  });
+
+  fs.writeFileSync(pdfPath, data);
+  printPreviewTempFiles.add(pdfPath);
+
+  logi('[PrintPreview] PDF generated, size:', data.length);
+  openPrintPreviewWindow(sourceWindow, data, pdfPath);
+}
+
+function openPrintPreviewWindow(parentWindow, pdfBuffer, filePath) {
+  const previewWin = new BrowserWindow({
+    width: 900,
+    height: 1100,
+    parent: parentWindow || undefined,
+    title: 'Print Preview',
+    autoHideMenuBar: true,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true,
+    }
+  });
+
+  if (parentWindow && !parentWindow.isDestroyed()) {
+    previewWin._originalWindowId = parentWindow.id;
+  }
+
+  // Embed the PDF as a base64 data URI inside the iframe.
+  // This avoids file:// CORS issues and custom protocol complexity.
+  const pdfBase64 = pdfBuffer.toString('base64');
+  const pdfDataUrl = 'data:application/pdf;base64,' + pdfBase64;
+  const safePath = (filePath || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Print Preview</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f0f2f5;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+  .toolbar{background:#fff;border-bottom:1px solid #d1d5db;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}
+  .toolbar-title{font-size:15px;font-weight:600;color:#111827}
+  .btn{padding:6px 14px;border:1px solid #d1d5db;border-radius:6px;background:#fff;color:#374151;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s ease}
+  .btn:hover:not(:disabled){background:#f9fafb;border-color:#9ca3af}
+  .btn:disabled{opacity:.55;cursor:not-allowed}
+  .btn-primary{background:#2563eb;color:#fff;border-color:#2563eb}
+  .btn-primary:hover:not(:disabled){background:#1d4ed8;border-color:#1d4ed8}
+  .preview-container{flex:1;padding:16px;overflow:auto;display:flex;justify-content:center;background:#e5e7eb}
+  iframe{width:100%;max-width:850px;height:100%;border:none;background:#fff;box-shadow:0 4px 6px -1px rgba(0,0,0,.1);border-radius:4px}
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <div class="toolbar-title">📄 Print Preview</div>
+  <div>
+    <button id="btnPrint" class="btn btn-primary">🖨️ Print</button>
+    <button id="btnClose" class="btn">Close</button>
+  </div>
+</div>
+<div class="preview-container">
+  <iframe id="pdfFrame" src="${pdfDataUrl}"></iframe>
+</div>
+<script>
+  document.getElementById('btnPrint').addEventListener('click', function() {
+    if (window.electron && window.electron.openPdfInViewer) {
+      window.electron.openPdfInViewer("${safePath}").catch(function(err) {
+        alert('Could not open PDF viewer: ' + (err.message || 'Unknown error'));
+      });
+    } else {
+      alert('Preview API not available');
+    }
+  });
+  document.getElementById('btnClose').addEventListener('click', function() {
+    if (window.electron && window.electron.send) {
+      window.electron.send('close-preview-window');
+    } else {
+      window.close();
+    }
+  });
+</script>
+</body>
+</html>`;
+  previewWin.loadURL('data:text/html;base64,' + Buffer.from(html).toString('base64'));
+
+  return previewWin;
+}
+
+/**
+ * IPC: open-print-preview-window
+ * One-shot: generate PDF + open preview window.
+ */
+ipcMain.handle('open-print-preview-window', async (event) => {
+  const senderWindow = BrowserWindow.fromWebContents(event.sender);
+  if (!senderWindow || senderWindow.isDestroyed()) {
+    throw new Error('Sender window not available');
+  }
+
+  try {
+    await generateAndShowPreview(senderWindow);
+    return { success: true };
+  } catch (err) {
+    logi('[PrintPreview] Generation failed:', err.message);
+    throw new Error(err.message || 'Could not generate print preview.');
+  }
+});
+
+/**
+ * IPC: open-pdf-in-viewer
+ * Opens the temp PDF in the system's default PDF viewer.
+ * This gives the user a real print preview + print dialog on Windows.
+ */
+ipcMain.handle('open-pdf-in-viewer', async (event, filePath) => {
+  if (!filePath || !fs.existsSync(filePath)) {
+    throw new Error('PDF file not found');
+  }
+  try {
+    const result = await shell.openPath(filePath);
+    if (result) {
+      logi('[PrintPreview] openPath returned:', result);
+    }
+    return { success: true };
+  } catch (err) {
+    throw new Error(err.message || 'Could not open PDF viewer.');
   }
 });
 
@@ -282,12 +604,30 @@ app.whenReady().then(async () => {
   try {
     await prismaStartupBootstrap();
     require('./server/app'); // Keep server startup after DB bootstrap.
+
+    // Register custom protocol handler for serving PDF previews to renderer iframes
+    protocol.handle('app-print', async (request) => {
+      const url = new URL(request.url);
+      const token = url.hostname;
+      const filePath = previewTokenMap.get(token);
+      if (filePath && fs.existsSync(filePath)) {
+        const data = fs.readFileSync(filePath);
+        return new Response(data, {
+          headers: {
+            'Content-Type': 'application/pdf',
+            'Content-Length': data.length,
+          },
+        });
+      }
+      return new Response('PDF not found', { status: 404 });
+    });
+
     createWindow();
 
-    // Conditionally hide menu bar in production
-    if (app.isPackaged) {
-      Menu.setApplicationMenu(null);
-    }
+    // Remove the default menu bar in ALL modes.
+    // The default Electron menu has a Ctrl+P Print accelerator that bypasses
+    // before-input-event and opens the broken native print dialog on Windows.
+    Menu.setApplicationMenu(null);
   } catch (error) {
     await showStartupErrorDialog(error);
     app.quit();
