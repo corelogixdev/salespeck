@@ -81,19 +81,12 @@ exports.getSale = async (req, res) => {
 exports.form = async (req, res) => {
   // OPTIMIZED: Don't load all customers upfront, use AJAX search instead
   // Only send empty array, customers will be loaded via searchCustomers endpoint
-  res.render("sales/form", { customers: [], hidenav: true });
+  res.render("sales/form", { customers: [] });
 };
 
 exports.save = async (req, res) => {
-  const { customer, products, discountpercentage, totalPayment, totalPrice } = req.body;
-  if (!products || products.length === 0) {
-    return res.status(400).send({ status: "error", message: "Please add products to the sale" });
-  }
-  if (totalPayment < 0) {
-    return res.status(400).send({ status: "error", message: "Invalid total payment" });
-  }
-
   try {
+    const { customer, products, discountpercentage, totalPayment, totalPrice, ledger, transactionDate, revenueAccountId } = req.body;
     const { user } = res.locals;
     const sale = await queries.sales.createSaleTransaction({
       userId: user.id,
@@ -101,7 +94,10 @@ exports.save = async (req, res) => {
       discountpercentage,
       totalPayment,
       totalPrice,
-      products
+      ledger,
+      products,
+      transactionDate,
+      revenueAccountId
     });
 
     res.send({
@@ -173,7 +169,7 @@ exports.saleview = async (req, res) => {
         silentPrinting: false,
         numberOfPrints: 1
       },
-      hidenav: true,
+      hidenav: false,
       layout: false
     });
   } catch (error) {
@@ -188,7 +184,7 @@ exports.productsget = async (req, res) => {
     search = { ...search, barcode: req.body.barcode };
   }
   // OPTIMIZED: Limit to 5 products for faster search results
-  let data = await queries.products.findForSale(search, 5);
+  let data = await queries.products.findForSale(search);
   const productIds = data.map((product) => product.id);
   const allBatches = await Promise.all(productIds.map((id) => queries.batches.listByProduct(id)));
   data = data.map((product, index) => ({
@@ -220,4 +216,22 @@ exports.searchCustomers = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
+};
+
+exports.getNextInvoiceNum = async (req, res) => {
+    try {
+        const nextNum = await queries.helpers.getNextInvoiceNumber('SAL');
+        res.json({ success: true, nextNum });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+exports.getRevenueAccounts = async (req, res) => {
+    try {
+        const accounts = await queries.accounting.getAccountsByParent('4100'); // Sales Revenue
+        res.json({ success: true, accounts });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
 };

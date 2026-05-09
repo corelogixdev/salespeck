@@ -11,11 +11,13 @@
 
     // Use capture phase to intercept the click before any other menu scripts
     document.addEventListener('click', function (e) {
-        // Target any anchor link with an href inside the navbar
-        const link = e.target.closest('#navbar-nav a[href], .navbar-header a[href], .user-profile-menu a[href]');
+        // Target any anchor link with an href inside the navbar or common navigation areas
+        const link = e.target.closest('#navbar-nav a[href], .navbar-header a[href], .user-profile-menu a[href], .topnav-hamburger, .vertical-overlay');
 
-        const hamburger = e.target.closest('#topnav-hamburger-icon');
-        if (hamburger) {
+        if (!link) return;
+
+        // Hamburger menu toggle
+        if (link.id === 'topnav-hamburger-icon' || link.classList.contains('topnav-hamburger')) {
             if (window.innerWidth < 1200) {
                 document.body.classList.toggle('menu');
                 e.preventDefault();
@@ -24,8 +26,8 @@
             return;
         }
 
-        const overlay = e.target.closest('.vertical-overlay');
-        if (overlay) {
+        // Overlay click (to close mobile menu)
+        if (link.classList.contains('vertical-overlay')) {
             if (window.innerWidth < 1200) {
                 document.body.classList.remove('menu');
                 document.body.classList.remove('vertical-sidebar-enable');
@@ -35,13 +37,11 @@
             return;
         }
 
-        if (!link) return;
-
-        // Custom dropdown toggler for mobile since app.js breaks horizontal dropdowns on mobile
-        if (link && link.classList.contains('dropdown-toggle') && link.closest('#navbar-nav')) {
+        // Custom dropdown toggler for mobile
+        if (link.classList.contains('dropdown-toggle') && link.closest('#navbar-nav')) {
             if (window.innerWidth < 1200) {
                 e.preventDefault();
-                e.stopPropagation(); // Stop app.js or Popper from breaking it
+                e.stopPropagation();
                 
                 const dropdownMenu = link.nextElementSibling;
                 if (dropdownMenu && dropdownMenu.classList.contains('dropdown-menu')) {
@@ -67,36 +67,32 @@
             }
         }
 
-        // Skip if it's a dropdown toggle (desktop), or a form element (inputs, buttons, etc.)
-        if (link && (link.hasAttribute('data-bs-toggle') || 
+        // Skip if it's a dropdown toggle (desktop) or interactive element
+        if (link.hasAttribute('data-bs-toggle') || 
             link.classList.contains('dropdown-toggle') ||
-            e.target.closest('input, textarea, select, button'))) {
+            e.target.closest('input, textarea, select, button')) {
             return;
         }
 
-        const href = link ? link.getAttribute('href') : null;
+        const href = link.getAttribute('href');
 
-        // Only handle real navigation URLs (skip hashes and javascript:)
+        // Only handle real navigation URLs
         if (href && href !== '#' && !href.startsWith('#') && !href.startsWith('javascript:')) {
-
-            // Skip if the link is disabled
             if (link.classList.contains('disabled') || link.hasAttribute('disabled')) {
                 return;
             }
 
-            // Optional: Show the global loader if it exists
+            // Show the global loader using the 'active' class from pos-theme.css
             const loader = document.getElementById('global-loader');
             if (loader) {
-                loader.style.display = 'flex';
-                loader.style.opacity = '1';
-                loader.style.visibility = 'visible';
+                loader.classList.add('active');
             }
 
-            // Stop other scripts from interfering and navigate immediately
+            // Stop other scripts from interfering
             e.preventDefault();
             e.stopPropagation();
 
-            // Use window.location.href for immediate redirection
+            // Navigate immediately
             window.location.href = href;
         }
     }, true); // TRUE: Capture phase is critical here

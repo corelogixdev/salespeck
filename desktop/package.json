@@ -1,6 +1,6 @@
 {
-  "name": "openmenu",
-  "description": "OpenMenu for POS,Stocks and Invoicing.",
+  "name": "stitchcore",
+  "description": "StitchCore for POS,Stocks and Invoicing.",
   "version": "1.0.7",
   "private": "true",
   "main": "main.js",
@@ -26,8 +26,8 @@
     "test:update": "node test-local-installed-update.js"
   },
   "build": {
-    "appId": "io.openmenu.app",
-    "productName": "openmenu",
+    "appId": "io.stitchcore.app",
+    "productName": "stitchcore",
     "directories": {
       "output": "dist"
     },

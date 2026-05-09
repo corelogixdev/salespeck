@@ -36,46 +36,6 @@
         // Initialize clock updates
         updateAllClocks();
         setInterval(updateAllClocks, 1000);
-
-        // Prevent window from losing focus during barcode scanning
-        // This prevents the application from minimizing when barcode scanner input is processed
-        let isSearchInputFocused = false;
-
-        // Track when any search input is focused
-        document.addEventListener('focusin', (event) => {
-            if (event.target && event.target.id && event.target.id.startsWith('product-search-')) {
-                isSearchInputFocused = true;
-            }
-        });
-
-        document.addEventListener('focusout', (event) => {
-            if (event.target && event.target.id && event.target.id.startsWith('product-search-')) {
-                // Small delay to handle quick focus changes
-                setTimeout(() => {
-                    const activeElement = document.activeElement;
-                    if (!activeElement || !activeElement.id || !activeElement.id.startsWith('product-search-')) {
-                        isSearchInputFocused = false;
-                    }
-                }, 50);
-            }
-        });
-
-        // Prevent window blur when search input is focused
-        window.addEventListener('blur', (event) => {
-            if (isSearchInputFocused && currentTabId) {
-                event.preventDefault();
-                event.stopPropagation();
-
-                // Immediately refocus the window and input
-                requestAnimationFrame(() => {
-                    window.focus();
-                    const activeSearch = document.getElementById(`product-search-${currentTabId}`);
-                    if (activeSearch) {
-                        activeSearch.focus();
-                    }
-                });
-            }
-        }, true); // Use capture phase for earlier handling
     });
 
     // Update all visible clocks
@@ -131,6 +91,29 @@
         tabContent.innerHTML = getTabContentHTML(tabId);
         document.getElementById('sale-tab-content-container').appendChild(tabContent);
 
+        // Fetch next invoice number
+        fetch('/sales/next-invoice-num')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const display = document.getElementById(`invoice-num-display-${tabId}`);
+                    if (display) display.innerText = data.nextNum;
+                    tabData.invoicenum = data.nextNum;
+                }
+            });
+
+        // Fetch revenue accounts
+        fetch('/sales/revenue-accounts')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const select = document.getElementById(`revenue-account-${tabId}`);
+                    if (select) {
+                        select.innerHTML = data.accounts.map(acc => `<option value="${acc.id}">${acc.code} - ${acc.name}</option>`).join('');
+                    }
+                }
+            });
+
         // Switch to new tab
         switchToTab(tabId);
 
@@ -164,7 +147,28 @@
             // Store customer selection
             $(`#customer-${tabId}`).on('select2:select', function (e) {
                 const tab = saleTabs.find(t => t.id === tabId);
-                if (tab) tab.customer = e.params.data.id;
+                const customerId = e.params.data.id;
+                if (tab) tab.customer = customerId;
+
+                // Fetch and show balance
+                const balanceDisplay = document.getElementById(`customer-balance-info-${tabId}`);
+                if (balanceDisplay) {
+                    balanceDisplay.innerHTML = '<i class="ri-loader-4-line rotate"></i> Loading...';
+                    balanceDisplay.classList.remove('d-none');
+                    
+                    fetch(`/users/${customerId}/balance`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                const balance = data.balance;
+                                const balanceClass = balance > 0 ? 'text-danger' : (balance < 0 ? 'text-success' : 'text-muted');
+                                balanceDisplay.innerHTML = `Current Balance: <span class="${balanceClass} fw-bold">Rs.${Math.abs(balance).toFixed(2)} ${balance > 0 ? '(Receivable)' : (balance < 0 ? '(Payable)' : '')}</span>`;
+                            }
+                        })
+                        .catch(err => {
+                            balanceDisplay.innerHTML = '<span class="text-danger">Failed to load balance</span>';
+                        });
+                }
             });
         }, 100);
     }
@@ -176,21 +180,35 @@
                 <div class="col-lg-3">
                     <div class="card h-100">
                         <div class="card-body d-flex flex-column" style="height: 100%;">
+                            <div class="mb-3 p-3 bg-light rounded border-primary border" style="border-width: 2px !important;">
+                                <label class="form-label text-primary text-uppercase fw-bold mb-1" style="font-size: 13px;">Invoice Number</label>
+                                <div class="h3 mb-0 text-dark fw-bold" id="invoice-num-display-${tabId}">Loading...</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="revenue-account-${tabId}" class="form-label text-muted text-uppercase fw-semibold" style="font-size: 11px;">Sales Revenue Account</label>
+                                <select id="revenue-account-${tabId}" class="form-select form-select-sm border-primary">
+                                    <option value="">Loading accounts...</option>
+                                </select>
+                            </div>
+
                             <div id="search-product-sales-page-search-seaction-${tabId}" style="position: relative;">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <label for="product-search-${tabId}" class="form-label text-muted text-uppercase fw-semibold mb-0">Search Product</label>
                                     <div class="btn-group btn-group-sm search-mode-toggle-compact" role="group">
-                                        <input type="radio" class="btn-check" name="search-mode-${tabId}" id="search-manual-${tabId}" autocomplete="off">
+                                        <input type="radio" class="btn-check" name="search-mode-${tabId}" id="search-manual-${tabId}" autocomplete="off" checked>
                                         <label class="btn btn-outline-secondary" for="search-manual-${tabId}">Manual</label>
                                         
-                                        <input type="radio" class="btn-check" name="search-mode-${tabId}" id="search-barcode-${tabId}" autocomplete="off" checked>
+                                        <input type="radio" class="btn-check" name="search-mode-${tabId}" id="search-barcode-${tabId}" autocomplete="off">
                                         <label class="btn btn-outline-primary" for="search-barcode-${tabId}">Barcode</label>
                                     </div>
                                 </div>
                                 <input type="text" class="form-control mb-2" id="product-search-${tabId}" placeholder="Enter product name or barcode">
-                                <small class="text-warning d-block mb-3">
-                                    Out of stock or products with inactive sales won't appear in search results.
-                                </small>
+                                <div class="d-flex justify-content-between align-items-center mb-3 mt-1">
+                                    <a href="/products" class="btn btn-soft-primary btn-sm px-2 py-0 fs-11 rounded-pill">
+                                        <i class="ri-add-line align-bottom"></i> New Product
+                                    </a>
+                                </div>
                                 <div id="search-results-${tabId}" class="shadow-lg rounded p-3 d-none" style="position: absolute; width: 100%; z-index: 9999;"></div>
                             </div>
                             
@@ -220,7 +238,6 @@
                                     <thead class="table-light" style="position: sticky; top: 0;">
                                         <tr>
                                             <th scope="col">#</th>
-                                            <th scope="col">Barcode</th>
                                             <th scope="col">Name</th>
                                             <th scope="col">Qty</th>
                                             <th scope="col">Price</th>
@@ -247,6 +264,20 @@
                             </div>
 
                             <div class="mb-3">
+                                <label for="transaction-date-${tabId}" class="form-label text-uppercase fw-bold text-primary" style="font-size: 11px;">Transaction Date & Time</label>
+                                <input type="datetime-local" id="transaction-date-${tabId}" class="form-control form-control-sm border-primary" 
+                                    value="${new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)}">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="customer-${tabId}" class="form-label text-muted text-uppercase fw-semibold">Customer</label>
+                                <select id="customer-${tabId}" class="form-select select2" data-placeholder="Select Customer">
+                                    <option value="">Select Customer</option>
+                                </select>
+                                <div id="customer-balance-info-${tabId}" class="mt-2 fs-12 d-none p-2 bg-light rounded border border-dashed"></div>
+                            </div>
+
+                            <div class="mb-3">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <label for="discountpercentage-${tabId}" class="form-label text-muted text-uppercase fw-semibold mb-0">Discount %</label>
                                     <input type="number" class="form-control form-control-sm inline-input" id="discountpercentage-${tabId}" value="0" style="width: 100px;">
@@ -260,7 +291,7 @@
                                 </div>
                                 <div class="form-check mt-2 ms-2">
                                     <input type="checkbox" class="form-check-input" id="ledger-${tabId}">
-                                    <label class="form-check-label text-muted" for="ledger-${tabId}">Ledger</label>
+                                    <label class="form-check-label text-muted" for="ledger-${tabId}">Ledger Posting</label>
                                 </div>
                             </div>
 
@@ -269,13 +300,6 @@
                                     <label class="form-label text-muted text-uppercase fw-semibold mb-0">Change</label>
                                     <h4 id="change-${tabId}" class="mb-0 text-success">Rs.0.00</h4>
                                 </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="customer-${tabId}" class="form-label text-muted text-uppercase fw-semibold">Customer</label>
-                                <select id="customer-${tabId}" class="form-select select2" data-placeholder="Select Customer">
-                                    <option value="">Select Customer</option>
-                                </select>
                             </div>
 
                             <!-- Complete Sale Button -->
@@ -467,14 +491,18 @@
                     // Manual mode - add selected product from dropdown
                     const selectedItem = searchResults.querySelector('.search-result-product.selected');
                     if (selectedItem) {
-                        selectedItem.click();
+                        const productId = selectedItem.id.split('-')[1];
+                        const product = filteredProds.find(p => p.id == productId);
+                        if (product) {
+                            selectThisProduct(product, tabId, productSearch, searchResults, tab);
+                        }
                     } else if (tab.previousEntry) {
                         addProduct(tab.previousEntry, tabId);
                         productSearch.value = '';
+                        setTimeout(() => productSearch.focus(), 100);
                     }
 
                     tab.selectedProduct = null;
-                    setTimeout(() => productSearch.focus(), 100);
                 }
             }
         });
@@ -482,11 +510,10 @@
         productSearch.addEventListener('input', async () => {
             if (searchBarcode.checked) return;
             const query = productSearch.value;
-            if (query.length === 0) {
-                document.getElementById(`search-results-${tabId}`).classList.add('d-none');
-                return;
-            }
-            const products = await getProducts({ name: query });
+            
+            // Fetch products (all if query is empty)
+            const products = await getProducts(query.length > 0 ? { name: query } : {});
+            
             if (products.length === 0) {
                 document.getElementById(`search-results-${tabId}`).classList.add('d-none');
                 return;
@@ -518,15 +545,33 @@
                     </div>
                     <span>Rs. ${parseFloat(product.saleprice || 0).toFixed(2)}</span>
                 `;
-                productElement.addEventListener('click', () => {
-                    addProduct(product, tabId);
-                    productSearch.value = '';
-                    searchResults.classList.add('d-none');
-                    tab.selectedProduct = null;
-                    productSearch.focus();
+                productElement.addEventListener('mouseenter', () => {
+                    searchResults.querySelectorAll('.search-result-product').forEach(el => el.classList.remove('selected'));
+                    productElement.classList.add('selected');
+                    tab.selectedProduct = product.id;
                 });
+
+                productElement.addEventListener('mousedown', (e) => {
+                    e.preventDefault(); // Prevent focus loss from input
+                    selectThisProduct(product, tabId, productSearch, searchResults, tab);
+                });
+                
                 searchResults.appendChild(productElement);
             });
+        });
+
+        function selectThisProduct(product, tabId, productSearch, searchResults, tab) {
+            productSearch.value = '';
+            searchResults.classList.add('d-none');
+            tab.selectedProduct = null;
+            addProduct(product, tabId);
+        }
+
+        // Show all products on focus in Manual mode
+        productSearch.addEventListener('focus', async () => {
+            if (!searchBarcode.checked && productSearch.value.length === 0) {
+                productSearch.dispatchEvent(new Event('input'));
+            }
         });
 
         // Payment input handler
@@ -539,50 +584,7 @@
             updateTotalBill(tabId);
         });
 
-        // Click handlers for editable inputs
-        selectedProductsTable.addEventListener('click', (event) => {
-            const target = event.target;
-            if (target.tagName === 'TD') {
-                const row = target.closest('tr');
-                if (target.classList.contains('product-quantity')) {
-                    let quantityElement = target.querySelector('.editable-input');
-                    if (!quantityElement) return;
-                    const quantity = parseInt(quantityElement.value);
-                    const priceElement = row.querySelector('.product-price .editable-input');
-                    const totalElement = row.querySelector('.product-total');
-                    const price = parseFloat(priceElement.value);
-                    createEdiableInput(
-                        (event, input) => UpdateProductQuantity(event, input, quantityElement, price, totalElement, tabId),
-                        quantity,
-                        target,
-                        'number'
-                    );
-                } else if (target.classList.contains('product-price')) {
-                    let priceElement = target.querySelector('.editable-input');
-                    const price = parseFloat(priceElement.value);
-                    const quantityElement = row.querySelector('.product-quantity .editable-input');
-                    const totalElement = row.querySelector('.product-total');
-                    createEdiableInput(
-                        (event, input) => {
-                            if (event.key === 'Enter') {
-                                const newPrice = parseFloat(input.value);
-                                if (newPrice <= 0) {
-                                    input.style.borderBottomColor = 'red';
-                                    toastr.warning('Price should be greater than 0');
-                                    return false;
-                                }
-                                priceElement.value = newPrice;
-                                totalElement.textContent = parseFloat((parseInt(quantityElement.value) * newPrice));
-                                updateTotalBill(tabId);
-                            }
-                        },
-                        price,
-                        target,
-                        'number'
-                    );
-                }
-            }
-        });
+
 
         // Click outside to close search results
         document.addEventListener('click', (event) => {
@@ -618,29 +620,26 @@
         if (!tab) return;
 
         tab.previousEntry = product;
-        if (product.quantity <= 0) {
-            toastr.warning('Product quantity is not available');
-            return;
-        }
         let discountedPrice = product.saleprice - (product.saleprice * product.discount / 100);
         const selectedProductsTable = document.getElementById(`selected-products-${tabId}`);
 
         const existingRow = document.getElementById(`product-row-${product.id}-${tabId}`);
         if (existingRow) {
             checkIfProductIsExpired(existingRow, product);
-            const quantityElement = existingRow.querySelector('.product-quantity').querySelector('.editable-input');
-            const priceElement = existingRow.querySelector('.product-price').querySelector('.editable-input');
-            const totalElement = existingRow.querySelector('.product-total');
-
-            const quantity = parseInt(quantityElement.value);
-            if (product.quantity < quantity + 1) {
-                toastr.warning('Product quantity is not available');
-                return;
+            const quantityInput = existingRow.querySelector('.product-quantity input');
+            if (quantityInput) {
+                const quantity = parseInt(quantityInput.value);
+                if (product.quantity < quantity + 1) {
+                    toastr.warning('Product quantity is not available');
+                    return;
+                }
+                quantityInput.value = quantity + 1;
+                manualQuantityUpdate(quantityInput, product.id, tabId);
+                setTimeout(() => {
+                    quantityInput.focus();
+                    quantityInput.select();
+                }, 50);
             }
-            quantityElement.value = quantity + 1;
-            totalElement.textContent = Math.round((quantity + 1) * parseFloat(priceElement.value));
-            checkIfProductIsExpired(existingRow, product);
-            updateTotalBill(tabId);
             return;
         }
 
@@ -650,7 +649,6 @@
         row.id = `product-row-${product.id}-${tabId}`;
         row.innerHTML = `
             <td class="product-serial">${currentIndex}</td>
-            <td class="product-barcode">${product.barcode}</td>
             <td class="product-name">
                 <div class="product-name-cell" title="${product.name}">
                     ${product.name}
@@ -658,10 +656,19 @@
                 </div>
             </td>
             <td class="product-quantity">
-                <input type="text" class="editable-input" value="${newQuantity}" readonly>
+                <div class="d-flex align-items-center justify-content-center gap-1">
+                    <button type="button" class="btn btn-sm btn-outline-secondary p-0" style="width: 20px; height: 20px; line-height: 1;" onclick="changeQuantityInline('${product.id}', '${tabId}', -1)">-</button>
+                    <input type="number" class="form-control form-control-sm text-center px-1 editable-input" value="1" style="width: 60px; height: 24px; font-size: 12px;" 
+                        oninput="manualQuantityUpdate(this, '${product.id}', '${tabId}')"
+                        onkeydown="quantityKeyHandler(event, this, '${product.id}', '${tabId}')"
+                        onfocus="this.select()">
+                    <button type="button" class="btn btn-sm btn-outline-secondary p-0" style="width: 20px; height: 20px; line-height: 1;" onclick="changeQuantityInline('${product.id}', '${tabId}', 1)">+</button>
+                </div>
             </td>
             <td class="product-price">
-                <input type="text" class="editable-input" value="${discountedPrice}" readonly>
+                <input type="number" class="form-control form-control-sm text-center px-1 editable-input" value="${discountedPrice}" style="width: 80px; height: 24px; font-size: 12px;" 
+                    oninput="manualPriceUpdate(this, '${product.id}', '${tabId}')"
+                    onfocus="this.select()">
             </td>
             <td class="product-total">${newQuantity * discountedPrice}</td>
             <td class="product-action">
@@ -671,8 +678,17 @@
             </td>
         `;
         selectedProductsTable.appendChild(row);
-        checkIfProductIsExpired(row, product);
         updateTotalBill(tabId);
+        checkIfProductIsExpired(row, product);
+
+        // Focus the new quantity input
+        setTimeout(() => {
+            const qInput = row.querySelector('.product-quantity input');
+            if (qInput) {
+                qInput.focus();
+                qInput.select();
+            }
+        }, 50);
     }
 
     function updateTotalBill(tabId) {
@@ -728,28 +744,99 @@
 
     function UpdateProductQuantity(event, input, quantityElement, price, totalElement, tabId) {
         if (event.key === 'Enter') {
-            const row = input.closest('tr');
-            const productId = row.id.split('-')[2];
-            const product = allProducts.find(p => p.id === parseInt(productId));
-            const newQuantity = parseInt(input.value);
-            input.value = newQuantity;
-
-            if (newQuantity <= 0) {
-                input.style.borderBottomColor = 'red';
-                toastr.warning('Quantity should be greater than 0');
-                return false;
-            } else if (newQuantity > product.quantity) {
-                input.style.borderBottomColor = 'red';
-                toastr.warning('Product quantity is not available');
-                return false;
-            }
-
-            quantityElement.textContent = newQuantity;
-            totalElement.textContent = Math.round(newQuantity * price);
-            checkIfProductIsExpired(row, product);
-            updateTotalBill(tabId);
+            return applyQuantityUpdate(input, quantityElement, price, totalElement, tabId);
         }
     }
+
+    function applyQuantityUpdate(input, quantityElement, price, totalElement, tabId) {
+        const row = input.closest('tr');
+        const productId = row.id.replace(`product-row-`, '').replace(`-${tabId}`, '');
+        const product = allProducts.find(p => p.id == productId);
+        const newQuantity = parseInt(input.value) || 0;
+
+        if (newQuantity <= 0) {
+            input.style.borderBottomColor = 'red';
+            toastr.warning('Quantity should be greater than 0');
+            return false;
+        } else if (product && newQuantity > product.quantity) {
+            input.style.borderBottomColor = 'red';
+            toastr.warning('Product quantity is not available');
+            return false;
+        }
+
+        input.value = newQuantity;
+        totalElement.textContent = Math.round(newQuantity * price);
+        if (product) checkIfProductIsExpired(row, product);
+        updateTotalBill(tabId);
+        return true;
+    }
+
+    function changeQuantityInline(productId, tabId, delta) {
+        const row = document.getElementById(`product-row-${productId}-${tabId}`);
+        if (!row) return;
+        const input = row.querySelector('.product-quantity input');
+        let val = parseInt(input.value) || 0;
+        val += delta;
+        if (val < 1) val = 1;
+        
+        const product = allProducts.find(p => p.id == productId);
+        if (product && val > product.quantity && delta > 0) {
+            toastr.warning('Product quantity is not available');
+            return;
+        }
+
+        input.value = val;
+        manualQuantityUpdate(input, productId, tabId);
+    }
+
+    function manualPriceUpdate(input, productId, tabId) {
+        const row = document.getElementById(`product-row-${productId}-${tabId}`);
+        if (!row) return;
+        const totalElement = row.querySelector('.product-total');
+        const quantityInput = row.querySelector('.product-quantity input');
+        const price = parseFloat(input.value) || 0;
+        const quantity = parseInt(quantityInput.value) || 0;
+        
+        totalElement.textContent = Math.round(quantity * price);
+        updateTotalBill(tabId);
+    }
+
+    function manualQuantityUpdate(input, productId, tabId) {
+        const row = document.getElementById(`product-row-${productId}-${tabId}`);
+        if (!row) return;
+        const totalElement = row.querySelector('.product-total');
+        const priceInput = row.querySelector('.product-price .editable-input');
+        const quantity = parseInt(input.value) || 0;
+        const price = parseFloat(priceInput.value) || 0;
+        const product = allProducts.find(p => p.id == productId);
+
+        if (product && quantity > product.quantity) {
+            input.style.borderBottomColor = 'red';
+            toastr.warning('Product quantity is not available');
+            // We allow them to type it, but maybe highlight it?
+        } else {
+            input.style.borderBottomColor = '';
+        }
+        
+        totalElement.textContent = Math.round(quantity * price);
+        if (product) checkIfProductIsExpired(row, product);
+        updateTotalBill(tabId);
+    }
+
+    function quantityKeyHandler(event, input, productId, tabId) {
+        if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            changeQuantityInline(productId, tabId, 1);
+        } else if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            changeQuantityInline(productId, tabId, -1);
+        } else if (event.key === 'Enter') {
+            event.preventDefault();
+            input.blur();
+        }
+    }
+
+
 
     function checkIfProductIsExpired(row, product) {
         let quantity = parseInt(row.querySelector('.product-quantity .editable-input').value);
@@ -833,7 +920,7 @@
         input.onkeyup = null;
     }
 
-    function createEdiableInput(onSave, value, target, inputtype) {
+    function createEdiableInput(onSave, value, target, inputtype, onUpdate = null) {
         const input = target.querySelector('.editable-input') || document.createElement('input');
         let prevInputType = input.getAttribute('type');
         if (prevInputType !== inputtype) {
@@ -843,40 +930,56 @@
         input.style.borderBottom = '1px solid #000';
         input.style.pointerEvents = 'all';
         input.removeAttribute('readonly');
-        input.onkeyup = (event) => {
-            if (event.key === 'Enter') {
+        
+        input.onkeydown = (event) => {
+            if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+                event.preventDefault();
+                let val = parseInt(input.value) || 0;
+                if (event.key === 'ArrowUp') val++;
+                else if (event.key === 'ArrowDown' && val > 1) val--;
+                input.value = val;
+                if (onUpdate) onUpdate(input);
+            } else if (event.key === 'Enter') {
+                event.preventDefault();
                 let success = onSave(event, input);
                 if (success !== false) {
                     postSaveInput(input);
                 }
             }
         };
+
+        input.onkeyup = null;
         input.onblur = () => {
             let success = onSave({ key: 'Enter' }, input);
             if (success !== false) {
                 postSaveInput(input);
             }
         };
-        input.focus();
+        setTimeout(() => {
+            input.focus();
+            input.select();
+        }, 50);
     }
 
     function completeSale(tabId) {
         const tab = saleTabs.find(t => t.id === tabId);
         if (!tab) return;
 
-        const customerDropdown = document.getElementById(`customer-${tabId}`);
-        const ledgerCheckbox = document.getElementById(`ledger-${tabId}`);
-        const discountpercentage = parseFloat(document.getElementById(`discountpercentage-${tabId}`).value);
+        const customer = document.getElementById(`customer-${tabId}`).value || null;
         const selectedProductsTable = document.getElementById(`selected-products-${tabId}`);
-        const totalPayment = document.getElementById(`total-payment-${tabId}`);
+        const discountpercentage = parseFloat(document.getElementById(`discountpercentage-${tabId}`).value);
+        const ledger = document.getElementById(`ledger-${tabId}`).checked;
+        const transactionDate = document.getElementById(`transaction-date-${tabId}`).value;
+        const totalPaymentVal = parseFloat(document.getElementById(`total-payment-${tabId}`).value) || 0;
+        const revenueAccountId = document.getElementById(`revenue-account-${tabId}`).value;
 
-        const customer = customerDropdown.value || null;
-        const ledger = ledgerCheckbox.checked;
         const products = [];
         selectedProductsTable.querySelectorAll('tr').forEach(row => {
             const productId = row.id.split('-')[2];
-            const quantity = parseInt(row.querySelector('td:nth-child(4)').querySelector('.editable-input').value);
-            const price = parseFloat(row.querySelector('td:nth-child(5)').querySelector('.editable-input').value);
+            const qInput = row.querySelector('.product-quantity .editable-input');
+            const pInput = row.querySelector('.product-price .editable-input');
+            const quantity = parseInt(qInput.value) || 0;
+            const price = parseFloat(pInput.value) || 0;
             products.push({ productId, quantity, price });
         });
 
@@ -885,7 +988,6 @@
             return;
         }
 
-        const totalPaymentVal = parseFloat(totalPayment.value) || 0;
         const priceWithoutDiscount = products.reduce((acc, product) => acc + (product.quantity * product.price), 0);
         const totalPrice = priceWithoutDiscount;
 
@@ -899,50 +1001,110 @@
             toastr.warning('Please check the ledger option or pay the full amount');
             return;
         }
-        if (totalPaymentVal < priceWithDiscount && !customer) {
-            toastr.warning('Please select a customer or pay the full amount');
-            return;
-        }
 
-        fetch('/sales/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ customer, discountpercentage, totalPrice, ledger, products, totalPayment: totalPaymentVal }),
-        }).then(async response => {
-            let data = await response.json();
-            if (response.ok) {
-                $.alert({
-                    title: 'Success!',
-                    content: data.message,
-                    theme: 'material',
-                    useBootstrap: false,
-                    boxWidth: '30%',
-                    type: 'green',
-                    buttons: {
-                        confirm: {
-                            text: 'Ok',
-                            btnClass: 'btn-success',
-                            action: function () {
-                                window.location.href = '/sales/' + data.saleId;
+        // Show confirmation modal
+        $.confirm({
+            title: '<i class="ri-information-line me-2 text-primary"></i>Confirm Transaction Accounts',
+            theme: 'material',
+            closeIcon: true,
+            boxWidth: '400px',
+            useBootstrap: false,
+            content: `
+                <div class="p-2">
+                    <p class="text-muted mb-3" style="font-size: 13px;">Please verify the accounts for this transaction before proceeding.</p>
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-uppercase fw-bold text-muted" style="font-size: 11px;">Revenue Account</label>
+                        <select id="modal-revenue-account" class="form-select form-select-sm border-primary">
+                            ${document.getElementById(`revenue-account-${tabId}`).innerHTML}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-uppercase fw-bold text-muted" style="font-size: 11px;">Customer / Party</label>
+                        <select id="modal-customer" class="form-select form-select-sm border-primary">
+                            ${document.getElementById(`customer-${tabId}`).innerHTML}
+                        </select>
+                    </div>
+                </div>
+            `,
+            onContentReady: function () {
+                // Set initial values from the main form
+                const modalAcc = this.$content.find('#modal-revenue-account');
+                const modalCust = this.$content.find('#modal-customer');
+                
+                modalAcc.val(revenueAccountId);
+                modalCust.val(customer);
+            },
+            buttons: {
+                confirm: {
+                    text: 'Finish Sale',
+                    btnClass: 'btn-primary',
+                    action: function () {
+                        const finalRevenueAccountId = this.$content.find('#modal-revenue-account').val();
+                        const finalCustomer = this.$content.find('#modal-customer').val();
+
+                        if (totalPaymentVal < priceWithDiscount && !finalCustomer) {
+                            toastr.warning('Please select a customer for ledger posting');
+                            return false;
+                        }
+
+                        fetch('/sales/save', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                customer: finalCustomer, 
+                                products, 
+                                discountpercentage, 
+                                totalPrice, 
+                                ledger, 
+                                totalPayment: totalPaymentVal, 
+                                transactionDate, 
+                                revenueAccountId: finalRevenueAccountId 
+                            }),
+                        }).then(async response => {
+                            let data = await response.json();
+                            if (response.ok) {
+                                $.alert({
+                                    title: 'Success!',
+                                    content: data.message,
+                                    theme: 'material',
+                                    useBootstrap: false,
+                                    boxWidth: '30%',
+                                    type: 'green',
+                                    buttons: {
+                                        confirm: {
+                                            text: 'Ok',
+                                            btnClass: 'btn-success',
+                                            action: function () {
+                                                window.location.href = '/sales/' + data.saleId;
+                                            }
+                                        }
+                                    }
+                                });
+                            } else {
+                                $.alert({
+                                    title: 'Error!',
+                                    content: data.message,
+                                    theme: 'material',
+                                    useBootstrap: false,
+                                    boxWidth: '30%',
+                                    type: 'red',
+                                    buttons: {
+                                        confirm: {
+                                            text: 'Ok',
+                                            btnClass: 'btn-danger',
+                                        }
+                                    }
+                                });
                             }
-                        }
+                        });
                     }
-                });
-            } else {
-                $.alert({
-                    title: 'Error!',
-                    content: data.message,
-                    theme: 'material',
-                    useBootstrap: false,
-                    boxWidth: '30%',
-                    type: 'red',
-                    buttons: {
-                        confirm: {
-                            text: 'Ok',
-                            btnClass: 'btn-danger',
-                        }
-                    }
-                });
+                },
+                cancel: {
+                    text: 'Back',
+                    btnClass: 'btn-light'
+                }
             }
         });
     }

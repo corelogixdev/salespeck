@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-header align-items-center d-flex">
-        <h4 class="card-title mb-0 flex-grow-1">Inventory Logs</h4>
+        <h4 class="card-title mb-0 flex-grow-1">Stock Ledger</h4>
         <div class="d-flex gap-2 align-items-center">
             <button class="btn btn-soft-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#inventoryFilters" aria-expanded="false" aria-controls="inventoryFilters">
                 <i class="ri-filter-3-line align-bottom me-1"></i> Filters
@@ -25,6 +25,15 @@
         </div>
 
         <%
+        if (typeof currentProduct !== 'undefined' && currentProduct) {
+            // Calculate running balance for the current page (descending)
+            let currentBal = currentProduct.quantity;
+            inventoryLogs.forEach((log, index) => {
+                log.runningBalance = currentBal;
+                currentBal -= (log.quantity || 0);
+            });
+        }
+
         const tableColumns = [
             { 
                 key: 'createdAt', 
@@ -55,12 +64,23 @@
             },
             { 
                 key: 'quantity', 
-                label: 'Quantity', 
+                label: 'Change', 
                 sortable: true, 
                 render: (row) => {
                     const qty = row.quantity || 0;
                     const color = parseInt(qty) < 0 ? 'text-danger' : 'text-success';
-                    return `<span class="${color}">${qty}</span>`;
+                    return `<span class="${color} fw-medium">${qty > 0 ? '+' : ''}${qty}</span>`;
+                }
+            },
+            {
+                key: 'runningBalance',
+                label: 'Balance',
+                sortable: false,
+                render: (row) => {
+                    if (typeof row.runningBalance !== 'undefined' && row.runningBalance !== null) {
+                        return `<span class="fw-bold">${row.runningBalance}</span>`;
+                    }
+                    return '<span class="text-muted">-</span>';
                 }
             },
             { 

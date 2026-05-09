@@ -79,79 +79,49 @@ exports.getCategory = async (req, res) => {
 
 exports.saveCategory = async (req, res) => {
     try {
-        const { name, description } = req.body;
-
-        // Check if category already exists
-        const existingCategory = await queries.categories.findByName(name);
-
-        if (existingCategory) {
-            return res.status(400).json({
-                success: false,
-                message: 'Category with this name already exists'
-            });
-        }
-
-        const newCategory = await queries.categories.create({
-            name,
-            description,
-            status: true,
-            createdby: req.session.user.id
-        });
-
-        res.status(200).json({
-            success: true,
-            message: 'Category created successfully',
-            category: newCategory
-        });
-    } catch (error) {
-        console.error('Error creating category:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Internal Server Error'
-        });
-    }
-};
-
-exports.updateCategory = async (req, res) => {
-    try {
         const { id, name, description, status } = req.body;
 
-        // Check if category exists
-        const category = await queries.categories.findById(id);
-        if (!category) {
-            return res.status(404).json({
-                success: false,
-                message: 'Category not found'
+        if (id) {
+            // UPDATE
+            const category = await queries.categories.findById(id);
+            if (!category) {
+                return res.status(404).json({ success: false, message: 'Category not found' });
+            }
+
+            const existingCategory = await queries.categories.findByNameExceptId(name, id);
+            if (existingCategory) {
+                return res.status(400).json({ success: false, message: 'Category name already exists' });
+            }
+
+            const parsedStatus = status === '1' || status === 'true' || status === 'on' || status === true;
+
+            await queries.categories.update(id, {
+                name,
+                description,
+                status: parsedStatus,
+                updatedby: req.session.user.id
             });
-        }
 
-        // Check if name is already taken by another category
-        const existingCategory = await queries.categories.findByNameExceptId(name, id);
+            return res.status(200).json({ success: true, message: 'Category updated successfully' });
+        } else {
+            // CREATE
+            const existingCategory = await queries.categories.findByName(name);
+            if (existingCategory) {
+                return res.status(400).json({ success: false, message: 'Category already exists' });
+            }
 
-        if (existingCategory) {
-            return res.status(400).json({
-                success: false,
-                message: 'Category name already exists'
+            const newCategory = await queries.categories.create({
+                name,
+                description,
+                status: true,
+                createdby: req.session.user.id
             });
+
+            return res.status(200).json({ success: true, message: 'Category created successfully', category: newCategory });
         }
-
-        await queries.categories.update(id, {
-            name,
-            description,
-            status,
-            updatedby: req.session.user.id
-        });
-
-        res.status(200).json({
-            success: true,
-            message: 'Category updated successfully'
-        });
     } catch (error) {
-        console.error('Error updating category:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Internal Server Error'
-        });
+        console.error('Error saving category:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 };
 

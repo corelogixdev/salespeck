@@ -1,31 +1,37 @@
-<% const filterValues = values || {}; %>
+<% 
+const filterValues = values || {}; 
+const isAutoSubmit = typeof autoSubmit !== 'undefined' ? autoSubmit : false;
+const shouldHideClear = typeof hideClear !== 'undefined' ? hideClear : false;
+const sectionId = 'filter_' + Math.random().toString(36).substr(2, 9);
+%>
 
-<div class="filter-section">
-    <form id="filterForm" method="GET" action="<%= action %>" class="row g-3">
+<div class="filter-section" id="<%= sectionId %>_wrapper">
+    <form id="<%= sectionId %>_form" method="GET" action="<%= action %>" class="row g-3">
         <% filters.forEach(filter => {
             const value = filterValues[filter.name] || '';
+            const inputId = sectionId + '_' + (filter.name || (filter.names ? filter.names.join('_') : 'filter'));
             if (filter.type === 'hidden') { %>
-                <input type="hidden" id="<%= filter.name %>" name="<%= filter.name %>" value="<%= value %>">
+                <input type="hidden" id="<%= inputId %>" name="<%= filter.name %>" value="<%= value %>">
             <% } else { %>
                 <div class="col-lg-<%= filter.colSize || 3 %>">
                     <% if (filter.type === 'text') { %>
                         <div class="search-box">
-                            <label for="<%= filter.name %>" class="form-label">
+                            <label for="<%= inputId %>" class="form-label">
                                 <%= filter.label %>
                             </label>
-                            <input type="text" class="form-control" id="<%= filter.name %>" name="<%= filter.name %>"
-                                placeholder="<%= filter.placeholder || filter.label %>" value="<%= value %>">
+                            <input type="text" class="form-control" id="<%= inputId %>" name="<%= filter.name %>"
+                                placeholder="<%= filter.placeholder || filter.label %>" value="<%= value %>" autocomplete="off">
                             <i class="<%= filter.icon || 'ri-search-line' %> search-icon"></i>
                         </div>
                     <% } else if (filter.type === 'select') { %>
                         <div class="form-group">
-                            <label for="<%= filter.name %>" class="form-label">
+                            <label for="<%= inputId %>" class="form-label">
                                 <%= filter.label %>
                             </label>
-                            <select class="form-select" id="<%= filter.name %>" name="<%= filter.name %>">
+                            <select class="form-select" id="<%= inputId %>" name="<%= filter.name %>">
                                 <option value="">All</option>
                                 <% (filter.options || []).forEach(opt => { %>
-                                    <option value="<%= opt.value %>" <%= value == opt.value ? 'selected' : '' %>>
+                                    <option value="<%= opt.value %>" <%= String(value) === String(opt.value) ? 'selected' : '' %>>
                                         <%= opt.label %>
                                     </option>
                                 <% }) %>
@@ -34,60 +40,60 @@
                     <% } else if (filter.type === 'toggle') { %>
                         <div class="form-group">
                             <label class="form-label"><%= filter.label %></label>
-                            <div class="btn-group filter-toggle-group w-100" role="group" data-input="<%= filter.name %>">
+                            <div class="btn-group filter-toggle-group w-100" role="group" data-input="<%= inputId %>">
                                 <button type="button" class="btn btn-sm <%= !value ? 'btn-primary active' : 'btn-light' %>" data-value="">
                                     All
                                 </button>
                                 <% (filter.options || []).forEach(opt => { %>
-                                    <button type="button" class="btn btn-sm <%= value == opt.value ? 'btn-primary active' : 'btn-light' %>" data-value="<%= opt.value %>">
+                                    <button type="button" class="btn btn-sm <%= String(value) === String(opt.value) ? 'btn-primary active' : 'btn-light' %>" data-value="<%= opt.value %>">
                                         <%= opt.label %>
                                     </button>
                                 <% }) %>
                             </div>
-                            <input type="hidden" id="<%= filter.name %>" name="<%= filter.name %>" value="<%= value %>">
+                            <input type="hidden" id="<%= inputId %>" name="<%= filter.name %>" value="<%= value %>">
                         </div>
                     <% } else if (filter.type === 'date') { %>
                         <div class="form-group">
-                            <label for="<%= filter.name %>" class="form-label">
+                            <label for="<%= inputId %>" class="form-label">
                                 <%= filter.label %>
                             </label>
-                            <input type="date" class="form-control" id="<%= filter.name %>"
+                            <input type="date" class="form-control" id="<%= inputId %>"
                                 name="<%= filter.name %>" value="<%= value %>">
                         </div>
                     <% } else if (filter.type === 'number') { %>
                         <div class="form-group">
-                            <label for="<%= filter.name %>" class="form-label">
+                            <label for="<%= inputId %>" class="form-label">
                                 <%= filter.label %>
                             </label>
-                            <input type="number" class="form-control" id="<%= filter.name %>"
+                            <input type="number" class="form-control" id="<%= inputId %>"
                                 name="<%= filter.name %>"
                                 placeholder="<%= filter.placeholder || filter.label %>" value="<%= value %>"
                                 <%= filter.min !== undefined ? `min="${filter.min}"` : '' %>
-                                <%= filter.max !== undefined ? `max="${filter.max}"` : '' %>>
+                                <%= filter.max !== undefined ? `max="${filter.max}"` : '' %> autocomplete="off">
                         </div>
                     <% } else if (filter.type === 'range') { %>
                         <div class="form-group">
                             <label class="form-label"><%= filter.label %></label>
                             <div class="input-group range-input-group">
-                                <input type="number" class="form-control" id="<%= filter.names[0] %>"
+                                <input type="number" class="form-control" id="<%= inputId %>_min"
                                     name="<%= filter.names[0] %>"
                                     placeholder="<%= filter.placeholders ? filter.placeholders[0] : 'Min' %>"
-                                    value="<%= filterValues[filter.names[0]] || '' %>">
-                                <span class="input-group-text">â€“</span>
-                                <input type="number" class="form-control" id="<%= filter.names[1] %>"
+                                    value="<%= filterValues[filter.names[0]] || '' %>" autocomplete="off">
+                                <span class="input-group-text"> to </span>
+                                <input type="number" class="form-control" id="<%= inputId %>_max"
                                     name="<%= filter.names[1] %>"
                                     placeholder="<%= filter.placeholders ? filter.placeholders[1] : 'Max' %>"
-                                    value="<%= filterValues[filter.names[1]] || '' %>">
+                                    value="<%= filterValues[filter.names[1]] || '' %>" autocomplete="off">
                             </div>
                         </div>
                     <% } else if (filter.type === 'daterange') { %>
                         <div class="search-box">
-                            <label for="<%= filter.name %>" class="form-label">
+                            <label for="<%= inputId %>" class="form-label">
                                 <%= filter.label %>
                             </label>
                             <input type="text" class="form-control flatpickr-range" data-provider="flatpickr" data-range="true" data-date-format="Y-m-d"
-                                id="<%= filter.name %>" name="<%= filter.name %>"
-                                placeholder="<%= filter.placeholder || filter.label %>" value="<%= value %>">
+                                id="<%= inputId %>" name="<%= filter.name %>"
+                                placeholder="<%= filter.placeholder || filter.label %>" value="<%= value %>" autocomplete="off">
                             <i class="<%= filter.icon || 'ri-calendar-2-line' %> search-icon"></i>
                         </div>
                     <% } %>
@@ -96,45 +102,129 @@
         }) %>
 
         <!-- Action Buttons -->
+        <% if (!isAutoSubmit || !shouldHideClear) { %>
         <div class="col-lg-<%= typeof buttonColSize !== 'undefined' ? buttonColSize : (filters.length > 3 ? 12 : 3) %> d-flex align-items-end gap-2">
+            <% if (!isAutoSubmit) { %>
             <button type="submit" class="btn btn-primary">
                 <i class="ri-search-line me-1"></i> Search
             </button>
+            <% } %>
             <% const hasActiveFilters = Object.keys(filterValues).some(key =>
-                filterValues[key] && key !== 'page' && key !== 'pageSize'
+                filterValues[key] !== undefined && filterValues[key] !== '' && key !== 'page' && key !== 'pageSize' && key !== 'sortBy' && key !== 'sortOrder'
             );
-            if (hasActiveFilters) { %>
+            if (hasActiveFilters && !shouldHideClear) { %>
                 <a href="<%= action %>" class="btn btn-danger">
                     <i class="ri-close-line me-1"></i> Clear
                 </a>
             <% } %>
         </div>
+        <% } %>
     </form>
 </div>
 
-
-
 <script>
     (function() {
-        if (window.filterToggleInitialized) return;
-        window.filterToggleInitialized = true;
-        document.addEventListener('click', function(e) {
+        const isAutoSubmit = <%= isAutoSubmit %>;
+        const sectionId = '<%= sectionId %>';
+        const form = document.getElementById(sectionId + '_form');
+        const ajaxContainer = '<%= typeof ajaxContainer !== "undefined" ? ajaxContainer : "" %>';
+        let timeout = null;
+
+        function submitForm() {
+            if (!form) return;
+
+            if (ajaxContainer) {
+                const formData = new FormData(form);
+                const params = new URLSearchParams();
+                for (const [key, value] of formData) {
+                    if (value !== '') params.append(key, value);
+                }
+                
+                // Preserve sorting parameters if present in URL
+                const currentUrlParams = new URLSearchParams(window.location.search);
+                if (currentUrlParams.has('sortBy')) params.set('sortBy', currentUrlParams.get('sortBy'));
+                if (currentUrlParams.has('sortOrder')) params.set('sortOrder', currentUrlParams.get('sortOrder'));
+                
+                params.set('partial', '1');
+                const url = `${form.action}?${params.toString()}`;
+                
+                // Update browser URL
+                const displayParams = new URLSearchParams(params);
+                displayParams.delete('partial');
+                window.history.pushState({}, '', `${form.action}?${displayParams.toString()}`);
+                
+                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(r => r.text())
+                .then(html => {
+                    const container = document.querySelector(ajaxContainer);
+                    if (container) {
+                        container.innerHTML = html;
+                        // Dispatch event for any other components that need to know data changed
+                        document.dispatchEvent(new CustomEvent('filter:updated', { detail: { sectionId } }));
+                    }
+                })
+                .catch(e => console.error('AJAX Error:', e));
+                return;
+            }
+
+            // Save focus state before submit (for full page reload)
+            if (document.activeElement && document.activeElement.id && document.activeElement.id.startsWith(sectionId)) {
+                localStorage.setItem('filter_last_focus_id', document.activeElement.id);
+                if (document.activeElement.selectionStart !== undefined) {
+                    localStorage.setItem('filter_last_focus_pos', document.activeElement.selectionStart);
+                }
+            }
+            form.submit();
+        }
+
+        // Restore focus on page load
+        const lastFocusId = localStorage.getItem('filter_last_focus_id');
+        if (lastFocusId && lastFocusId.startsWith(sectionId)) {
+            const el = document.getElementById(lastFocusId);
+            if (el) {
+                el.focus();
+                const lastPos = localStorage.getItem('filter_last_focus_pos');
+                if (lastPos !== null && el.setSelectionRange) {
+                    el.setSelectionRange(lastPos, lastPos);
+                }
+            }
+            localStorage.removeItem('filter_last_focus_id');
+            localStorage.removeItem('filter_last_focus_pos');
+        }
+
+        // Handle Toggle clicks locally
+        form.addEventListener('click', function(e) {
             const btn = e.target.closest('.filter-toggle-group .btn');
             if (!btn) return;
             const group = btn.closest('.filter-toggle-group');
-            if (!group) return;
             const inputId = group.getAttribute('data-input');
             const input = document.getElementById(inputId);
             if (!input) return;
 
-            group.querySelectorAll('.btn').forEach(function(b) {
+            group.querySelectorAll('.btn').forEach(b => {
                 b.classList.remove('btn-primary', 'active');
                 b.classList.add('btn-light');
             });
             btn.classList.remove('btn-light');
             btn.classList.add('btn-primary', 'active');
             input.value = btn.getAttribute('data-value');
+
+            if (isAutoSubmit) submitForm();
         });
+
+        if (isAutoSubmit) {
+            // Text and Number inputs: Use 'input' event for real-time response
+            form.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
+                input.addEventListener('input', () => {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(submitForm, 500);
+                });
+            });
+
+            // Selects and others: Use 'change'
+            form.querySelectorAll('select, input[type="date"], input[type="checkbox"], input[type="radio"]').forEach(input => {
+                input.addEventListener('change', submitForm);
+            });
+        }
     })();
 </script>
-

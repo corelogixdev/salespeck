@@ -219,12 +219,29 @@ const inventorylogs = async (req, res) => {
       sortOrder
     });
 
+    // If we are filtered by a single product, get its current quantity for running balance calculation
+    let currentProduct = null;
+    if (product || query.productId) {
+        const pId = query.productId || product;
+        if (pId && !isNaN(pId)) {
+            currentProduct = await queries.products.findById(pId);
+        } else if (processedLogs.length > 0) {
+            // Check if all logs are for the same product
+            const firstProdId = processedLogs[0].product_id;
+            const allSame = processedLogs.every(log => log.product_id === firstProdId);
+            if (allSame) {
+                currentProduct = await queries.products.findById(firstProdId);
+            }
+        }
+    }
+
     const pagination = getPaginationMeta(page, pageSize, count);
 
     if (req.query.partial) {
         return res.render("inventory_logs/_table_rows", {
             layout: false,
             inventoryLogs: processedLogs,
+            currentProduct
         });
     }
 
@@ -235,6 +252,7 @@ const inventorylogs = async (req, res) => {
       query,
       sortBy,
       sortOrder,
+      currentProduct
     });
   } catch (error) {
     console.error("Error fetching inventory logs:", error);
@@ -323,6 +341,7 @@ const inventorylogsById = async (req, res) => {
       sortOrder: "desc"
     });
 
+    const currentProduct = await queries.products.findById(productId);
     const totalPages = Math.ceil(count / pageSize);
     const pagination = {
       currentPage: page,
@@ -339,16 +358,17 @@ const inventorylogsById = async (req, res) => {
         return res.render("inventory_logs/_table_rows", {
             layout: false,
             inventoryLogs: processedLogs,
+            currentProduct
         });
     }
 
     res.render("inventory_logs/index", {
       inventoryLogs: processedLogs,
-      title: `Inventory Logs - ${processedLogs[0]?.Product?.name || "Product"}`,
-      hidenav: true,
+      title: `Stock Ledger - ${currentProduct?.name || "Product"}`,
       searchParams: {},
       pagination,
       query: req.query,
+      currentProduct
     });
   } catch (error) {
     console.error("Error fetching inventory logs:", error);

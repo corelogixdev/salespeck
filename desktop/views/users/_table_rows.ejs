@@ -1,6 +1,6 @@
 <% if (!data || data.length===0) { %>
     <tr>
-        <td colspan="<%= role === 'user' ? 7 : 5 %>" class="text-center">
+        <td colspan="<%= role === 'user' ? 7 : 6 %>" class="text-center">
             <i class="ri-error-warning-line align-middle me-1"></i> No data found
         </td>
     </tr>
@@ -20,6 +20,13 @@
             <td>
                 <%= obj.email %>
             </td>
+            <% if (role !== 'user') { %>
+                <td>
+                    <span class="badge bg-soft-secondary text-secondary">
+                        <%= obj.fk_financeaccount_id ? 'Linked' : 'Not Linked' %>
+                    </span>
+                </td>
+            <% } %>
             <% if (role==='user' ) { %>
                 <td>
                     <%= obj.username %>

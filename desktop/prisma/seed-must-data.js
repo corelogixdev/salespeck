@@ -50,92 +50,134 @@ async function upsertFinanceAccount({ prisma, account }) {
 async function upsertChartOfAccounts(prisma) {
   // Build parent first then children so FK ids exist.
   const topLevel = [
-    { name: "Assets", type: "asset", isDefault: true },
-    { name: "Liabilities", type: "liability", isDefault: true },
-    { name: "Equity", type: "equity", isDefault: true },
-    { name: "Revenue", type: "revenue", isDefault: true },
-    { name: "Expense", type: "expense", isDefault: true },
+    { name: "Assets", type: "asset", code: "1000", category: "ASSET", isDefault: true },
+    { name: "Liabilities", type: "liability", code: "2000", category: "LIABILITY", isDefault: true },
+    { name: "Equity", type: "equity", code: "3000", category: "EQUITY", isDefault: true },
+    { name: "Revenue", type: "revenue", code: "4000", category: "REVENUE", isDefault: true },
+    { name: "Expense", type: "expense", code: "5000", category: "EXPENSE", isDefault: true },
   ];
 
   const children = [
-    { name: "Cash", type: "asset", parentName: "Assets", isDefault: true },
-    { name: "Accounts Receivable", type: "asset", parentName: "Assets", isDefault: false },
-    { name: "Inventory Assets", type: "asset", parentName: "Assets", isDefault: false },
+    // Assets
+    { name: "Current Assets", type: "asset", code: "1100", category: "ASSET", parentName: "Assets", isDefault: true },
+    { name: "Cash", type: "asset", code: "1110", category: "ASSET", parentName: "Current Assets", isDefault: true },
+    { name: "Bank", type: "asset", code: "1120", category: "ASSET", parentName: "Current Assets", isDefault: false },
+    { name: "Accounts Receivable", type: "asset", code: "1130", category: "ASSET", parentName: "Current Assets", isDefault: true },
+    
+    // Inventory - Manufacturing Specific
+    { name: "Inventory Assets", type: "asset", code: "1140", category: "ASSET", parentName: "Current Assets", isDefault: true },
+    { name: "Raw Materials (Fabric/Thread)", type: "asset", code: "1141", category: "ASSET", parentName: "Inventory Assets", isDefault: false },
+    { name: "Work-in-Process (WIP)", type: "asset", code: "1142", category: "ASSET", parentName: "Inventory Assets", isDefault: false },
+    { name: "Finished Goods", type: "asset", code: "1143", category: "ASSET", parentName: "Inventory Assets", isDefault: false },
+    
+    // Fixed Assets
+    { name: "Fixed Assets", type: "asset", code: "1500", category: "ASSET", parentName: "Assets", isDefault: true },
+    { name: "Stitching Machines", type: "asset", code: "1510", category: "ASSET", parentName: "Fixed Assets", isDefault: false },
+    { name: "Embroidery Machines", type: "asset", code: "1520", category: "ASSET", parentName: "Fixed Assets", isDefault: false },
 
-    { name: "Accounts Payable", type: "liability", parentName: "Liabilities", isDefault: false },
-    { name: "Tax Payable", type: "liability", parentName: "Liabilities", isDefault: false },
+    // Liabilities
+    { name: "Current Liabilities", type: "liability", code: "2100", category: "LIABILITY", parentName: "Liabilities", isDefault: true },
+    { name: "Accounts Payable", type: "liability", code: "2110", category: "LIABILITY", parentName: "Current Liabilities", isDefault: true },
+    { name: "Tax Payable", type: "liability", code: "2120", category: "LIABILITY", parentName: "Current Liabilities", isDefault: true },
+    { name: "Outsource Vendors Payable", type: "liability", code: "2130", category: "LIABILITY", parentName: "Current Liabilities", isDefault: false },
 
-    { name: "Owner Equity", type: "equity", parentName: "Equity", isDefault: true },
+    // Equity
+    { name: "Owner Equity", type: "equity", code: "3100", category: "EQUITY", parentName: "Equity", isDefault: true },
+    { name: "Opening Balance Equity", type: "equity", code: "3200", category: "EQUITY", parentName: "Equity", isDefault: true },
+    { name: "Retained Earnings", type: "equity", code: "3300", category: "EQUITY", parentName: "Equity", isDefault: true },
 
-    { name: "Sales Revenue", type: "revenue", parentName: "Revenue", isDefault: true },
-    { name: "Other Income", type: "revenue", parentName: "Revenue", isDefault: false },
+    // Revenue
+    { name: "Sales Revenue", type: "revenue", code: "4100", category: "REVENUE", parentName: "Revenue", isDefault: true },
+    { name: "Stitching Services Income", type: "revenue", code: "4110", category: "REVENUE", parentName: "Sales Revenue", isDefault: false },
+    { name: "Embroidery Services Income", type: "revenue", code: "4120", category: "REVENUE", parentName: "Sales Revenue", isDefault: false },
+    { name: "Other Income", type: "revenue", code: "4200", category: "REVENUE", parentName: "Revenue", isDefault: false },
 
-    { name: "COGS", type: "expense", parentName: "Expense", isDefault: true },
-    { name: "Rent Expense", type: "expense", parentName: "Expense", isDefault: false },
-    { name: "Utilities Expense", type: "expense", parentName: "Expense", isDefault: false },
+    // Expense
+    { name: "COGS (Manufacturing)", type: "expense", code: "5100", category: "EXPENSE", parentName: "Expense", isDefault: true },
+    { name: "Raw Material Purchases", type: "expense", code: "5110", category: "EXPENSE", parentName: "COGS (Manufacturing)", isDefault: false },
+    { name: "Stitching Labor Charges", type: "expense", code: "5120", category: "EXPENSE", parentName: "COGS (Manufacturing)", isDefault: false },
+    { name: "Embroidery Labor Charges", type: "expense", code: "5130", category: "EXPENSE", parentName: "COGS (Manufacturing)", isDefault: false },
+    { name: "Outsource/Subcontract Charges", type: "expense", code: "5140", category: "EXPENSE", parentName: "COGS (Manufacturing)", isDefault: false },
+    
+    { name: "Operating Expenses", type: "expense", code: "5200", category: "EXPENSE", parentName: "Expense", isDefault: true },
+    { name: "Rent Expense", type: "expense", code: "5210", category: "EXPENSE", parentName: "Operating Expenses", isDefault: false },
+    { name: "Utilities Expense", type: "expense", code: "5220", category: "EXPENSE", parentName: "Operating Expenses", isDefault: false },
+    { name: "Salaries Expense", type: "expense", code: "5230", category: "EXPENSE", parentName: "Operating Expenses", isDefault: false },
   ];
 
-  const topLevelCreated = [];
+  const allAccountsMap = new Map();
+
+  // Create Top Level
   for (const a of topLevel) {
-    const existing = await prisma.financeaccount.findFirst({
-      where: {
-        name: a.name,
-        type: a.type,
-        fk_parent_in_financeaccount: null,
-      },
+    let existing = await prisma.financeaccount.findFirst({
+      where: { code: a.code },
     });
-    if (existing) {
-      topLevelCreated.push({ ...a, id: existing.id });
-    } else {
-      const created = await prisma.financeaccount.create({
-        data: {
-          id: generateId(32),
-          name: a.name,
-          type: a.type,
-          fk_parent_in_financeaccount: null,
-          isDefault: a.isDefault,
-          createdby: null,
-          updatedby: null,
-          source: "must-data-seeder",
-          value: null,
-        },
-      });
-      topLevelCreated.push({ ...a, id: created.id });
+    
+    if (!existing) {
+        // Try fallback by name if code didn't exist
+        existing = await prisma.financeaccount.findFirst({
+            where: { name: a.name, fk_parent_in_financeaccount: null }
+        });
     }
-  }
-
-  const topMap = new Map(topLevelCreated.map((item) => [item.name, item.id]));
-
-  for (const c of children) {
-    const parentId = topMap.get(c.parentName) || null;
-    const existing = await prisma.financeaccount.findFirst({
-      where: {
-        name: c.name,
-        type: c.type,
-        fk_parent_in_financeaccount: parentId,
-      },
-    });
 
     const data = {
-      name: c.name,
-      type: c.type,
-      fk_parent_in_financeaccount: parentId,
-      isDefault: c.isDefault ?? false,
-      createdby: null,
-      updatedby: null,
-      source: "must-data-seeder",
-      value: null,
+        name: a.name,
+        type: a.type,
+        code: a.code,
+        category: a.category,
+        fk_parent_in_financeaccount: null,
+        isDefault: a.isDefault,
+        source: "must-data-seeder",
     };
 
     if (existing) {
-      await prisma.financeaccount.update({ where: { id: existing.id }, data });
+      const updated = await prisma.financeaccount.update({ where: { id: existing.id }, data });
+      allAccountsMap.set(a.name, updated.id);
     } else {
-      await prisma.financeaccount.create({
+      const created = await prisma.financeaccount.create({
         data: {
           id: generateId(32),
           ...data,
         },
       });
+      allAccountsMap.set(a.name, created.id);
+    }
+  }
+
+  // Create Children (2 levels deep supported by the children array ordering)
+  for (const c of children) {
+    const parentId = allAccountsMap.get(c.parentName) || null;
+    let existing = await prisma.financeaccount.findFirst({
+      where: { code: c.code },
+    });
+
+    if (!existing) {
+        existing = await prisma.financeaccount.findFirst({
+            where: { name: c.name, fk_parent_in_financeaccount: parentId }
+        });
+    }
+
+    const data = {
+      name: c.name,
+      type: c.type,
+      code: c.code,
+      category: c.category,
+      fk_parent_in_financeaccount: parentId,
+      isDefault: c.isDefault ?? false,
+      source: "must-data-seeder",
+    };
+
+    if (existing) {
+      const updated = await prisma.financeaccount.update({ where: { id: existing.id }, data });
+      allAccountsMap.set(c.name, updated.id);
+    } else {
+      const created = await prisma.financeaccount.create({
+        data: {
+          id: generateId(32),
+          ...data,
+        },
+      });
+      allAccountsMap.set(c.name, created.id);
     }
   }
 }

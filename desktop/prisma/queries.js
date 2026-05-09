@@ -56,7 +56,9 @@ const brands = {
     const { skip, take } = normalizePagination(page, pageSize);
     const where = {};
     if (search) where.name = { contains: search };
-    if (status !== undefined && status !== "") where.status = status === "true" || status === true;
+    if (status !== undefined && status !== "" && status !== null) {
+      where.status = String(status) === "1" || String(status).toLowerCase() === "true" || status === true;
+    }
     const [count, rows] = await Promise.all([
       prisma.brand.count({ where }),
       prisma.brand.findMany({
@@ -107,7 +109,9 @@ const categories = {
     const { skip, take } = normalizePagination(page, pageSize);
     const where = {};
     if (search) where.name = { contains: search };
-    if (status !== undefined && status !== "") where.status = status === "true" || status === true;
+    if (status !== undefined && status !== "" && status !== null) {
+      where.status = String(status) === "1" || String(status).toLowerCase() === "true" || status === true;
+    }
     const [count, rows] = await Promise.all([
       prisma.category.count({ where }),
       prisma.category.findMany({
@@ -226,7 +230,20 @@ const users = {
     return prisma.user.findMany({
       where: {
         role,
-        OR: [{ firstname: { contains: search } }, { lastname: { contains: search } }, { phone: { contains: search } }],
+        OR: [
+          { firstname: { contains: search } }, 
+          { lastname: { contains: search } }, 
+          { phone: { contains: search } },
+          { username: { contains: search } }
+        ],
+      },
+      select: {
+        id: true,
+        firstname: true,
+        lastname: true,
+        phone: true,
+        username: true,
+        fk_financeaccount_id: true
       },
       take: limit,
     });
@@ -369,13 +386,11 @@ const products = {
       select: { id: true, name: true, saleprice: true },
     });
   },
-  async findForSale(searchFilter, limit = 5) {
+  async findForSale(searchFilter, limit = 500) {
     const prisma = getPrisma();
     return prisma.product.findMany({
       where: {
-        ...searchFilter,
-        quantity: { gt: 0 },
-        saleactive: true,
+        ...searchFilter
       },
       take: limit,
       orderBy: { name: "asc" },
@@ -385,8 +400,7 @@ const products = {
     const prisma = getPrisma();
     return prisma.product.findMany({
       where: {
-        ...searchFilter,
-        purchaseactive: true,
+        ...searchFilter
       },
     });
   },
@@ -729,7 +743,7 @@ const sales = {
       })),
     };
   },
-  async createSaleTransaction({ userId, customer, discountpercentage, totalPayment, totalPrice, products }) {
+  async createSaleTransaction({ userId, customer, discountpercentage, totalPayment, totalPrice, ledger, products, transactionDate, revenueAccountId }) {
     const prisma = getPrisma();
     return prisma.$transaction(async (tx) => {
       const productIds = products.map((item) => item.productId);
@@ -810,6 +824,7 @@ const sales = {
         });
       }
 
+      const invoicenum = await helpers.getNextInvoiceNumber('SAL', tx);
       const saleId = generateId(32);
       await tx.sale.create({
         data: {
@@ -819,8 +834,9 @@ const sales = {
           discountpercentage: String(discountpercentage ?? 0),
           totalpayment: String(totalPayment ?? 0),
           totalprice: String(totalPrice ?? 0),
-          invoicenum: `INV-${Math.floor(Math.random() * 1000000)}`,
+          invoicenum,
           createdby: userId,
+          createdAt: transactionDate ? new Date(transactionDate) : undefined
         },
       });
 
@@ -843,11 +859,87 @@ const sales = {
           id: generateId(32),
           product_id: item.product,
           quantity: -Math.abs(Number(item.quantity)),
-          note: "Sold",
+          note: `Sold via Invoice ${invoicenum}`,
           createdby: userId,
           type: "sale",
+          createdAt: transactionDate ? new Date(transactionDate) : undefined
         })),
       });
+
+      // --- DOUBLE ENTRY LEDGER POSTING ---
+      if (ledger) {
+        const discount = parseFloat(discountpercentage) || 0;
+        const grossAmt = parseFloat(totalPrice) || 0;
+        const netAmt = grossAmt - (grossAmt * discount / 100);
+        const paidAmt = parseFloat(totalPayment) || 0;
+        const balanceAmt = netAmt - paidAmt;
+
+        const journalId = generateId(32);
+        await tx.account_journal.create({
+          data: {
+            id: journalId,
+            date: transactionDate ? new Date(transactionDate) : new Date(),
+            description: `Sale Invoice ${invoicenum}`,
+            reference: saleId,
+            source: 'desktop',
+            createdby: userId
+          }
+        });
+
+        // 1. Credit Revenue (Selected Account or fallback to 4100)
+        let salesAccount = null;
+        if (revenueAccountId) {
+          salesAccount = await tx.financeaccount.findUnique({ where: { id: revenueAccountId } });
+        }
+        if (!salesAccount) {
+          salesAccount = await tx.financeaccount.findFirst({ where: { code: '4100' } });
+        }
+
+        if (salesAccount) {
+          await tx.account_ledger.create({
+            data: {
+              id: generateId(32),
+              journal_id: journalId,
+              account_id: salesAccount.id,
+              credit: netAmt,
+              details: `Sales Revenue for Invoice ${invoicenum}`
+            }
+          });
+        }
+
+        // 2. Debit Cash/Bank (1110) (if paid)
+        if (paidAmt !== 0) {
+          const cashAccount = await tx.financeaccount.findFirst({ where: { code: '1110' } });
+          if (cashAccount) {
+            await tx.account_ledger.create({
+              data: {
+                id: generateId(32),
+                journal_id: journalId,
+                account_id: cashAccount.id,
+                debit: paidAmt,
+                details: `Cash received for Invoice ${invoicenum}`
+              }
+            });
+          }
+        }
+
+        // 3. Debit Customer (if credit/balance)
+        if (balanceAmt !== 0 && customer) {
+          const customerAccountId = await accounting.getOrCreateUserAccount(tx, customer, 'customer');
+          if (customerAccountId) {
+            await tx.account_ledger.create({
+              data: {
+                id: generateId(32),
+                journal_id: journalId,
+                account_id: customerAccountId,
+                debit: balanceAmt > 0 ? balanceAmt : 0,
+                credit: balanceAmt < 0 ? Math.abs(balanceAmt) : 0,
+                details: balanceAmt > 0 ? `Receivable for Invoice ${invoicenum}` : `Advance/Overpayment from Invoice ${invoicenum}`
+              }
+            });
+          }
+        }
+      }
 
       return { id: saleId };
     });
@@ -1453,11 +1545,284 @@ const purchases = {
     const prisma = getPrisma();
     return prisma.purchasedproducts.create({ data: { id: generateId(32), ...data } });
   },
+  async createPurchaseTransaction({ userId, vendor, discountpercentage, totalAmount, totalPayment, ledger, products, source, transactionDate, purchaseAccountId }) {
+    const prisma = getPrisma();
+    return prisma.$transaction(async (tx) => {
+      const invoicenum = await helpers.getNextInvoiceNumber('PUR', tx);
+      const purchaseId = generateId(32);
+      const purchase = await tx.purchase.create({
+        data: {
+          id: purchaseId,
+          vendor,
+          discountpercentage: String(discountpercentage ?? 0),
+          totalAmount: parseFloat(totalAmount ?? 0),
+          totalPayment: parseFloat(totalPayment ?? 0),
+          ledger: !!ledger,
+          createdby: userId,
+          invoicenum,
+          createdAt: transactionDate ? new Date(transactionDate) : undefined
+        }
+      });
+
+      for (const product of products) {
+        await tx.purchasedproducts.create({
+          data: {
+            id: generateId(32),
+            purchase: purchaseId,
+            product: product.productId,
+            quantity: Number(product.quantity),
+            price: Number(product.price),
+            source
+          }
+        });
+
+        // Create/update batch
+        let expiry = null;
+        if (product.expiryDate && product.expiryDate.trim()) {
+          const d = new Date(product.expiryDate);
+          if (!isNaN(d.getTime())) {
+            expiry = d;
+          }
+        }
+        await tx.productbatches.create({
+          data: {
+            id: generateId(32),
+            product: product.productId,
+            quantity: Number(product.quantity),
+            expirydate: expiry,
+            source
+          }
+        });
+
+        // Increment stock
+        await tx.product.update({
+          where: { id: product.productId },
+          data: { quantity: { increment: Number(product.quantity) } }
+        });
+
+        // Log inventory
+        await tx.inventorylogs.create({
+          data: {
+            id: generateId(32),
+            product_id: product.productId,
+            quantity: Number(product.quantity),
+            note: vendor ? `Purchased from vendor (Ref: ${invoicenum})` : `Purchased (Ref: ${invoicenum})`,
+            createdby: userId,
+            type: "purchase",
+            createdAt: transactionDate ? new Date(transactionDate) : undefined
+          }
+        });
+      }
+
+      // --- DOUBLE ENTRY LEDGER POSTING ---
+      if (ledger) {
+        const discount = parseFloat(discountpercentage) || 0;
+        const grossAmt = parseFloat(totalAmount) || 0;
+        const netAmt = grossAmt - (grossAmt * discount / 100);
+        const paidAmt = parseFloat(totalPayment) || 0;
+        const balanceAmt = netAmt - paidAmt;
+
+        const journalId = generateId(32);
+        await tx.account_journal.create({
+          data: {
+            id: journalId,
+            date: transactionDate ? new Date(transactionDate) : new Date(),
+            description: `Purchase Invoice ${invoicenum}`,
+            reference: purchaseId,
+            source: 'desktop',
+            createdby: userId
+          }
+        });
+
+        // 1. Debit Purchase/Inventory (Selected Account or fallback to 5100)
+        let purchaseAccount = null;
+        if (purchaseAccountId) {
+          purchaseAccount = await tx.financeaccount.findUnique({ where: { id: purchaseAccountId } });
+        }
+        if (!purchaseAccount) {
+          purchaseAccount = await tx.financeaccount.findFirst({ where: { code: '5100' } });
+        }
+
+        if (purchaseAccount) {
+          await tx.account_ledger.create({
+            data: {
+              id: generateId(32),
+              journal_id: journalId,
+              account_id: purchaseAccount.id,
+              debit: netAmt,
+              details: `Purchase for Invoice ${invoicenum}`
+            }
+          });
+        }
+
+        // 2. Credit Cash/Bank (1110) (if paid)
+        if (paidAmt !== 0) {
+          const cashAccount = await tx.financeaccount.findFirst({ where: { code: '1110' } });
+          if (cashAccount) {
+            await tx.account_ledger.create({
+              data: {
+                id: generateId(32),
+                journal_id: journalId,
+                account_id: cashAccount.id,
+                credit: paidAmt,
+                details: `Cash paid for Invoice ${invoicenum}`
+              }
+            });
+          }
+        }
+
+        // 3. Credit Vendor (if credit/balance)
+        if (balanceAmt !== 0 && vendor) {
+          const vendorAccountId = await accounting.getOrCreateUserAccount(tx, vendor, 'vendor');
+          if (vendorAccountId) {
+            await tx.account_ledger.create({
+              data: {
+                id: generateId(32),
+                journal_id: journalId,
+                account_id: vendorAccountId,
+                debit: balanceAmt < 0 ? Math.abs(balanceAmt) : 0,
+                credit: balanceAmt > 0 ? balanceAmt : 0,
+                details: balanceAmt > 0 ? `Payable for Invoice ${invoicenum}` : `Advance/Overpayment for Invoice ${invoicenum}`
+              }
+            });
+          }
+        }
+      }
+
+      return purchase;
+    });
+  },
 };
 
 const helpers = {
   normalizePagination,
   toLike,
+  async getNextInvoiceNumber(prefix, tx = null) {
+    const prisma = tx || getPrisma();
+    const table = prefix === 'PUR' ? 'purchase' : 'sale';
+    const lastRecord = await prisma[table].findFirst({
+      where: { invoicenum: { startsWith: prefix } },
+      orderBy: { createdAt: 'desc' },
+      select: { invoicenum: true }
+    });
+
+    let nextNumber = 1;
+    if (lastRecord && lastRecord.invoicenum) {
+      const parts = lastRecord.invoicenum.split('-');
+      if (parts.length > 1) {
+        // Find the numeric part. Some might have random numbers from before.
+        // We try to find the max numeric part if possible, or just increment the last one.
+        const lastNum = parseInt(parts[1]);
+        if (!isNaN(lastNum)) {
+          nextNumber = lastNum + 1;
+        }
+      }
+    }
+    return `${prefix}-${String(nextNumber).padStart(6, '0')}`;
+  },
+};
+
+const accounting = {
+  async getCOA() {
+    const prisma = getPrisma();
+    return prisma.financeaccount.findMany({
+      orderBy: [
+        { category: 'asc' },
+        { code: 'asc' }
+      ]
+    });
+  },
+  async getAccountsByParent(parentCode) {
+    const prisma = getPrisma();
+    const parent = await prisma.financeaccount.findFirst({ where: { code: parentCode } });
+    if (!parent) return [];
+    return prisma.financeaccount.findMany({
+      where: { fk_parent_in_financeaccount: parent.id },
+      orderBy: { code: 'asc' }
+    });
+  },
+  async findAccountByCode(code) {
+    const prisma = getPrisma();
+    return prisma.financeaccount.findFirst({ where: { code } });
+  },
+  async getOrCreateUserAccount(tx, userId, role) {
+    const user = await tx.user.findUnique({
+      where: { id: userId },
+      select: { id: true, firstname: true, lastname: true, fk_financeaccount_id: true }
+    });
+
+    if (user && user.fk_financeaccount_id) {
+      return user.fk_financeaccount_id;
+    }
+
+    if (!user) return null;
+
+    // Find parent account
+    // Use 2130 (Outsource Vendors Payable) for vendors if it exists, fallback to 2110
+    let parentCode = role === 'customer' ? '1130' : '2110';
+    if (role === 'vendor') {
+        const outsourceParent = await tx.financeaccount.findFirst({ where: { code: '2130' } });
+        if (outsourceParent) parentCode = '2130';
+    }
+    const parentAccount = await tx.financeaccount.findFirst({ where: { code: parentCode } });
+    if (!parentAccount) return null;
+
+    // Create a new sub-account
+    const newAccount = await tx.financeaccount.create({
+      data: {
+        id: generateId(32),
+        name: `${user.firstname} ${user.lastname} (${role.charAt(0).toUpperCase() + role.slice(1)})`,
+        code: `${parentAccount.code}-${user.id.substring(0, 4)}`,
+        type: parentAccount.type,
+        category: parentAccount.category,
+        fk_parent_in_financeaccount: parentAccount.id,
+        source: 'system-generated'
+      }
+    });
+
+    // Link user
+    await tx.user.update({
+      where: { id: user.id },
+      data: { fk_financeaccount_id: newAccount.id }
+    });
+
+    return newAccount.id;
+  },
+  async findAccountByName(name) {
+    const prisma = getPrisma();
+    return prisma.financeaccount.findFirst({ where: { name } });
+  },
+  async createAccount(data) {
+    const prisma = getPrisma();
+    return prisma.financeaccount.create({ data: { id: generateId(32), ...data } });
+  },
+  async postJournalEntry(tx, { description, reference, source, userId, entries }) {
+    const journalId = generateId(32);
+    await tx.account_journal.create({
+      data: {
+        id: journalId,
+        date: new Date(),
+        description,
+        reference,
+        source: source || 'desktop',
+        createdby: userId
+      }
+    });
+
+    for (const entry of entries) {
+      await tx.account_ledger.create({
+        data: {
+          id: generateId(32),
+          journal_id: journalId,
+          account_id: entry.accountId,
+          debit: entry.debit || 0,
+          credit: entry.credit || 0,
+          details: entry.details
+        }
+      });
+    }
+    return journalId;
+  }
 };
 
 module.exports = {
@@ -1476,5 +1841,6 @@ module.exports = {
   sales,
   reports,
   dashboard,
+  accounting,
   helpers,
 };

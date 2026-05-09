@@ -133,13 +133,13 @@
                                                 </td>
                                                 <td class="code">
                                                     <span>
-                                                        Rs.<%= product.totalAmount %>
+                                                        Rs.<%= product.price %>
                                                     </span>
                                                 </td>
                                                 <td class="code">
                                                     <%= product.quantity %>
                                                 </td>
-                                                <td class="text-end code">Rs.<%= (product.quantity * product.totalAmount
+                                                <td class="text-end code">Rs.<%= (product.quantity * product.price
                                                         || 0).toFixed(2) %>
                                                 </td>
                                             </tr>
@@ -187,7 +187,8 @@
 
                             </div>
 
-                            <div class="hstack gap-2 justify-content-end d-print-none mt-4">
+                            <div class="d-flex justify-content-end gap-2 mt-4">
+                                <button onclick="window.history.back()" class="btn btn-light">Back</button>
                                 <button onclick="window.print()" class="btn btn-success">
                                     <i class="ri-printer-line align-bottom me-1"></i> Print
                                 </button>
