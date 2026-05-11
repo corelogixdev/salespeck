@@ -1,27 +1,29 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #0ea5e9;      /* sky-500 */
-  --color-primary-dark: #0284c7; /* sky-600 */
-  --color-primary-light: #38bdf8;/* sky-400 */
+  --color-primary: #6366f1;      /* indigo-500 */
+  --color-primary-dark: #4f46e5; /* indigo-600 */
+  --color-primary-light: #818cf8;/* indigo-400 */
+  --color-accent: #f43f5e;       /* rose-500 */
 
   --color-surface: #ffffff;
-  --color-bg: #ffffff;
+  --color-bg: #f8fafc;           /* slate-50 */
 
   --color-text: #0f172a;       /* slate-900 */
-  --color-text-muted: #475569; /* slate-600 */
+  --color-text-muted: #64748b; /* slate-500 */
   
-  --font-sans: var(--font-sans), system-ui, -apple-system, sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 :root {
-  --color-bg: #ffffff;
+  --color-bg: #f8fafc;
   --color-text: #0f172a;
 }
 
 html.dark {
   --color-bg: #020617;
   --color-text: #f8fafc;
+  --color-surface: #0f172a;
 }
 
 @layer base {
@@ -29,5 +31,39 @@ html.dark {
     background: var(--color-bg);
     color: var(--color-text);
     transition: background-color 0.3s ease, color 0.3s ease;
+    @apply antialiased;
   }
 }
+
+@layer components {
+  .glass-card {
+    @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border border-white/20 dark:border-slate-800/50 shadow-xl;
+  }
+  
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-dark;
+  }
+
+  .hover-lift {
+    @apply transition-transform duration-300 hover:-translate-y-2;
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes grow-up {
+  from { height: 0; }
+  to { height: 100%; }
+}
+
+.animate-fade-in { animation: fade-in 1s ease-out forwards; }
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-bounce-subtle { animation: float 4s ease-in-out infinite; }
