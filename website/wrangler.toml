@@ -1,0 +1,17 @@
+name = "salespeck-website"
+main = ".open-next/worker.js"
+compatibility_date = "2024-12-30"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "salespeck-db"
+database_id = "ac07cdb1-0fa1-472a-9db6-e1b7e3b6a821"
+
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "salespeck-files"
