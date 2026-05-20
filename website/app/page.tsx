@@ -1,267 +1,455 @@
 import React from "react";
-import { 
-  Package, 
-  Users, 
-  BarChart3, 
-  Globe, 
-  Smartphone, 
-  ShieldCheck, 
-  Zap, 
-  Cloud, 
-  WifiOff, 
-  MessageSquare,
+import {
+  Package,
+  BarChart3,
+  ShieldCheck,
+  WifiOff,
+  Cloud,
+  Building2,
+  Monitor,
+  Bot,
+  ClipboardList,
   ChevronRight,
-  CheckCircle2,
+  Check,
   Store,
   ShoppingCart,
-  CreditCard
+  CreditCard,
+  Pill,
+  Receipt,
+  Mail,
 } from "lucide-react";
 
-export default function HomePage() {
-  const features = [
-    {
-      icon: <Package className="w-10 h-10" />,
-      title: "Real-time Inventory",
-      description: "Automated stock tracking across multiple locations with predictive low-stock intelligence."
-    },
-    {
-      icon: <ShieldCheck className="w-10 h-10" />,
-      title: "FBR Certified",
-      description: "Seamless, real-time integration with FBR servers. Automatic invoice synchronization and compliance."
-    },
-    {
-      icon: <Globe className="w-10 h-10" />,
-      title: "Global Dashboard",
-      description: "Access your entire business ecosystem from any device, anywhere in the world."
-    },
-    {
-      icon: <BarChart3 className="w-10 h-10" />,
-      title: "Predictive Analytics",
-      description: "AI-driven insights that help you anticipate market trends and optimize your inventory."
-    },
-    {
-      icon: <WifiOff className="w-10 h-10" />,
-      title: "Hybrid Cloud",
-      description: "Fully functional offline mode with lightning-fast cloud synchronization once reconnected."
-    },
-    {
-      icon: <MessageSquare className="w-10 h-10" />,
-      title: "WhatsApp CRM",
-      description: "Engage customers with automated digital receipts and personalized loyalty rewards via WhatsApp."
-    }
-  ];
+const capabilities = [
+  {
+    icon: Cloud,
+    title: "Online",
+    description: "Cloud sync, remote dashboards, and data available wherever you have a connection.",
+  },
+  {
+    icon: WifiOff,
+    title: "Offline",
+    description: "Counters keep running when the internet drops. Sales upload automatically when you're back online.",
+  },
+  {
+    icon: Building2,
+    title: "Multiple branches",
+    description: "One view across locations — stock, sales, and transfers between branches without duplicate entry.",
+  },
+  {
+    icon: Monitor,
+    title: "Multiple systems",
+    description: "Several counters, back-office PCs, and roles working on the same live data at once.",
+  },
+  {
+    icon: Bot,
+    title: "WhatsApp AI automation",
+    description: "Integrated WhatsApp with AI-driven replies, follow-ups, and customer communication — less manual messaging.",
+  },
+  {
+    icon: ClipboardList,
+    title: "Order processing",
+    description: "Take orders from counter, phone, or chat, track status, and fulfil without losing the thread.",
+  },
+];
 
-  const industries = [
-    { title: "Retail", icon: <ShoppingCart /> },
-    { title: "Dining", icon: <CreditCard /> },
-    { title: "Pharma", icon: <Zap /> },
-    { title: "Grocery", icon: <Store /> },
-  ];
+const features = [
+  {
+    icon: Receipt,
+    title: "Point of sale",
+    description: "Fast checkout, discounts, payments, and receipts at the counter.",
+  },
+  {
+    icon: Package,
+    title: "Inventory",
+    description: "Stock levels, purchases, transfers, and low-stock alerts across branches.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Tax-compliant invoicing",
+    description: "Electronic invoices generated with the sale, ready for your region's requirements.",
+  },
+  {
+    icon: BarChart3,
+    title: "Reports",
+    description: "Daily sales, margins, and exports for management and accounting.",
+  },
+];
 
+const whoItsFor = [
+  {
+    title: "Shops & retail",
+    icon: ShoppingCart,
+    text: "In-store sales plus orders that come in by phone or message — one pipeline.",
+  },
+  {
+    title: "Restaurants & cafés",
+    icon: CreditCard,
+    text: "Tables, kitchen flow, split bills, and takeaway orders in the same system.",
+  },
+  {
+    title: "Pharmacies",
+    icon: Pill,
+    text: "Batch and expiry tracking with the compliance reporting you need.",
+  },
+  {
+    title: "Grocery & chains",
+    icon: Store,
+    text: "High-volume checkout and multi-branch stock under one roof.",
+  },
+];
+
+const setupSteps = [
+  {
+    title: "Map your setup",
+    text: "We note your branches, counters, who needs access, and whether you want WhatsApp automation from day one.",
+  },
+  {
+    title: "Import & configure",
+    text: "Products, prices, users, and branch structure loaded. Online sync and offline mode tested on your hardware.",
+  },
+  {
+    title: "Train & go live",
+    text: "Staff learn billing and order flow. We stay on call through the first week across all your systems.",
+  },
+];
+
+const pricingPlans = [
+  {
+    name: "Single location",
+    price: "From $49",
+    note: "per month · 1 branch",
+    includes: [
+      "Online + offline POS",
+      "Order processing",
+      "Inventory & reports",
+      "Email support",
+    ],
+  },
+  {
+    name: "Multi-system",
+    price: "From $99",
+    note: "per month · multiple counters",
+    includes: [
+      "Everything in Single location",
+      "Multiple terminals & users",
+      "WhatsApp integration",
+      "Priority support",
+    ],
+    popular: true,
+  },
+  {
+    name: "Multi-branch",
+    price: "Custom",
+    note: "branches + automation",
+    includes: [
+      "Unlimited branches (quoted)",
+      "WhatsApp AI automation",
+      "Central reporting",
+      "Dedicated onboarding",
+    ],
+  },
+];
+
+const faqs = [
+  {
+    q: "Can we run online and offline at the same time?",
+    a: "Yes. Branches sync through the cloud when connected. Each counter can still sell offline and merge data when the link is back.",
+  },
+  {
+    q: "How do multiple branches stay in sync?",
+    a: "Stock and sales update from each location into a central database. You can transfer items between branches and see group totals without logging into each shop separately.",
+  },
+  {
+    q: "What does WhatsApp AI automation do?",
+    a: "Customer messages on WhatsApp can trigger automated replies, order confirmations, and follow-ups based on rules you set — so your team spends less time on repetitive chats.",
+  },
+  {
+    q: "Is order processing separate from POS?",
+    a: "No — orders from WhatsApp, phone, or the counter land in the same workflow. Status moves from new → preparing → ready → completed without retyping.",
+  },
+  {
+    q: "How many systems can we install?",
+    a: "As many counters and back-office machines as your plan allows. All of them pull from the same product and customer data.",
+  },
+];
+
+function ScreenPreview() {
   return (
-    <div className="overflow-hidden bg-white selection:bg-primary/30">
-      {/* Mesh Gradient Background */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-500/10 rounded-full blur-[120px] animate-pulse delay-700" />
+    <div className="rounded-lg border border-slate-300 bg-slate-100 overflow-hidden shadow-md">
+      <div className="px-4 py-2.5 bg-slate-200 border-b border-slate-300 flex justify-between items-center">
+        <span className="text-xs font-medium text-slate-600">
+          Branch A · Online
+        </span>
+        <span className="text-[10px] text-slate-500 flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+          3 counters active
+        </span>
       </div>
-
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-40 md:pt-48 md:pb-60 z-10">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex flex-col items-center text-center">
-            <div className="inline-flex items-center gap-3 px-6 py-2 mb-10 text-xs font-black tracking-[0.3em] text-primary uppercase bg-primary/5 rounded-full border border-primary/10 backdrop-blur-sm animate-fade-in">
-              <Zap className="w-4 h-4 fill-primary" />
-              Intelligence for Modern Commerce
-            </div>
-            <h1 className="text-6xl md:text-9xl font-black mb-10 tracking-tight leading-[0.85] text-slate-900">
-              RETAIL <br />
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-indigo-600 to-primary-dark">REIMAGINED</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-slate-500 max-w-3xl mx-auto mb-16 leading-relaxed font-medium">
-              Elevate your business with Salespeck—the elite POS solution that fuses high-performance inventory management with deep retail analytics.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <button className="w-full sm:w-auto bg-slate-900 text-white px-12 py-6 rounded-2xl font-black text-lg hover:bg-primary transition-all shadow-[0_20px_50px_-10px_rgba(0,0,0,0.3)] hover:shadow-primary/40 flex items-center justify-center gap-3 group">
-                START FREE TRIAL
-                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </button>
-              <button className="w-full sm:w-auto bg-white/50 backdrop-blur-md border-2 border-slate-200 px-12 py-6 rounded-2xl font-black text-lg hover:bg-slate-50 transition-all flex items-center justify-center gap-3">
-                EXPLORE PRICING
-              </button>
-            </div>
+      <div className="p-4 bg-white min-h-[280px] text-sm">
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="rounded border border-slate-200 p-3">
+            <p className="text-[10px] text-slate-500 uppercase">Orders today</p>
+            <p className="text-lg font-semibold text-slate-900">52</p>
           </div>
+          <div className="rounded border border-slate-200 p-3">
+            <p className="text-[10px] text-slate-500 uppercase">All branches</p>
+            <p className="text-lg font-semibold text-slate-900">$8,420</p>
+          </div>
+        </div>
+        <p className="text-xs font-medium text-slate-500 mb-2">Open orders</p>
+        <ul className="space-y-1.5 text-xs text-slate-700 mb-4">
+          <li className="flex justify-between py-1.5 border-b border-slate-100">
+            <span>#ORD-218 · WhatsApp</span>
+            <span className="text-amber-700 font-medium">Preparing</span>
+          </li>
+          <li className="flex justify-between py-1.5 border-b border-slate-100">
+            <span>#ORD-217 · Counter 2</span>
+            <span className="text-emerald-700 font-medium">Ready</span>
+          </li>
+          <li className="flex justify-between py-1.5 border-b border-slate-100">
+            <span>#ORD-216 · Branch B</span>
+            <span className="text-slate-500 font-medium">New</span>
+          </li>
+        </ul>
+        <div className="rounded border border-emerald-200 bg-emerald-50 px-3 py-2 text-[11px] text-emerald-800">
+          <span className="font-medium">WhatsApp AI</span> — auto-replied to 6
+          customer queries in the last hour
+        </div>
+      </div>
+    </div>
+  );
+}
 
-          {/* Interactive Mockup */}
-          <div className="mt-32 relative max-w-6xl mx-auto group">
-             <div className="absolute -inset-1 bg-gradient-to-r from-primary to-indigo-600 rounded-[2.5rem] blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
-             <div className="relative aspect-[16/9] bg-slate-950 rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(99,102,241,0.1),_transparent)]" />
-                <div className="w-full h-full flex flex-col p-8">
-                   <div className="flex items-center justify-between mb-8">
-                      <div className="flex gap-2">
-                         <div className="w-3 h-3 rounded-full bg-red-500/50" />
-                         <div className="w-3 h-3 rounded-full bg-amber-500/50" />
-                         <div className="w-3 h-3 rounded-full bg-green-500/50" />
-                      </div>
-                      <div className="px-4 py-1 rounded-full bg-white/5 text-[10px] font-bold tracking-widest text-white/40 uppercase border border-white/5">Salespeck Cloud v4.2</div>
-                   </div>
-                   <div className="flex-1 grid grid-cols-12 gap-6">
-                      <div className="col-span-3 space-y-4">
-                         {[1,2,3,4].map(i => <div key={i} className="h-12 rounded-xl bg-white/5 border border-white/5 animate-pulse" style={{animationDelay: `${i*200}ms`}} />)}
-                      </div>
-                      <div className="col-span-9 rounded-2xl bg-white/5 border border-white/5 p-6 relative overflow-hidden">
-                         <div className="absolute top-0 right-0 p-6">
-                            <div className="text-4xl font-black text-primary animate-float">Rs. 1,425,000</div>
-                            <div className="text-[10px] font-black text-white/30 tracking-[0.2em] uppercase text-right mt-1">Live Revenue Today</div>
-                         </div>
-                         <div className="mt-auto h-32 w-full flex items-end gap-2">
-                            {[40,70,50,90,60,80,100,70,90].map((h, i) => (
-                               <div key={i} className="flex-1 bg-primary/20 border-t-2 border-primary rounded-t-lg transition-all duration-1000 ease-out" style={{height: `${h}%`, animation: `grow-up 1.5s ease-out forwards ${i*100}ms`}} />
-                            ))}
-                         </div>
-                      </div>
-                   </div>
-                </div>
-             </div>
-             
-             {/* Dynamic Badges */}
-             <div className="absolute -top-10 -right-10 hidden xl:flex flex-col gap-4">
-                <div className="p-6 glass-card rounded-2xl border-l-4 border-primary shadow-2xl animate-bounce-subtle">
-                   <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-green-500/10 rounded-full flex items-center justify-center text-green-500">
-                         <ShieldCheck className="w-6 h-6" />
-                      </div>
-                      <div>
-                         <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">FBR Status</div>
-                         <div className="text-lg font-black text-slate-900">VERIFIED</div>
-                      </div>
-                   </div>
-                </div>
-                <div className="p-6 glass-card rounded-2xl border-l-4 border-indigo-500 shadow-2xl animate-bounce-subtle delay-300">
-                   <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-indigo-500/10 rounded-full flex items-center justify-center text-indigo-500">
-                         <Users className="w-6 h-6" />
-                      </div>
-                      <div>
-                         <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Active Users</div>
-                         <div className="text-lg font-black text-slate-900">12,402+</div>
-                      </div>
-                   </div>
-                </div>
-             </div>
+export default function HomePage() {
+  return (
+    <div className="bg-white">
+      <section className="section-pad border-b border-slate-200">
+        <div className="container-pro">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-start">
+            <div>
+              <h1 className="heading-xl mb-4">
+                Retail operations online, offline, and across every branch
+              </h1>
+              <p className="text-slate-600 text-base md:text-lg leading-relaxed mb-6 max-w-lg">
+                Salespeck is POS, inventory, order processing, and WhatsApp AI
+                automation in one platform. Run multiple counters and branches,
+                stay open when the internet isn&apos;t, and handle orders from
+                the shop floor or chat without switching tools.
+              </p>
+              <ul className="grid sm:grid-cols-2 gap-2 text-sm text-slate-600 mb-8">
+                {[
+                  "Online & offline",
+                  "Multiple branches",
+                  "Multiple systems",
+                  "WhatsApp AI automation",
+                  "Order processing",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-teal-700 shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                <a href="mailto:hello@salespeck.com" className="btn-primary">
+                  <Mail className="w-4 h-4" />
+                  hello@salespeck.com
+                </a>
+                <a href="#capabilities" className="btn-outline">
+                  See capabilities
+                </a>
+              </div>
+              <p className="text-sm text-slate-500">
+                Tell us how many branches and counters you run — we&apos;ll
+                reply within one business day.
+              </p>
+            </div>
+            <ScreenPreview />
           </div>
         </div>
       </section>
 
-      {/* Premium Industries Section */}
-      <section className="py-40 bg-slate-50 relative">
-        <div className="max-w-7xl mx-auto px-4 relative z-10">
-          <div className="text-center mb-24">
-            <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tight">CRAFTED FOR YOUR INDUSTRY</h2>
-            <p className="text-slate-500 font-medium max-w-2xl mx-auto text-lg">Every business is unique. Our solutions are precision-engineered to meet the specific demands of your sector.</p>
-          </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {industries.map((industry, i) => (
-              <div key={i} className="bg-white p-12 rounded-[2.5rem] text-center shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] hover:shadow-2xl transition-all duration-500 hover:-translate-y-4 border border-slate-100 group cursor-pointer">
-                <div className="w-20 h-20 bg-slate-50 rounded-[2rem] flex items-center justify-center text-slate-900 mb-8 mx-auto group-hover:bg-primary group-hover:text-white transition-all duration-500 transform group-hover:rotate-[10deg]">
-                  {React.cloneElement(industry.icon as React.ReactElement, { className: "w-10 h-10" })}
-                </div>
-                <h3 className="text-2xl font-black tracking-tight">{industry.title}</h3>
-                <div className="mt-4 text-xs font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity tracking-[0.2em] uppercase">View Solution</div>
-              </div>
+      <section
+        id="capabilities"
+        className="section-pad bg-slate-50 border-b border-slate-200"
+      >
+        <div className="container-pro">
+          <h2 className="heading-lg mb-3">What we offer</h2>
+          <p className="text-slate-600 max-w-2xl mb-10">
+            Built for businesses that sell in person, over the phone, and on
+            WhatsApp — with more than one location or checkout.
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {capabilities.map(({ icon: Icon, title, description }) => (
+              <article key={title} className="card-pro !p-6">
+                <Icon className="w-5 h-5 text-primary mb-3" />
+                <h3 className="font-semibold text-slate-900 mb-2">{title}</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  {description}
+                </p>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* High-Impact Features Section */}
-      <section className="py-60 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 relative z-10">
-          <div className="grid lg:grid-cols-12 gap-24 items-center">
-            <div className="lg:col-span-5">
-              <div className="inline-block px-4 py-1.5 mb-8 text-[10px] font-black tracking-[0.3em] text-primary uppercase bg-primary/5 rounded-full border border-primary/10">
-                Power & Simplicity
-              </div>
-              <h2 className="text-5xl md:text-7xl font-black mb-10 tracking-tight leading-[0.95]">
-                UNMATCHED <br />
-                <span className="text-primary">PRECISION</span>
-              </h2>
-              <p className="text-xl text-slate-500 mb-12 leading-relaxed font-medium">
-                We don't just build software. We build intelligence engines that empower you to dominate your market with data-driven confidence.
-              </p>
-              <div className="space-y-6">
-                {[
-                  { label: "24/7 Elite Response Support", icon: <CheckCircle2 className="text-green-500" /> },
-                  { label: "Bespoke Enterprise Integration", icon: <CheckCircle2 className="text-green-500" /> },
-                  { label: "Weekly Intelligence Updates", icon: <CheckCircle2 className="text-green-500" /> }
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-4 text-lg font-bold text-slate-900 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                    {item.icon}
-                    {item.label}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-8">
-              {features.map((feature, index) => (
-                <div key={index} className="p-10 rounded-[2.5rem] glass-card border border-slate-200/50 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl group cursor-pointer">
-                  <div className="w-20 h-20 rounded-2xl bg-primary/5 flex items-center justify-center text-primary mb-10 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500 transform group-hover:-rotate-3">
-                    {feature.icon}
-                  </div>
-                  <h3 className="text-2xl font-black mb-4 tracking-tight">{feature.title}</h3>
-                  <p className="text-slate-500 text-base leading-relaxed font-medium">
-                    {feature.description}
-                  </p>
+      <section id="features" className="section-pad bg-white border-b border-slate-200">
+        <div className="container-pro">
+          <h2 className="heading-lg mb-3">Also included</h2>
+          <p className="text-slate-600 max-w-2xl mb-10">
+            The day-to-day tools every location needs on top of orders and
+            messaging.
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {features.map(({ icon: Icon, title, description }) => (
+              <article key={title} className="card-muted !p-6">
+                <Icon className="w-5 h-5 text-primary mb-3" />
+                <h3 className="font-semibold text-slate-900 mb-2">{title}</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  {description}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="who" className="section-pad">
+        <div className="container-pro">
+          <h2 className="heading-lg mb-3">Who it&apos;s for</h2>
+          <p className="text-slate-600 max-w-2xl mb-10">
+            One platform whether you run a single busy counter or a small chain.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-5">
+            {whoItsFor.map(({ title, icon: Icon, text }) => (
+              <article key={title} className="card-pro !p-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <Icon className="w-5 h-5 text-primary" />
+                  <h3 className="font-semibold text-slate-900">{title}</h3>
                 </div>
-              ))}
-            </div>
+                <p className="text-sm text-slate-600 leading-relaxed">{text}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Elite Trust Metrics */}
-      <section className="bg-slate-900 py-32 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
-        <div className="max-w-7xl mx-auto px-4 relative z-10 grid grid-cols-2 md:grid-cols-4 gap-16 text-center">
-          {[
-            { value: "1,200+", label: "Elite Partners" },
-            { value: "45+", label: "Cities Nationwide" },
-            { value: "99.99%", label: "Platform Uptime" },
-            { value: "Rs. 25B+", label: "Processed Annually" }
-          ].map((stat, i) => (
-            <div key={i}>
-              <div className="text-4xl md:text-6xl font-black text-white mb-4 tracking-tighter">{stat.value}</div>
-              <div className="text-primary font-black uppercase tracking-[0.2em] text-[10px]">{stat.label}</div>
-            </div>
-          ))}
+      <section className="section-pad bg-slate-50 border-y border-slate-200">
+        <div className="container-pro max-w-3xl">
+          <h2 className="heading-lg mb-3">Getting started</h2>
+          <p className="text-slate-600 mb-10">
+            We configure online sync, offline mode, and branch structure before
+            your team touches the live system.
+          </p>
+          <ol className="space-y-8">
+            {setupSteps.map(({ title, text }, i) => (
+              <li key={title} className="flex gap-4">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-white text-sm font-semibold">
+                  {i + 1}
+                </span>
+                <div>
+                  <h3 className="font-semibold text-slate-900 mb-1">{title}</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">{text}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 
-      {/* Ultimate CTA Section */}
-      <section className="py-60 relative overflow-hidden bg-white">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="bg-slate-900 rounded-[4rem] p-16 md:p-32 text-center relative overflow-hidden shadow-2xl group">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/30 transition-all duration-1000" />
-            <div className="relative z-10">
-              <h2 className="text-5xl md:text-8xl font-black text-white mb-10 tracking-tight leading-none">
-                THE FUTURE <br />
-                <span className="text-primary">IS YOURS</span>
-              </h2>
-              <p className="text-slate-400 text-xl md:text-2xl max-w-3xl mx-auto mb-16 leading-relaxed font-medium">
-                Step into the new era of commerce. Join the elite circle of businesses powered by Salespeck Intelligence.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
-                <button className="bg-white text-slate-900 px-16 py-7 rounded-[2rem] font-black text-2xl hover:bg-primary hover:text-white transition-all shadow-2xl active:scale-95">
-                  GET STARTED
-                </button>
-                <div className="text-white/50 font-bold uppercase tracking-widest text-xs">No Credit Card Required</div>
-              </div>
-            </div>
+      <section id="pricing" className="section-pad">
+        <div className="container-pro">
+          <h2 className="heading-lg mb-3">Pricing</h2>
+          <p className="text-slate-600 max-w-2xl mb-10">
+            Depends on branches, counters, and whether you need full WhatsApp AI
+            automation. Figures below are indicative in USD — we&apos;ll quote
+            for your exact setup.
+          </p>
+          <div className="grid md:grid-cols-3 gap-5">
+            {pricingPlans.map((plan) => (
+              <article
+                key={plan.name}
+                className={`rounded-xl border p-6 flex flex-col ${
+                  plan.popular
+                    ? "border-primary bg-slate-50"
+                    : "border-slate-200 bg-white"
+                }`}
+              >
+                {plan.popular && (
+                  <p className="text-xs font-medium text-primary mb-3">
+                    Most growing teams
+                  </p>
+                )}
+                <h3 className="font-semibold text-slate-900">{plan.name}</h3>
+                <p className="text-2xl font-semibold text-slate-900 mt-3">
+                  {plan.price}
+                </p>
+                <p className="text-xs text-slate-500 mb-5">{plan.note}</p>
+                <ul className="space-y-2 text-sm text-slate-600 flex-1">
+                  {plan.includes.map((item) => (
+                    <li key={item} className="flex gap-2">
+                      <Check className="w-4 h-4 text-teal-700 shrink-0 mt-0.5" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <a href="#contact" className="btn-outline w-full mt-6 text-center">
+                  Ask for a quote
+                </a>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
+      <section
+        id="faq"
+        className="section-pad bg-slate-50 border-t border-slate-200"
+      >
+        <div className="container-pro max-w-2xl">
+          <h2 className="heading-lg mb-8">Common questions</h2>
+          <div className="space-y-2">
+            {faqs.map(({ q, a }) => (
+              <details
+                key={q}
+                className="group rounded-lg border border-slate-200 bg-white"
+              >
+                <summary className="cursor-pointer list-none px-4 py-3.5 text-sm font-medium text-slate-900 flex justify-between gap-4 [&::-webkit-details-marker]:hidden">
+                  {q}
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-open:rotate-90 transition-transform shrink-0" />
+                </summary>
+                <p className="px-4 pb-4 text-sm text-slate-600 leading-relaxed">
+                  {a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section-pad border-t border-slate-200">
+        <div className="container-pro max-w-2xl text-center">
+          <h2 className="heading-lg mb-3">See it with your branch layout</h2>
+          <p className="text-slate-600 mb-8">
+            Share how many locations, counters, and WhatsApp lines you use. We
+            walk you through orders, offline mode, and automation on a live
+            demo.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-3">
+            <a href="mailto:hello@salespeck.com" className="btn-primary">
+              hello@salespeck.com
+            </a>
+            <a
+              href="https://wa.me/923209492059"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-outline"
+            >
+              WhatsApp
+            </a>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
