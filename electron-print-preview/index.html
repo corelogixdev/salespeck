@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Print Preview Demo</title>
+  <style>
+    /* =============================================================================
+       SCREEN STYLES — UI chrome, toolbar, preview pane
+       ============================================================================= */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+      line-height: 1.5;
+    }
+
+    /* Toolbar */
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .toolbar-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #111827;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #374151;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:hover:not(:disabled) { background: #f9fafb; border-color: #9ca3af; }
+    .btn:active:not(:disabled) { transform: translateY(1px); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .btn-primary { background: #2563eb; color: #ffffff; border-color: #2563eb; }
+    .btn-primary:hover:not(:disabled) { background: #1d4ed8; border-color: #1d4ed8; }
+
+    .btn-success { background: #059669; color: #ffffff; border-color: #059669; }
+    .btn-success:hover:not(:disabled) { background: #047857; border-color: #047857; }
+
+    /* Status / Loading Bar */
+    .status-bar {
+      padding: 10px 20px;
+      background: #eff6ff;
+      border-bottom: 1px solid #dbeafe;
+      font-size: 13px;
+      color: #1e40af;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+    .status-bar.active { display: flex; }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid #bfdbfe;
+      border-top-color: #2563eb;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error Banner */
+    .error-banner {
+      padding: 12px 20px;
+      background: #fef2f2;
+      border-bottom: 1px solid #fecaca;
+      color: #991b1b;
+      font-size: 13px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+    .error-banner.active { display: flex; }
+    .error-banner button {
+      margin-left: auto;
+      background: transparent;
+      border: none;
+      color: #991b1b;
+      font-size: 16px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    /* Layout: content + preview */
+    .app-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      height: calc(100vh - 57px); /* minus toolbar */
+    }
+
+    /* Left pane: the "live" document being printed */
+    .document-pane {
+      padding: 24px;
+      overflow-y: auto;
+      background: #f3f4f6;
+    }
+
+    .document-sheet {
+      max-width: 210mm;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 20mm;
+      min-height: 297mm;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08);
+      border-radius: 4px;
+    }
+
+    /* Right pane: PDF preview iframe */
+    .preview-pane {
+      background: #e5e7eb;
+      border-left: 1px solid #d1d5db;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .preview-frame {
+      flex: 1;
+      width: 100%;
+      border: none;
+      background: white;
+    }
+
+    .empty-state {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #6b7280;
+      gap: 12px;
+      text-align: center;
+      padding: 24px;
+    }
+    .empty-state svg {
+      width: 56px;
+      height: 56px;
+      opacity: 0.35;
+    }
+
+    /* =============================================================================
+       PRINTABLE CONTENT STYLES (shared between screen and print)
+       ============================================================================= */
+    .printable-content h1 {
+      font-size: 22px;
+      margin-bottom: 8px;
+      color: #111827;
+    }
+
+    .printable-content .meta {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 20px;
+    }
+
+    .printable-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 14px;
+    }
+
+    .printable-content th,
+    .printable-content td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .printable-content th {
+      background: #f9fafb;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .printable-content tr:last-child td {
+      border-bottom: none;
+    }
+
+    .printable-content .total-row {
+      font-weight: 700;
+      background: #f3f4f6;
+    }
+
+    .printable-content .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .printable-content footer {
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    /* =============================================================================
+       @MEDIA PRINT — Ensures screen and print layouts match exactly.
+       ============================================================================= */
+    @media print {
+      /* Hide all UI chrome */
+      .toolbar,
+      .status-bar,
+      .error-banner,
+      .preview-pane,
+      .no-print {
+        display: none !important;
+      }
+
+      /* Reset body for clean print output */
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        height: auto;
+        overflow: visible;
+      }
+
+      /* Ensure the document pane fills the page */
+      .app-body {
+        display: block !important;
+        height: auto !important;
+      }
+
+      .document-pane {
+        padding: 0 !important;
+        overflow: visible !important;
+        background: #ffffff !important;
+      }
+
+      .document-sheet {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: none !important;
+        min-height: auto !important;
+      }
+
+      /* Force background graphics (colors, images) to print */
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      /* Prevent awkward page breaks inside table rows */
+      .printable-content tr {
+        page-break-inside: avoid;
+      }
+
+      /* Keep headings with subsequent content */
+      .printable-content h1,
+      .printable-content h2 {
+        page-break-after: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Toolbar: always hidden when printing via @media print -->
+  <div class="toolbar no-print">
+    <div class="toolbar-title">
+      <span>📄</span>
+      <span>Print Preview</span>
+    </div>
+    <div class="toolbar-actions">
+      <button id="btnGenerate" class="btn btn-primary">
+        <span>Show Print Preview</span>
+      </button>
+      <button id="btnPrint" class="btn btn-success" disabled>
+        <span>Print Now</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Status Bar -->
+  <div id="statusBar" class="status-bar no-print">
+    <div class="spinner"></div>
+    <span id="statusText">Generating PDF preview…</span>
+  </div>
+
+  <!-- Error Banner -->
+  <div id="errorBanner" class="error-banner no-print">
+    <span>⚠️</span>
+    <span id="errorText">Something went wrong.</span>
+    <button id="btnDismissError" aria-label="Dismiss">×</button>
+  </div>
+
+  <!-- Main Body: Document (left) + Preview iframe (right) -->
+  <div class="app-body">
+    <!-- Document Pane: this is what gets rendered to PDF -->
+    <div class="document-pane">
+      <div class="document-sheet">
+        <div class="printable-content">
+          <h1>Sales Invoice #INV-2026-0421</h1>
+          <div class="meta">
+            <div>Date: 21 Apr 2026</div>
+            <div>Customer: Acme Corp</div>
+            <div>Sales Rep: Jane Doe</div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Unit Price</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Wireless Keyboard <span class="badge">SKU-KB-01</span></td>
+                <td>2</td>
+                <td>$49.00</td>
+                <td>$98.00</td>
+              </tr>
+              <tr>
+                <td>USB-C Hub <span class="badge">SKU-HUB-12</span></td>
+                <td>1</td>
+                <td>$79.00</td>
+                <td>$79.00</td>
+              </tr>
+              <tr>
+                <td>27" Monitor <span class="badge">SKU-MON-99</span></td>
+                <td>1</td>
+                <td>$299.00</td>
+                <td>$299.00</td>
+              </tr>
+              <tr class="total-row">
+                <td colspan="3" style="text-align:right">Total</td>
+                <td>$476.00</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <footer>
+            Thank you for your business. For support, contact support@example.com
+          </footer>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview Pane -->
+    <div class="preview-pane no-print">
+      <iframe id="pdfFrame" class="preview-frame" hidden></iframe>
+      <div id="emptyState" class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+        </svg>
+        <p>Click <strong>Show Print Preview</strong> to generate a PDF of the current page.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

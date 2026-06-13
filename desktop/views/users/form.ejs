@@ -87,6 +87,18 @@
                     </div>
                   </div>
                 <% } %>
+                <% if (role === 'customer' || role === 'vendor') { %>
+                  <div class="col-xxl-3 col-md-6">
+                    <div>
+                      <label for="opening_balance" class="form-label">Opening Balance</label>
+                      <div class="form-icon">
+                        <input type="number" class="form-control form-control-icon" id="opening_balance" name="opening_balance"
+                          value="0" placeholder="Enter opening balance" step="any">
+                        <i class="ri-money-dollar-circle-line"></i>
+                      </div>
+                    </div>
+                  </div>
+                <% } %>
                 <input type="hidden" name="role" value="<%= role %>">
                 <div class="col-12">
                   <button type="submit" class="btn btn-primary"><%= data ? 'Update' : 'Create' %></button>

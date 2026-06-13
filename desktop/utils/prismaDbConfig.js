@@ -8,16 +8,16 @@ function resolveProductionBaseDir() {
       ? path.join(os.homedir(), "Library", "Application Support")
       : path.join(os.homedir(), ".config"));
 
-  return path.join(appDataPath, "openmenu");
+  return path.join(appDataPath, "stitchcore");
 }
 
 function resolveDatabasePath() {
   const isPackagedRuntime = __dirname.includes("app.asar");
   if (isPackagedRuntime) {
-    return path.join(resolveProductionBaseDir(), "database.sqlite");
+    return path.join(resolveProductionBaseDir(), "stitch.sqlite");
   }
 
-  return path.join(__dirname, "..", "db", "database.sqlite");
+  return path.join(__dirname, "..", "db", "stitch.sqlite");
 }
 
 function ensureDatabaseDirectory() {

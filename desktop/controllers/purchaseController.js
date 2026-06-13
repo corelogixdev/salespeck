@@ -80,75 +80,31 @@ exports.purchaseDetails = async (req, res) => {
 
 exports.save = async (req, res) => {
   try {
-    let data = req.body;
-    const {
-      totalPayment = 0,
-      totalPrice: totalAmount = 0,
-      vendor = null, // Vendor is explicitly allowed to be null
-    } = data;
-    let user = req.session.user.id;
-    const randomInvoice = Math.floor(Math.random() * 1000000);
-    
-    // Source for tracking where the record was created
+    const { products, vendor, discountpercentage, totalPayment, totalPrice, ledger, transactionDate, purchaseAccountId } = req.body;
+    const { user } = res.locals;
     const source = 'desktop';
-    
-    // Save purchase with vendor as optional
-    let purchase = await queries.purchases.create({
-      createdby: user,
-      vendor,      // Can be null or undefined
-      totalAmount,
+
+    if (!products || products.length === 0) {
+      return res.status(400).send({ status: "error", message: "Please add products to the purchase" });
+    }
+
+    const purchase = await queries.purchases.createPurchaseTransaction({
+      userId: user.id,
+      vendor,
+      discountpercentage,
+      totalAmount: totalPrice,
       totalPayment,
-      invoicenum: "INV-" + randomInvoice,
+      ledger,
+      products,
       source,
+      transactionDate,
+      purchaseAccountId
     });
 
-    if (purchase) {
-      let products = data.products;
-      for (let i = 0; i < products.length; i++) {
-        let product = products[i];
-        let purchasedProduct = await queries.purchases.createPurchasedProduct({
-          purchase: purchase.id,
-          product: product.productId,
-          quantity: product.quantity,
-          totalAmount: product.price,
-          source,
-        });
-
-        // save the purchased batch
-        let expiry = null;
-        if (product.expiryDate && product.expiryDate.trim()) {
-          const d = new Date(product.expiryDate);
-          if (!isNaN(d.getTime())) {
-            expiry = d;
-          }
-        }
-
-        await queries.batches.create({
-          product: product.productId,
-          quantity: product.quantity,
-          expirydate: expiry,
-          source,
-        });
-
-        if (purchasedProduct) {
-          await queries.products.incrementQuantity(product.productId, product.quantity);
-          // Log inventory
-          await queries.inventory.createLog({
-            product_id: product.productId,
-            quantity: product.quantity,
-            note: vendor ? "Purchased from vendor" : "Purchased",
-            createdby: user,
-            type: "purchase",
-            vendor,  // Can be null
-            source,
-          });
-        }
-      }
-      res.send({ status: "success", message: "Purchase saved successfully" });
-    }
+    res.send({ status: "success", message: "Purchase saved successfully", purchaseId: purchase.id });
   } catch (error) {
     console.error("Error saving purchase:", error);
-    res.status(500).send({ status: "error", message: "Internal Server Error" });
+    res.status(500).send({ status: "error", message: error.message || "Internal Server Error" });
   }
 };
 
@@ -166,8 +122,7 @@ exports.form = async (_, res) => {
   res.render("accounting/purchase/form", {
     title: "Save Purchase",
     vendors,
-    vendorRequired: false,  // Add this flag to inform the view that vendor is not required
-    hidenav: true,
+    hidenav: false,
   });
 };
 const {findLike} = require("../utils/searchquery");
@@ -190,4 +145,22 @@ exports.searchVendors = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
+};
+
+exports.getNextInvoiceNum = async (req, res) => {
+    try {
+        const nextNum = await queries.helpers.getNextInvoiceNumber('PUR');
+        res.json({ success: true, nextNum });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+exports.getExpenseAccounts = async (req, res) => {
+    try {
+        const accounts = await queries.accounting.getAccountsByParent('5100'); // COGS (Manufacturing)
+        res.json({ success: true, accounts });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
 };

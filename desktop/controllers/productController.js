@@ -4,43 +4,45 @@ const { getPaginationMeta, buildSortClause, sanitizeFilters } = require('../util
 
 exports.index = async (req, res) => {
   try {
-    const query = req.query;
+    const query = req.method === 'POST' ? { ...req.query, ...req.body } : req.query;
+    const logi = require('../utils/logi');
 
     // Pagination parameters
-    const page = parseInt(query.page) || 1;
-    const pageSize = parseInt(query.pageSize) || 50; // Default 50 for products
+    const page = Math.max(1, parseInt(query.page) || 1);
+    const pageSize = Math.max(1, parseInt(query.pageSize) || 50);
 
     // Build comprehensive filter
     const whereClause = {};
 
     // Name filter (partial match)
-    if (query.name) {
-      whereClause.name = { contains: query.name };
-    }
-
-    // Barcode filter (exact match recommended for performance)
-    if (query.barcode) {
-      whereClause.barcode = query.barcode;
+    if (query.name && typeof query.name === 'string' && query.name.trim()) {
+      whereClause.name = { contains: query.name.trim() };
     }
 
     // Category filter
-    if (query.category) {
-      whereClause.category = { contains: query.category };
+    if (query.category && query.category !== '') {
+      whereClause.category = query.category;
     }
 
     // Brand filter
-    if (query.brand) {
-      whereClause.brand = { contains: query.brand };
+    if (query.brand && query.brand !== '') {
+      whereClause.brand = query.brand;
     }
 
-    // Price range filters
-    if (query.price_min) {
-      whereClause.saleprice = whereClause.saleprice || {};
-      whereClause.saleprice.gte = parseFloat(query.price_min);
+    // Price range filters (targeting saleprice)
+    if (query.price_min && query.price_min !== '') {
+      const min = parseFloat(query.price_min);
+      if (!isNaN(min)) {
+        whereClause.saleprice = whereClause.saleprice || {};
+        whereClause.saleprice.gte = min;
+      }
     }
-    if (query.price_max) {
-      whereClause.saleprice = whereClause.saleprice || {};
-      whereClause.saleprice.lte = parseFloat(query.price_max);
+    if (query.price_max && query.price_max !== '') {
+      const max = parseFloat(query.price_max);
+      if (!isNaN(max)) {
+        whereClause.saleprice = whereClause.saleprice || {};
+        whereClause.saleprice.lte = max;
+      }
     }
 
     // Stock status filter
@@ -55,16 +57,17 @@ exports.index = async (req, res) => {
     }
 
     // Active status filters
-    if (query.sale_active !== undefined && query.sale_active !== '') {
+    if (query.sale_active === '1' || query.sale_active === '0') {
       whereClause.saleactive = query.sale_active === '1';
     }
-    if (query.purchase_active !== undefined && query.purchase_active !== '') {
+    if (query.purchase_active === '1' || query.purchase_active === '0') {
       whereClause.purchaseactive = query.purchase_active === '1';
     }
 
     // Sort parameters
     const sortBy = query.sortBy || 'id';
     const sortOrder = query.sortOrder || 'desc';
+    
     const { count, rows: data } = await queries.products.list({
       page,
       pageSize,
@@ -83,15 +86,7 @@ exports.index = async (req, res) => {
       queries.common.listTaxes()
     ]);
 
-    if (query.partial) {
-      return res.render('products/_table_rows', {
-        layout: false,
-        data,
-        categories
-      });
-    }
-
-    res.render('products/index', {
+    const renderData = {
       title: "Products",
       data,
       searchParams: query,
@@ -102,9 +97,18 @@ exports.index = async (req, res) => {
       brands,
       categories,
       taxes
-    });
+    };
+
+    if (query.partial || req.xhr) {
+      return res.render('products/_table_content', renderData);
+    }
+
+    res.render('products/index', renderData);
   } catch (error) {
     console.error('Error fetching products:', error);
+    if (req.xhr) {
+      return res.status(500).json({ success: false, message: 'Error fetching products' });
+    }
     req.session.message = {
       type: "error",
       text: "An error occurred while fetching products."
@@ -241,7 +245,7 @@ exports.quantityForm = async (req, res) => {
     res.render('products/quantity-form', {
       title: 'Add Product Quantity',
       product,
-      hidenav: true,
+      hidenav: false,
       type
     });
   } catch (error) {
@@ -344,3 +348,29 @@ exports.saveQuantity = async (req, res) => {
     });
   }
 };
+
+// --- Test Execution Block ---
+if (require.main === module) {
+  const req = {
+    method: 'GET',
+    query: { name: '1590' },
+    session: { permissions: {} }
+  };
+
+  const res = {
+    render: (view, data) => {
+      console.log("Rendered View:", view);
+      console.log("Data count:", data.data.length);
+      console.log("Data rows names:", data.data.map(d => d.name));
+    },
+    status: (code) => {
+      console.log("Status:", code);
+      return {
+        json: (data) => console.log("JSON:", data)
+      };
+    },
+    redirect: (url) => console.log("Redirect:", url)
+  };
+
+  exports.index(req, res).then(() => console.log("Done.")).catch(console.error);
+}

@@ -4,9 +4,11 @@
       <%= title %>
     </h4>
     <div class="d-flex gap-2 align-items-center">
-      <button class="btn btn-soft-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#productFilters" aria-expanded="false" aria-controls="productFilters">
-        <i class="ri-filter-3-line align-bottom me-1"></i> Filters
-      </button>
+      <% if (permissions.productsCreate) { %>
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addProductModal">
+          <i class="ri-add-line align-middle me-1"></i> Add New Product
+        </button>
+      <% } %>
       <button onclick="window.location.reload()" class="btn btn-soft-success btn-sm" title="Refresh">
         <i class="ri-refresh-line align-middle"></i> Refresh
       </button>
@@ -14,101 +16,79 @@
   </div>
 
   <div class="card-body">
-    <div class="collapse mb-3" id="productFilters">
+    <div class="mb-3" id="productFilters">
       <%
         const categoryOptions = categories.map(c => ({ value: c.id, label: c.name }));
         const brandOptions = brands.map(b => ({ value: b.id, label: b.name }));
       %>
       <%- include('../components/partials/filter-section', {
         filters: [
-          { name: 'name', label: 'Product Name', type: 'text', placeholder: 'Search by name...', icon: 'ri-search-line', colSize: 2 },
-          { name: 'barcode', label: 'Barcode', type: 'text', placeholder: 'Barcode...', icon: 'ri-barcode-line', colSize: 2 },
+          { name: 'name', label: 'Product Name', type: 'text', placeholder: 'Name...', icon: 'ri-search-line', colSize: 2 },
           { name: 'category', label: 'Category', type: 'select', options: categoryOptions, colSize: 2 },
-          { name: 'brand', label: 'Brand', type: 'select', options: brandOptions, colSize: 2 },
-          { name: 'stock_status', label: 'Stock Status', type: 'toggle', options: [
+          { name: 'brand', label: 'Brand', type: 'select', options: brandOptions, colSize: 1 },
+          { name: 'stock_status', label: 'Stock', type: 'select', options: [
             { value: 'in_stock', label: 'In Stock' },
             { value: 'low_stock', label: 'Low Stock' },
             { value: 'out_of_stock', label: 'Out of Stock' }
-          ], colSize: 3 },
+          ], colSize: 2 },
           { label: 'Price Range', type: 'range', names: ['price_min', 'price_max'], placeholders: ['Min', 'Max'], colSize: 2 },
-          { name: 'sale_active', label: 'Sale Active', type: 'toggle', options: [{ value: '1', label: 'Yes' }, { value: '0', label: 'No' }], colSize: 2 },
-          { name: 'purchase_active', label: 'Purchase Active', type: 'toggle', options: [{ value: '1', label: 'Yes' }, { value: '0', label: 'No' }], colSize: 2 }
+          { name: 'sale_active', label: 'Sale', type: 'select', options: [{ value: '1', label: 'Active' }, { value: '0', label: 'Inactive' }], colSize: 1 },
+          { name: 'purchase_active', label: 'Purchase', type: 'select', options: [{ value: '1', label: 'Active' }, { value: '0', label: 'Inactive' }], colSize: 1 }
         ],
         values: query,
         action: '/products',
-        buttonColSize: 2
+        buttonColSize: 1,
+        autoSubmit: true,
+        hideClear: true,
+        ajaxContainer: '#table-wrapper'
       }) %>
     </div>
 
-    <%
-      const brandMap = {};
-      brands.forEach(b => brandMap[b.id] = b.name);
-      const categoryMap = {};
-      categories.forEach(c => categoryMap[c.id] = c.name);
-
-      const tableColumns = [
-        { key: 'barcode', label: 'Barcode', sortable: true },
-        { key: 'name', label: 'Name', sortable: true, render: (row) => `<h6 class="fs-14 mb-0">${row.name}</h6>` },
-        { key: 'category', label: 'Category', sortable: true, render: (row) => categoryMap[row.category] || '-' },
-        { key: 'discount', label: 'Discount', sortable: true, render: (row) => `${row.discount || 0}%` },
-        { key: 'purchaseprice', label: 'Purchase Price', sortable: true, render: (row) => typeof row.purchaseprice === 'number' ? row.purchaseprice.toFixed(2) : row.purchaseprice },
-        { key: 'purchaseactive', label: 'Purchase Active', sortable: true, render: (row) => row.purchaseactive ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>' },
-        { 
-          key: 'quantity', 
-          label: 'Quantity', 
-          sortable: true, 
-          render: (row) => {
-            let badge = '';
-            if (row.quantity === 0) badge = '<span class="badge bg-danger">Out of Stock</span>';
-            else if (row.quantity < 10) badge = `<span class="badge bg-warning">${row.quantity} (Low)</span>`;
-            else badge = `<span class="badge bg-success">${row.quantity}</span>`;
-            return badge + ` <button type="button" class="btn btn-sm btn-ghost-primary waves-effect waves-light p-0 ms-1" onclick="updateQuantity('${row.id}', '${row.name.replace(/'/g, "\\'")}', '${row.quantity}')" title="Add Quantity"><i class="ri-add-circle-line fs-16 align-middle"></i></button>`;
-          }
-        },
-        { key: 'saleprice', label: 'Sale Price', sortable: true, render: (row) => typeof row.saleprice === 'number' ? row.saleprice.toFixed(2) : row.saleprice },
-        { key: 'saleactive', label: 'Sale Active', sortable: true, render: (row) => row.saleactive ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>' },
-        {
-          key: 'actions',
-          label: 'Actions',
-          sortable: false,
-          class: 'text-end',
-          render: (row) => {
-            return `<div class="btn-group btn-group-sm action-group" role="group">
-              <button type="button" class="btn btn-soft-info action-btn" onclick="openViewModal('${row.id}')" title="View"><i class="ri-eye-line"></i></button>
-              <button type="button" class="btn btn-soft-warning action-btn" onclick="openEditModal('${row.id}')" title="Edit"><i class="ri-pencil-fill"></i></button>
-              <button type="button" class="btn btn-soft-danger action-btn" onclick="deleteRecord('${row.id}')" title="Delete"><i class="ri-delete-bin-fill"></i></button>
-            </div>`;
-          }
-        }
-      ];
-    %>
-
-    <%- include('../components/partials/data-table', {
-      columns: tableColumns,
-      data: data,
-      sortBy: sortBy,
-      sortOrder: sortOrder,
-      baseUrl: '/products',
-      query: query
-    }) %>
-
-    <%- include('../components/partials/pagination', {
-      pagination: pagination,
-      baseUrl: '/products',
-      query: query
-    }) %>
+    <div id="table-wrapper">
+      <%- include('./_table_content') %>
+    </div>
   </div>
 </div>
 
-<% if (permissions.productsCreate) { %>
-<%- include('../components/partials/floating-action-btn', {
-  targetModal: '#addProductModal',
-  icon: 'ri-add-line',
-  tooltip: 'New Product',
-  colorClass: 'btn-primary',
-  show: true
-}) %>
-<% } %>
+<script>
+  // AJAX handling for sorting and pagination
+  document.addEventListener('click', function(e) {
+    const link = e.target.closest('.sort-link, .pagination a');
+    if (!link) return;
+    
+    e.preventDefault();
+    const url = new URL(link.href);
+    url.searchParams.set('partial', '1');
+    
+    // Ensure active filters are included in the sort/pagination link
+    const currentParams = new URLSearchParams(window.location.search);
+    for (const [key, value] of currentParams) {
+        if (!url.searchParams.has(key)) {
+            url.searchParams.set(key, value);
+        }
+    }
+    
+    // Update browser URL
+    const displayUrl = new URL(url.toString());
+    displayUrl.searchParams.delete('partial');
+    window.history.pushState({}, '', displayUrl.toString());
+    
+    fetch(url.toString(), {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(response => response.text())
+    .then(html => {
+        const wrapper = document.getElementById('table-wrapper');
+        if (wrapper) wrapper.innerHTML = html;
+    })
+    .catch(error => {
+        console.error('AJAX Error:', error);
+        window.location.href = displayUrl.toString(); // Fallback
+    });
+  });
+</script>
+
+
 
 <!-- Add Product Modal -->
 <div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
@@ -606,3 +586,13 @@
     });
   }
 </script>
+
+<% if (permissions.productsCreate) { %>
+  <%- include('../components/partials/floating-action-btn', {
+    targetModal: '#addProductModal',
+    icon: 'ri-add-line',
+    tooltip: 'Add New Product',
+    colorClass: 'btn-primary',
+    show: true
+  }) %>
+<% } %>

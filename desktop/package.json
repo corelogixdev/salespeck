@@ -1,6 +1,6 @@
 {
-  "name": "openmenu",
-  "description": "OpenMenu for POS,Stocks and Invoicing.",
+  "name": "stitchcore",
+  "description": "StitchCore for POS,Stocks and Invoicing.",
   "version": "1.0.7",
   "private": "true",
   "main": "main.js",
@@ -14,20 +14,20 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "prisma:seed": "node prisma/seed-must-data.js",
-    "prisma:seed:test-small": "node prisma/test-small-data-seed.js",
-    "prisma:seed:test-large": "node prisma/test-large-data-seed.js",
+    "prisma:seed:test-small": "node prisma/seed-must-data.js --small",
+    "prisma:seed:test-large": "node prisma/seed-must-data.js --large",
     "prisma:bootstrap": "node prisma/bootstrap.js",
     "prebuild": "prisma generate",
     "build": "electron-builder",
     "postbuild": "rimraf dist/win-unpacked",
     "upload": "node build/upload.js",
-    "test-local-installed-update": "node test-local-installed-update.js",
-    "local-update:installed": "node test-local-installed-update.js",
-    "test:update": "node test-local-installed-update.js"
+    "test-local-installed-update": "node scripts/test-local-installed-update.js",
+    "local-update:installed": "node scripts/test-local-installed-update.js",
+    "test:update": "node scripts/test-local-installed-update.js"
   },
   "build": {
-    "appId": "io.openmenu.app",
-    "productName": "openmenu",
+    "appId": "io.stitchcore.app",
+    "productName": "stitchcore",
     "directories": {
       "output": "dist"
     },
@@ -91,6 +91,7 @@
     "@prisma/adapter-libsql": "^7.7.0",
     "@prisma/client": "^7.7.0",
     "@prisma/client-runtime-utils": "^7.7.0",
+    "better-sqlite3": "^12.10.0",
     "cookie-session": "^2.1.0",
     "cors": "^2.8.5",
     "cross-spawn": "^7.0.3",

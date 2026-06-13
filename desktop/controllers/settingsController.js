@@ -8,7 +8,11 @@ exports.index = async (req, res) => {
   let dbSettings = await queries.settings.getAllSoftwareSettings();
   let dbSettingsObj = {};
   dbSettings.forEach((setting) => {
-    dbSettingsObj[setting.name] = JSON.parse(setting.value);
+    try {
+      dbSettingsObj[setting.name] = JSON.parse(setting.value);
+    } catch (e) {
+      dbSettingsObj[setting.name] = setting.value;
+    }
   });
   
   // Get DEFAULT_SETTINGS from installEnv.js (single source of truth)

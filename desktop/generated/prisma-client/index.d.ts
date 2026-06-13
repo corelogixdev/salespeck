@@ -39,6 +39,16 @@ export type category = $Result.DefaultSelection<Prisma.$categoryPayload>
  */
 export type financeaccount = $Result.DefaultSelection<Prisma.$financeaccountPayload>
 /**
+ * Model account_journal
+ * 
+ */
+export type account_journal = $Result.DefaultSelection<Prisma.$account_journalPayload>
+/**
+ * Model account_ledger
+ * 
+ */
+export type account_ledger = $Result.DefaultSelection<Prisma.$account_ledgerPayload>
+/**
  * Model financetransaction
  * 
  */
@@ -274,6 +284,26 @@ export class PrismaClient<
     * ```
     */
   get financeaccount(): Prisma.financeaccountDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.account_journal`: Exposes CRUD operations for the **account_journal** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Account_journals
+    * const account_journals = await prisma.account_journal.findMany()
+    * ```
+    */
+  get account_journal(): Prisma.account_journalDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.account_ledger`: Exposes CRUD operations for the **account_ledger** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Account_ledgers
+    * const account_ledgers = await prisma.account_ledger.findMany()
+    * ```
+    */
+  get account_ledger(): Prisma.account_ledgerDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.financetransaction`: Exposes CRUD operations for the **financetransaction** model.
@@ -843,6 +873,8 @@ export namespace Prisma {
     cashclosing: 'cashclosing',
     category: 'category',
     financeaccount: 'financeaccount',
+    account_journal: 'account_journal',
+    account_ledger: 'account_ledger',
     financetransaction: 'financetransaction',
     inventorylogs: 'inventorylogs',
     product: 'product',
@@ -871,7 +903,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "sequelizeMeta" | "brand" | "cashclosing" | "category" | "financeaccount" | "financetransaction" | "inventorylogs" | "product" | "productbatches" | "productsalepurchase" | "productsub" | "purchase" | "purchasedproducts" | "sale" | "softwaresetting" | "soldproducts" | "taxes" | "user"
+      modelProps: "sequelizeMeta" | "brand" | "cashclosing" | "category" | "financeaccount" | "account_journal" | "account_ledger" | "financetransaction" | "inventorylogs" | "product" | "productbatches" | "productsalepurchase" | "productsub" | "purchase" | "purchasedproducts" | "sale" | "softwaresetting" | "soldproducts" | "taxes" | "user"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1242,6 +1274,154 @@ export namespace Prisma {
           count: {
             args: Prisma.financeaccountCountArgs<ExtArgs>
             result: $Utils.Optional<FinanceaccountCountAggregateOutputType> | number
+          }
+        }
+      }
+      account_journal: {
+        payload: Prisma.$account_journalPayload<ExtArgs>
+        fields: Prisma.account_journalFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.account_journalFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_journalPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.account_journalFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_journalPayload>
+          }
+          findFirst: {
+            args: Prisma.account_journalFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_journalPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.account_journalFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_journalPayload>
+          }
+          findMany: {
+            args: Prisma.account_journalFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_journalPayload>[]
+          }
+          create: {
+            args: Prisma.account_journalCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_journalPayload>
+          }
+          createMany: {
+            args: Prisma.account_journalCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.account_journalCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_journalPayload>[]
+          }
+          delete: {
+            args: Prisma.account_journalDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_journalPayload>
+          }
+          update: {
+            args: Prisma.account_journalUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_journalPayload>
+          }
+          deleteMany: {
+            args: Prisma.account_journalDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.account_journalUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.account_journalUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_journalPayload>[]
+          }
+          upsert: {
+            args: Prisma.account_journalUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_journalPayload>
+          }
+          aggregate: {
+            args: Prisma.Account_journalAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAccount_journal>
+          }
+          groupBy: {
+            args: Prisma.account_journalGroupByArgs<ExtArgs>
+            result: $Utils.Optional<Account_journalGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.account_journalCountArgs<ExtArgs>
+            result: $Utils.Optional<Account_journalCountAggregateOutputType> | number
+          }
+        }
+      }
+      account_ledger: {
+        payload: Prisma.$account_ledgerPayload<ExtArgs>
+        fields: Prisma.account_ledgerFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.account_ledgerFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_ledgerPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.account_ledgerFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_ledgerPayload>
+          }
+          findFirst: {
+            args: Prisma.account_ledgerFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_ledgerPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.account_ledgerFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_ledgerPayload>
+          }
+          findMany: {
+            args: Prisma.account_ledgerFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_ledgerPayload>[]
+          }
+          create: {
+            args: Prisma.account_ledgerCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_ledgerPayload>
+          }
+          createMany: {
+            args: Prisma.account_ledgerCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.account_ledgerCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_ledgerPayload>[]
+          }
+          delete: {
+            args: Prisma.account_ledgerDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_ledgerPayload>
+          }
+          update: {
+            args: Prisma.account_ledgerUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_ledgerPayload>
+          }
+          deleteMany: {
+            args: Prisma.account_ledgerDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.account_ledgerUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.account_ledgerUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_ledgerPayload>[]
+          }
+          upsert: {
+            args: Prisma.account_ledgerUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$account_ledgerPayload>
+          }
+          aggregate: {
+            args: Prisma.Account_ledgerAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAccount_ledger>
+          }
+          groupBy: {
+            args: Prisma.account_ledgerGroupByArgs<ExtArgs>
+            result: $Utils.Optional<Account_ledgerGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.account_ledgerCountArgs<ExtArgs>
+            result: $Utils.Optional<Account_ledgerCountAggregateOutputType> | number
           }
         }
       }
@@ -2320,6 +2500,8 @@ export namespace Prisma {
     cashclosing?: cashclosingOmit
     category?: categoryOmit
     financeaccount?: financeaccountOmit
+    account_journal?: account_journalOmit
+    account_ledger?: account_ledgerOmit
     financetransaction?: financetransactionOmit
     inventorylogs?: inventorylogsOmit
     product?: productOmit
@@ -2407,6 +2589,67 @@ export namespace Prisma {
    * Count Types
    */
 
+
+  /**
+   * Count Type FinanceaccountCountOutputType
+   */
+
+  export type FinanceaccountCountOutputType = {
+    ledger_entries: number
+  }
+
+  export type FinanceaccountCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    ledger_entries?: boolean | FinanceaccountCountOutputTypeCountLedger_entriesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * FinanceaccountCountOutputType without action
+   */
+  export type FinanceaccountCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FinanceaccountCountOutputType
+     */
+    select?: FinanceaccountCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * FinanceaccountCountOutputType without action
+   */
+  export type FinanceaccountCountOutputTypeCountLedger_entriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: account_ledgerWhereInput
+  }
+
+
+  /**
+   * Count Type Account_journalCountOutputType
+   */
+
+  export type Account_journalCountOutputType = {
+    ledger_entries: number
+  }
+
+  export type Account_journalCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    ledger_entries?: boolean | Account_journalCountOutputTypeCountLedger_entriesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * Account_journalCountOutputType without action
+   */
+  export type Account_journalCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Account_journalCountOutputType
+     */
+    select?: Account_journalCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * Account_journalCountOutputType without action
+   */
+  export type Account_journalCountOutputTypeCountLedger_entriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: account_ledgerWhereInput
+  }
 
 
   /**
@@ -6577,22 +6820,29 @@ export namespace Prisma {
   }
 
   export type FinanceaccountAvgAggregateOutputType = {
+    opening_balance: number | null
     value: Decimal | null
   }
 
   export type FinanceaccountSumAggregateOutputType = {
+    opening_balance: number | null
     value: Decimal | null
   }
 
   export type FinanceaccountMinAggregateOutputType = {
     id: string | null
     name: string | null
+    code: string | null
     type: string | null
+    category: string | null
+    opening_balance: number | null
+    balance_type: string | null
     fk_parent_in_financeaccount: string | null
     createdby: string | null
     updatedby: string | null
     source: string | null
     value: Decimal | null
+    opening_balance_date: Date | null
     isDefault: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -6601,12 +6851,17 @@ export namespace Prisma {
   export type FinanceaccountMaxAggregateOutputType = {
     id: string | null
     name: string | null
+    code: string | null
     type: string | null
+    category: string | null
+    opening_balance: number | null
+    balance_type: string | null
     fk_parent_in_financeaccount: string | null
     createdby: string | null
     updatedby: string | null
     source: string | null
     value: Decimal | null
+    opening_balance_date: Date | null
     isDefault: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -6615,12 +6870,17 @@ export namespace Prisma {
   export type FinanceaccountCountAggregateOutputType = {
     id: number
     name: number
+    code: number
     type: number
+    category: number
+    opening_balance: number
+    balance_type: number
     fk_parent_in_financeaccount: number
     createdby: number
     updatedby: number
     source: number
     value: number
+    opening_balance_date: number
     isDefault: number
     createdAt: number
     updatedAt: number
@@ -6629,22 +6889,29 @@ export namespace Prisma {
 
 
   export type FinanceaccountAvgAggregateInputType = {
+    opening_balance?: true
     value?: true
   }
 
   export type FinanceaccountSumAggregateInputType = {
+    opening_balance?: true
     value?: true
   }
 
   export type FinanceaccountMinAggregateInputType = {
     id?: true
     name?: true
+    code?: true
     type?: true
+    category?: true
+    opening_balance?: true
+    balance_type?: true
     fk_parent_in_financeaccount?: true
     createdby?: true
     updatedby?: true
     source?: true
     value?: true
+    opening_balance_date?: true
     isDefault?: true
     createdAt?: true
     updatedAt?: true
@@ -6653,12 +6920,17 @@ export namespace Prisma {
   export type FinanceaccountMaxAggregateInputType = {
     id?: true
     name?: true
+    code?: true
     type?: true
+    category?: true
+    opening_balance?: true
+    balance_type?: true
     fk_parent_in_financeaccount?: true
     createdby?: true
     updatedby?: true
     source?: true
     value?: true
+    opening_balance_date?: true
     isDefault?: true
     createdAt?: true
     updatedAt?: true
@@ -6667,12 +6939,17 @@ export namespace Prisma {
   export type FinanceaccountCountAggregateInputType = {
     id?: true
     name?: true
+    code?: true
     type?: true
+    category?: true
+    opening_balance?: true
+    balance_type?: true
     fk_parent_in_financeaccount?: true
     createdby?: true
     updatedby?: true
     source?: true
     value?: true
+    opening_balance_date?: true
     isDefault?: true
     createdAt?: true
     updatedAt?: true
@@ -6768,12 +7045,17 @@ export namespace Prisma {
   export type FinanceaccountGroupByOutputType = {
     id: string
     name: string | null
+    code: string | null
     type: string | null
+    category: string | null
+    opening_balance: number | null
+    balance_type: string | null
     fk_parent_in_financeaccount: string | null
     createdby: string | null
     updatedby: string | null
     source: string | null
     value: Decimal | null
+    opening_balance_date: Date | null
     isDefault: boolean | null
     createdAt: Date
     updatedAt: Date
@@ -6801,26 +7083,38 @@ export namespace Prisma {
   export type financeaccountSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
+    code?: boolean
     type?: boolean
+    category?: boolean
+    opening_balance?: boolean
+    balance_type?: boolean
     fk_parent_in_financeaccount?: boolean
     createdby?: boolean
     updatedby?: boolean
     source?: boolean
     value?: boolean
+    opening_balance_date?: boolean
     isDefault?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    ledger_entries?: boolean | financeaccount$ledger_entriesArgs<ExtArgs>
+    _count?: boolean | FinanceaccountCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["financeaccount"]>
 
   export type financeaccountSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
+    code?: boolean
     type?: boolean
+    category?: boolean
+    opening_balance?: boolean
+    balance_type?: boolean
     fk_parent_in_financeaccount?: boolean
     createdby?: boolean
     updatedby?: boolean
     source?: boolean
     value?: boolean
+    opening_balance_date?: boolean
     isDefault?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -6829,12 +7123,17 @@ export namespace Prisma {
   export type financeaccountSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
+    code?: boolean
     type?: boolean
+    category?: boolean
+    opening_balance?: boolean
+    balance_type?: boolean
     fk_parent_in_financeaccount?: boolean
     createdby?: boolean
     updatedby?: boolean
     source?: boolean
     value?: boolean
+    opening_balance_date?: boolean
     isDefault?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -6843,31 +7142,49 @@ export namespace Prisma {
   export type financeaccountSelectScalar = {
     id?: boolean
     name?: boolean
+    code?: boolean
     type?: boolean
+    category?: boolean
+    opening_balance?: boolean
+    balance_type?: boolean
     fk_parent_in_financeaccount?: boolean
     createdby?: boolean
     updatedby?: boolean
     source?: boolean
     value?: boolean
+    opening_balance_date?: boolean
     isDefault?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type financeaccountOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "type" | "fk_parent_in_financeaccount" | "createdby" | "updatedby" | "source" | "value" | "isDefault" | "createdAt" | "updatedAt", ExtArgs["result"]["financeaccount"]>
+  export type financeaccountOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "code" | "type" | "category" | "opening_balance" | "balance_type" | "fk_parent_in_financeaccount" | "createdby" | "updatedby" | "source" | "value" | "opening_balance_date" | "isDefault" | "createdAt" | "updatedAt", ExtArgs["result"]["financeaccount"]>
+  export type financeaccountInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    ledger_entries?: boolean | financeaccount$ledger_entriesArgs<ExtArgs>
+    _count?: boolean | FinanceaccountCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type financeaccountIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type financeaccountIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $financeaccountPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "financeaccount"
-    objects: {}
+    objects: {
+      ledger_entries: Prisma.$account_ledgerPayload<ExtArgs>[]
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       name: string | null
+      code: string | null
       type: string | null
+      category: string | null
+      opening_balance: number | null
+      balance_type: string | null
       fk_parent_in_financeaccount: string | null
       createdby: string | null
       updatedby: string | null
       source: string | null
       value: Prisma.Decimal | null
+      opening_balance_date: Date | null
       isDefault: boolean | null
       createdAt: Date
       updatedAt: Date
@@ -7265,6 +7582,7 @@ export namespace Prisma {
    */
   export interface Prisma__financeaccountClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    ledger_entries<T extends financeaccount$ledger_entriesArgs<ExtArgs> = {}>(args?: Subset<T, financeaccount$ledger_entriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$account_ledgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7296,12 +7614,17 @@ export namespace Prisma {
   interface financeaccountFieldRefs {
     readonly id: FieldRef<"financeaccount", 'String'>
     readonly name: FieldRef<"financeaccount", 'String'>
+    readonly code: FieldRef<"financeaccount", 'String'>
     readonly type: FieldRef<"financeaccount", 'String'>
+    readonly category: FieldRef<"financeaccount", 'String'>
+    readonly opening_balance: FieldRef<"financeaccount", 'Float'>
+    readonly balance_type: FieldRef<"financeaccount", 'String'>
     readonly fk_parent_in_financeaccount: FieldRef<"financeaccount", 'String'>
     readonly createdby: FieldRef<"financeaccount", 'String'>
     readonly updatedby: FieldRef<"financeaccount", 'String'>
     readonly source: FieldRef<"financeaccount", 'String'>
     readonly value: FieldRef<"financeaccount", 'Decimal'>
+    readonly opening_balance_date: FieldRef<"financeaccount", 'DateTime'>
     readonly isDefault: FieldRef<"financeaccount", 'Boolean'>
     readonly createdAt: FieldRef<"financeaccount", 'DateTime'>
     readonly updatedAt: FieldRef<"financeaccount", 'DateTime'>
@@ -7322,6 +7645,10 @@ export namespace Prisma {
      */
     omit?: financeaccountOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: financeaccountInclude<ExtArgs> | null
+    /**
      * Filter, which financeaccount to fetch.
      */
     where: financeaccountWhereUniqueInput
@@ -7340,6 +7667,10 @@ export namespace Prisma {
      */
     omit?: financeaccountOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: financeaccountInclude<ExtArgs> | null
+    /**
      * Filter, which financeaccount to fetch.
      */
     where: financeaccountWhereUniqueInput
@@ -7357,6 +7688,10 @@ export namespace Prisma {
      * Omit specific fields from the financeaccount
      */
     omit?: financeaccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: financeaccountInclude<ExtArgs> | null
     /**
      * Filter, which financeaccount to fetch.
      */
@@ -7406,6 +7741,10 @@ export namespace Prisma {
      */
     omit?: financeaccountOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: financeaccountInclude<ExtArgs> | null
+    /**
      * Filter, which financeaccount to fetch.
      */
     where?: financeaccountWhereInput
@@ -7453,6 +7792,10 @@ export namespace Prisma {
      * Omit specific fields from the financeaccount
      */
     omit?: financeaccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: financeaccountInclude<ExtArgs> | null
     /**
      * Filter, which financeaccounts to fetch.
      */
@@ -7502,6 +7845,10 @@ export namespace Prisma {
      */
     omit?: financeaccountOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: financeaccountInclude<ExtArgs> | null
+    /**
      * The data needed to create a financeaccount.
      */
     data: XOR<financeaccountCreateInput, financeaccountUncheckedCreateInput>
@@ -7547,6 +7894,10 @@ export namespace Prisma {
      * Omit specific fields from the financeaccount
      */
     omit?: financeaccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: financeaccountInclude<ExtArgs> | null
     /**
      * The data needed to update a financeaccount.
      */
@@ -7614,6 +7965,10 @@ export namespace Prisma {
      */
     omit?: financeaccountOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: financeaccountInclude<ExtArgs> | null
+    /**
      * The filter to search for the financeaccount to update in case it exists.
      */
     where: financeaccountWhereUniqueInput
@@ -7640,6 +7995,10 @@ export namespace Prisma {
      */
     omit?: financeaccountOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: financeaccountInclude<ExtArgs> | null
+    /**
      * Filter which financeaccount to delete.
      */
     where: financeaccountWhereUniqueInput
@@ -7660,6 +8019,30 @@ export namespace Prisma {
   }
 
   /**
+   * financeaccount.ledger_entries
+   */
+  export type financeaccount$ledger_entriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_ledger
+     */
+    select?: account_ledgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_ledger
+     */
+    omit?: account_ledgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_ledgerInclude<ExtArgs> | null
+    where?: account_ledgerWhereInput
+    orderBy?: account_ledgerOrderByWithRelationInput | account_ledgerOrderByWithRelationInput[]
+    cursor?: account_ledgerWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Account_ledgerScalarFieldEnum | Account_ledgerScalarFieldEnum[]
+  }
+
+  /**
    * financeaccount without action
    */
   export type financeaccountDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7671,6 +8054,2281 @@ export namespace Prisma {
      * Omit specific fields from the financeaccount
      */
     omit?: financeaccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: financeaccountInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model account_journal
+   */
+
+  export type AggregateAccount_journal = {
+    _count: Account_journalCountAggregateOutputType | null
+    _min: Account_journalMinAggregateOutputType | null
+    _max: Account_journalMaxAggregateOutputType | null
+  }
+
+  export type Account_journalMinAggregateOutputType = {
+    id: string | null
+    date: Date | null
+    description: string | null
+    reference: string | null
+    source: string | null
+    createdby: string | null
+    updatedby: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type Account_journalMaxAggregateOutputType = {
+    id: string | null
+    date: Date | null
+    description: string | null
+    reference: string | null
+    source: string | null
+    createdby: string | null
+    updatedby: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type Account_journalCountAggregateOutputType = {
+    id: number
+    date: number
+    description: number
+    reference: number
+    source: number
+    createdby: number
+    updatedby: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type Account_journalMinAggregateInputType = {
+    id?: true
+    date?: true
+    description?: true
+    reference?: true
+    source?: true
+    createdby?: true
+    updatedby?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type Account_journalMaxAggregateInputType = {
+    id?: true
+    date?: true
+    description?: true
+    reference?: true
+    source?: true
+    createdby?: true
+    updatedby?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type Account_journalCountAggregateInputType = {
+    id?: true
+    date?: true
+    description?: true
+    reference?: true
+    source?: true
+    createdby?: true
+    updatedby?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type Account_journalAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which account_journal to aggregate.
+     */
+    where?: account_journalWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of account_journals to fetch.
+     */
+    orderBy?: account_journalOrderByWithRelationInput | account_journalOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: account_journalWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` account_journals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` account_journals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned account_journals
+    **/
+    _count?: true | Account_journalCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: Account_journalMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: Account_journalMaxAggregateInputType
+  }
+
+  export type GetAccount_journalAggregateType<T extends Account_journalAggregateArgs> = {
+        [P in keyof T & keyof AggregateAccount_journal]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAccount_journal[P]>
+      : GetScalarType<T[P], AggregateAccount_journal[P]>
+  }
+
+
+
+
+  export type account_journalGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: account_journalWhereInput
+    orderBy?: account_journalOrderByWithAggregationInput | account_journalOrderByWithAggregationInput[]
+    by: Account_journalScalarFieldEnum[] | Account_journalScalarFieldEnum
+    having?: account_journalScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: Account_journalCountAggregateInputType | true
+    _min?: Account_journalMinAggregateInputType
+    _max?: Account_journalMaxAggregateInputType
+  }
+
+  export type Account_journalGroupByOutputType = {
+    id: string
+    date: Date
+    description: string | null
+    reference: string | null
+    source: string | null
+    createdby: string | null
+    updatedby: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: Account_journalCountAggregateOutputType | null
+    _min: Account_journalMinAggregateOutputType | null
+    _max: Account_journalMaxAggregateOutputType | null
+  }
+
+  type GetAccount_journalGroupByPayload<T extends account_journalGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<Account_journalGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof Account_journalGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], Account_journalGroupByOutputType[P]>
+            : GetScalarType<T[P], Account_journalGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type account_journalSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    date?: boolean
+    description?: boolean
+    reference?: boolean
+    source?: boolean
+    createdby?: boolean
+    updatedby?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    ledger_entries?: boolean | account_journal$ledger_entriesArgs<ExtArgs>
+    _count?: boolean | Account_journalCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["account_journal"]>
+
+  export type account_journalSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    date?: boolean
+    description?: boolean
+    reference?: boolean
+    source?: boolean
+    createdby?: boolean
+    updatedby?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["account_journal"]>
+
+  export type account_journalSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    date?: boolean
+    description?: boolean
+    reference?: boolean
+    source?: boolean
+    createdby?: boolean
+    updatedby?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["account_journal"]>
+
+  export type account_journalSelectScalar = {
+    id?: boolean
+    date?: boolean
+    description?: boolean
+    reference?: boolean
+    source?: boolean
+    createdby?: boolean
+    updatedby?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type account_journalOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "date" | "description" | "reference" | "source" | "createdby" | "updatedby" | "createdAt" | "updatedAt", ExtArgs["result"]["account_journal"]>
+  export type account_journalInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    ledger_entries?: boolean | account_journal$ledger_entriesArgs<ExtArgs>
+    _count?: boolean | Account_journalCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type account_journalIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type account_journalIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $account_journalPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "account_journal"
+    objects: {
+      ledger_entries: Prisma.$account_ledgerPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      date: Date
+      description: string | null
+      reference: string | null
+      source: string | null
+      createdby: string | null
+      updatedby: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["account_journal"]>
+    composites: {}
+  }
+
+  type account_journalGetPayload<S extends boolean | null | undefined | account_journalDefaultArgs> = $Result.GetResult<Prisma.$account_journalPayload, S>
+
+  type account_journalCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<account_journalFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: Account_journalCountAggregateInputType | true
+    }
+
+  export interface account_journalDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['account_journal'], meta: { name: 'account_journal' } }
+    /**
+     * Find zero or one Account_journal that matches the filter.
+     * @param {account_journalFindUniqueArgs} args - Arguments to find a Account_journal
+     * @example
+     * // Get one Account_journal
+     * const account_journal = await prisma.account_journal.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends account_journalFindUniqueArgs>(args: SelectSubset<T, account_journalFindUniqueArgs<ExtArgs>>): Prisma__account_journalClient<$Result.GetResult<Prisma.$account_journalPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Account_journal that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {account_journalFindUniqueOrThrowArgs} args - Arguments to find a Account_journal
+     * @example
+     * // Get one Account_journal
+     * const account_journal = await prisma.account_journal.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends account_journalFindUniqueOrThrowArgs>(args: SelectSubset<T, account_journalFindUniqueOrThrowArgs<ExtArgs>>): Prisma__account_journalClient<$Result.GetResult<Prisma.$account_journalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Account_journal that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {account_journalFindFirstArgs} args - Arguments to find a Account_journal
+     * @example
+     * // Get one Account_journal
+     * const account_journal = await prisma.account_journal.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends account_journalFindFirstArgs>(args?: SelectSubset<T, account_journalFindFirstArgs<ExtArgs>>): Prisma__account_journalClient<$Result.GetResult<Prisma.$account_journalPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Account_journal that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {account_journalFindFirstOrThrowArgs} args - Arguments to find a Account_journal
+     * @example
+     * // Get one Account_journal
+     * const account_journal = await prisma.account_journal.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends account_journalFindFirstOrThrowArgs>(args?: SelectSubset<T, account_journalFindFirstOrThrowArgs<ExtArgs>>): Prisma__account_journalClient<$Result.GetResult<Prisma.$account_journalPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Account_journals that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {account_journalFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Account_journals
+     * const account_journals = await prisma.account_journal.findMany()
+     * 
+     * // Get first 10 Account_journals
+     * const account_journals = await prisma.account_journal.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const account_journalWithIdOnly = await prisma.account_journal.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends account_journalFindManyArgs>(args?: SelectSubset<T, account_journalFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$account_journalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Account_journal.
+     * @param {account_journalCreateArgs} args - Arguments to create a Account_journal.
+     * @example
+     * // Create one Account_journal
+     * const Account_journal = await prisma.account_journal.create({
+     *   data: {
+     *     // ... data to create a Account_journal
+     *   }
+     * })
+     * 
+     */
+    create<T extends account_journalCreateArgs>(args: SelectSubset<T, account_journalCreateArgs<ExtArgs>>): Prisma__account_journalClient<$Result.GetResult<Prisma.$account_journalPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Account_journals.
+     * @param {account_journalCreateManyArgs} args - Arguments to create many Account_journals.
+     * @example
+     * // Create many Account_journals
+     * const account_journal = await prisma.account_journal.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends account_journalCreateManyArgs>(args?: SelectSubset<T, account_journalCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Account_journals and returns the data saved in the database.
+     * @param {account_journalCreateManyAndReturnArgs} args - Arguments to create many Account_journals.
+     * @example
+     * // Create many Account_journals
+     * const account_journal = await prisma.account_journal.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Account_journals and only return the `id`
+     * const account_journalWithIdOnly = await prisma.account_journal.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends account_journalCreateManyAndReturnArgs>(args?: SelectSubset<T, account_journalCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$account_journalPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Account_journal.
+     * @param {account_journalDeleteArgs} args - Arguments to delete one Account_journal.
+     * @example
+     * // Delete one Account_journal
+     * const Account_journal = await prisma.account_journal.delete({
+     *   where: {
+     *     // ... filter to delete one Account_journal
+     *   }
+     * })
+     * 
+     */
+    delete<T extends account_journalDeleteArgs>(args: SelectSubset<T, account_journalDeleteArgs<ExtArgs>>): Prisma__account_journalClient<$Result.GetResult<Prisma.$account_journalPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Account_journal.
+     * @param {account_journalUpdateArgs} args - Arguments to update one Account_journal.
+     * @example
+     * // Update one Account_journal
+     * const account_journal = await prisma.account_journal.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends account_journalUpdateArgs>(args: SelectSubset<T, account_journalUpdateArgs<ExtArgs>>): Prisma__account_journalClient<$Result.GetResult<Prisma.$account_journalPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Account_journals.
+     * @param {account_journalDeleteManyArgs} args - Arguments to filter Account_journals to delete.
+     * @example
+     * // Delete a few Account_journals
+     * const { count } = await prisma.account_journal.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends account_journalDeleteManyArgs>(args?: SelectSubset<T, account_journalDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Account_journals.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {account_journalUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Account_journals
+     * const account_journal = await prisma.account_journal.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends account_journalUpdateManyArgs>(args: SelectSubset<T, account_journalUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Account_journals and returns the data updated in the database.
+     * @param {account_journalUpdateManyAndReturnArgs} args - Arguments to update many Account_journals.
+     * @example
+     * // Update many Account_journals
+     * const account_journal = await prisma.account_journal.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Account_journals and only return the `id`
+     * const account_journalWithIdOnly = await prisma.account_journal.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends account_journalUpdateManyAndReturnArgs>(args: SelectSubset<T, account_journalUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$account_journalPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Account_journal.
+     * @param {account_journalUpsertArgs} args - Arguments to update or create a Account_journal.
+     * @example
+     * // Update or create a Account_journal
+     * const account_journal = await prisma.account_journal.upsert({
+     *   create: {
+     *     // ... data to create a Account_journal
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Account_journal we want to update
+     *   }
+     * })
+     */
+    upsert<T extends account_journalUpsertArgs>(args: SelectSubset<T, account_journalUpsertArgs<ExtArgs>>): Prisma__account_journalClient<$Result.GetResult<Prisma.$account_journalPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Account_journals.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {account_journalCountArgs} args - Arguments to filter Account_journals to count.
+     * @example
+     * // Count the number of Account_journals
+     * const count = await prisma.account_journal.count({
+     *   where: {
+     *     // ... the filter for the Account_journals we want to count
+     *   }
+     * })
+    **/
+    count<T extends account_journalCountArgs>(
+      args?: Subset<T, account_journalCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], Account_journalCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Account_journal.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {Account_journalAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends Account_journalAggregateArgs>(args: Subset<T, Account_journalAggregateArgs>): Prisma.PrismaPromise<GetAccount_journalAggregateType<T>>
+
+    /**
+     * Group by Account_journal.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {account_journalGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends account_journalGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: account_journalGroupByArgs['orderBy'] }
+        : { orderBy?: account_journalGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, account_journalGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAccount_journalGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the account_journal model
+   */
+  readonly fields: account_journalFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for account_journal.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__account_journalClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    ledger_entries<T extends account_journal$ledger_entriesArgs<ExtArgs> = {}>(args?: Subset<T, account_journal$ledger_entriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$account_ledgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the account_journal model
+   */
+  interface account_journalFieldRefs {
+    readonly id: FieldRef<"account_journal", 'String'>
+    readonly date: FieldRef<"account_journal", 'DateTime'>
+    readonly description: FieldRef<"account_journal", 'String'>
+    readonly reference: FieldRef<"account_journal", 'String'>
+    readonly source: FieldRef<"account_journal", 'String'>
+    readonly createdby: FieldRef<"account_journal", 'String'>
+    readonly updatedby: FieldRef<"account_journal", 'String'>
+    readonly createdAt: FieldRef<"account_journal", 'DateTime'>
+    readonly updatedAt: FieldRef<"account_journal", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * account_journal findUnique
+   */
+  export type account_journalFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_journal
+     */
+    select?: account_journalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_journal
+     */
+    omit?: account_journalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_journalInclude<ExtArgs> | null
+    /**
+     * Filter, which account_journal to fetch.
+     */
+    where: account_journalWhereUniqueInput
+  }
+
+  /**
+   * account_journal findUniqueOrThrow
+   */
+  export type account_journalFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_journal
+     */
+    select?: account_journalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_journal
+     */
+    omit?: account_journalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_journalInclude<ExtArgs> | null
+    /**
+     * Filter, which account_journal to fetch.
+     */
+    where: account_journalWhereUniqueInput
+  }
+
+  /**
+   * account_journal findFirst
+   */
+  export type account_journalFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_journal
+     */
+    select?: account_journalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_journal
+     */
+    omit?: account_journalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_journalInclude<ExtArgs> | null
+    /**
+     * Filter, which account_journal to fetch.
+     */
+    where?: account_journalWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of account_journals to fetch.
+     */
+    orderBy?: account_journalOrderByWithRelationInput | account_journalOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for account_journals.
+     */
+    cursor?: account_journalWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` account_journals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` account_journals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of account_journals.
+     */
+    distinct?: Account_journalScalarFieldEnum | Account_journalScalarFieldEnum[]
+  }
+
+  /**
+   * account_journal findFirstOrThrow
+   */
+  export type account_journalFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_journal
+     */
+    select?: account_journalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_journal
+     */
+    omit?: account_journalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_journalInclude<ExtArgs> | null
+    /**
+     * Filter, which account_journal to fetch.
+     */
+    where?: account_journalWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of account_journals to fetch.
+     */
+    orderBy?: account_journalOrderByWithRelationInput | account_journalOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for account_journals.
+     */
+    cursor?: account_journalWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` account_journals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` account_journals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of account_journals.
+     */
+    distinct?: Account_journalScalarFieldEnum | Account_journalScalarFieldEnum[]
+  }
+
+  /**
+   * account_journal findMany
+   */
+  export type account_journalFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_journal
+     */
+    select?: account_journalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_journal
+     */
+    omit?: account_journalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_journalInclude<ExtArgs> | null
+    /**
+     * Filter, which account_journals to fetch.
+     */
+    where?: account_journalWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of account_journals to fetch.
+     */
+    orderBy?: account_journalOrderByWithRelationInput | account_journalOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing account_journals.
+     */
+    cursor?: account_journalWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` account_journals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` account_journals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of account_journals.
+     */
+    distinct?: Account_journalScalarFieldEnum | Account_journalScalarFieldEnum[]
+  }
+
+  /**
+   * account_journal create
+   */
+  export type account_journalCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_journal
+     */
+    select?: account_journalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_journal
+     */
+    omit?: account_journalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_journalInclude<ExtArgs> | null
+    /**
+     * The data needed to create a account_journal.
+     */
+    data: XOR<account_journalCreateInput, account_journalUncheckedCreateInput>
+  }
+
+  /**
+   * account_journal createMany
+   */
+  export type account_journalCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many account_journals.
+     */
+    data: account_journalCreateManyInput | account_journalCreateManyInput[]
+  }
+
+  /**
+   * account_journal createManyAndReturn
+   */
+  export type account_journalCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_journal
+     */
+    select?: account_journalSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_journal
+     */
+    omit?: account_journalOmit<ExtArgs> | null
+    /**
+     * The data used to create many account_journals.
+     */
+    data: account_journalCreateManyInput | account_journalCreateManyInput[]
+  }
+
+  /**
+   * account_journal update
+   */
+  export type account_journalUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_journal
+     */
+    select?: account_journalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_journal
+     */
+    omit?: account_journalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_journalInclude<ExtArgs> | null
+    /**
+     * The data needed to update a account_journal.
+     */
+    data: XOR<account_journalUpdateInput, account_journalUncheckedUpdateInput>
+    /**
+     * Choose, which account_journal to update.
+     */
+    where: account_journalWhereUniqueInput
+  }
+
+  /**
+   * account_journal updateMany
+   */
+  export type account_journalUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update account_journals.
+     */
+    data: XOR<account_journalUpdateManyMutationInput, account_journalUncheckedUpdateManyInput>
+    /**
+     * Filter which account_journals to update
+     */
+    where?: account_journalWhereInput
+    /**
+     * Limit how many account_journals to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * account_journal updateManyAndReturn
+   */
+  export type account_journalUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_journal
+     */
+    select?: account_journalSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_journal
+     */
+    omit?: account_journalOmit<ExtArgs> | null
+    /**
+     * The data used to update account_journals.
+     */
+    data: XOR<account_journalUpdateManyMutationInput, account_journalUncheckedUpdateManyInput>
+    /**
+     * Filter which account_journals to update
+     */
+    where?: account_journalWhereInput
+    /**
+     * Limit how many account_journals to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * account_journal upsert
+   */
+  export type account_journalUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_journal
+     */
+    select?: account_journalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_journal
+     */
+    omit?: account_journalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_journalInclude<ExtArgs> | null
+    /**
+     * The filter to search for the account_journal to update in case it exists.
+     */
+    where: account_journalWhereUniqueInput
+    /**
+     * In case the account_journal found by the `where` argument doesn't exist, create a new account_journal with this data.
+     */
+    create: XOR<account_journalCreateInput, account_journalUncheckedCreateInput>
+    /**
+     * In case the account_journal was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<account_journalUpdateInput, account_journalUncheckedUpdateInput>
+  }
+
+  /**
+   * account_journal delete
+   */
+  export type account_journalDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_journal
+     */
+    select?: account_journalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_journal
+     */
+    omit?: account_journalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_journalInclude<ExtArgs> | null
+    /**
+     * Filter which account_journal to delete.
+     */
+    where: account_journalWhereUniqueInput
+  }
+
+  /**
+   * account_journal deleteMany
+   */
+  export type account_journalDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which account_journals to delete
+     */
+    where?: account_journalWhereInput
+    /**
+     * Limit how many account_journals to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * account_journal.ledger_entries
+   */
+  export type account_journal$ledger_entriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_ledger
+     */
+    select?: account_ledgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_ledger
+     */
+    omit?: account_ledgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_ledgerInclude<ExtArgs> | null
+    where?: account_ledgerWhereInput
+    orderBy?: account_ledgerOrderByWithRelationInput | account_ledgerOrderByWithRelationInput[]
+    cursor?: account_ledgerWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Account_ledgerScalarFieldEnum | Account_ledgerScalarFieldEnum[]
+  }
+
+  /**
+   * account_journal without action
+   */
+  export type account_journalDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_journal
+     */
+    select?: account_journalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_journal
+     */
+    omit?: account_journalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_journalInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model account_ledger
+   */
+
+  export type AggregateAccount_ledger = {
+    _count: Account_ledgerCountAggregateOutputType | null
+    _avg: Account_ledgerAvgAggregateOutputType | null
+    _sum: Account_ledgerSumAggregateOutputType | null
+    _min: Account_ledgerMinAggregateOutputType | null
+    _max: Account_ledgerMaxAggregateOutputType | null
+  }
+
+  export type Account_ledgerAvgAggregateOutputType = {
+    debit: number | null
+    credit: number | null
+  }
+
+  export type Account_ledgerSumAggregateOutputType = {
+    debit: number | null
+    credit: number | null
+  }
+
+  export type Account_ledgerMinAggregateOutputType = {
+    id: string | null
+    journal_id: string | null
+    account_id: string | null
+    debit: number | null
+    credit: number | null
+    details: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type Account_ledgerMaxAggregateOutputType = {
+    id: string | null
+    journal_id: string | null
+    account_id: string | null
+    debit: number | null
+    credit: number | null
+    details: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type Account_ledgerCountAggregateOutputType = {
+    id: number
+    journal_id: number
+    account_id: number
+    debit: number
+    credit: number
+    details: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type Account_ledgerAvgAggregateInputType = {
+    debit?: true
+    credit?: true
+  }
+
+  export type Account_ledgerSumAggregateInputType = {
+    debit?: true
+    credit?: true
+  }
+
+  export type Account_ledgerMinAggregateInputType = {
+    id?: true
+    journal_id?: true
+    account_id?: true
+    debit?: true
+    credit?: true
+    details?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type Account_ledgerMaxAggregateInputType = {
+    id?: true
+    journal_id?: true
+    account_id?: true
+    debit?: true
+    credit?: true
+    details?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type Account_ledgerCountAggregateInputType = {
+    id?: true
+    journal_id?: true
+    account_id?: true
+    debit?: true
+    credit?: true
+    details?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type Account_ledgerAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which account_ledger to aggregate.
+     */
+    where?: account_ledgerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of account_ledgers to fetch.
+     */
+    orderBy?: account_ledgerOrderByWithRelationInput | account_ledgerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: account_ledgerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` account_ledgers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` account_ledgers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned account_ledgers
+    **/
+    _count?: true | Account_ledgerCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: Account_ledgerAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: Account_ledgerSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: Account_ledgerMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: Account_ledgerMaxAggregateInputType
+  }
+
+  export type GetAccount_ledgerAggregateType<T extends Account_ledgerAggregateArgs> = {
+        [P in keyof T & keyof AggregateAccount_ledger]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAccount_ledger[P]>
+      : GetScalarType<T[P], AggregateAccount_ledger[P]>
+  }
+
+
+
+
+  export type account_ledgerGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: account_ledgerWhereInput
+    orderBy?: account_ledgerOrderByWithAggregationInput | account_ledgerOrderByWithAggregationInput[]
+    by: Account_ledgerScalarFieldEnum[] | Account_ledgerScalarFieldEnum
+    having?: account_ledgerScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: Account_ledgerCountAggregateInputType | true
+    _avg?: Account_ledgerAvgAggregateInputType
+    _sum?: Account_ledgerSumAggregateInputType
+    _min?: Account_ledgerMinAggregateInputType
+    _max?: Account_ledgerMaxAggregateInputType
+  }
+
+  export type Account_ledgerGroupByOutputType = {
+    id: string
+    journal_id: string
+    account_id: string
+    debit: number
+    credit: number
+    details: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: Account_ledgerCountAggregateOutputType | null
+    _avg: Account_ledgerAvgAggregateOutputType | null
+    _sum: Account_ledgerSumAggregateOutputType | null
+    _min: Account_ledgerMinAggregateOutputType | null
+    _max: Account_ledgerMaxAggregateOutputType | null
+  }
+
+  type GetAccount_ledgerGroupByPayload<T extends account_ledgerGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<Account_ledgerGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof Account_ledgerGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], Account_ledgerGroupByOutputType[P]>
+            : GetScalarType<T[P], Account_ledgerGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type account_ledgerSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    journal_id?: boolean
+    account_id?: boolean
+    debit?: boolean
+    credit?: boolean
+    details?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    journal?: boolean | account_journalDefaultArgs<ExtArgs>
+    account?: boolean | financeaccountDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["account_ledger"]>
+
+  export type account_ledgerSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    journal_id?: boolean
+    account_id?: boolean
+    debit?: boolean
+    credit?: boolean
+    details?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    journal?: boolean | account_journalDefaultArgs<ExtArgs>
+    account?: boolean | financeaccountDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["account_ledger"]>
+
+  export type account_ledgerSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    journal_id?: boolean
+    account_id?: boolean
+    debit?: boolean
+    credit?: boolean
+    details?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    journal?: boolean | account_journalDefaultArgs<ExtArgs>
+    account?: boolean | financeaccountDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["account_ledger"]>
+
+  export type account_ledgerSelectScalar = {
+    id?: boolean
+    journal_id?: boolean
+    account_id?: boolean
+    debit?: boolean
+    credit?: boolean
+    details?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type account_ledgerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "journal_id" | "account_id" | "debit" | "credit" | "details" | "createdAt" | "updatedAt", ExtArgs["result"]["account_ledger"]>
+  export type account_ledgerInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    journal?: boolean | account_journalDefaultArgs<ExtArgs>
+    account?: boolean | financeaccountDefaultArgs<ExtArgs>
+  }
+  export type account_ledgerIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    journal?: boolean | account_journalDefaultArgs<ExtArgs>
+    account?: boolean | financeaccountDefaultArgs<ExtArgs>
+  }
+  export type account_ledgerIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    journal?: boolean | account_journalDefaultArgs<ExtArgs>
+    account?: boolean | financeaccountDefaultArgs<ExtArgs>
+  }
+
+  export type $account_ledgerPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "account_ledger"
+    objects: {
+      journal: Prisma.$account_journalPayload<ExtArgs>
+      account: Prisma.$financeaccountPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      journal_id: string
+      account_id: string
+      debit: number
+      credit: number
+      details: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["account_ledger"]>
+    composites: {}
+  }
+
+  type account_ledgerGetPayload<S extends boolean | null | undefined | account_ledgerDefaultArgs> = $Result.GetResult<Prisma.$account_ledgerPayload, S>
+
+  type account_ledgerCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<account_ledgerFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: Account_ledgerCountAggregateInputType | true
+    }
+
+  export interface account_ledgerDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['account_ledger'], meta: { name: 'account_ledger' } }
+    /**
+     * Find zero or one Account_ledger that matches the filter.
+     * @param {account_ledgerFindUniqueArgs} args - Arguments to find a Account_ledger
+     * @example
+     * // Get one Account_ledger
+     * const account_ledger = await prisma.account_ledger.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends account_ledgerFindUniqueArgs>(args: SelectSubset<T, account_ledgerFindUniqueArgs<ExtArgs>>): Prisma__account_ledgerClient<$Result.GetResult<Prisma.$account_ledgerPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Account_ledger that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {account_ledgerFindUniqueOrThrowArgs} args - Arguments to find a Account_ledger
+     * @example
+     * // Get one Account_ledger
+     * const account_ledger = await prisma.account_ledger.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends account_ledgerFindUniqueOrThrowArgs>(args: SelectSubset<T, account_ledgerFindUniqueOrThrowArgs<ExtArgs>>): Prisma__account_ledgerClient<$Result.GetResult<Prisma.$account_ledgerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Account_ledger that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {account_ledgerFindFirstArgs} args - Arguments to find a Account_ledger
+     * @example
+     * // Get one Account_ledger
+     * const account_ledger = await prisma.account_ledger.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends account_ledgerFindFirstArgs>(args?: SelectSubset<T, account_ledgerFindFirstArgs<ExtArgs>>): Prisma__account_ledgerClient<$Result.GetResult<Prisma.$account_ledgerPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Account_ledger that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {account_ledgerFindFirstOrThrowArgs} args - Arguments to find a Account_ledger
+     * @example
+     * // Get one Account_ledger
+     * const account_ledger = await prisma.account_ledger.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends account_ledgerFindFirstOrThrowArgs>(args?: SelectSubset<T, account_ledgerFindFirstOrThrowArgs<ExtArgs>>): Prisma__account_ledgerClient<$Result.GetResult<Prisma.$account_ledgerPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Account_ledgers that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {account_ledgerFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Account_ledgers
+     * const account_ledgers = await prisma.account_ledger.findMany()
+     * 
+     * // Get first 10 Account_ledgers
+     * const account_ledgers = await prisma.account_ledger.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const account_ledgerWithIdOnly = await prisma.account_ledger.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends account_ledgerFindManyArgs>(args?: SelectSubset<T, account_ledgerFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$account_ledgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Account_ledger.
+     * @param {account_ledgerCreateArgs} args - Arguments to create a Account_ledger.
+     * @example
+     * // Create one Account_ledger
+     * const Account_ledger = await prisma.account_ledger.create({
+     *   data: {
+     *     // ... data to create a Account_ledger
+     *   }
+     * })
+     * 
+     */
+    create<T extends account_ledgerCreateArgs>(args: SelectSubset<T, account_ledgerCreateArgs<ExtArgs>>): Prisma__account_ledgerClient<$Result.GetResult<Prisma.$account_ledgerPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Account_ledgers.
+     * @param {account_ledgerCreateManyArgs} args - Arguments to create many Account_ledgers.
+     * @example
+     * // Create many Account_ledgers
+     * const account_ledger = await prisma.account_ledger.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends account_ledgerCreateManyArgs>(args?: SelectSubset<T, account_ledgerCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Account_ledgers and returns the data saved in the database.
+     * @param {account_ledgerCreateManyAndReturnArgs} args - Arguments to create many Account_ledgers.
+     * @example
+     * // Create many Account_ledgers
+     * const account_ledger = await prisma.account_ledger.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Account_ledgers and only return the `id`
+     * const account_ledgerWithIdOnly = await prisma.account_ledger.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends account_ledgerCreateManyAndReturnArgs>(args?: SelectSubset<T, account_ledgerCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$account_ledgerPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Account_ledger.
+     * @param {account_ledgerDeleteArgs} args - Arguments to delete one Account_ledger.
+     * @example
+     * // Delete one Account_ledger
+     * const Account_ledger = await prisma.account_ledger.delete({
+     *   where: {
+     *     // ... filter to delete one Account_ledger
+     *   }
+     * })
+     * 
+     */
+    delete<T extends account_ledgerDeleteArgs>(args: SelectSubset<T, account_ledgerDeleteArgs<ExtArgs>>): Prisma__account_ledgerClient<$Result.GetResult<Prisma.$account_ledgerPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Account_ledger.
+     * @param {account_ledgerUpdateArgs} args - Arguments to update one Account_ledger.
+     * @example
+     * // Update one Account_ledger
+     * const account_ledger = await prisma.account_ledger.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends account_ledgerUpdateArgs>(args: SelectSubset<T, account_ledgerUpdateArgs<ExtArgs>>): Prisma__account_ledgerClient<$Result.GetResult<Prisma.$account_ledgerPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Account_ledgers.
+     * @param {account_ledgerDeleteManyArgs} args - Arguments to filter Account_ledgers to delete.
+     * @example
+     * // Delete a few Account_ledgers
+     * const { count } = await prisma.account_ledger.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends account_ledgerDeleteManyArgs>(args?: SelectSubset<T, account_ledgerDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Account_ledgers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {account_ledgerUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Account_ledgers
+     * const account_ledger = await prisma.account_ledger.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends account_ledgerUpdateManyArgs>(args: SelectSubset<T, account_ledgerUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Account_ledgers and returns the data updated in the database.
+     * @param {account_ledgerUpdateManyAndReturnArgs} args - Arguments to update many Account_ledgers.
+     * @example
+     * // Update many Account_ledgers
+     * const account_ledger = await prisma.account_ledger.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Account_ledgers and only return the `id`
+     * const account_ledgerWithIdOnly = await prisma.account_ledger.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends account_ledgerUpdateManyAndReturnArgs>(args: SelectSubset<T, account_ledgerUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$account_ledgerPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Account_ledger.
+     * @param {account_ledgerUpsertArgs} args - Arguments to update or create a Account_ledger.
+     * @example
+     * // Update or create a Account_ledger
+     * const account_ledger = await prisma.account_ledger.upsert({
+     *   create: {
+     *     // ... data to create a Account_ledger
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Account_ledger we want to update
+     *   }
+     * })
+     */
+    upsert<T extends account_ledgerUpsertArgs>(args: SelectSubset<T, account_ledgerUpsertArgs<ExtArgs>>): Prisma__account_ledgerClient<$Result.GetResult<Prisma.$account_ledgerPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Account_ledgers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {account_ledgerCountArgs} args - Arguments to filter Account_ledgers to count.
+     * @example
+     * // Count the number of Account_ledgers
+     * const count = await prisma.account_ledger.count({
+     *   where: {
+     *     // ... the filter for the Account_ledgers we want to count
+     *   }
+     * })
+    **/
+    count<T extends account_ledgerCountArgs>(
+      args?: Subset<T, account_ledgerCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], Account_ledgerCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Account_ledger.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {Account_ledgerAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends Account_ledgerAggregateArgs>(args: Subset<T, Account_ledgerAggregateArgs>): Prisma.PrismaPromise<GetAccount_ledgerAggregateType<T>>
+
+    /**
+     * Group by Account_ledger.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {account_ledgerGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends account_ledgerGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: account_ledgerGroupByArgs['orderBy'] }
+        : { orderBy?: account_ledgerGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, account_ledgerGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAccount_ledgerGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the account_ledger model
+   */
+  readonly fields: account_ledgerFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for account_ledger.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__account_ledgerClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    journal<T extends account_journalDefaultArgs<ExtArgs> = {}>(args?: Subset<T, account_journalDefaultArgs<ExtArgs>>): Prisma__account_journalClient<$Result.GetResult<Prisma.$account_journalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    account<T extends financeaccountDefaultArgs<ExtArgs> = {}>(args?: Subset<T, financeaccountDefaultArgs<ExtArgs>>): Prisma__financeaccountClient<$Result.GetResult<Prisma.$financeaccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the account_ledger model
+   */
+  interface account_ledgerFieldRefs {
+    readonly id: FieldRef<"account_ledger", 'String'>
+    readonly journal_id: FieldRef<"account_ledger", 'String'>
+    readonly account_id: FieldRef<"account_ledger", 'String'>
+    readonly debit: FieldRef<"account_ledger", 'Float'>
+    readonly credit: FieldRef<"account_ledger", 'Float'>
+    readonly details: FieldRef<"account_ledger", 'String'>
+    readonly createdAt: FieldRef<"account_ledger", 'DateTime'>
+    readonly updatedAt: FieldRef<"account_ledger", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * account_ledger findUnique
+   */
+  export type account_ledgerFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_ledger
+     */
+    select?: account_ledgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_ledger
+     */
+    omit?: account_ledgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_ledgerInclude<ExtArgs> | null
+    /**
+     * Filter, which account_ledger to fetch.
+     */
+    where: account_ledgerWhereUniqueInput
+  }
+
+  /**
+   * account_ledger findUniqueOrThrow
+   */
+  export type account_ledgerFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_ledger
+     */
+    select?: account_ledgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_ledger
+     */
+    omit?: account_ledgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_ledgerInclude<ExtArgs> | null
+    /**
+     * Filter, which account_ledger to fetch.
+     */
+    where: account_ledgerWhereUniqueInput
+  }
+
+  /**
+   * account_ledger findFirst
+   */
+  export type account_ledgerFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_ledger
+     */
+    select?: account_ledgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_ledger
+     */
+    omit?: account_ledgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_ledgerInclude<ExtArgs> | null
+    /**
+     * Filter, which account_ledger to fetch.
+     */
+    where?: account_ledgerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of account_ledgers to fetch.
+     */
+    orderBy?: account_ledgerOrderByWithRelationInput | account_ledgerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for account_ledgers.
+     */
+    cursor?: account_ledgerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` account_ledgers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` account_ledgers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of account_ledgers.
+     */
+    distinct?: Account_ledgerScalarFieldEnum | Account_ledgerScalarFieldEnum[]
+  }
+
+  /**
+   * account_ledger findFirstOrThrow
+   */
+  export type account_ledgerFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_ledger
+     */
+    select?: account_ledgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_ledger
+     */
+    omit?: account_ledgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_ledgerInclude<ExtArgs> | null
+    /**
+     * Filter, which account_ledger to fetch.
+     */
+    where?: account_ledgerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of account_ledgers to fetch.
+     */
+    orderBy?: account_ledgerOrderByWithRelationInput | account_ledgerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for account_ledgers.
+     */
+    cursor?: account_ledgerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` account_ledgers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` account_ledgers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of account_ledgers.
+     */
+    distinct?: Account_ledgerScalarFieldEnum | Account_ledgerScalarFieldEnum[]
+  }
+
+  /**
+   * account_ledger findMany
+   */
+  export type account_ledgerFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_ledger
+     */
+    select?: account_ledgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_ledger
+     */
+    omit?: account_ledgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_ledgerInclude<ExtArgs> | null
+    /**
+     * Filter, which account_ledgers to fetch.
+     */
+    where?: account_ledgerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of account_ledgers to fetch.
+     */
+    orderBy?: account_ledgerOrderByWithRelationInput | account_ledgerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing account_ledgers.
+     */
+    cursor?: account_ledgerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` account_ledgers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` account_ledgers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of account_ledgers.
+     */
+    distinct?: Account_ledgerScalarFieldEnum | Account_ledgerScalarFieldEnum[]
+  }
+
+  /**
+   * account_ledger create
+   */
+  export type account_ledgerCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_ledger
+     */
+    select?: account_ledgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_ledger
+     */
+    omit?: account_ledgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_ledgerInclude<ExtArgs> | null
+    /**
+     * The data needed to create a account_ledger.
+     */
+    data: XOR<account_ledgerCreateInput, account_ledgerUncheckedCreateInput>
+  }
+
+  /**
+   * account_ledger createMany
+   */
+  export type account_ledgerCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many account_ledgers.
+     */
+    data: account_ledgerCreateManyInput | account_ledgerCreateManyInput[]
+  }
+
+  /**
+   * account_ledger createManyAndReturn
+   */
+  export type account_ledgerCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_ledger
+     */
+    select?: account_ledgerSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_ledger
+     */
+    omit?: account_ledgerOmit<ExtArgs> | null
+    /**
+     * The data used to create many account_ledgers.
+     */
+    data: account_ledgerCreateManyInput | account_ledgerCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_ledgerIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * account_ledger update
+   */
+  export type account_ledgerUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_ledger
+     */
+    select?: account_ledgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_ledger
+     */
+    omit?: account_ledgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_ledgerInclude<ExtArgs> | null
+    /**
+     * The data needed to update a account_ledger.
+     */
+    data: XOR<account_ledgerUpdateInput, account_ledgerUncheckedUpdateInput>
+    /**
+     * Choose, which account_ledger to update.
+     */
+    where: account_ledgerWhereUniqueInput
+  }
+
+  /**
+   * account_ledger updateMany
+   */
+  export type account_ledgerUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update account_ledgers.
+     */
+    data: XOR<account_ledgerUpdateManyMutationInput, account_ledgerUncheckedUpdateManyInput>
+    /**
+     * Filter which account_ledgers to update
+     */
+    where?: account_ledgerWhereInput
+    /**
+     * Limit how many account_ledgers to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * account_ledger updateManyAndReturn
+   */
+  export type account_ledgerUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_ledger
+     */
+    select?: account_ledgerSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_ledger
+     */
+    omit?: account_ledgerOmit<ExtArgs> | null
+    /**
+     * The data used to update account_ledgers.
+     */
+    data: XOR<account_ledgerUpdateManyMutationInput, account_ledgerUncheckedUpdateManyInput>
+    /**
+     * Filter which account_ledgers to update
+     */
+    where?: account_ledgerWhereInput
+    /**
+     * Limit how many account_ledgers to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_ledgerIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * account_ledger upsert
+   */
+  export type account_ledgerUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_ledger
+     */
+    select?: account_ledgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_ledger
+     */
+    omit?: account_ledgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_ledgerInclude<ExtArgs> | null
+    /**
+     * The filter to search for the account_ledger to update in case it exists.
+     */
+    where: account_ledgerWhereUniqueInput
+    /**
+     * In case the account_ledger found by the `where` argument doesn't exist, create a new account_ledger with this data.
+     */
+    create: XOR<account_ledgerCreateInput, account_ledgerUncheckedCreateInput>
+    /**
+     * In case the account_ledger was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<account_ledgerUpdateInput, account_ledgerUncheckedUpdateInput>
+  }
+
+  /**
+   * account_ledger delete
+   */
+  export type account_ledgerDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_ledger
+     */
+    select?: account_ledgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_ledger
+     */
+    omit?: account_ledgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_ledgerInclude<ExtArgs> | null
+    /**
+     * Filter which account_ledger to delete.
+     */
+    where: account_ledgerWhereUniqueInput
+  }
+
+  /**
+   * account_ledger deleteMany
+   */
+  export type account_ledgerDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which account_ledgers to delete
+     */
+    where?: account_ledgerWhereInput
+    /**
+     * Limit how many account_ledgers to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * account_ledger without action
+   */
+  export type account_ledgerDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the account_ledger
+     */
+    select?: account_ledgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the account_ledger
+     */
+    omit?: account_ledgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: account_ledgerInclude<ExtArgs> | null
   }
 
 
@@ -14359,8 +17017,10 @@ export namespace Prisma {
     createdby: string | null
     updatedby: string | null
     vendor: string | null
+    discountpercentage: string | null
     totalAmount: number | null
     totalPayment: number | null
+    ledger: boolean | null
     invoicenum: string | null
     source: string | null
     createdAt: Date | null
@@ -14372,8 +17032,10 @@ export namespace Prisma {
     createdby: string | null
     updatedby: string | null
     vendor: string | null
+    discountpercentage: string | null
     totalAmount: number | null
     totalPayment: number | null
+    ledger: boolean | null
     invoicenum: string | null
     source: string | null
     createdAt: Date | null
@@ -14385,8 +17047,10 @@ export namespace Prisma {
     createdby: number
     updatedby: number
     vendor: number
+    discountpercentage: number
     totalAmount: number
     totalPayment: number
+    ledger: number
     invoicenum: number
     source: number
     createdAt: number
@@ -14410,8 +17074,10 @@ export namespace Prisma {
     createdby?: true
     updatedby?: true
     vendor?: true
+    discountpercentage?: true
     totalAmount?: true
     totalPayment?: true
+    ledger?: true
     invoicenum?: true
     source?: true
     createdAt?: true
@@ -14423,8 +17089,10 @@ export namespace Prisma {
     createdby?: true
     updatedby?: true
     vendor?: true
+    discountpercentage?: true
     totalAmount?: true
     totalPayment?: true
+    ledger?: true
     invoicenum?: true
     source?: true
     createdAt?: true
@@ -14436,8 +17104,10 @@ export namespace Prisma {
     createdby?: true
     updatedby?: true
     vendor?: true
+    discountpercentage?: true
     totalAmount?: true
     totalPayment?: true
+    ledger?: true
     invoicenum?: true
     source?: true
     createdAt?: true
@@ -14536,8 +17206,10 @@ export namespace Prisma {
     createdby: string | null
     updatedby: string | null
     vendor: string | null
+    discountpercentage: string | null
     totalAmount: number | null
     totalPayment: number | null
+    ledger: boolean | null
     invoicenum: string | null
     source: string | null
     createdAt: Date
@@ -14568,8 +17240,10 @@ export namespace Prisma {
     createdby?: boolean
     updatedby?: boolean
     vendor?: boolean
+    discountpercentage?: boolean
     totalAmount?: boolean
     totalPayment?: boolean
+    ledger?: boolean
     invoicenum?: boolean
     source?: boolean
     createdAt?: boolean
@@ -14581,8 +17255,10 @@ export namespace Prisma {
     createdby?: boolean
     updatedby?: boolean
     vendor?: boolean
+    discountpercentage?: boolean
     totalAmount?: boolean
     totalPayment?: boolean
+    ledger?: boolean
     invoicenum?: boolean
     source?: boolean
     createdAt?: boolean
@@ -14594,8 +17270,10 @@ export namespace Prisma {
     createdby?: boolean
     updatedby?: boolean
     vendor?: boolean
+    discountpercentage?: boolean
     totalAmount?: boolean
     totalPayment?: boolean
+    ledger?: boolean
     invoicenum?: boolean
     source?: boolean
     createdAt?: boolean
@@ -14607,15 +17285,17 @@ export namespace Prisma {
     createdby?: boolean
     updatedby?: boolean
     vendor?: boolean
+    discountpercentage?: boolean
     totalAmount?: boolean
     totalPayment?: boolean
+    ledger?: boolean
     invoicenum?: boolean
     source?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type purchaseOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdby" | "updatedby" | "vendor" | "totalAmount" | "totalPayment" | "invoicenum" | "source" | "createdAt" | "updatedAt", ExtArgs["result"]["purchase"]>
+  export type purchaseOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdby" | "updatedby" | "vendor" | "discountpercentage" | "totalAmount" | "totalPayment" | "ledger" | "invoicenum" | "source" | "createdAt" | "updatedAt", ExtArgs["result"]["purchase"]>
 
   export type $purchasePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "purchase"
@@ -14625,8 +17305,10 @@ export namespace Prisma {
       createdby: string | null
       updatedby: string | null
       vendor: string | null
+      discountpercentage: string | null
       totalAmount: number | null
       totalPayment: number | null
+      ledger: boolean | null
       invoicenum: string | null
       source: string | null
       createdAt: Date
@@ -15058,8 +17740,10 @@ export namespace Prisma {
     readonly createdby: FieldRef<"purchase", 'String'>
     readonly updatedby: FieldRef<"purchase", 'String'>
     readonly vendor: FieldRef<"purchase", 'String'>
+    readonly discountpercentage: FieldRef<"purchase", 'String'>
     readonly totalAmount: FieldRef<"purchase", 'Float'>
     readonly totalPayment: FieldRef<"purchase", 'Float'>
+    readonly ledger: FieldRef<"purchase", 'Boolean'>
     readonly invoicenum: FieldRef<"purchase", 'String'>
     readonly source: FieldRef<"purchase", 'String'>
     readonly createdAt: FieldRef<"purchase", 'DateTime'>
@@ -15447,11 +18131,13 @@ export namespace Prisma {
 
   export type PurchasedproductsAvgAggregateOutputType = {
     quantity: number | null
+    price: number | null
     totalAmount: number | null
   }
 
   export type PurchasedproductsSumAggregateOutputType = {
     quantity: number | null
+    price: number | null
     totalAmount: number | null
   }
 
@@ -15460,6 +18146,7 @@ export namespace Prisma {
     purchase: string | null
     product: string | null
     quantity: number | null
+    price: number | null
     totalAmount: number | null
     source: string | null
     createdAt: Date | null
@@ -15471,6 +18158,7 @@ export namespace Prisma {
     purchase: string | null
     product: string | null
     quantity: number | null
+    price: number | null
     totalAmount: number | null
     source: string | null
     createdAt: Date | null
@@ -15482,6 +18170,7 @@ export namespace Prisma {
     purchase: number
     product: number
     quantity: number
+    price: number
     totalAmount: number
     source: number
     createdAt: number
@@ -15492,11 +18181,13 @@ export namespace Prisma {
 
   export type PurchasedproductsAvgAggregateInputType = {
     quantity?: true
+    price?: true
     totalAmount?: true
   }
 
   export type PurchasedproductsSumAggregateInputType = {
     quantity?: true
+    price?: true
     totalAmount?: true
   }
 
@@ -15505,6 +18196,7 @@ export namespace Prisma {
     purchase?: true
     product?: true
     quantity?: true
+    price?: true
     totalAmount?: true
     source?: true
     createdAt?: true
@@ -15516,6 +18208,7 @@ export namespace Prisma {
     purchase?: true
     product?: true
     quantity?: true
+    price?: true
     totalAmount?: true
     source?: true
     createdAt?: true
@@ -15527,6 +18220,7 @@ export namespace Prisma {
     purchase?: true
     product?: true
     quantity?: true
+    price?: true
     totalAmount?: true
     source?: true
     createdAt?: true
@@ -15625,6 +18319,7 @@ export namespace Prisma {
     purchase: string | null
     product: string | null
     quantity: number | null
+    price: number | null
     totalAmount: number | null
     source: string | null
     createdAt: Date
@@ -15655,6 +18350,7 @@ export namespace Prisma {
     purchase?: boolean
     product?: boolean
     quantity?: boolean
+    price?: boolean
     totalAmount?: boolean
     source?: boolean
     createdAt?: boolean
@@ -15666,6 +18362,7 @@ export namespace Prisma {
     purchase?: boolean
     product?: boolean
     quantity?: boolean
+    price?: boolean
     totalAmount?: boolean
     source?: boolean
     createdAt?: boolean
@@ -15677,6 +18374,7 @@ export namespace Prisma {
     purchase?: boolean
     product?: boolean
     quantity?: boolean
+    price?: boolean
     totalAmount?: boolean
     source?: boolean
     createdAt?: boolean
@@ -15688,13 +18386,14 @@ export namespace Prisma {
     purchase?: boolean
     product?: boolean
     quantity?: boolean
+    price?: boolean
     totalAmount?: boolean
     source?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type purchasedproductsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "purchase" | "product" | "quantity" | "totalAmount" | "source" | "createdAt" | "updatedAt", ExtArgs["result"]["purchasedproducts"]>
+  export type purchasedproductsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "purchase" | "product" | "quantity" | "price" | "totalAmount" | "source" | "createdAt" | "updatedAt", ExtArgs["result"]["purchasedproducts"]>
 
   export type $purchasedproductsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "purchasedproducts"
@@ -15704,6 +18403,7 @@ export namespace Prisma {
       purchase: string | null
       product: string | null
       quantity: number | null
+      price: number | null
       totalAmount: number | null
       source: string | null
       createdAt: Date
@@ -16135,6 +18835,7 @@ export namespace Prisma {
     readonly purchase: FieldRef<"purchasedproducts", 'String'>
     readonly product: FieldRef<"purchasedproducts", 'String'>
     readonly quantity: FieldRef<"purchasedproducts", 'Int'>
+    readonly price: FieldRef<"purchasedproducts", 'Float'>
     readonly totalAmount: FieldRef<"purchasedproducts", 'Float'>
     readonly source: FieldRef<"purchasedproducts", 'String'>
     readonly createdAt: FieldRef<"purchasedproducts", 'DateTime'>
@@ -20729,6 +23430,7 @@ export namespace Prisma {
     source: string | null
     profile_image_url: string | null
     dashboard_config: string | null
+    fk_financeaccount_id: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -20750,6 +23452,7 @@ export namespace Prisma {
     source: string | null
     profile_image_url: string | null
     dashboard_config: string | null
+    fk_financeaccount_id: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -20771,6 +23474,7 @@ export namespace Prisma {
     source: number
     profile_image_url: number
     dashboard_config: number
+    fk_financeaccount_id: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -20794,6 +23498,7 @@ export namespace Prisma {
     source?: true
     profile_image_url?: true
     dashboard_config?: true
+    fk_financeaccount_id?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -20815,6 +23520,7 @@ export namespace Prisma {
     source?: true
     profile_image_url?: true
     dashboard_config?: true
+    fk_financeaccount_id?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -20836,6 +23542,7 @@ export namespace Prisma {
     source?: true
     profile_image_url?: true
     dashboard_config?: true
+    fk_financeaccount_id?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -20930,6 +23637,7 @@ export namespace Prisma {
     source: string | null
     profile_image_url: string | null
     dashboard_config: string | null
+    fk_financeaccount_id: string | null
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -20968,6 +23676,7 @@ export namespace Prisma {
     source?: boolean
     profile_image_url?: boolean
     dashboard_config?: boolean
+    fk_financeaccount_id?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -20989,6 +23698,7 @@ export namespace Prisma {
     source?: boolean
     profile_image_url?: boolean
     dashboard_config?: boolean
+    fk_financeaccount_id?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -21010,6 +23720,7 @@ export namespace Prisma {
     source?: boolean
     profile_image_url?: boolean
     dashboard_config?: boolean
+    fk_financeaccount_id?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -21031,11 +23742,12 @@ export namespace Prisma {
     source?: boolean
     profile_image_url?: boolean
     dashboard_config?: boolean
+    fk_financeaccount_id?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type userOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "address" | "account_key" | "email" | "firstname" | "lastname" | "password" | "username" | "phone" | "phone2" | "role" | "createdby" | "updatedby" | "source" | "profile_image_url" | "dashboard_config" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type userOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "address" | "account_key" | "email" | "firstname" | "lastname" | "password" | "username" | "phone" | "phone2" | "role" | "createdby" | "updatedby" | "source" | "profile_image_url" | "dashboard_config" | "fk_financeaccount_id" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 
   export type $userPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "user"
@@ -21057,6 +23769,7 @@ export namespace Prisma {
       source: string | null
       profile_image_url: string | null
       dashboard_config: string | null
+      fk_financeaccount_id: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -21498,6 +24211,7 @@ export namespace Prisma {
     readonly source: FieldRef<"user", 'String'>
     readonly profile_image_url: FieldRef<"user", 'String'>
     readonly dashboard_config: FieldRef<"user", 'String'>
+    readonly fk_financeaccount_id: FieldRef<"user", 'String'>
     readonly createdAt: FieldRef<"user", 'DateTime'>
     readonly updatedAt: FieldRef<"user", 'DateTime'>
   }
@@ -21936,18 +24650,52 @@ export namespace Prisma {
   export const FinanceaccountScalarFieldEnum: {
     id: 'id',
     name: 'name',
+    code: 'code',
     type: 'type',
+    category: 'category',
+    opening_balance: 'opening_balance',
+    balance_type: 'balance_type',
     fk_parent_in_financeaccount: 'fk_parent_in_financeaccount',
     createdby: 'createdby',
     updatedby: 'updatedby',
     source: 'source',
     value: 'value',
+    opening_balance_date: 'opening_balance_date',
     isDefault: 'isDefault',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
 
   export type FinanceaccountScalarFieldEnum = (typeof FinanceaccountScalarFieldEnum)[keyof typeof FinanceaccountScalarFieldEnum]
+
+
+  export const Account_journalScalarFieldEnum: {
+    id: 'id',
+    date: 'date',
+    description: 'description',
+    reference: 'reference',
+    source: 'source',
+    createdby: 'createdby',
+    updatedby: 'updatedby',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type Account_journalScalarFieldEnum = (typeof Account_journalScalarFieldEnum)[keyof typeof Account_journalScalarFieldEnum]
+
+
+  export const Account_ledgerScalarFieldEnum: {
+    id: 'id',
+    journal_id: 'journal_id',
+    account_id: 'account_id',
+    debit: 'debit',
+    credit: 'credit',
+    details: 'details',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type Account_ledgerScalarFieldEnum = (typeof Account_ledgerScalarFieldEnum)[keyof typeof Account_ledgerScalarFieldEnum]
 
 
   export const FinancetransactionScalarFieldEnum: {
@@ -22055,8 +24803,10 @@ export namespace Prisma {
     createdby: 'createdby',
     updatedby: 'updatedby',
     vendor: 'vendor',
+    discountpercentage: 'discountpercentage',
     totalAmount: 'totalAmount',
     totalPayment: 'totalPayment',
+    ledger: 'ledger',
     invoicenum: 'invoicenum',
     source: 'source',
     createdAt: 'createdAt',
@@ -22071,6 +24821,7 @@ export namespace Prisma {
     purchase: 'purchase',
     product: 'product',
     quantity: 'quantity',
+    price: 'price',
     totalAmount: 'totalAmount',
     source: 'source',
     createdAt: 'createdAt',
@@ -22151,6 +24902,7 @@ export namespace Prisma {
     source: 'source',
     profile_image_url: 'profile_image_url',
     dashboard_config: 'dashboard_config',
+    fk_financeaccount_id: 'fk_financeaccount_id',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -22485,29 +25237,41 @@ export namespace Prisma {
     NOT?: financeaccountWhereInput | financeaccountWhereInput[]
     id?: StringFilter<"financeaccount"> | string
     name?: StringNullableFilter<"financeaccount"> | string | null
+    code?: StringNullableFilter<"financeaccount"> | string | null
     type?: StringNullableFilter<"financeaccount"> | string | null
+    category?: StringNullableFilter<"financeaccount"> | string | null
+    opening_balance?: FloatNullableFilter<"financeaccount"> | number | null
+    balance_type?: StringNullableFilter<"financeaccount"> | string | null
     fk_parent_in_financeaccount?: StringNullableFilter<"financeaccount"> | string | null
     createdby?: StringNullableFilter<"financeaccount"> | string | null
     updatedby?: StringNullableFilter<"financeaccount"> | string | null
     source?: StringNullableFilter<"financeaccount"> | string | null
     value?: DecimalNullableFilter<"financeaccount"> | Decimal | DecimalJsLike | number | string | null
+    opening_balance_date?: DateTimeNullableFilter<"financeaccount"> | Date | string | null
     isDefault?: BoolNullableFilter<"financeaccount"> | boolean | null
     createdAt?: DateTimeFilter<"financeaccount"> | Date | string
     updatedAt?: DateTimeFilter<"financeaccount"> | Date | string
+    ledger_entries?: Account_ledgerListRelationFilter
   }
 
   export type financeaccountOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrderInput | SortOrder
+    code?: SortOrderInput | SortOrder
     type?: SortOrderInput | SortOrder
+    category?: SortOrderInput | SortOrder
+    opening_balance?: SortOrderInput | SortOrder
+    balance_type?: SortOrderInput | SortOrder
     fk_parent_in_financeaccount?: SortOrderInput | SortOrder
     createdby?: SortOrderInput | SortOrder
     updatedby?: SortOrderInput | SortOrder
     source?: SortOrderInput | SortOrder
     value?: SortOrderInput | SortOrder
+    opening_balance_date?: SortOrderInput | SortOrder
     isDefault?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    ledger_entries?: account_ledgerOrderByRelationAggregateInput
   }
 
   export type financeaccountWhereUniqueInput = Prisma.AtLeast<{
@@ -22516,26 +25280,37 @@ export namespace Prisma {
     OR?: financeaccountWhereInput[]
     NOT?: financeaccountWhereInput | financeaccountWhereInput[]
     name?: StringNullableFilter<"financeaccount"> | string | null
+    code?: StringNullableFilter<"financeaccount"> | string | null
     type?: StringNullableFilter<"financeaccount"> | string | null
+    category?: StringNullableFilter<"financeaccount"> | string | null
+    opening_balance?: FloatNullableFilter<"financeaccount"> | number | null
+    balance_type?: StringNullableFilter<"financeaccount"> | string | null
     fk_parent_in_financeaccount?: StringNullableFilter<"financeaccount"> | string | null
     createdby?: StringNullableFilter<"financeaccount"> | string | null
     updatedby?: StringNullableFilter<"financeaccount"> | string | null
     source?: StringNullableFilter<"financeaccount"> | string | null
     value?: DecimalNullableFilter<"financeaccount"> | Decimal | DecimalJsLike | number | string | null
+    opening_balance_date?: DateTimeNullableFilter<"financeaccount"> | Date | string | null
     isDefault?: BoolNullableFilter<"financeaccount"> | boolean | null
     createdAt?: DateTimeFilter<"financeaccount"> | Date | string
     updatedAt?: DateTimeFilter<"financeaccount"> | Date | string
+    ledger_entries?: Account_ledgerListRelationFilter
   }, "id">
 
   export type financeaccountOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrderInput | SortOrder
+    code?: SortOrderInput | SortOrder
     type?: SortOrderInput | SortOrder
+    category?: SortOrderInput | SortOrder
+    opening_balance?: SortOrderInput | SortOrder
+    balance_type?: SortOrderInput | SortOrder
     fk_parent_in_financeaccount?: SortOrderInput | SortOrder
     createdby?: SortOrderInput | SortOrder
     updatedby?: SortOrderInput | SortOrder
     source?: SortOrderInput | SortOrder
     value?: SortOrderInput | SortOrder
+    opening_balance_date?: SortOrderInput | SortOrder
     isDefault?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -22552,15 +25327,170 @@ export namespace Prisma {
     NOT?: financeaccountScalarWhereWithAggregatesInput | financeaccountScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"financeaccount"> | string
     name?: StringNullableWithAggregatesFilter<"financeaccount"> | string | null
+    code?: StringNullableWithAggregatesFilter<"financeaccount"> | string | null
     type?: StringNullableWithAggregatesFilter<"financeaccount"> | string | null
+    category?: StringNullableWithAggregatesFilter<"financeaccount"> | string | null
+    opening_balance?: FloatNullableWithAggregatesFilter<"financeaccount"> | number | null
+    balance_type?: StringNullableWithAggregatesFilter<"financeaccount"> | string | null
     fk_parent_in_financeaccount?: StringNullableWithAggregatesFilter<"financeaccount"> | string | null
     createdby?: StringNullableWithAggregatesFilter<"financeaccount"> | string | null
     updatedby?: StringNullableWithAggregatesFilter<"financeaccount"> | string | null
     source?: StringNullableWithAggregatesFilter<"financeaccount"> | string | null
     value?: DecimalNullableWithAggregatesFilter<"financeaccount"> | Decimal | DecimalJsLike | number | string | null
+    opening_balance_date?: DateTimeNullableWithAggregatesFilter<"financeaccount"> | Date | string | null
     isDefault?: BoolNullableWithAggregatesFilter<"financeaccount"> | boolean | null
     createdAt?: DateTimeWithAggregatesFilter<"financeaccount"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"financeaccount"> | Date | string
+  }
+
+  export type account_journalWhereInput = {
+    AND?: account_journalWhereInput | account_journalWhereInput[]
+    OR?: account_journalWhereInput[]
+    NOT?: account_journalWhereInput | account_journalWhereInput[]
+    id?: StringFilter<"account_journal"> | string
+    date?: DateTimeFilter<"account_journal"> | Date | string
+    description?: StringNullableFilter<"account_journal"> | string | null
+    reference?: StringNullableFilter<"account_journal"> | string | null
+    source?: StringNullableFilter<"account_journal"> | string | null
+    createdby?: StringNullableFilter<"account_journal"> | string | null
+    updatedby?: StringNullableFilter<"account_journal"> | string | null
+    createdAt?: DateTimeFilter<"account_journal"> | Date | string
+    updatedAt?: DateTimeFilter<"account_journal"> | Date | string
+    ledger_entries?: Account_ledgerListRelationFilter
+  }
+
+  export type account_journalOrderByWithRelationInput = {
+    id?: SortOrder
+    date?: SortOrder
+    description?: SortOrderInput | SortOrder
+    reference?: SortOrderInput | SortOrder
+    source?: SortOrderInput | SortOrder
+    createdby?: SortOrderInput | SortOrder
+    updatedby?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    ledger_entries?: account_ledgerOrderByRelationAggregateInput
+  }
+
+  export type account_journalWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: account_journalWhereInput | account_journalWhereInput[]
+    OR?: account_journalWhereInput[]
+    NOT?: account_journalWhereInput | account_journalWhereInput[]
+    date?: DateTimeFilter<"account_journal"> | Date | string
+    description?: StringNullableFilter<"account_journal"> | string | null
+    reference?: StringNullableFilter<"account_journal"> | string | null
+    source?: StringNullableFilter<"account_journal"> | string | null
+    createdby?: StringNullableFilter<"account_journal"> | string | null
+    updatedby?: StringNullableFilter<"account_journal"> | string | null
+    createdAt?: DateTimeFilter<"account_journal"> | Date | string
+    updatedAt?: DateTimeFilter<"account_journal"> | Date | string
+    ledger_entries?: Account_ledgerListRelationFilter
+  }, "id">
+
+  export type account_journalOrderByWithAggregationInput = {
+    id?: SortOrder
+    date?: SortOrder
+    description?: SortOrderInput | SortOrder
+    reference?: SortOrderInput | SortOrder
+    source?: SortOrderInput | SortOrder
+    createdby?: SortOrderInput | SortOrder
+    updatedby?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: account_journalCountOrderByAggregateInput
+    _max?: account_journalMaxOrderByAggregateInput
+    _min?: account_journalMinOrderByAggregateInput
+  }
+
+  export type account_journalScalarWhereWithAggregatesInput = {
+    AND?: account_journalScalarWhereWithAggregatesInput | account_journalScalarWhereWithAggregatesInput[]
+    OR?: account_journalScalarWhereWithAggregatesInput[]
+    NOT?: account_journalScalarWhereWithAggregatesInput | account_journalScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"account_journal"> | string
+    date?: DateTimeWithAggregatesFilter<"account_journal"> | Date | string
+    description?: StringNullableWithAggregatesFilter<"account_journal"> | string | null
+    reference?: StringNullableWithAggregatesFilter<"account_journal"> | string | null
+    source?: StringNullableWithAggregatesFilter<"account_journal"> | string | null
+    createdby?: StringNullableWithAggregatesFilter<"account_journal"> | string | null
+    updatedby?: StringNullableWithAggregatesFilter<"account_journal"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"account_journal"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"account_journal"> | Date | string
+  }
+
+  export type account_ledgerWhereInput = {
+    AND?: account_ledgerWhereInput | account_ledgerWhereInput[]
+    OR?: account_ledgerWhereInput[]
+    NOT?: account_ledgerWhereInput | account_ledgerWhereInput[]
+    id?: StringFilter<"account_ledger"> | string
+    journal_id?: StringFilter<"account_ledger"> | string
+    account_id?: StringFilter<"account_ledger"> | string
+    debit?: FloatFilter<"account_ledger"> | number
+    credit?: FloatFilter<"account_ledger"> | number
+    details?: StringNullableFilter<"account_ledger"> | string | null
+    createdAt?: DateTimeFilter<"account_ledger"> | Date | string
+    updatedAt?: DateTimeFilter<"account_ledger"> | Date | string
+    journal?: XOR<Account_journalScalarRelationFilter, account_journalWhereInput>
+    account?: XOR<FinanceaccountScalarRelationFilter, financeaccountWhereInput>
+  }
+
+  export type account_ledgerOrderByWithRelationInput = {
+    id?: SortOrder
+    journal_id?: SortOrder
+    account_id?: SortOrder
+    debit?: SortOrder
+    credit?: SortOrder
+    details?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    journal?: account_journalOrderByWithRelationInput
+    account?: financeaccountOrderByWithRelationInput
+  }
+
+  export type account_ledgerWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: account_ledgerWhereInput | account_ledgerWhereInput[]
+    OR?: account_ledgerWhereInput[]
+    NOT?: account_ledgerWhereInput | account_ledgerWhereInput[]
+    journal_id?: StringFilter<"account_ledger"> | string
+    account_id?: StringFilter<"account_ledger"> | string
+    debit?: FloatFilter<"account_ledger"> | number
+    credit?: FloatFilter<"account_ledger"> | number
+    details?: StringNullableFilter<"account_ledger"> | string | null
+    createdAt?: DateTimeFilter<"account_ledger"> | Date | string
+    updatedAt?: DateTimeFilter<"account_ledger"> | Date | string
+    journal?: XOR<Account_journalScalarRelationFilter, account_journalWhereInput>
+    account?: XOR<FinanceaccountScalarRelationFilter, financeaccountWhereInput>
+  }, "id">
+
+  export type account_ledgerOrderByWithAggregationInput = {
+    id?: SortOrder
+    journal_id?: SortOrder
+    account_id?: SortOrder
+    debit?: SortOrder
+    credit?: SortOrder
+    details?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: account_ledgerCountOrderByAggregateInput
+    _avg?: account_ledgerAvgOrderByAggregateInput
+    _max?: account_ledgerMaxOrderByAggregateInput
+    _min?: account_ledgerMinOrderByAggregateInput
+    _sum?: account_ledgerSumOrderByAggregateInput
+  }
+
+  export type account_ledgerScalarWhereWithAggregatesInput = {
+    AND?: account_ledgerScalarWhereWithAggregatesInput | account_ledgerScalarWhereWithAggregatesInput[]
+    OR?: account_ledgerScalarWhereWithAggregatesInput[]
+    NOT?: account_ledgerScalarWhereWithAggregatesInput | account_ledgerScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"account_ledger"> | string
+    journal_id?: StringWithAggregatesFilter<"account_ledger"> | string
+    account_id?: StringWithAggregatesFilter<"account_ledger"> | string
+    debit?: FloatWithAggregatesFilter<"account_ledger"> | number
+    credit?: FloatWithAggregatesFilter<"account_ledger"> | number
+    details?: StringNullableWithAggregatesFilter<"account_ledger"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"account_ledger"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"account_ledger"> | Date | string
   }
 
   export type financetransactionWhereInput = {
@@ -23065,8 +25995,10 @@ export namespace Prisma {
     createdby?: StringNullableFilter<"purchase"> | string | null
     updatedby?: StringNullableFilter<"purchase"> | string | null
     vendor?: StringNullableFilter<"purchase"> | string | null
+    discountpercentage?: StringNullableFilter<"purchase"> | string | null
     totalAmount?: FloatNullableFilter<"purchase"> | number | null
     totalPayment?: FloatNullableFilter<"purchase"> | number | null
+    ledger?: BoolNullableFilter<"purchase"> | boolean | null
     invoicenum?: StringNullableFilter<"purchase"> | string | null
     source?: StringNullableFilter<"purchase"> | string | null
     createdAt?: DateTimeFilter<"purchase"> | Date | string
@@ -23078,8 +26010,10 @@ export namespace Prisma {
     createdby?: SortOrderInput | SortOrder
     updatedby?: SortOrderInput | SortOrder
     vendor?: SortOrderInput | SortOrder
+    discountpercentage?: SortOrderInput | SortOrder
     totalAmount?: SortOrderInput | SortOrder
     totalPayment?: SortOrderInput | SortOrder
+    ledger?: SortOrderInput | SortOrder
     invoicenum?: SortOrderInput | SortOrder
     source?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -23094,8 +26028,10 @@ export namespace Prisma {
     createdby?: StringNullableFilter<"purchase"> | string | null
     updatedby?: StringNullableFilter<"purchase"> | string | null
     vendor?: StringNullableFilter<"purchase"> | string | null
+    discountpercentage?: StringNullableFilter<"purchase"> | string | null
     totalAmount?: FloatNullableFilter<"purchase"> | number | null
     totalPayment?: FloatNullableFilter<"purchase"> | number | null
+    ledger?: BoolNullableFilter<"purchase"> | boolean | null
     invoicenum?: StringNullableFilter<"purchase"> | string | null
     source?: StringNullableFilter<"purchase"> | string | null
     createdAt?: DateTimeFilter<"purchase"> | Date | string
@@ -23107,8 +26043,10 @@ export namespace Prisma {
     createdby?: SortOrderInput | SortOrder
     updatedby?: SortOrderInput | SortOrder
     vendor?: SortOrderInput | SortOrder
+    discountpercentage?: SortOrderInput | SortOrder
     totalAmount?: SortOrderInput | SortOrder
     totalPayment?: SortOrderInput | SortOrder
+    ledger?: SortOrderInput | SortOrder
     invoicenum?: SortOrderInput | SortOrder
     source?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -23128,8 +26066,10 @@ export namespace Prisma {
     createdby?: StringNullableWithAggregatesFilter<"purchase"> | string | null
     updatedby?: StringNullableWithAggregatesFilter<"purchase"> | string | null
     vendor?: StringNullableWithAggregatesFilter<"purchase"> | string | null
+    discountpercentage?: StringNullableWithAggregatesFilter<"purchase"> | string | null
     totalAmount?: FloatNullableWithAggregatesFilter<"purchase"> | number | null
     totalPayment?: FloatNullableWithAggregatesFilter<"purchase"> | number | null
+    ledger?: BoolNullableWithAggregatesFilter<"purchase"> | boolean | null
     invoicenum?: StringNullableWithAggregatesFilter<"purchase"> | string | null
     source?: StringNullableWithAggregatesFilter<"purchase"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"purchase"> | Date | string
@@ -23144,6 +26084,7 @@ export namespace Prisma {
     purchase?: StringNullableFilter<"purchasedproducts"> | string | null
     product?: StringNullableFilter<"purchasedproducts"> | string | null
     quantity?: IntNullableFilter<"purchasedproducts"> | number | null
+    price?: FloatNullableFilter<"purchasedproducts"> | number | null
     totalAmount?: FloatNullableFilter<"purchasedproducts"> | number | null
     source?: StringNullableFilter<"purchasedproducts"> | string | null
     createdAt?: DateTimeFilter<"purchasedproducts"> | Date | string
@@ -23155,6 +26096,7 @@ export namespace Prisma {
     purchase?: SortOrderInput | SortOrder
     product?: SortOrderInput | SortOrder
     quantity?: SortOrderInput | SortOrder
+    price?: SortOrderInput | SortOrder
     totalAmount?: SortOrderInput | SortOrder
     source?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -23169,6 +26111,7 @@ export namespace Prisma {
     purchase?: StringNullableFilter<"purchasedproducts"> | string | null
     product?: StringNullableFilter<"purchasedproducts"> | string | null
     quantity?: IntNullableFilter<"purchasedproducts"> | number | null
+    price?: FloatNullableFilter<"purchasedproducts"> | number | null
     totalAmount?: FloatNullableFilter<"purchasedproducts"> | number | null
     source?: StringNullableFilter<"purchasedproducts"> | string | null
     createdAt?: DateTimeFilter<"purchasedproducts"> | Date | string
@@ -23180,6 +26123,7 @@ export namespace Prisma {
     purchase?: SortOrderInput | SortOrder
     product?: SortOrderInput | SortOrder
     quantity?: SortOrderInput | SortOrder
+    price?: SortOrderInput | SortOrder
     totalAmount?: SortOrderInput | SortOrder
     source?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -23199,6 +26143,7 @@ export namespace Prisma {
     purchase?: StringNullableWithAggregatesFilter<"purchasedproducts"> | string | null
     product?: StringNullableWithAggregatesFilter<"purchasedproducts"> | string | null
     quantity?: IntNullableWithAggregatesFilter<"purchasedproducts"> | number | null
+    price?: FloatNullableWithAggregatesFilter<"purchasedproducts"> | number | null
     totalAmount?: FloatNullableWithAggregatesFilter<"purchasedproducts"> | number | null
     source?: StringNullableWithAggregatesFilter<"purchasedproducts"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"purchasedproducts"> | Date | string
@@ -23487,6 +26432,7 @@ export namespace Prisma {
     source?: StringNullableFilter<"user"> | string | null
     profile_image_url?: StringNullableFilter<"user"> | string | null
     dashboard_config?: StringNullableFilter<"user"> | string | null
+    fk_financeaccount_id?: StringNullableFilter<"user"> | string | null
     createdAt?: DateTimeFilter<"user"> | Date | string
     updatedAt?: DateTimeFilter<"user"> | Date | string
   }
@@ -23508,6 +26454,7 @@ export namespace Prisma {
     source?: SortOrderInput | SortOrder
     profile_image_url?: SortOrderInput | SortOrder
     dashboard_config?: SortOrderInput | SortOrder
+    fk_financeaccount_id?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -23532,6 +26479,7 @@ export namespace Prisma {
     source?: StringNullableFilter<"user"> | string | null
     profile_image_url?: StringNullableFilter<"user"> | string | null
     dashboard_config?: StringNullableFilter<"user"> | string | null
+    fk_financeaccount_id?: StringNullableFilter<"user"> | string | null
     createdAt?: DateTimeFilter<"user"> | Date | string
     updatedAt?: DateTimeFilter<"user"> | Date | string
   }, "id">
@@ -23553,6 +26501,7 @@ export namespace Prisma {
     source?: SortOrderInput | SortOrder
     profile_image_url?: SortOrderInput | SortOrder
     dashboard_config?: SortOrderInput | SortOrder
+    fk_financeaccount_id?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: userCountOrderByAggregateInput
@@ -23580,6 +26529,7 @@ export namespace Prisma {
     source?: StringNullableWithAggregatesFilter<"user"> | string | null
     profile_image_url?: StringNullableWithAggregatesFilter<"user"> | string | null
     dashboard_config?: StringNullableWithAggregatesFilter<"user"> | string | null
+    fk_financeaccount_id?: StringNullableWithAggregatesFilter<"user"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"user"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"user"> | Date | string
   }
@@ -23874,68 +26824,97 @@ export namespace Prisma {
   export type financeaccountCreateInput = {
     id: string
     name?: string | null
+    code?: string | null
     type?: string | null
+    category?: string | null
+    opening_balance?: number | null
+    balance_type?: string | null
     fk_parent_in_financeaccount?: string | null
     createdby?: string | null
     updatedby?: string | null
     source?: string | null
     value?: Decimal | DecimalJsLike | number | string | null
+    opening_balance_date?: Date | string | null
     isDefault?: boolean | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    ledger_entries?: account_ledgerCreateNestedManyWithoutAccountInput
   }
 
   export type financeaccountUncheckedCreateInput = {
     id: string
     name?: string | null
+    code?: string | null
     type?: string | null
+    category?: string | null
+    opening_balance?: number | null
+    balance_type?: string | null
     fk_parent_in_financeaccount?: string | null
     createdby?: string | null
     updatedby?: string | null
     source?: string | null
     value?: Decimal | DecimalJsLike | number | string | null
+    opening_balance_date?: Date | string | null
     isDefault?: boolean | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    ledger_entries?: account_ledgerUncheckedCreateNestedManyWithoutAccountInput
   }
 
   export type financeaccountUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
     type?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    opening_balance?: NullableFloatFieldUpdateOperationsInput | number | null
+    balance_type?: NullableStringFieldUpdateOperationsInput | string | null
     fk_parent_in_financeaccount?: NullableStringFieldUpdateOperationsInput | string | null
     createdby?: NullableStringFieldUpdateOperationsInput | string | null
     updatedby?: NullableStringFieldUpdateOperationsInput | string | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
     value?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    opening_balance_date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isDefault?: NullableBoolFieldUpdateOperationsInput | boolean | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    ledger_entries?: account_ledgerUpdateManyWithoutAccountNestedInput
   }
 
   export type financeaccountUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
     type?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    opening_balance?: NullableFloatFieldUpdateOperationsInput | number | null
+    balance_type?: NullableStringFieldUpdateOperationsInput | string | null
     fk_parent_in_financeaccount?: NullableStringFieldUpdateOperationsInput | string | null
     createdby?: NullableStringFieldUpdateOperationsInput | string | null
     updatedby?: NullableStringFieldUpdateOperationsInput | string | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
     value?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    opening_balance_date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isDefault?: NullableBoolFieldUpdateOperationsInput | boolean | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    ledger_entries?: account_ledgerUncheckedUpdateManyWithoutAccountNestedInput
   }
 
   export type financeaccountCreateManyInput = {
     id: string
     name?: string | null
+    code?: string | null
     type?: string | null
+    category?: string | null
+    opening_balance?: number | null
+    balance_type?: string | null
     fk_parent_in_financeaccount?: string | null
     createdby?: string | null
     updatedby?: string | null
     source?: string | null
     value?: Decimal | DecimalJsLike | number | string | null
+    opening_balance_date?: Date | string | null
     isDefault?: boolean | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -23944,12 +26923,17 @@ export namespace Prisma {
   export type financeaccountUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
     type?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    opening_balance?: NullableFloatFieldUpdateOperationsInput | number | null
+    balance_type?: NullableStringFieldUpdateOperationsInput | string | null
     fk_parent_in_financeaccount?: NullableStringFieldUpdateOperationsInput | string | null
     createdby?: NullableStringFieldUpdateOperationsInput | string | null
     updatedby?: NullableStringFieldUpdateOperationsInput | string | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
     value?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    opening_balance_date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isDefault?: NullableBoolFieldUpdateOperationsInput | boolean | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -23958,13 +26942,181 @@ export namespace Prisma {
   export type financeaccountUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
     type?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    opening_balance?: NullableFloatFieldUpdateOperationsInput | number | null
+    balance_type?: NullableStringFieldUpdateOperationsInput | string | null
     fk_parent_in_financeaccount?: NullableStringFieldUpdateOperationsInput | string | null
     createdby?: NullableStringFieldUpdateOperationsInput | string | null
     updatedby?: NullableStringFieldUpdateOperationsInput | string | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
     value?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    opening_balance_date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isDefault?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type account_journalCreateInput = {
+    id: string
+    date?: Date | string
+    description?: string | null
+    reference?: string | null
+    source?: string | null
+    createdby?: string | null
+    updatedby?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    ledger_entries?: account_ledgerCreateNestedManyWithoutJournalInput
+  }
+
+  export type account_journalUncheckedCreateInput = {
+    id: string
+    date?: Date | string
+    description?: string | null
+    reference?: string | null
+    source?: string | null
+    createdby?: string | null
+    updatedby?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    ledger_entries?: account_ledgerUncheckedCreateNestedManyWithoutJournalInput
+  }
+
+  export type account_journalUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    reference?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    ledger_entries?: account_ledgerUpdateManyWithoutJournalNestedInput
+  }
+
+  export type account_journalUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    reference?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    ledger_entries?: account_ledgerUncheckedUpdateManyWithoutJournalNestedInput
+  }
+
+  export type account_journalCreateManyInput = {
+    id: string
+    date?: Date | string
+    description?: string | null
+    reference?: string | null
+    source?: string | null
+    createdby?: string | null
+    updatedby?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type account_journalUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    reference?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type account_journalUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    reference?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type account_ledgerCreateInput = {
+    id: string
+    debit?: number
+    credit?: number
+    details?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    journal: account_journalCreateNestedOneWithoutLedger_entriesInput
+    account: financeaccountCreateNestedOneWithoutLedger_entriesInput
+  }
+
+  export type account_ledgerUncheckedCreateInput = {
+    id: string
+    journal_id: string
+    account_id: string
+    debit?: number
+    credit?: number
+    details?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type account_ledgerUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    debit?: FloatFieldUpdateOperationsInput | number
+    credit?: FloatFieldUpdateOperationsInput | number
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    journal?: account_journalUpdateOneRequiredWithoutLedger_entriesNestedInput
+    account?: financeaccountUpdateOneRequiredWithoutLedger_entriesNestedInput
+  }
+
+  export type account_ledgerUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    journal_id?: StringFieldUpdateOperationsInput | string
+    account_id?: StringFieldUpdateOperationsInput | string
+    debit?: FloatFieldUpdateOperationsInput | number
+    credit?: FloatFieldUpdateOperationsInput | number
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type account_ledgerCreateManyInput = {
+    id: string
+    journal_id: string
+    account_id: string
+    debit?: number
+    credit?: number
+    details?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type account_ledgerUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    debit?: FloatFieldUpdateOperationsInput | number
+    credit?: FloatFieldUpdateOperationsInput | number
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type account_ledgerUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    journal_id?: StringFieldUpdateOperationsInput | string
+    account_id?: StringFieldUpdateOperationsInput | string
+    debit?: FloatFieldUpdateOperationsInput | number
+    credit?: FloatFieldUpdateOperationsInput | number
+    details?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -24548,8 +27700,10 @@ export namespace Prisma {
     createdby?: string | null
     updatedby?: string | null
     vendor?: string | null
+    discountpercentage?: string | null
     totalAmount?: number | null
     totalPayment?: number | null
+    ledger?: boolean | null
     invoicenum?: string | null
     source?: string | null
     createdAt?: Date | string
@@ -24561,8 +27715,10 @@ export namespace Prisma {
     createdby?: string | null
     updatedby?: string | null
     vendor?: string | null
+    discountpercentage?: string | null
     totalAmount?: number | null
     totalPayment?: number | null
+    ledger?: boolean | null
     invoicenum?: string | null
     source?: string | null
     createdAt?: Date | string
@@ -24574,8 +27730,10 @@ export namespace Prisma {
     createdby?: NullableStringFieldUpdateOperationsInput | string | null
     updatedby?: NullableStringFieldUpdateOperationsInput | string | null
     vendor?: NullableStringFieldUpdateOperationsInput | string | null
+    discountpercentage?: NullableStringFieldUpdateOperationsInput | string | null
     totalAmount?: NullableFloatFieldUpdateOperationsInput | number | null
     totalPayment?: NullableFloatFieldUpdateOperationsInput | number | null
+    ledger?: NullableBoolFieldUpdateOperationsInput | boolean | null
     invoicenum?: NullableStringFieldUpdateOperationsInput | string | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24587,8 +27745,10 @@ export namespace Prisma {
     createdby?: NullableStringFieldUpdateOperationsInput | string | null
     updatedby?: NullableStringFieldUpdateOperationsInput | string | null
     vendor?: NullableStringFieldUpdateOperationsInput | string | null
+    discountpercentage?: NullableStringFieldUpdateOperationsInput | string | null
     totalAmount?: NullableFloatFieldUpdateOperationsInput | number | null
     totalPayment?: NullableFloatFieldUpdateOperationsInput | number | null
+    ledger?: NullableBoolFieldUpdateOperationsInput | boolean | null
     invoicenum?: NullableStringFieldUpdateOperationsInput | string | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24600,8 +27760,10 @@ export namespace Prisma {
     createdby?: string | null
     updatedby?: string | null
     vendor?: string | null
+    discountpercentage?: string | null
     totalAmount?: number | null
     totalPayment?: number | null
+    ledger?: boolean | null
     invoicenum?: string | null
     source?: string | null
     createdAt?: Date | string
@@ -24613,8 +27775,10 @@ export namespace Prisma {
     createdby?: NullableStringFieldUpdateOperationsInput | string | null
     updatedby?: NullableStringFieldUpdateOperationsInput | string | null
     vendor?: NullableStringFieldUpdateOperationsInput | string | null
+    discountpercentage?: NullableStringFieldUpdateOperationsInput | string | null
     totalAmount?: NullableFloatFieldUpdateOperationsInput | number | null
     totalPayment?: NullableFloatFieldUpdateOperationsInput | number | null
+    ledger?: NullableBoolFieldUpdateOperationsInput | boolean | null
     invoicenum?: NullableStringFieldUpdateOperationsInput | string | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24626,8 +27790,10 @@ export namespace Prisma {
     createdby?: NullableStringFieldUpdateOperationsInput | string | null
     updatedby?: NullableStringFieldUpdateOperationsInput | string | null
     vendor?: NullableStringFieldUpdateOperationsInput | string | null
+    discountpercentage?: NullableStringFieldUpdateOperationsInput | string | null
     totalAmount?: NullableFloatFieldUpdateOperationsInput | number | null
     totalPayment?: NullableFloatFieldUpdateOperationsInput | number | null
+    ledger?: NullableBoolFieldUpdateOperationsInput | boolean | null
     invoicenum?: NullableStringFieldUpdateOperationsInput | string | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24639,6 +27805,7 @@ export namespace Prisma {
     purchase?: string | null
     product?: string | null
     quantity?: number | null
+    price?: number | null
     totalAmount?: number | null
     source?: string | null
     createdAt?: Date | string
@@ -24650,6 +27817,7 @@ export namespace Prisma {
     purchase?: string | null
     product?: string | null
     quantity?: number | null
+    price?: number | null
     totalAmount?: number | null
     source?: string | null
     createdAt?: Date | string
@@ -24661,6 +27829,7 @@ export namespace Prisma {
     purchase?: NullableStringFieldUpdateOperationsInput | string | null
     product?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: NullableIntFieldUpdateOperationsInput | number | null
+    price?: NullableFloatFieldUpdateOperationsInput | number | null
     totalAmount?: NullableFloatFieldUpdateOperationsInput | number | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24672,6 +27841,7 @@ export namespace Prisma {
     purchase?: NullableStringFieldUpdateOperationsInput | string | null
     product?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: NullableIntFieldUpdateOperationsInput | number | null
+    price?: NullableFloatFieldUpdateOperationsInput | number | null
     totalAmount?: NullableFloatFieldUpdateOperationsInput | number | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24683,6 +27853,7 @@ export namespace Prisma {
     purchase?: string | null
     product?: string | null
     quantity?: number | null
+    price?: number | null
     totalAmount?: number | null
     source?: string | null
     createdAt?: Date | string
@@ -24694,6 +27865,7 @@ export namespace Prisma {
     purchase?: NullableStringFieldUpdateOperationsInput | string | null
     product?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: NullableIntFieldUpdateOperationsInput | number | null
+    price?: NullableFloatFieldUpdateOperationsInput | number | null
     totalAmount?: NullableFloatFieldUpdateOperationsInput | number | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24705,6 +27877,7 @@ export namespace Prisma {
     purchase?: NullableStringFieldUpdateOperationsInput | string | null
     product?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: NullableIntFieldUpdateOperationsInput | number | null
+    price?: NullableFloatFieldUpdateOperationsInput | number | null
     totalAmount?: NullableFloatFieldUpdateOperationsInput | number | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25022,6 +28195,7 @@ export namespace Prisma {
     source?: string | null
     profile_image_url?: string | null
     dashboard_config?: string | null
+    fk_financeaccount_id?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -25043,6 +28217,7 @@ export namespace Prisma {
     source?: string | null
     profile_image_url?: string | null
     dashboard_config?: string | null
+    fk_financeaccount_id?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -25064,6 +28239,7 @@ export namespace Prisma {
     source?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     dashboard_config?: NullableStringFieldUpdateOperationsInput | string | null
+    fk_financeaccount_id?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -25085,6 +28261,7 @@ export namespace Prisma {
     source?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     dashboard_config?: NullableStringFieldUpdateOperationsInput | string | null
+    fk_financeaccount_id?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -25106,6 +28283,7 @@ export namespace Prisma {
     source?: string | null
     profile_image_url?: string | null
     dashboard_config?: string | null
+    fk_financeaccount_id?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -25127,6 +28305,7 @@ export namespace Prisma {
     source?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     dashboard_config?: NullableStringFieldUpdateOperationsInput | string | null
+    fk_financeaccount_id?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -25148,6 +28327,7 @@ export namespace Prisma {
     source?: NullableStringFieldUpdateOperationsInput | string | null
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     dashboard_config?: NullableStringFieldUpdateOperationsInput | string | null
+    fk_financeaccount_id?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -25455,33 +28635,54 @@ export namespace Prisma {
     not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
   }
 
+  export type Account_ledgerListRelationFilter = {
+    every?: account_ledgerWhereInput
+    some?: account_ledgerWhereInput
+    none?: account_ledgerWhereInput
+  }
+
+  export type account_ledgerOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type financeaccountCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    code?: SortOrder
     type?: SortOrder
+    category?: SortOrder
+    opening_balance?: SortOrder
+    balance_type?: SortOrder
     fk_parent_in_financeaccount?: SortOrder
     createdby?: SortOrder
     updatedby?: SortOrder
     source?: SortOrder
     value?: SortOrder
+    opening_balance_date?: SortOrder
     isDefault?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type financeaccountAvgOrderByAggregateInput = {
+    opening_balance?: SortOrder
     value?: SortOrder
   }
 
   export type financeaccountMaxOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    code?: SortOrder
     type?: SortOrder
+    category?: SortOrder
+    opening_balance?: SortOrder
+    balance_type?: SortOrder
     fk_parent_in_financeaccount?: SortOrder
     createdby?: SortOrder
     updatedby?: SortOrder
     source?: SortOrder
     value?: SortOrder
+    opening_balance_date?: SortOrder
     isDefault?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -25490,18 +28691,24 @@ export namespace Prisma {
   export type financeaccountMinOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    code?: SortOrder
     type?: SortOrder
+    category?: SortOrder
+    opening_balance?: SortOrder
+    balance_type?: SortOrder
     fk_parent_in_financeaccount?: SortOrder
     createdby?: SortOrder
     updatedby?: SortOrder
     source?: SortOrder
     value?: SortOrder
+    opening_balance_date?: SortOrder
     isDefault?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type financeaccountSumOrderByAggregateInput = {
+    opening_balance?: SortOrder
     value?: SortOrder
   }
 
@@ -25519,6 +28726,122 @@ export namespace Prisma {
     _sum?: NestedDecimalNullableFilter<$PrismaModel>
     _min?: NestedDecimalNullableFilter<$PrismaModel>
     _max?: NestedDecimalNullableFilter<$PrismaModel>
+  }
+
+  export type account_journalCountOrderByAggregateInput = {
+    id?: SortOrder
+    date?: SortOrder
+    description?: SortOrder
+    reference?: SortOrder
+    source?: SortOrder
+    createdby?: SortOrder
+    updatedby?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type account_journalMaxOrderByAggregateInput = {
+    id?: SortOrder
+    date?: SortOrder
+    description?: SortOrder
+    reference?: SortOrder
+    source?: SortOrder
+    createdby?: SortOrder
+    updatedby?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type account_journalMinOrderByAggregateInput = {
+    id?: SortOrder
+    date?: SortOrder
+    description?: SortOrder
+    reference?: SortOrder
+    source?: SortOrder
+    createdby?: SortOrder
+    updatedby?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type Account_journalScalarRelationFilter = {
+    is?: account_journalWhereInput
+    isNot?: account_journalWhereInput
+  }
+
+  export type FinanceaccountScalarRelationFilter = {
+    is?: financeaccountWhereInput
+    isNot?: financeaccountWhereInput
+  }
+
+  export type account_ledgerCountOrderByAggregateInput = {
+    id?: SortOrder
+    journal_id?: SortOrder
+    account_id?: SortOrder
+    debit?: SortOrder
+    credit?: SortOrder
+    details?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type account_ledgerAvgOrderByAggregateInput = {
+    debit?: SortOrder
+    credit?: SortOrder
+  }
+
+  export type account_ledgerMaxOrderByAggregateInput = {
+    id?: SortOrder
+    journal_id?: SortOrder
+    account_id?: SortOrder
+    debit?: SortOrder
+    credit?: SortOrder
+    details?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type account_ledgerMinOrderByAggregateInput = {
+    id?: SortOrder
+    journal_id?: SortOrder
+    account_id?: SortOrder
+    debit?: SortOrder
+    credit?: SortOrder
+    details?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type account_ledgerSumOrderByAggregateInput = {
+    debit?: SortOrder
+    credit?: SortOrder
+  }
+
+  export type FloatWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedFloatFilter<$PrismaModel>
+    _min?: NestedFloatFilter<$PrismaModel>
+    _max?: NestedFloatFilter<$PrismaModel>
   }
 
   export type financetransactionCountOrderByAggregateInput = {
@@ -25859,8 +29182,10 @@ export namespace Prisma {
     createdby?: SortOrder
     updatedby?: SortOrder
     vendor?: SortOrder
+    discountpercentage?: SortOrder
     totalAmount?: SortOrder
     totalPayment?: SortOrder
+    ledger?: SortOrder
     invoicenum?: SortOrder
     source?: SortOrder
     createdAt?: SortOrder
@@ -25877,8 +29202,10 @@ export namespace Prisma {
     createdby?: SortOrder
     updatedby?: SortOrder
     vendor?: SortOrder
+    discountpercentage?: SortOrder
     totalAmount?: SortOrder
     totalPayment?: SortOrder
+    ledger?: SortOrder
     invoicenum?: SortOrder
     source?: SortOrder
     createdAt?: SortOrder
@@ -25890,8 +29217,10 @@ export namespace Prisma {
     createdby?: SortOrder
     updatedby?: SortOrder
     vendor?: SortOrder
+    discountpercentage?: SortOrder
     totalAmount?: SortOrder
     totalPayment?: SortOrder
+    ledger?: SortOrder
     invoicenum?: SortOrder
     source?: SortOrder
     createdAt?: SortOrder
@@ -25919,6 +29248,7 @@ export namespace Prisma {
     purchase?: SortOrder
     product?: SortOrder
     quantity?: SortOrder
+    price?: SortOrder
     totalAmount?: SortOrder
     source?: SortOrder
     createdAt?: SortOrder
@@ -25927,6 +29257,7 @@ export namespace Prisma {
 
   export type purchasedproductsAvgOrderByAggregateInput = {
     quantity?: SortOrder
+    price?: SortOrder
     totalAmount?: SortOrder
   }
 
@@ -25935,6 +29266,7 @@ export namespace Prisma {
     purchase?: SortOrder
     product?: SortOrder
     quantity?: SortOrder
+    price?: SortOrder
     totalAmount?: SortOrder
     source?: SortOrder
     createdAt?: SortOrder
@@ -25946,6 +29278,7 @@ export namespace Prisma {
     purchase?: SortOrder
     product?: SortOrder
     quantity?: SortOrder
+    price?: SortOrder
     totalAmount?: SortOrder
     source?: SortOrder
     createdAt?: SortOrder
@@ -25954,6 +29287,7 @@ export namespace Prisma {
 
   export type purchasedproductsSumOrderByAggregateInput = {
     quantity?: SortOrder
+    price?: SortOrder
     totalAmount?: SortOrder
   }
 
@@ -26134,6 +29468,7 @@ export namespace Prisma {
     source?: SortOrder
     profile_image_url?: SortOrder
     dashboard_config?: SortOrder
+    fk_financeaccount_id?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -26155,6 +29490,7 @@ export namespace Prisma {
     source?: SortOrder
     profile_image_url?: SortOrder
     dashboard_config?: SortOrder
+    fk_financeaccount_id?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -26176,6 +29512,7 @@ export namespace Prisma {
     source?: SortOrder
     profile_image_url?: SortOrder
     dashboard_config?: SortOrder
+    fk_financeaccount_id?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -26208,12 +29545,132 @@ export namespace Prisma {
     set?: Date | string | null
   }
 
+  export type account_ledgerCreateNestedManyWithoutAccountInput = {
+    create?: XOR<account_ledgerCreateWithoutAccountInput, account_ledgerUncheckedCreateWithoutAccountInput> | account_ledgerCreateWithoutAccountInput[] | account_ledgerUncheckedCreateWithoutAccountInput[]
+    connectOrCreate?: account_ledgerCreateOrConnectWithoutAccountInput | account_ledgerCreateOrConnectWithoutAccountInput[]
+    createMany?: account_ledgerCreateManyAccountInputEnvelope
+    connect?: account_ledgerWhereUniqueInput | account_ledgerWhereUniqueInput[]
+  }
+
+  export type account_ledgerUncheckedCreateNestedManyWithoutAccountInput = {
+    create?: XOR<account_ledgerCreateWithoutAccountInput, account_ledgerUncheckedCreateWithoutAccountInput> | account_ledgerCreateWithoutAccountInput[] | account_ledgerUncheckedCreateWithoutAccountInput[]
+    connectOrCreate?: account_ledgerCreateOrConnectWithoutAccountInput | account_ledgerCreateOrConnectWithoutAccountInput[]
+    createMany?: account_ledgerCreateManyAccountInputEnvelope
+    connect?: account_ledgerWhereUniqueInput | account_ledgerWhereUniqueInput[]
+  }
+
   export type NullableDecimalFieldUpdateOperationsInput = {
     set?: Decimal | DecimalJsLike | number | string | null
     increment?: Decimal | DecimalJsLike | number | string
     decrement?: Decimal | DecimalJsLike | number | string
     multiply?: Decimal | DecimalJsLike | number | string
     divide?: Decimal | DecimalJsLike | number | string
+  }
+
+  export type account_ledgerUpdateManyWithoutAccountNestedInput = {
+    create?: XOR<account_ledgerCreateWithoutAccountInput, account_ledgerUncheckedCreateWithoutAccountInput> | account_ledgerCreateWithoutAccountInput[] | account_ledgerUncheckedCreateWithoutAccountInput[]
+    connectOrCreate?: account_ledgerCreateOrConnectWithoutAccountInput | account_ledgerCreateOrConnectWithoutAccountInput[]
+    upsert?: account_ledgerUpsertWithWhereUniqueWithoutAccountInput | account_ledgerUpsertWithWhereUniqueWithoutAccountInput[]
+    createMany?: account_ledgerCreateManyAccountInputEnvelope
+    set?: account_ledgerWhereUniqueInput | account_ledgerWhereUniqueInput[]
+    disconnect?: account_ledgerWhereUniqueInput | account_ledgerWhereUniqueInput[]
+    delete?: account_ledgerWhereUniqueInput | account_ledgerWhereUniqueInput[]
+    connect?: account_ledgerWhereUniqueInput | account_ledgerWhereUniqueInput[]
+    update?: account_ledgerUpdateWithWhereUniqueWithoutAccountInput | account_ledgerUpdateWithWhereUniqueWithoutAccountInput[]
+    updateMany?: account_ledgerUpdateManyWithWhereWithoutAccountInput | account_ledgerUpdateManyWithWhereWithoutAccountInput[]
+    deleteMany?: account_ledgerScalarWhereInput | account_ledgerScalarWhereInput[]
+  }
+
+  export type account_ledgerUncheckedUpdateManyWithoutAccountNestedInput = {
+    create?: XOR<account_ledgerCreateWithoutAccountInput, account_ledgerUncheckedCreateWithoutAccountInput> | account_ledgerCreateWithoutAccountInput[] | account_ledgerUncheckedCreateWithoutAccountInput[]
+    connectOrCreate?: account_ledgerCreateOrConnectWithoutAccountInput | account_ledgerCreateOrConnectWithoutAccountInput[]
+    upsert?: account_ledgerUpsertWithWhereUniqueWithoutAccountInput | account_ledgerUpsertWithWhereUniqueWithoutAccountInput[]
+    createMany?: account_ledgerCreateManyAccountInputEnvelope
+    set?: account_ledgerWhereUniqueInput | account_ledgerWhereUniqueInput[]
+    disconnect?: account_ledgerWhereUniqueInput | account_ledgerWhereUniqueInput[]
+    delete?: account_ledgerWhereUniqueInput | account_ledgerWhereUniqueInput[]
+    connect?: account_ledgerWhereUniqueInput | account_ledgerWhereUniqueInput[]
+    update?: account_ledgerUpdateWithWhereUniqueWithoutAccountInput | account_ledgerUpdateWithWhereUniqueWithoutAccountInput[]
+    updateMany?: account_ledgerUpdateManyWithWhereWithoutAccountInput | account_ledgerUpdateManyWithWhereWithoutAccountInput[]
+    deleteMany?: account_ledgerScalarWhereInput | account_ledgerScalarWhereInput[]
+  }
+
+  export type account_ledgerCreateNestedManyWithoutJournalInput = {
+    create?: XOR<account_ledgerCreateWithoutJournalInput, account_ledgerUncheckedCreateWithoutJournalInput> | account_ledgerCreateWithoutJournalInput[] | account_ledgerUncheckedCreateWithoutJournalInput[]
+    connectOrCreate?: account_ledgerCreateOrConnectWithoutJournalInput | account_ledgerCreateOrConnectWithoutJournalInput[]
+    createMany?: account_ledgerCreateManyJournalInputEnvelope
+    connect?: account_ledgerWhereUniqueInput | account_ledgerWhereUniqueInput[]
+  }
+
+  export type account_ledgerUncheckedCreateNestedManyWithoutJournalInput = {
+    create?: XOR<account_ledgerCreateWithoutJournalInput, account_ledgerUncheckedCreateWithoutJournalInput> | account_ledgerCreateWithoutJournalInput[] | account_ledgerUncheckedCreateWithoutJournalInput[]
+    connectOrCreate?: account_ledgerCreateOrConnectWithoutJournalInput | account_ledgerCreateOrConnectWithoutJournalInput[]
+    createMany?: account_ledgerCreateManyJournalInputEnvelope
+    connect?: account_ledgerWhereUniqueInput | account_ledgerWhereUniqueInput[]
+  }
+
+  export type account_ledgerUpdateManyWithoutJournalNestedInput = {
+    create?: XOR<account_ledgerCreateWithoutJournalInput, account_ledgerUncheckedCreateWithoutJournalInput> | account_ledgerCreateWithoutJournalInput[] | account_ledgerUncheckedCreateWithoutJournalInput[]
+    connectOrCreate?: account_ledgerCreateOrConnectWithoutJournalInput | account_ledgerCreateOrConnectWithoutJournalInput[]
+    upsert?: account_ledgerUpsertWithWhereUniqueWithoutJournalInput | account_ledgerUpsertWithWhereUniqueWithoutJournalInput[]
+    createMany?: account_ledgerCreateManyJournalInputEnvelope
+    set?: account_ledgerWhereUniqueInput | account_ledgerWhereUniqueInput[]
+    disconnect?: account_ledgerWhereUniqueInput | account_ledgerWhereUniqueInput[]
+    delete?: account_ledgerWhereUniqueInput | account_ledgerWhereUniqueInput[]
+    connect?: account_ledgerWhereUniqueInput | account_ledgerWhereUniqueInput[]
+    update?: account_ledgerUpdateWithWhereUniqueWithoutJournalInput | account_ledgerUpdateWithWhereUniqueWithoutJournalInput[]
+    updateMany?: account_ledgerUpdateManyWithWhereWithoutJournalInput | account_ledgerUpdateManyWithWhereWithoutJournalInput[]
+    deleteMany?: account_ledgerScalarWhereInput | account_ledgerScalarWhereInput[]
+  }
+
+  export type account_ledgerUncheckedUpdateManyWithoutJournalNestedInput = {
+    create?: XOR<account_ledgerCreateWithoutJournalInput, account_ledgerUncheckedCreateWithoutJournalInput> | account_ledgerCreateWithoutJournalInput[] | account_ledgerUncheckedCreateWithoutJournalInput[]
+    connectOrCreate?: account_ledgerCreateOrConnectWithoutJournalInput | account_ledgerCreateOrConnectWithoutJournalInput[]
+    upsert?: account_ledgerUpsertWithWhereUniqueWithoutJournalInput | account_ledgerUpsertWithWhereUniqueWithoutJournalInput[]
+    createMany?: account_ledgerCreateManyJournalInputEnvelope
+    set?: account_ledgerWhereUniqueInput | account_ledgerWhereUniqueInput[]
+    disconnect?: account_ledgerWhereUniqueInput | account_ledgerWhereUniqueInput[]
+    delete?: account_ledgerWhereUniqueInput | account_ledgerWhereUniqueInput[]
+    connect?: account_ledgerWhereUniqueInput | account_ledgerWhereUniqueInput[]
+    update?: account_ledgerUpdateWithWhereUniqueWithoutJournalInput | account_ledgerUpdateWithWhereUniqueWithoutJournalInput[]
+    updateMany?: account_ledgerUpdateManyWithWhereWithoutJournalInput | account_ledgerUpdateManyWithWhereWithoutJournalInput[]
+    deleteMany?: account_ledgerScalarWhereInput | account_ledgerScalarWhereInput[]
+  }
+
+  export type account_journalCreateNestedOneWithoutLedger_entriesInput = {
+    create?: XOR<account_journalCreateWithoutLedger_entriesInput, account_journalUncheckedCreateWithoutLedger_entriesInput>
+    connectOrCreate?: account_journalCreateOrConnectWithoutLedger_entriesInput
+    connect?: account_journalWhereUniqueInput
+  }
+
+  export type financeaccountCreateNestedOneWithoutLedger_entriesInput = {
+    create?: XOR<financeaccountCreateWithoutLedger_entriesInput, financeaccountUncheckedCreateWithoutLedger_entriesInput>
+    connectOrCreate?: financeaccountCreateOrConnectWithoutLedger_entriesInput
+    connect?: financeaccountWhereUniqueInput
+  }
+
+  export type FloatFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type account_journalUpdateOneRequiredWithoutLedger_entriesNestedInput = {
+    create?: XOR<account_journalCreateWithoutLedger_entriesInput, account_journalUncheckedCreateWithoutLedger_entriesInput>
+    connectOrCreate?: account_journalCreateOrConnectWithoutLedger_entriesInput
+    upsert?: account_journalUpsertWithoutLedger_entriesInput
+    connect?: account_journalWhereUniqueInput
+    update?: XOR<XOR<account_journalUpdateToOneWithWhereWithoutLedger_entriesInput, account_journalUpdateWithoutLedger_entriesInput>, account_journalUncheckedUpdateWithoutLedger_entriesInput>
+  }
+
+  export type financeaccountUpdateOneRequiredWithoutLedger_entriesNestedInput = {
+    create?: XOR<financeaccountCreateWithoutLedger_entriesInput, financeaccountUncheckedCreateWithoutLedger_entriesInput>
+    connectOrCreate?: financeaccountCreateOrConnectWithoutLedger_entriesInput
+    upsert?: financeaccountUpsertWithoutLedger_entriesInput
+    connect?: financeaccountWhereUniqueInput
+    update?: XOR<XOR<financeaccountUpdateToOneWithWhereWithoutLedger_entriesInput, financeaccountUpdateWithoutLedger_entriesInput>, financeaccountUncheckedUpdateWithoutLedger_entriesInput>
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -26433,6 +29890,33 @@ export namespace Prisma {
     _max?: NestedDecimalNullableFilter<$PrismaModel>
   }
 
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedFloatFilter<$PrismaModel>
+    _min?: NestedFloatFilter<$PrismaModel>
+    _max?: NestedFloatFilter<$PrismaModel>
+  }
+
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[]
@@ -26449,17 +29933,6 @@ export namespace Prisma {
     _max?: NestedIntFilter<$PrismaModel>
   }
 
-  export type NestedFloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatFilter<$PrismaModel> | number
-  }
-
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | null
@@ -26474,6 +29947,346 @@ export namespace Prisma {
     _sum?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedIntNullableFilter<$PrismaModel>
     _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type account_ledgerCreateWithoutAccountInput = {
+    id: string
+    debit?: number
+    credit?: number
+    details?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    journal: account_journalCreateNestedOneWithoutLedger_entriesInput
+  }
+
+  export type account_ledgerUncheckedCreateWithoutAccountInput = {
+    id: string
+    journal_id: string
+    debit?: number
+    credit?: number
+    details?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type account_ledgerCreateOrConnectWithoutAccountInput = {
+    where: account_ledgerWhereUniqueInput
+    create: XOR<account_ledgerCreateWithoutAccountInput, account_ledgerUncheckedCreateWithoutAccountInput>
+  }
+
+  export type account_ledgerCreateManyAccountInputEnvelope = {
+    data: account_ledgerCreateManyAccountInput | account_ledgerCreateManyAccountInput[]
+  }
+
+  export type account_ledgerUpsertWithWhereUniqueWithoutAccountInput = {
+    where: account_ledgerWhereUniqueInput
+    update: XOR<account_ledgerUpdateWithoutAccountInput, account_ledgerUncheckedUpdateWithoutAccountInput>
+    create: XOR<account_ledgerCreateWithoutAccountInput, account_ledgerUncheckedCreateWithoutAccountInput>
+  }
+
+  export type account_ledgerUpdateWithWhereUniqueWithoutAccountInput = {
+    where: account_ledgerWhereUniqueInput
+    data: XOR<account_ledgerUpdateWithoutAccountInput, account_ledgerUncheckedUpdateWithoutAccountInput>
+  }
+
+  export type account_ledgerUpdateManyWithWhereWithoutAccountInput = {
+    where: account_ledgerScalarWhereInput
+    data: XOR<account_ledgerUpdateManyMutationInput, account_ledgerUncheckedUpdateManyWithoutAccountInput>
+  }
+
+  export type account_ledgerScalarWhereInput = {
+    AND?: account_ledgerScalarWhereInput | account_ledgerScalarWhereInput[]
+    OR?: account_ledgerScalarWhereInput[]
+    NOT?: account_ledgerScalarWhereInput | account_ledgerScalarWhereInput[]
+    id?: StringFilter<"account_ledger"> | string
+    journal_id?: StringFilter<"account_ledger"> | string
+    account_id?: StringFilter<"account_ledger"> | string
+    debit?: FloatFilter<"account_ledger"> | number
+    credit?: FloatFilter<"account_ledger"> | number
+    details?: StringNullableFilter<"account_ledger"> | string | null
+    createdAt?: DateTimeFilter<"account_ledger"> | Date | string
+    updatedAt?: DateTimeFilter<"account_ledger"> | Date | string
+  }
+
+  export type account_ledgerCreateWithoutJournalInput = {
+    id: string
+    debit?: number
+    credit?: number
+    details?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    account: financeaccountCreateNestedOneWithoutLedger_entriesInput
+  }
+
+  export type account_ledgerUncheckedCreateWithoutJournalInput = {
+    id: string
+    account_id: string
+    debit?: number
+    credit?: number
+    details?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type account_ledgerCreateOrConnectWithoutJournalInput = {
+    where: account_ledgerWhereUniqueInput
+    create: XOR<account_ledgerCreateWithoutJournalInput, account_ledgerUncheckedCreateWithoutJournalInput>
+  }
+
+  export type account_ledgerCreateManyJournalInputEnvelope = {
+    data: account_ledgerCreateManyJournalInput | account_ledgerCreateManyJournalInput[]
+  }
+
+  export type account_ledgerUpsertWithWhereUniqueWithoutJournalInput = {
+    where: account_ledgerWhereUniqueInput
+    update: XOR<account_ledgerUpdateWithoutJournalInput, account_ledgerUncheckedUpdateWithoutJournalInput>
+    create: XOR<account_ledgerCreateWithoutJournalInput, account_ledgerUncheckedCreateWithoutJournalInput>
+  }
+
+  export type account_ledgerUpdateWithWhereUniqueWithoutJournalInput = {
+    where: account_ledgerWhereUniqueInput
+    data: XOR<account_ledgerUpdateWithoutJournalInput, account_ledgerUncheckedUpdateWithoutJournalInput>
+  }
+
+  export type account_ledgerUpdateManyWithWhereWithoutJournalInput = {
+    where: account_ledgerScalarWhereInput
+    data: XOR<account_ledgerUpdateManyMutationInput, account_ledgerUncheckedUpdateManyWithoutJournalInput>
+  }
+
+  export type account_journalCreateWithoutLedger_entriesInput = {
+    id: string
+    date?: Date | string
+    description?: string | null
+    reference?: string | null
+    source?: string | null
+    createdby?: string | null
+    updatedby?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type account_journalUncheckedCreateWithoutLedger_entriesInput = {
+    id: string
+    date?: Date | string
+    description?: string | null
+    reference?: string | null
+    source?: string | null
+    createdby?: string | null
+    updatedby?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type account_journalCreateOrConnectWithoutLedger_entriesInput = {
+    where: account_journalWhereUniqueInput
+    create: XOR<account_journalCreateWithoutLedger_entriesInput, account_journalUncheckedCreateWithoutLedger_entriesInput>
+  }
+
+  export type financeaccountCreateWithoutLedger_entriesInput = {
+    id: string
+    name?: string | null
+    code?: string | null
+    type?: string | null
+    category?: string | null
+    opening_balance?: number | null
+    balance_type?: string | null
+    fk_parent_in_financeaccount?: string | null
+    createdby?: string | null
+    updatedby?: string | null
+    source?: string | null
+    value?: Decimal | DecimalJsLike | number | string | null
+    opening_balance_date?: Date | string | null
+    isDefault?: boolean | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type financeaccountUncheckedCreateWithoutLedger_entriesInput = {
+    id: string
+    name?: string | null
+    code?: string | null
+    type?: string | null
+    category?: string | null
+    opening_balance?: number | null
+    balance_type?: string | null
+    fk_parent_in_financeaccount?: string | null
+    createdby?: string | null
+    updatedby?: string | null
+    source?: string | null
+    value?: Decimal | DecimalJsLike | number | string | null
+    opening_balance_date?: Date | string | null
+    isDefault?: boolean | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type financeaccountCreateOrConnectWithoutLedger_entriesInput = {
+    where: financeaccountWhereUniqueInput
+    create: XOR<financeaccountCreateWithoutLedger_entriesInput, financeaccountUncheckedCreateWithoutLedger_entriesInput>
+  }
+
+  export type account_journalUpsertWithoutLedger_entriesInput = {
+    update: XOR<account_journalUpdateWithoutLedger_entriesInput, account_journalUncheckedUpdateWithoutLedger_entriesInput>
+    create: XOR<account_journalCreateWithoutLedger_entriesInput, account_journalUncheckedCreateWithoutLedger_entriesInput>
+    where?: account_journalWhereInput
+  }
+
+  export type account_journalUpdateToOneWithWhereWithoutLedger_entriesInput = {
+    where?: account_journalWhereInput
+    data: XOR<account_journalUpdateWithoutLedger_entriesInput, account_journalUncheckedUpdateWithoutLedger_entriesInput>
+  }
+
+  export type account_journalUpdateWithoutLedger_entriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    reference?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type account_journalUncheckedUpdateWithoutLedger_entriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    reference?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type financeaccountUpsertWithoutLedger_entriesInput = {
+    update: XOR<financeaccountUpdateWithoutLedger_entriesInput, financeaccountUncheckedUpdateWithoutLedger_entriesInput>
+    create: XOR<financeaccountCreateWithoutLedger_entriesInput, financeaccountUncheckedCreateWithoutLedger_entriesInput>
+    where?: financeaccountWhereInput
+  }
+
+  export type financeaccountUpdateToOneWithWhereWithoutLedger_entriesInput = {
+    where?: financeaccountWhereInput
+    data: XOR<financeaccountUpdateWithoutLedger_entriesInput, financeaccountUncheckedUpdateWithoutLedger_entriesInput>
+  }
+
+  export type financeaccountUpdateWithoutLedger_entriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    opening_balance?: NullableFloatFieldUpdateOperationsInput | number | null
+    balance_type?: NullableStringFieldUpdateOperationsInput | string | null
+    fk_parent_in_financeaccount?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    value?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    opening_balance_date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isDefault?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type financeaccountUncheckedUpdateWithoutLedger_entriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    opening_balance?: NullableFloatFieldUpdateOperationsInput | number | null
+    balance_type?: NullableStringFieldUpdateOperationsInput | string | null
+    fk_parent_in_financeaccount?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    value?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    opening_balance_date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isDefault?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type account_ledgerCreateManyAccountInput = {
+    id: string
+    journal_id: string
+    debit?: number
+    credit?: number
+    details?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type account_ledgerUpdateWithoutAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    debit?: FloatFieldUpdateOperationsInput | number
+    credit?: FloatFieldUpdateOperationsInput | number
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    journal?: account_journalUpdateOneRequiredWithoutLedger_entriesNestedInput
+  }
+
+  export type account_ledgerUncheckedUpdateWithoutAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    journal_id?: StringFieldUpdateOperationsInput | string
+    debit?: FloatFieldUpdateOperationsInput | number
+    credit?: FloatFieldUpdateOperationsInput | number
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type account_ledgerUncheckedUpdateManyWithoutAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    journal_id?: StringFieldUpdateOperationsInput | string
+    debit?: FloatFieldUpdateOperationsInput | number
+    credit?: FloatFieldUpdateOperationsInput | number
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type account_ledgerCreateManyJournalInput = {
+    id: string
+    account_id: string
+    debit?: number
+    credit?: number
+    details?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type account_ledgerUpdateWithoutJournalInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    debit?: FloatFieldUpdateOperationsInput | number
+    credit?: FloatFieldUpdateOperationsInput | number
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    account?: financeaccountUpdateOneRequiredWithoutLedger_entriesNestedInput
+  }
+
+  export type account_ledgerUncheckedUpdateWithoutJournalInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    account_id?: StringFieldUpdateOperationsInput | string
+    debit?: FloatFieldUpdateOperationsInput | number
+    credit?: FloatFieldUpdateOperationsInput | number
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type account_ledgerUncheckedUpdateManyWithoutJournalInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    account_id?: StringFieldUpdateOperationsInput | string
+    debit?: FloatFieldUpdateOperationsInput | number
+    credit?: FloatFieldUpdateOperationsInput | number
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

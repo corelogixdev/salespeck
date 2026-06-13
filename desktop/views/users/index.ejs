@@ -1,8 +1,20 @@
 <div class="card">
     <div class="card-header align-items-center d-flex">
-        <h4 class="card-title mb-0 flex-grow-1">
-            <%= role==='user' ? 'Users' : (role==='vendor' ? 'Vendors' : 'Customers' ) %> List
-        </h4>
+        <div class="flex-grow-1">
+            <h4 class="card-title mb-1">
+                <%= role==='user' ? 'Users' : (role==='vendor' ? 'Vendors' : 'Customers' ) %> List
+            </h4>
+            <p class="text-muted mb-0 fs-12">Manage and view details of your <%= role %>s</p>
+        </div>
+        <% if (typeof totalBalance !== 'undefined' && role !== 'user') { %>
+            <div class="text-end me-4">
+                <small class="text-muted text-uppercase fw-bold fs-10 d-block mb-1">Total Net Balance</small>
+                <h4 class="mb-0 fw-bold <%= totalBalance >= 0 ? 'text-success' : 'text-danger' %>">
+                    <%= Math.abs(totalBalance).toLocaleString(undefined, { minimumFractionDigits: 2 }) %>
+                    <small class="fs-12 fw-normal text-muted"><%= totalBalance >= 0 ? 'Dr' : 'Cr' %></small>
+                </h4>
+            </div>
+        <% } %>
         <div class="d-flex gap-2 align-items-center">
             <% if ((role=='user' && permissions.usersSearch) || (role=='vendor' && permissions.vendorsSearch) ||
                 (role=='customer' && permissions.customersSearch)) { %>
@@ -38,6 +50,24 @@
             { key: 'phone', label: 'Phone', sortable: true },
             { key: 'email', label: 'Email', sortable: true }
         ];
+        
+        if (role !== 'user') {
+            tableColumns.push({ 
+                key: 'balance', 
+                label: 'Balance',
+                class: 'text-end',
+                render: (row) => {
+                    const bal = row.balance || 0;
+                    const suffix = bal >= 0 ? ' (Dr)' : ' (Cr)';
+                    return `<span class="fw-bold">${Math.abs(bal).toLocaleString()}</span> <small class="text-muted">${suffix}</small>`;
+                }
+            });
+            tableColumns.push({ 
+                key: 'fk_financeaccount_id', 
+                label: 'Account Head', 
+                render: (row) => row.fk_financeaccount_id ? '<span class="badge bg-soft-info text-info">Linked</span>' : '<span class="badge bg-soft-secondary text-muted">Not Linked</span>'
+            });
+        }
 
         if (role === 'user') {
             tableColumns.push({ key: 'username', label: 'Username', sortable: true });
@@ -115,33 +145,85 @@ const canCreate = (role=='user' && permissions.usersCreate) || (role=='vendor' &
                             <input type="text" class="form-control" id="addFirstName" name="firstname" required>
                         </div>
                         <div class="col-md-6">
-                            <label for="addLastName" class="form-label">Last Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="addLastName" name="lastname" required>
+                            <label for="addLastName" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="addLastName" name="lastname">
                         </div>
                         <div class="col-md-6">
-                            <label for="addEmail" class="form-label">Email <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" id="addEmail" name="email" required>
+                            <label for="addEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="addEmail" name="email">
                         </div>
                         <div class="col-md-6">
-                            <label for="addUsername" class="form-label">Username <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="addUsername" name="username" required>
+                            <label for="addUsername" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="addUsername" name="username">
                         </div>
                         <div class="col-md-6">
-                            <label for="addPhone" class="form-label">Phone <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="addPhone" name="phone" required>
+                            <label for="addPhone" class="form-label">Phone</label>
+                            <input type="text" class="form-control" id="addPhone" name="phone">
                         </div>
                         <div class="col-md-6">
-                            <label for="addAddress" class="form-label">Address <span class="text-danger">*</span></label>
-                            <textarea class="form-control" id="addAddress" name="address" rows="1" required></textarea>
+                            <label for="addAddress" class="form-label">Address</label>
+                            <textarea class="form-control" id="addAddress" name="address" rows="1"></textarea>
                         </div>
                         <% if (role !== 'customer' && role !== 'vendor') { %>
                         <div class="col-md-6 position-relative">
-                            <label for="addPassword" class="form-label">Password <span class="text-danger">*</span></label>
+                            <label for="addPassword" class="form-label">Password</label>
                             <div class="input-group">
-                                <input type="password" class="form-control" id="addPassword" name="password" autocomplete="on" required>
+                                <input type="password" class="form-control" id="addPassword" name="password" autocomplete="on">
                                 <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('addPassword', this)">
                                     <i class="ri-eye-line"></i>
                                 </button>
+                            </div>
+                        </div>
+                        <% } else { %>
+                        <div class="col-12">
+                            <div class="card border border-dashed shadow-none mb-0 bg-light">
+                                <div class="card-header py-2 d-flex align-items-center">
+                                    <h6 class="card-title mb-0 fs-13 flex-grow-1"><i class="ri-scales-3-line me-1 align-bottom"></i> Opening Balance Setup (Double Entry)</h6>
+                                    <span class="badge bg-soft-success text-success fs-10" id="obBalanceBadge">Balanced</span>
+                                </div>
+                                <div class="card-body p-2">
+                                    <div class="row mb-2 gy-2">
+                                        <div class="col-md-12">
+                                            <label class="form-label fs-11 mb-1">As of Date <span class="text-danger">*</span></label>
+                                            <input type="date" class="form-control form-control-sm" name="ob_date" value="<%= new Date().toISOString().split('T')[0] %>" required>
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-nowrap align-middle mb-0">
+                                            <thead class="table-light fs-11">
+                                                <tr>
+                                                    <th>Account Head</th>
+                                                    <th class="text-end" style="width: 120px;">Debit</th>
+                                                    <th class="text-end" style="width: 120px;">Credit</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="fs-12">
+                                                <!-- Primary Account (Party) -->
+                                                <tr>
+                                                    <td>
+                                                        <div class="fw-medium text-primary">New <%= role.charAt(0).toUpperCase() + role.slice(1) %> Account</div>
+                                                        <small class="text-muted">Sub-ledger under <%= role === 'customer' ? 'Receivables' : 'Payables' %></small>
+                                                    </td>
+                                                    <td><input type="number" class="form-control form-control-sm text-end ob-input" name="ob_primary_debit" value="0" step="any" oninput="balanceOB(this, 'primary', 'debit')"></td>
+                                                    <td><input type="number" class="form-control form-control-sm text-end ob-input" name="ob_primary_credit" value="0" step="any" oninput="balanceOB(this, 'primary', 'credit')"></td>
+                                                </tr>
+                                                <!-- Contra Account -->
+                                                <tr>
+                                                    <td>
+                                                        <select class="form-select form-select-sm border-0 bg-transparent fw-medium" name="ob_contra_account">
+                                                            <% accounts.forEach(acc => { %>
+                                                                <option value="<%= acc.id %>" <%= acc.code === '3200' ? 'selected' : '' %>><%= acc.code %> - <%= acc.name %></option>
+                                                            <% }) %>
+                                                        </select>
+                                                        <small class="text-muted ms-1">Offsetting account</small>
+                                                    </td>
+                                                    <td><input type="number" class="form-control form-control-sm text-end ob-input" name="ob_contra_debit" value="0" step="any" oninput="balanceOB(this, 'contra', 'debit')"></td>
+                                                    <td><input type="number" class="form-control form-control-sm text-end ob-input" name="ob_contra_credit" value="0" step="any" oninput="balanceOB(this, 'contra', 'credit')"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <% } %>
@@ -174,33 +256,41 @@ const canCreate = (role=='user' && permissions.usersCreate) || (role=='vendor' &
                             <input type="text" class="form-control" id="editFirstName" name="firstname" required>
                         </div>
                         <div class="col-md-6">
-                            <label for="editLastName" class="form-label">Last Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="editLastName" name="lastname" required>
+                            <label for="editLastName" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="editLastName" name="lastname">
                         </div>
                         <div class="col-md-6">
-                            <label for="editEmail" class="form-label">Email <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" id="editEmail" name="email" required>
+                            <label for="editEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editEmail" name="email">
                         </div>
                         <div class="col-md-6">
-                            <label for="editUsername" class="form-label">Username <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="editUsername" name="username" required>
+                            <label for="editUsername" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="editUsername" name="username">
                         </div>
                         <div class="col-md-6">
-                            <label for="editPhone" class="form-label">Phone <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="editPhone" name="phone" required>
+                            <label for="editPhone" class="form-label">Phone</label>
+                            <input type="text" class="form-control" id="editPhone" name="phone">
                         </div>
                         <div class="col-md-6">
-                            <label for="editAddress" class="form-label">Address <span class="text-danger">*</span></label>
-                            <textarea class="form-control" id="editAddress" name="address" rows="1" required></textarea>
+                            <label for="editAddress" class="form-label">Address</label>
+                            <textarea class="form-control" id="editAddress" name="address" rows="1"></textarea>
                         </div>
                         <% if (role !== 'customer' && role !== 'vendor') { %>
                         <div class="col-md-6 position-relative">
-                            <label for="editPassword" class="form-label">Password <span class="text-danger">*</span></label>
+                            <label for="editPassword" class="form-label">Password</label>
                             <div class="input-group">
-                                <input type="password" class="form-control" id="editPassword" name="password" autocomplete="on" required>
+                                <input type="password" class="form-control" id="editPassword" name="password" autocomplete="on">
                                 <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('editPassword', this)">
                                     <i class="ri-eye-line"></i>
                                 </button>
+                            </div>
+                        </div>
+                        <% } else { %>
+                        <div class="col-12">
+                            <div class="card border border-dashed shadow-none mb-0 bg-light-subtle">
+                                <div class="card-body p-2 text-center">
+                                    <small class="text-muted italic">Opening balance is set during creation. View the <strong>Ledger</strong> tab for current balance and transaction history.</small>
+                                </div>
                             </div>
                         </div>
                         <% } %>
@@ -225,6 +315,47 @@ const canCreate = (role=='user' && permissions.usersCreate) || (role=='vendor' &
 
 
 <script>
+    function balanceOB(input, rowType, fieldType) {
+        const form = input.closest('form');
+        const val = parseFloat(input.value) || 0;
+        
+        // Disable other field in same row
+        const otherFieldInRow = fieldType === 'debit' ? 'credit' : 'debit';
+        form.querySelector(`[name="ob_${rowType}_${otherFieldInRow}"]`).value = val > 0 ? 0 : form.querySelector(`[name="ob_${rowType}_${otherFieldInRow}"]`).value;
+
+        // Balance logic
+        const otherRowType = rowType === 'primary' ? 'contra' : 'primary';
+        const otherRowField = fieldType === 'debit' ? 'credit' : 'debit';
+        const sameFieldInOtherRow = fieldType;
+
+        if (val > 0) {
+            // If I debit primary, I should credit contra
+            form.querySelector(`[name="ob_${otherRowType}_${otherRowField}"]`).value = val;
+            form.querySelector(`[name="ob_${otherRowType}_${sameFieldInOtherRow}"]`).value = 0;
+        }
+
+        // Check balance badge
+        const pDebit = parseFloat(form.querySelector('[name="ob_primary_debit"]').value) || 0;
+        const pCredit = parseFloat(form.querySelector('[name="ob_primary_credit"]').value) || 0;
+        const cDebit = parseFloat(form.querySelector('[name="ob_contra_debit"]').value) || 0;
+        const cCredit = parseFloat(form.querySelector('[name="ob_contra_credit"]').value) || 0;
+        
+        const totalDebit = pDebit + cDebit;
+        const totalCredit = pCredit + cCredit;
+        
+        const badge = document.getElementById('obBalanceBadge');
+        if (totalDebit === totalCredit && totalDebit > 0) {
+            badge.innerText = 'Balanced';
+            badge.className = 'badge bg-soft-success text-success fs-10';
+        } else if (totalDebit !== totalCredit) {
+            badge.innerText = 'Imbalanced';
+            badge.className = 'badge bg-soft-danger text-danger fs-10';
+        } else {
+            badge.innerText = 'No Entry';
+            badge.className = 'badge bg-soft-secondary text-muted fs-10';
+        }
+    }
+
     function togglePassword(inputId, btn) {
         const input = document.getElementById(inputId);
         const icon = btn.querySelector('i');
@@ -239,28 +370,172 @@ const canCreate = (role=='user' && permissions.usersCreate) || (role=='vendor' &
         }
     }
 
-    function openViewModal(id) {
-        fetch('/users/' + id)
-            .then(r => r.json())
-            .then(result => {
-                if (!result.success) return toastr.error('Failed to load details');
-                const u = result.user;
-                const fields = [
-                    { label: 'First Name', value: u.firstname },
-                    { label: 'Last Name', value: u.lastname },
-                    { label: 'Email', value: u.email },
-                    { label: 'Phone', value: u.phone },
-                    { label: 'Address', value: u.address || '-' }
-                ];
-                <% if (role === 'user') { %>
-                fields.push({ label: 'Username', value: u.username || '-' });
-                fields.push({ label: 'Role', value: u.role || '-' });
-                <% } %>
-                renderViewModal('viewUserModal', fields);
-                const modal = new bootstrap.Modal(document.getElementById('viewUserModal'));
-                modal.show();
-            })
-            .catch(e => { console.error(e); toastr.error('Error loading details'); });
+    async function openViewModal(id) {
+        try {
+            const userResponse = await fetch('/users/' + id);
+            const userResult = await userResponse.json();
+            if (!userResult.success) return toastr.error('Failed to load details');
+            
+            const u = userResult.user;
+            const role = '<%= role %>';
+            const fields = [
+                { label: 'First Name', value: u.firstname, icon: 'ri-user-line' },
+                { label: 'Last Name', value: u.lastname || '-', icon: 'ri-user-line' },
+                { label: 'Email', value: u.email || '-', icon: 'ri-mail-line' },
+                { label: 'Phone', value: u.phone || '-', icon: 'ri-phone-line' },
+                { label: 'Address', value: u.address || '-', icon: 'ri-map-pin-line' }
+            ];
+
+            // Build Profile Header
+            const initials = (u.firstname.charAt(0) + (u.lastname ? u.lastname.charAt(0) : '')).toUpperCase();
+            let headerHtml = `
+                <div class="d-flex align-items-start">
+                    <div class="flex-shrink-0">
+                        <div class="avatar-lg">
+                            <span class="avatar-title bg-soft-primary text-primary rounded-circle fs-24 fw-bold" style="width: 60px; height: 60px;">
+                                ${initials}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <h2 class="mb-0 fw-bold text-dark">${u.firstname} ${u.lastname || ''}</h2>
+                            <span class="badge bg-soft-info text-info ms-3 fs-10 text-uppercase ls-1">${role}</span>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center">
+                                    <i class="ri-phone-line text-primary me-2"></i>
+                                    <div>
+                                        <small class="text-muted text-uppercase fw-bold fs-9 d-block ls-1">Phone</small>
+                                        <h6 class="mb-0 fs-12 fw-semibold">${u.phone || '-'}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center">
+                                    <i class="ri-mail-line text-primary me-2"></i>
+                                    <div>
+                                        <small class="text-muted text-uppercase fw-bold fs-9 d-block ls-1">Email</small>
+                                        <h6 class="mb-0 fs-12 fw-semibold text-truncate" style="max-width: 150px;">${u.email || '-'}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center">
+                                    <i class="ri-map-pin-line text-primary me-2"></i>
+                                    <div>
+                                        <small class="text-muted text-uppercase fw-bold fs-9 d-block ls-1">Address</small>
+                                        <h6 class="mb-0 fs-12 fw-semibold text-truncate" style="max-width: 200px;">${u.address || 'No address'}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    ${role !== 'user' ? `
+                    <div class="flex-shrink-0 text-end p-2 px-3 bg-white rounded border border-dashed ms-4" style="min-width: 160px;">
+                        <small class="text-muted text-uppercase fw-bold fs-9 d-block mb-0">Current Balance</small>
+                        <h3 class="mb-0 fw-bold ${u.balance >= 0 ? 'text-success' : 'text-danger'}">
+                            ${Math.abs(u.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                            <small class="fs-11 fw-normal text-muted">${u.balance >= 0 ? 'Dr' : 'Cr'}</small>
+                        </h3>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            if (role === 'user') {
+                fields.push({ label: 'Username', value: u.username || '-', icon: 'ri-user-settings-line' });
+                fields.push({ label: 'Role', value: u.role || '-', icon: 'ri-shield-user-line' });
+                renderViewModal('viewUserModal', fields, null, headerHtml);
+            } else {
+                // Fetch Ledger for Customers/Vendors
+                const ledgerResponse = await fetch('/accounting/ledger/party/' + id);
+                const ledgerResult = await ledgerResponse.json();
+                
+                let ledgerHtml = `
+                    <div class="card border-0 shadow-none mb-0">
+                        <div class="card-header p-0 pb-3 bg-transparent border-0 d-flex align-items-center">
+                            <h6 class="card-title mb-0 flex-grow-1"><i class="ri-file-list-3-line me-1 align-bottom text-primary"></i> Statement of Account</h6>
+                            <div class="flex-shrink-0">
+                                <button class="btn btn-soft-primary btn-sm" onclick="window.print()"><i class="ri-printer-line me-1"></i> Print Statement</button>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-nowrap align-middle mb-0">
+                                <thead class="table-light fs-11 text-uppercase">
+                                    <tr>
+                                        <th style="width: 100px;">Date</th>
+                                        <th>Description</th>
+                                        <th class="text-end" style="width: 120px;">Debit</th>
+                                        <th class="text-end" style="width: 120px;">Credit</th>
+                                        <th class="text-end" style="width: 140px;">Balance</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="fs-13">
+                `;
+                
+                if (ledgerResult.success && ledgerResult.ledger.length > 0) {
+                    let balance = 0;
+                    const sortedLedger = [...ledgerResult.ledger].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                    
+                    sortedLedger.forEach(entry => {
+                        const isDebit = entry.debit > 0;
+                        if (role === 'customer') {
+                            balance += (entry.debit - entry.credit);
+                        } else {
+                            balance += (entry.credit - entry.debit);
+                        }
+
+                        let viewButton = '';
+                        if (entry.journal.reference) {
+                            if (entry.journal.description && entry.journal.description.toLowerCase().includes('sale')) {
+                                viewButton = `<a href="/sales/${entry.journal.reference}" target="_blank" class="btn btn-soft-primary btn-sm px-2 py-0 fs-11 mt-1"><i class="ri-eye-line me-1"></i>View</a>`;
+                            } else if (entry.journal.description && entry.journal.description.toLowerCase().includes('purchase')) {
+                                viewButton = `<a href="/accounting/purchase/details/${entry.journal.reference}" target="_blank" class="btn btn-soft-primary btn-sm px-2 py-0 fs-11 mt-1"><i class="ri-eye-line me-1"></i>View</a>`;
+                            }
+                        }
+
+                        ledgerHtml += `
+                            <tr>
+                                <td class="text-muted">${new Date(entry.journal.date).toLocaleDateString()}</td>
+                                <td>
+                                    <div class="fw-semibold text-dark">${entry.journal.description || '-'}</div>
+                                    <div class="text-muted fs-12">${entry.details || ''}</div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        ${entry.journal.voucher_no ? `<span class="badge bg-soft-info text-info fs-10 mt-1">${entry.journal.voucher_no}</span>` : ''}
+                                        ${viewButton}
+                                    </div>
+                                </td>
+                                <td class="text-end fw-medium ${ (entry.debit > 0 || entry.credit < 0) ? 'text-success' : 'text-muted'}">
+                                    ${ (entry.debit > 0 || entry.credit < 0) ? Math.abs(entry.debit || entry.credit).toLocaleString(undefined, { minimumFractionDigits: 2 }) : '-'}
+                                </td>
+                                <td class="text-end fw-medium ${ (entry.credit > 0 || entry.debit < 0) ? 'text-danger' : 'text-muted'}">
+                                    ${ (entry.credit > 0 || entry.debit < 0) ? Math.abs(entry.credit || entry.debit).toLocaleString(undefined, { minimumFractionDigits: 2 }) : '-'}
+                                </td>
+                                <td class="text-end fw-bold text-dark bg-light-subtle">
+                                    ${Math.abs(balance).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                    <small class="text-muted fw-normal">${role === 'customer' ? (balance >= 0 ? 'Dr' : 'Cr') : (balance >= 0 ? 'Cr' : 'Dr')}</small>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    ledgerHtml += '<tr><td colspan="5" class="text-center py-5 text-muted"><i class="ri-file-history-line fs-24 d-block mb-2"></i>No transactions found for this period</td></tr>';
+                }
+                
+                ledgerHtml += '</tbody></table></div></div>';
+                
+                renderViewModal('viewUserModal', ledgerHtml, null, headerHtml);
+            }
+
+            const modal = new bootstrap.Modal(document.getElementById('viewUserModal'));
+            modal.show();
+        } catch (e) {
+            console.error(e);
+            toastr.error('Error loading details');
+        }
     }
 
     function openEditModal(id) {
@@ -298,7 +573,7 @@ const canCreate = (role=='user' && permissions.usersCreate) || (role=='vendor' &
             return null;
         }
         const phone = form.querySelector('input[name="phone"]').value;
-        if (phone.length < 8) {
+        if (phone && phone.length < 8) {
             toastr.error('Phone number must be at least 8 characters');
             form.querySelector('input[name="phone"]').focus();
             return null;

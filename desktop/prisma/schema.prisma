@@ -51,15 +51,50 @@ model category {
 model financeaccount {
   id                          String                     @id
   name                        String?
-  type                        String?
+  code                        String?
+  type                        String?                    // asset, liability, equity, revenue, expense
+  category                    String?                    // asset, liability, equity, revenue, expense
+  opening_balance             Float?                     @default(0)
+  balance_type                String?                    @default("DEBIT") // DEBIT or CREDIT
   fk_parent_in_financeaccount String?
   createdby                   String?
   updatedby                   String?
   source                      String?
   value                       Decimal?
+  opening_balance_date        DateTime?
   isDefault                   Boolean?
   createdAt                   DateTime                   @default(now())
   updatedAt                   DateTime                   @default(now())
+  ledger_entries              account_ledger[]
+}
+
+model account_journal {
+  id          String           @id
+  date        DateTime         @default(now())
+  description String?
+  reference   String?
+  source      String?
+  createdby   String?
+  updatedby   String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @default(now())
+  ledger_entries account_ledger[]
+}
+
+model account_ledger {
+  id                  String          @id
+  journal_id          String
+  account_id          String
+  debit               Float           @default(0)
+  credit              Float           @default(0)
+  details             String?
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @default(now())
+  journal             account_journal @relation(fields: [journal_id], references: [id])
+  account             financeaccount  @relation(fields: [account_id], references: [id])
+
+  @@index([journal_id])
+  @@index([account_id])
 }
 
 model financetransaction {
@@ -152,16 +187,18 @@ model productsub {
 }
 
 model purchase {
-  id           String   @id
-  createdby    String?
-  updatedby    String?
-  vendor       String?
-  totalAmount  Float?
-  totalPayment Float?
-  invoicenum   String?
-  source       String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @default(now())
+  id                 String   @id
+  createdby          String?
+  updatedby          String?
+  vendor             String?
+  discountpercentage String?
+  totalAmount        Float?
+  totalPayment       Float?
+  ledger             Boolean? @default(false)
+  invoicenum         String?
+  source             String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now())
 }
 
 model purchasedproducts {
@@ -169,6 +206,7 @@ model purchasedproducts {
   purchase    String?
   product     String?
   quantity    Int?
+  price       Float?
   totalAmount Float?
   source      String?
   createdAt   DateTime @default(now())
@@ -237,6 +275,7 @@ model user {
   source            String?  @default("desktop")
   profile_image_url String?
   dashboard_config  String?  @default("{}")
+  fk_financeaccount_id String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @default(now())
 }

@@ -8,6 +8,8 @@ router.get('/api/:id', allowed(['salesView']), sales.getSale);
 router.get('/form', allowed(['salesCreate']), sales.form);
 router.post('/save', allowed(['salesCreate']), sales.save);
 router.post('/productsget', allowed(['salesCreate']), sales.productsget);
+router.get('/next-invoice-num', sales.getNextInvoiceNum);
+router.get('/revenue-accounts', sales.getRevenueAccounts);
 router.get('/search-customers', sales.searchCustomers);
 router.get('/:id', allowed(['salesView']), sales.saleview);
 

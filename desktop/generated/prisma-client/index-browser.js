@@ -161,13 +161,41 @@ exports.Prisma.CategoryScalarFieldEnum = {
 exports.Prisma.FinanceaccountScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  code: 'code',
   type: 'type',
+  category: 'category',
+  opening_balance: 'opening_balance',
+  balance_type: 'balance_type',
   fk_parent_in_financeaccount: 'fk_parent_in_financeaccount',
   createdby: 'createdby',
   updatedby: 'updatedby',
   source: 'source',
   value: 'value',
+  opening_balance_date: 'opening_balance_date',
   isDefault: 'isDefault',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.Account_journalScalarFieldEnum = {
+  id: 'id',
+  date: 'date',
+  description: 'description',
+  reference: 'reference',
+  source: 'source',
+  createdby: 'createdby',
+  updatedby: 'updatedby',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.Account_ledgerScalarFieldEnum = {
+  id: 'id',
+  journal_id: 'journal_id',
+  account_id: 'account_id',
+  debit: 'debit',
+  credit: 'credit',
+  details: 'details',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -259,8 +287,10 @@ exports.Prisma.PurchaseScalarFieldEnum = {
   createdby: 'createdby',
   updatedby: 'updatedby',
   vendor: 'vendor',
+  discountpercentage: 'discountpercentage',
   totalAmount: 'totalAmount',
   totalPayment: 'totalPayment',
+  ledger: 'ledger',
   invoicenum: 'invoicenum',
   source: 'source',
   createdAt: 'createdAt',
@@ -272,6 +302,7 @@ exports.Prisma.PurchasedproductsScalarFieldEnum = {
   purchase: 'purchase',
   product: 'product',
   quantity: 'quantity',
+  price: 'price',
   totalAmount: 'totalAmount',
   source: 'source',
   createdAt: 'createdAt',
@@ -337,6 +368,7 @@ exports.Prisma.UserScalarFieldEnum = {
   source: 'source',
   profile_image_url: 'profile_image_url',
   dashboard_config: 'dashboard_config',
+  fk_financeaccount_id: 'fk_financeaccount_id',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -358,6 +390,8 @@ exports.Prisma.ModelName = {
   cashclosing: 'cashclosing',
   category: 'category',
   financeaccount: 'financeaccount',
+  account_journal: 'account_journal',
+  account_ledger: 'account_ledger',
   financetransaction: 'financetransaction',
   inventorylogs: 'inventorylogs',
   product: 'product',

@@ -79,79 +79,49 @@ exports.getBrand = async (req, res) => {
 
 exports.saveBrand = async (req, res) => {
     try {
-        const { name, description } = req.body;
-
-        // Check if brand already exists
-        const existingBrand = await queries.brands.findByName(name);
-
-        if (existingBrand) {
-            return res.status(400).json({
-                success: false,
-                message: 'Brand with this name already exists'
-            });
-        }
-
-        const newBrand = await queries.brands.create({
-            name,
-            description,
-            status: true,
-            createdby: req.session.user.id
-        });
-
-        res.status(200).json({
-            success: true,
-            message: 'Brand created successfully',
-            brand: newBrand
-        });
-    } catch (error) {
-        console.error('Error creating brand:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Internal Server Error'
-        });
-    }
-};
-
-exports.updateBrand = async (req, res) => {
-    try {
         const { id, name, description, status } = req.body;
 
-        // Check if brand exists
-        const brand = await queries.brands.findById(id);
-        if (!brand) {
-            return res.status(404).json({
-                success: false,
-                message: 'Brand not found'
+        if (id) {
+            // UPDATE
+            const brand = await queries.brands.findById(id);
+            if (!brand) {
+                return res.status(404).json({ success: false, message: 'Brand not found' });
+            }
+
+            const existingBrand = await queries.brands.findByNameExceptId(name, id);
+            if (existingBrand) {
+                return res.status(400).json({ success: false, message: 'Brand name already exists' });
+            }
+
+            const parsedStatus = status === '1' || status === 'true' || status === 'on' || status === true;
+
+            await queries.brands.update(id, {
+                name,
+                description,
+                status: parsedStatus,
+                updatedby: req.session.user.id
             });
-        }
 
-        // Check if name is already taken by another brand
-        const existingBrand = await queries.brands.findByNameExceptId(name, id);
+            return res.status(200).json({ success: true, message: 'Brand updated successfully' });
+        } else {
+            // CREATE
+            const existingBrand = await queries.brands.findByName(name);
+            if (existingBrand) {
+                return res.status(400).json({ success: false, message: 'Brand already exists' });
+            }
 
-        if (existingBrand) {
-            return res.status(400).json({
-                success: false,
-                message: 'Brand name already exists'
+            const newBrand = await queries.brands.create({
+                name,
+                description,
+                status: true,
+                createdby: req.session.user.id
             });
+
+            return res.status(200).json({ success: true, message: 'Brand created successfully', brand: newBrand });
         }
-
-        await queries.brands.update(id, {
-            name,
-            description,
-            status,
-            updatedby: req.session.user.id
-        });
-
-        res.status(200).json({
-            success: true,
-            message: 'Brand updated successfully'
-        });
     } catch (error) {
-        console.error('Error updating brand:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Internal Server Error'
-        });
+        console.error('Error saving brand:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 };
 
