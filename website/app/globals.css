@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #405189;
+  --color-primary-dark: #364574;
+  --color-primary-light: #5e72e4;
+  --color-accent: #0f766e;
+  --color-accent-warm: #b45309;
+
+  --color-surface: #ffffff;
+  --color-bg: #ffffff;
+  --color-muted: #f1f5f9;
+  --color-border: #e2e8f0;
+
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
+
+  --font-sans: var(--font-sans), system-ui, -apple-system, sans-serif;
+}
+
+:root {
+  --section-py: 5rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@layer base {
+  body {
+    background: var(--color-bg);
+    color: var(--color-text);
+    @apply antialiased text-[15px] leading-relaxed;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-primary) 18%, transparent);
+  }
+}
+
+@layer components {
+  .container-pro {
+    @apply max-w-6xl mx-auto px-5 sm:px-8;
+  }
+
+  .section-pad {
+    @apply py-20 md:py-24;
+  }
+
+  .heading-xl {
+    @apply text-3xl sm:text-4xl md:text-[2.75rem] font-semibold tracking-tight text-slate-900 leading-[1.15];
+  }
+
+  .heading-lg {
+    @apply text-2xl md:text-3xl font-semibold tracking-tight text-slate-900;
+  }
+
+  .lead {
+    @apply text-base md:text-lg text-slate-600 leading-relaxed;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 bg-primary text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-primary-dark transition-colors duration-200;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 bg-white text-slate-700 px-6 py-3 rounded-lg text-sm font-semibold border border-slate-300 hover:border-slate-400 hover:bg-slate-50 transition-colors duration-200;
+  }
+
+  .card-pro {
+    @apply bg-white border border-slate-200 rounded-xl p-6 md:p-8;
+  }
+
+  .card-muted {
+    @apply bg-slate-50 border border-slate-200 rounded-xl p-6 md:p-8;
+  }
+
+  .nav-link {
+    @apply text-sm text-slate-600 hover:text-slate-900 transition-colors;
+  }
+
+  .divider-stat {
+    @apply border-l border-slate-200 pl-8 md:pl-12 first:border-0 first:pl-0;
+  }
+}
