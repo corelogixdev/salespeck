@@ -129,6 +129,7 @@ const {findLike} = require("../utils/searchquery");
 exports.productsget = async (req, res) => {
   let body = req.body;
   let search = findLike(body);
+  search.is_service = false; // Exclude services from purchases
   if (req.body.barcode) {
     search = { ...search, barcode: req.body.barcode };
   }

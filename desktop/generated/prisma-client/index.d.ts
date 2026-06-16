@@ -12608,6 +12608,7 @@ export namespace Prisma {
     quantity: number | null
     saleactive: boolean | null
     saleprice: number | null
+    is_service: boolean | null
     taxid: string | null
     createdby: string | null
     updatedby: string | null
@@ -12629,6 +12630,7 @@ export namespace Prisma {
     quantity: number | null
     saleactive: boolean | null
     saleprice: number | null
+    is_service: boolean | null
     taxid: string | null
     createdby: string | null
     updatedby: string | null
@@ -12650,6 +12652,7 @@ export namespace Prisma {
     quantity: number
     saleactive: number
     saleprice: number
+    is_service: number
     taxid: number
     createdby: number
     updatedby: number
@@ -12689,6 +12692,7 @@ export namespace Prisma {
     quantity?: true
     saleactive?: true
     saleprice?: true
+    is_service?: true
     taxid?: true
     createdby?: true
     updatedby?: true
@@ -12710,6 +12714,7 @@ export namespace Prisma {
     quantity?: true
     saleactive?: true
     saleprice?: true
+    is_service?: true
     taxid?: true
     createdby?: true
     updatedby?: true
@@ -12731,6 +12736,7 @@ export namespace Prisma {
     quantity?: true
     saleactive?: true
     saleprice?: true
+    is_service?: true
     taxid?: true
     createdby?: true
     updatedby?: true
@@ -12839,6 +12845,7 @@ export namespace Prisma {
     quantity: number | null
     saleactive: boolean | null
     saleprice: number | null
+    is_service: boolean | null
     taxid: string | null
     createdby: string | null
     updatedby: string | null
@@ -12879,6 +12886,7 @@ export namespace Prisma {
     quantity?: boolean
     saleactive?: boolean
     saleprice?: boolean
+    is_service?: boolean
     taxid?: boolean
     createdby?: boolean
     updatedby?: boolean
@@ -12900,6 +12908,7 @@ export namespace Prisma {
     quantity?: boolean
     saleactive?: boolean
     saleprice?: boolean
+    is_service?: boolean
     taxid?: boolean
     createdby?: boolean
     updatedby?: boolean
@@ -12921,6 +12930,7 @@ export namespace Prisma {
     quantity?: boolean
     saleactive?: boolean
     saleprice?: boolean
+    is_service?: boolean
     taxid?: boolean
     createdby?: boolean
     updatedby?: boolean
@@ -12942,13 +12952,14 @@ export namespace Prisma {
     quantity?: boolean
     saleactive?: boolean
     saleprice?: boolean
+    is_service?: boolean
     taxid?: boolean
     createdby?: boolean
     updatedby?: boolean
     source?: boolean
   }
 
-  export type productOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "barcode" | "brand" | "carrycost" | "category" | "discount" | "ispurchaseable" | "issaleable" | "name" | "purchaseactive" | "purchaseprice" | "quantity" | "saleactive" | "saleprice" | "taxid" | "createdby" | "updatedby" | "source", ExtArgs["result"]["product"]>
+  export type productOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "barcode" | "brand" | "carrycost" | "category" | "discount" | "ispurchaseable" | "issaleable" | "name" | "purchaseactive" | "purchaseprice" | "quantity" | "saleactive" | "saleprice" | "is_service" | "taxid" | "createdby" | "updatedby" | "source", ExtArgs["result"]["product"]>
 
   export type $productPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "product"
@@ -12968,6 +12979,7 @@ export namespace Prisma {
       quantity: number | null
       saleactive: boolean | null
       saleprice: number | null
+      is_service: boolean | null
       taxid: string | null
       createdby: string | null
       updatedby: string | null
@@ -13409,6 +13421,7 @@ export namespace Prisma {
     readonly quantity: FieldRef<"product", 'Float'>
     readonly saleactive: FieldRef<"product", 'Boolean'>
     readonly saleprice: FieldRef<"product", 'Float'>
+    readonly is_service: FieldRef<"product", 'Boolean'>
     readonly taxid: FieldRef<"product", 'String'>
     readonly createdby: FieldRef<"product", 'String'>
     readonly updatedby: FieldRef<"product", 'String'>
@@ -24748,6 +24761,7 @@ export namespace Prisma {
     quantity: 'quantity',
     saleactive: 'saleactive',
     saleprice: 'saleprice',
+    is_service: 'is_service',
     taxid: 'taxid',
     createdby: 'createdby',
     updatedby: 'updatedby',
@@ -25684,6 +25698,7 @@ export namespace Prisma {
     quantity?: FloatNullableFilter<"product"> | number | null
     saleactive?: BoolNullableFilter<"product"> | boolean | null
     saleprice?: FloatNullableFilter<"product"> | number | null
+    is_service?: BoolNullableFilter<"product"> | boolean | null
     taxid?: StringNullableFilter<"product"> | string | null
     createdby?: StringNullableFilter<"product"> | string | null
     updatedby?: StringNullableFilter<"product"> | string | null
@@ -25705,6 +25720,7 @@ export namespace Prisma {
     quantity?: SortOrderInput | SortOrder
     saleactive?: SortOrderInput | SortOrder
     saleprice?: SortOrderInput | SortOrder
+    is_service?: SortOrderInput | SortOrder
     taxid?: SortOrderInput | SortOrder
     createdby?: SortOrderInput | SortOrder
     updatedby?: SortOrderInput | SortOrder
@@ -25729,6 +25745,7 @@ export namespace Prisma {
     quantity?: FloatNullableFilter<"product"> | number | null
     saleactive?: BoolNullableFilter<"product"> | boolean | null
     saleprice?: FloatNullableFilter<"product"> | number | null
+    is_service?: BoolNullableFilter<"product"> | boolean | null
     taxid?: StringNullableFilter<"product"> | string | null
     createdby?: StringNullableFilter<"product"> | string | null
     updatedby?: StringNullableFilter<"product"> | string | null
@@ -25750,6 +25767,7 @@ export namespace Prisma {
     quantity?: SortOrderInput | SortOrder
     saleactive?: SortOrderInput | SortOrder
     saleprice?: SortOrderInput | SortOrder
+    is_service?: SortOrderInput | SortOrder
     taxid?: SortOrderInput | SortOrder
     createdby?: SortOrderInput | SortOrder
     updatedby?: SortOrderInput | SortOrder
@@ -25779,6 +25797,7 @@ export namespace Prisma {
     quantity?: FloatNullableWithAggregatesFilter<"product"> | number | null
     saleactive?: BoolNullableWithAggregatesFilter<"product"> | boolean | null
     saleprice?: FloatNullableWithAggregatesFilter<"product"> | number | null
+    is_service?: BoolNullableWithAggregatesFilter<"product"> | boolean | null
     taxid?: StringNullableWithAggregatesFilter<"product"> | string | null
     createdby?: StringNullableWithAggregatesFilter<"product"> | string | null
     updatedby?: StringNullableWithAggregatesFilter<"product"> | string | null
@@ -27339,6 +27358,7 @@ export namespace Prisma {
     quantity?: number | null
     saleactive?: boolean | null
     saleprice?: number | null
+    is_service?: boolean | null
     taxid?: string | null
     createdby?: string | null
     updatedby?: string | null
@@ -27360,6 +27380,7 @@ export namespace Prisma {
     quantity?: number | null
     saleactive?: boolean | null
     saleprice?: number | null
+    is_service?: boolean | null
     taxid?: string | null
     createdby?: string | null
     updatedby?: string | null
@@ -27381,6 +27402,7 @@ export namespace Prisma {
     quantity?: NullableFloatFieldUpdateOperationsInput | number | null
     saleactive?: NullableBoolFieldUpdateOperationsInput | boolean | null
     saleprice?: NullableFloatFieldUpdateOperationsInput | number | null
+    is_service?: NullableBoolFieldUpdateOperationsInput | boolean | null
     taxid?: NullableStringFieldUpdateOperationsInput | string | null
     createdby?: NullableStringFieldUpdateOperationsInput | string | null
     updatedby?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27402,6 +27424,7 @@ export namespace Prisma {
     quantity?: NullableFloatFieldUpdateOperationsInput | number | null
     saleactive?: NullableBoolFieldUpdateOperationsInput | boolean | null
     saleprice?: NullableFloatFieldUpdateOperationsInput | number | null
+    is_service?: NullableBoolFieldUpdateOperationsInput | boolean | null
     taxid?: NullableStringFieldUpdateOperationsInput | string | null
     createdby?: NullableStringFieldUpdateOperationsInput | string | null
     updatedby?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27423,6 +27446,7 @@ export namespace Prisma {
     quantity?: number | null
     saleactive?: boolean | null
     saleprice?: number | null
+    is_service?: boolean | null
     taxid?: string | null
     createdby?: string | null
     updatedby?: string | null
@@ -27444,6 +27468,7 @@ export namespace Prisma {
     quantity?: NullableFloatFieldUpdateOperationsInput | number | null
     saleactive?: NullableBoolFieldUpdateOperationsInput | boolean | null
     saleprice?: NullableFloatFieldUpdateOperationsInput | number | null
+    is_service?: NullableBoolFieldUpdateOperationsInput | boolean | null
     taxid?: NullableStringFieldUpdateOperationsInput | string | null
     createdby?: NullableStringFieldUpdateOperationsInput | string | null
     updatedby?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27465,6 +27490,7 @@ export namespace Prisma {
     quantity?: NullableFloatFieldUpdateOperationsInput | number | null
     saleactive?: NullableBoolFieldUpdateOperationsInput | boolean | null
     saleprice?: NullableFloatFieldUpdateOperationsInput | number | null
+    is_service?: NullableBoolFieldUpdateOperationsInput | boolean | null
     taxid?: NullableStringFieldUpdateOperationsInput | string | null
     createdby?: NullableStringFieldUpdateOperationsInput | string | null
     updatedby?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28989,6 +29015,7 @@ export namespace Prisma {
     quantity?: SortOrder
     saleactive?: SortOrder
     saleprice?: SortOrder
+    is_service?: SortOrder
     taxid?: SortOrder
     createdby?: SortOrder
     updatedby?: SortOrder
@@ -29018,6 +29045,7 @@ export namespace Prisma {
     quantity?: SortOrder
     saleactive?: SortOrder
     saleprice?: SortOrder
+    is_service?: SortOrder
     taxid?: SortOrder
     createdby?: SortOrder
     updatedby?: SortOrder
@@ -29039,6 +29067,7 @@ export namespace Prisma {
     quantity?: SortOrder
     saleactive?: SortOrder
     saleprice?: SortOrder
+    is_service?: SortOrder
     taxid?: SortOrder
     createdby?: SortOrder
     updatedby?: SortOrder

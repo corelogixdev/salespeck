@@ -183,6 +183,7 @@ exports.productsget = async (req, res) => {
   if (req.body.barcode) {
     search = { ...search, barcode: req.body.barcode };
   }
+  search = { ...search, is_service: false };
   // OPTIMIZED: Limit to 5 products for faster search results
   let data = await queries.products.findForSale(search);
   const productIds = data.map((product) => product.id);
@@ -234,4 +235,59 @@ exports.getRevenueAccounts = async (req, res) => {
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
+};
+
+exports.serviceForm = async (req, res) => {
+  res.render("sales/service_form", { customers: [] });
+};
+
+exports.saveService = async (req, res) => {
+  try {
+    const { customer, products, discountpercentage, totalPayment, totalPrice, ledger, transactionDate, revenueAccountId } = req.body;
+    const { user } = res.locals;
+    const sale = await queries.sales.createServiceSaleTransaction({
+      userId: user.id,
+      customer,
+      discountpercentage,
+      totalPayment,
+      totalPrice,
+      ledger,
+      products,
+      transactionDate,
+      revenueAccountId
+    });
+
+    res.send({
+      status: "success",
+      message: "Service Sale created successfully",
+      saleId: sale.id
+    });
+
+  } catch (error) {
+    console.error("Service Sale creation error:", error);
+    res.status(500).send({ status: "error", message: error.message || "Internal Server Error" });
+  }
+};
+
+exports.getNextServiceInvoiceNum = async (req, res) => {
+    try {
+        const nextNum = await queries.helpers.getNextInvoiceNumber('SRV');
+        res.json({ success: true, nextNum });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+exports.serviceProductsget = async (req, res) => {
+  let body = req.body;
+  let search = findLike(body);
+  if (req.body.barcode) {
+    search = { ...search, barcode: req.body.barcode };
+  }
+  search = { ...search, is_service: true };
+  let data = await queries.products.findForSale(search);
+  // Optional: We could filter by category 'Service', but for now let's return all,
+  // or let's assume the frontend will allow selecting existing products or creating new ones.
+  data = JSON.parse(JSON.stringify(data));
+  res.json(data);
 };

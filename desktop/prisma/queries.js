@@ -949,6 +949,151 @@ const sales = {
       return { id: saleId };
     });
   },
+  async createServiceSaleTransaction({ userId, customer, discountpercentage, totalPayment, totalPrice, ledger, products, transactionDate, revenueAccountId }) {
+    const prisma = getPrisma();
+    return prisma.$transaction(async (tx) => {
+      let serviceCategory = await tx.category.findFirst({ where: { name: 'Service' } });
+      if (!serviceCategory) {
+        serviceCategory = await tx.category.create({
+          data: { id: generateId(32), name: 'Service', status: true }
+        });
+      }
+
+      const saleProductsData = [];
+
+      for (const orderProduct of products) {
+        let productId = orderProduct.productId;
+        if (!productId) {
+          // Find or create product by name (design number)
+          let dbProduct = await tx.product.findFirst({ where: { name: orderProduct.name } });
+          if (!dbProduct) {
+            dbProduct = await tx.product.create({
+              data: {
+                id: generateId(32),
+                name: orderProduct.name,
+                barcode: orderProduct.name, // using name as barcode
+                category: serviceCategory.id,
+                ispurchaseable: false,
+                issaleable: true,
+                quantity: 999999,
+                saleprice: Number(orderProduct.price),
+                is_service: true,
+                createdby: userId
+              }
+            });
+          }
+          productId = dbProduct.id;
+        }
+
+        saleProductsData.push({
+          id: generateId(32),
+          product: productId,
+          quantity: Number(orderProduct.quantity),
+          price: Number(orderProduct.price),
+        });
+      }
+
+      const invoicenum = await helpers.getNextInvoiceNumber('SRV', tx);
+      const saleId = generateId(32);
+      await tx.sale.create({
+        data: {
+          id: saleId,
+          user: userId,
+          customer: customer || null,
+          discountpercentage: String(discountpercentage ?? 0),
+          totalpayment: String(totalPayment ?? 0),
+          totalprice: String(totalPrice ?? 0),
+          invoicenum,
+          createdby: userId,
+          createdAt: transactionDate ? new Date(transactionDate) : undefined
+        },
+      });
+
+      await tx.soldproducts.createMany({
+        data: saleProductsData.map((item) => ({
+          ...item,
+          sale: saleId,
+        })),
+      });
+
+      // --- DOUBLE ENTRY LEDGER POSTING ---
+      if (ledger) {
+        const discount = parseFloat(discountpercentage) || 0;
+        const grossAmt = parseFloat(totalPrice) || 0;
+        const netAmt = grossAmt - (grossAmt * discount / 100);
+        const paidAmt = parseFloat(totalPayment) || 0;
+        const balanceAmt = netAmt - paidAmt;
+
+        const journalId = generateId(32);
+        await tx.account_journal.create({
+          data: {
+            id: journalId,
+            date: transactionDate ? new Date(transactionDate) : new Date(),
+            description: `Service Invoice ${invoicenum}`,
+            reference: saleId,
+            source: 'desktop',
+            createdby: userId
+          }
+        });
+
+        // 1. Credit Revenue (Selected Account or fallback to 4100)
+        let salesAccount = null;
+        if (revenueAccountId) {
+          salesAccount = await tx.financeaccount.findUnique({ where: { id: revenueAccountId } });
+        }
+        if (!salesAccount) {
+          salesAccount = await tx.financeaccount.findFirst({ where: { code: '4100' } });
+        }
+
+        if (salesAccount) {
+          await tx.account_ledger.create({
+            data: {
+              id: generateId(32),
+              journal_id: journalId,
+              account_id: salesAccount.id,
+              credit: netAmt,
+              details: `Service Revenue for Invoice ${invoicenum}`
+            }
+          });
+        }
+
+        // 2. Debit Cash/Bank (1110) (if paid)
+        if (paidAmt !== 0) {
+          const cashAccount = await tx.financeaccount.findFirst({ where: { code: '1110' } });
+          if (cashAccount) {
+            await tx.account_ledger.create({
+              data: {
+                id: generateId(32),
+                journal_id: journalId,
+                account_id: cashAccount.id,
+                debit: paidAmt,
+                details: `Cash received for Invoice ${invoicenum}`
+              }
+            });
+          }
+        }
+
+        // 3. Debit Customer (if credit/balance)
+        if (balanceAmt !== 0 && customer) {
+          const customerAccountId = await accounting.getOrCreateUserAccount(tx, customer, 'customer');
+          if (customerAccountId) {
+            await tx.account_ledger.create({
+              data: {
+                id: generateId(32),
+                journal_id: journalId,
+                account_id: customerAccountId,
+                debit: balanceAmt > 0 ? balanceAmt : 0,
+                credit: balanceAmt < 0 ? Math.abs(balanceAmt) : 0,
+                details: balanceAmt > 0 ? `Receivable for Invoice ${invoicenum}` : `Advance/Overpayment from Invoice ${invoicenum}`
+              }
+            });
+          }
+        }
+      }
+
+      return { id: saleId };
+    });
+  },
 };
 
 const reports = {

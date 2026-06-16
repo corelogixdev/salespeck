@@ -195,6 +195,7 @@ exports.save = async (req, res) => {
       quantity: body.quantity * 1,
       saleprice: body.saleprice * 1,
       saleactive: body.saleactive === 'on',
+      is_service: body.is_service === 'on',
       createdby: req.session.user.id,
       taxid: body.taxid ? body.taxid : null,
       brand: body.brand,

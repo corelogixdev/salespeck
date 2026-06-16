@@ -154,6 +154,7 @@ function createWindow() {
   // ---------------------------------------------------------------------------
   // Strategy A: before-input-event (synchronous preventDefault)
   mainWindow.webContents.on('before-input-event', (event, input) => {
+    // Print shortcut
     const isPrintShortcut = (input.control || input.meta) && input.key.toLowerCase() === 'p';
     if (isPrintShortcut && !input.alt && !input.shift) {
       event.preventDefault();
@@ -163,6 +164,14 @@ function createWindow() {
           dialog.showErrorBox('Print Preview Failed', err.message || 'Could not generate preview.');
         });
       });
+    }
+
+    // DevTools shortcuts (F12 or Ctrl+Shift+I)
+    const isF12 = input.key === 'F12';
+    const isCtrlShiftI = input.control && input.shift && input.key.toLowerCase() === 'i';
+    
+    if ((isF12 || isCtrlShiftI) && input.type === 'keyDown') {
+      mainWindow.webContents.toggleDevTools();
     }
   });
 

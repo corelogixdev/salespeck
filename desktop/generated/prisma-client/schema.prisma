@@ -144,6 +144,7 @@ model product {
   quantity       Float?
   saleactive     Boolean?
   saleprice      Float?
+  is_service     Boolean? @default(false)
   taxid          String?
   createdby      String?
   updatedby      String?

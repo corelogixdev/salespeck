@@ -112,4 +112,43 @@
 
     // Use capture phase to intercept the click before any other menu scripts
     document.addEventListener('click', handleNavigation, true);
+
+    // Fix Velzon horizontal menu bug where it incorrectly hides menu items on wide pages
+    // (e.g. Inventory Report with wide tables)
+    document.addEventListener('DOMContentLoaded', () => {
+        const navbarNav = document.getElementById('navbar-nav');
+        
+        if (navbarNav) {
+            // Backup the original menu HTML
+            const originalNavHtml = navbarNav.innerHTML;
+            
+            // Create a mutation observer to detect when Velzon tries to move items to "More"
+            const observer = new MutationObserver((mutations) => {
+                if (window.innerWidth >= 992) {
+                    // On desktop, we want all items visible. 
+                    // If Velzon removed items (we expect at least 5-6 menu items)
+                    if (navbarNav.children.length < 4) { 
+                        // Restore original HTML
+                        observer.disconnect(); 
+                        navbarNav.innerHTML = originalNavHtml;
+                        
+                        // Resume observing after a tiny delay
+                        setTimeout(() => observer.observe(navbarNav, { childList: true }), 100);
+                    }
+                }
+            });
+            
+            // Start observing child node changes
+            observer.observe(navbarNav, { childList: true });
+            
+            // Also enforce display block on resize as a fallback
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 992 && navbarNav.children.length < 4) {
+                    observer.disconnect();
+                    navbarNav.innerHTML = originalNavHtml;
+                    setTimeout(() => observer.observe(navbarNav, { childList: true }), 100);
+                }
+            });
+        }
+    });
 })();
