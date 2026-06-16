@@ -148,7 +148,6 @@ exports.saleview = async (req, res) => {
     let companySettings = await queries.common.getCompanySetting();
     
     if (!companySettings) {
-      // Default company settings if not found
       companySettings = { value: JSON.stringify({
         name: 'Company Name',
         address: 'Company Address',
@@ -156,10 +155,22 @@ exports.saleview = async (req, res) => {
         email: 'Company Email'
       })};
     }
+
+    // Fetch customer's current outstanding balance
+    let customerBalance = null;
+    if (result.customer && result.Customer) {
+      try {
+        const ledgerBalance = await queries.accounting.getPartyBalance(result.customer);
+        customerBalance = ledgerBalance;
+      } catch (e) {
+        console.error('Could not fetch customer balance:', e.message);
+      }
+    }
     
     res.render("sales/saleview", {
       sale: result,
       companySettings: JSON.parse(companySettings.value),
+      customerBalance,
       printerConfig: config.printer || {
         printer: '',
         paper: '58mm',

@@ -1,0 +1,158 @@
+<%- contentFor('body') %>
+
+<div class="row no-print">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0"><%= title %></h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);">Accounting</a></li>
+                    <li class="breadcrumb-item active"><%= title %></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card" id="balanceSheetCard">
+            <div class="card-header d-flex justify-content-between align-items-center no-print">
+                <h5 class="card-title mb-0">Balance Sheet Report</h5>
+                <form class="d-flex gap-2" method="GET" action="/accounting/balance-sheet">
+                    <input type="date" class="form-control form-control-sm" name="date" value="<%= asOfDate %>" max="<%= new Date().toISOString().split('T')[0] %>">
+                    <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                    <button type="button" class="btn btn-sm btn-success" onclick="window.print()">
+                        <i class="ri-printer-line align-bottom me-1"></i> Print
+                    </button>
+                </form>
+            </div>
+            
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <h3 class="mb-1">Corelogix POS</h3>
+                    <h4>Balance Sheet</h4>
+                    <p class="text-muted">As of <%= new Date(asOfDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+                </div>
+
+                <div class="row">
+                    <!-- Left Column: Assets -->
+                    <div class="col-md-6 border-end border-end-dashed">
+                        <h5 class="text-uppercase text-muted border-bottom pb-2">Assets</h5>
+                        <table class="table table-sm table-borderless">
+                            <tbody>
+                                <% if (data.assets && data.assets.length > 0) { %>
+                                    <% data.assets.forEach(function(asset) { %>
+                                        <tr>
+                                            <td><%= asset.code %> - <%= asset.name %></td>
+                                            <td class="text-end">Rs.<%= asset.balance.toLocaleString(undefined, {minimumFractionDigits: 2}) %></td>
+                                        </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="2" class="text-center text-muted">No Assets Found</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                            <tfoot class="border-top">
+                                <tr>
+                                    <th class="fs-15">Total Assets</th>
+                                    <th class="text-end fs-15">Rs.<%= data.totalAssets.toLocaleString(undefined, {minimumFractionDigits: 2}) %></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Right Column: Liabilities & Equity -->
+                    <div class="col-md-6">
+                        <h5 class="text-uppercase text-muted border-bottom pb-2">Liabilities</h5>
+                        <table class="table table-sm table-borderless mb-4">
+                            <tbody>
+                                <% if (data.liabilities && data.liabilities.length > 0) { %>
+                                    <% data.liabilities.forEach(function(liability) { %>
+                                        <tr>
+                                            <td><%= liability.code %> - <%= liability.name %></td>
+                                            <td class="text-end">Rs.<%= liability.balance.toLocaleString(undefined, {minimumFractionDigits: 2}) %></td>
+                                        </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="2" class="text-center text-muted">No Liabilities Found</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                            <tfoot class="border-top border-top-dashed">
+                                <tr>
+                                    <th>Total Liabilities</th>
+                                    <th class="text-end">Rs.<%= data.totalLiabilities.toLocaleString(undefined, {minimumFractionDigits: 2}) %></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <h5 class="text-uppercase text-muted border-bottom pb-2 mt-4">Equity</h5>
+                        <table class="table table-sm table-borderless">
+                            <tbody>
+                                <% if (data.equity && data.equity.length > 0) { %>
+                                    <% data.equity.forEach(function(eq) { %>
+                                        <tr>
+                                            <td><%= eq.code %> - <%= eq.name %></td>
+                                            <td class="text-end">Rs.<%= eq.balance.toLocaleString(undefined, {minimumFractionDigits: 2}) %></td>
+                                        </tr>
+                                    <% }); %>
+                                <% } %>
+                                <tr>
+                                    <td>Retained Earnings (Net Income)</td>
+                                    <td class="text-end">Rs.<%= data.netIncome.toLocaleString(undefined, {minimumFractionDigits: 2}) %></td>
+                                </tr>
+                            </tbody>
+                            <tfoot class="border-top border-top-dashed">
+                                <tr>
+                                    <th>Total Equity</th>
+                                    <th class="text-end">Rs.<%= data.totalEquity.toLocaleString(undefined, {minimumFractionDigits: 2}) %></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <table class="table table-sm table-borderless mt-4 border-top">
+                            <tbody>
+                                <tr>
+                                    <th class="fs-15">Total Liabilities & Equity</th>
+                                    <th class="text-end fs-15">Rs.<%= data.totalLiabilitiesAndEquity.toLocaleString(undefined, {minimumFractionDigits: 2}) %></th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <% if (data.totalAssets !== data.totalLiabilitiesAndEquity) { %>
+                <div class="alert alert-warning mt-4 no-print" role="alert">
+                    <strong>Warning!</strong> The balance sheet is out of balance by Rs.<%= Math.abs(data.totalAssets - data.totalLiabilitiesAndEquity).toLocaleString(undefined, {minimumFractionDigits: 2}) %>. Please check your chart of accounts classifications or journal entries.
+                </div>
+                <% } %>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        #balanceSheetCard, #balanceSheetCard * {
+            visibility: visible;
+        }
+        #balanceSheetCard {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        .no-print {
+            display: none !important;
+        }
+    }
+</style>

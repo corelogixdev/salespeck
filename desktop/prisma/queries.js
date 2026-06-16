@@ -419,6 +419,9 @@ const products = {
 };
 
 const common = {
+  getPrisma() {
+    return getPrisma();
+  },
   async listBrandsForSelect() {
     const prisma = getPrisma();
     return prisma.brand.findMany({ where: { status: true }, orderBy: { name: "asc" } });
@@ -877,21 +880,8 @@ const sales = {
         const grossAmt = parseFloat(totalPrice) || 0;
         const netAmt = grossAmt - (grossAmt * discount / 100);
         const paidAmt = parseFloat(totalPayment) || 0;
-        const balanceAmt = netAmt - paidAmt;
 
-        const journalId = generateId(32);
-        await tx.account_journal.create({
-          data: {
-            id: journalId,
-            date: transactionDate ? new Date(transactionDate) : new Date(),
-            description: `Sale Invoice ${invoicenum}`,
-            reference: saleId,
-            source: 'desktop',
-            createdby: userId
-          }
-        });
-
-        // 1. Credit Revenue (Selected Account or fallback to 4100)
+        // Resolve revenue account
         let salesAccount = null;
         if (revenueAccountId) {
           salesAccount = await tx.financeaccount.findUnique({ where: { id: revenueAccountId } });
@@ -900,11 +890,44 @@ const sales = {
           salesAccount = await tx.financeaccount.findFirst({ where: { code: '4100' } });
         }
 
+        // Resolve customer finance account (creates it if missing)
+        let customerAccountId = null;
+        if (customer) {
+          customerAccountId = await accounting.getOrCreateUserAccount(tx, customer, 'customer');
+        }
+
+        // ── JOURNAL 1: Invoice Raised ──
+        // Dr Customer (full net amount)   Cr Revenue (full net amount)
+        const invoiceJournalId = generateId(32);
+        await tx.account_journal.create({
+          data: {
+            id: invoiceJournalId,
+            date: transactionDate ? new Date(transactionDate) : new Date(),
+            description: `Sale Invoice ${invoicenum}`,
+            reference: saleId,
+            voucher_no: invoicenum,
+            source: 'desktop',
+            createdby: userId
+          }
+        });
+
+        if (customerAccountId) {
+          await tx.account_ledger.create({
+            data: {
+              id: generateId(32),
+              journal_id: invoiceJournalId,
+              account_id: customerAccountId,
+              debit: netAmt,
+              details: `Invoice ${invoicenum} raised`
+            }
+          });
+        }
+
         if (salesAccount) {
           await tx.account_ledger.create({
             data: {
               id: generateId(32),
-              journal_id: journalId,
+              journal_id: invoiceJournalId,
               account_id: salesAccount.id,
               credit: netAmt,
               details: `Sales Revenue for Invoice ${invoicenum}`
@@ -912,34 +935,43 @@ const sales = {
           });
         }
 
-        // 2. Debit Cash/Bank (1110) (if paid)
-        if (paidAmt !== 0) {
+        // ── JOURNAL 2: Payment Received (only if payment > 0) ──
+        // Dr Cash/Bank (paid amount)   Cr Customer (paid amount)
+        if (paidAmt > 0) {
+          const paymentJournalId = generateId(32);
+          await tx.account_journal.create({
+            data: {
+              id: paymentJournalId,
+              date: transactionDate ? new Date(transactionDate) : new Date(),
+              description: `Payment for Invoice ${invoicenum}`,
+              reference: saleId,
+              voucher_no: invoicenum,
+              source: 'desktop',
+              createdby: userId
+            }
+          });
+
           const cashAccount = await tx.financeaccount.findFirst({ where: { code: '1110' } });
           if (cashAccount) {
             await tx.account_ledger.create({
               data: {
                 id: generateId(32),
-                journal_id: journalId,
+                journal_id: paymentJournalId,
                 account_id: cashAccount.id,
                 debit: paidAmt,
                 details: `Cash received for Invoice ${invoicenum}`
               }
             });
           }
-        }
 
-        // 3. Debit Customer (if credit/balance)
-        if (balanceAmt !== 0 && customer) {
-          const customerAccountId = await accounting.getOrCreateUserAccount(tx, customer, 'customer');
           if (customerAccountId) {
             await tx.account_ledger.create({
               data: {
                 id: generateId(32),
-                journal_id: journalId,
+                journal_id: paymentJournalId,
                 account_id: customerAccountId,
-                debit: balanceAmt > 0 ? balanceAmt : 0,
-                credit: balanceAmt < 0 ? Math.abs(balanceAmt) : 0,
-                details: balanceAmt > 0 ? `Receivable for Invoice ${invoicenum}` : `Advance/Overpayment from Invoice ${invoicenum}`
+                credit: paidAmt,
+                details: `Payment received for Invoice ${invoicenum}`
               }
             });
           }
@@ -1024,19 +1056,7 @@ const sales = {
         const paidAmt = parseFloat(totalPayment) || 0;
         const balanceAmt = netAmt - paidAmt;
 
-        const journalId = generateId(32);
-        await tx.account_journal.create({
-          data: {
-            id: journalId,
-            date: transactionDate ? new Date(transactionDate) : new Date(),
-            description: `Service Invoice ${invoicenum}`,
-            reference: saleId,
-            source: 'desktop',
-            createdby: userId
-          }
-        });
-
-        // 1. Credit Revenue (Selected Account or fallback to 4100)
+        // Resolve revenue account
         let salesAccount = null;
         if (revenueAccountId) {
           salesAccount = await tx.financeaccount.findUnique({ where: { id: revenueAccountId } });
@@ -1045,52 +1065,93 @@ const sales = {
           salesAccount = await tx.financeaccount.findFirst({ where: { code: '4100' } });
         }
 
-        if (salesAccount) {
+        // Resolve customer finance account (creates it if missing)
+        let customerAccountId = null;
+        if (customer) {
+          customerAccountId = await accounting.getOrCreateUserAccount(tx, customer, 'customer');
+        }
+
+        // -- JOURNAL 1: Invoice Raised --
+        // Dr Customer (full net amount)   Cr Revenue (full net amount)
+        const invoiceJournalId = generateId(32);
+        await tx.account_journal.create({
+          data: {
+            id: invoiceJournalId,
+            date: transactionDate ? new Date(transactionDate) : new Date(),
+            description: "Service Invoice " + invoicenum,
+            reference: saleId,
+            voucher_no: invoicenum,
+            source: 'desktop',
+            createdby: userId
+          }
+        });
+
+        if (customerAccountId) {
           await tx.account_ledger.create({
             data: {
               id: generateId(32),
-              journal_id: journalId,
-              account_id: salesAccount.id,
-              credit: netAmt,
-              details: `Service Revenue for Invoice ${invoicenum}`
+              journal_id: invoiceJournalId,
+              account_id: customerAccountId,
+              debit: netAmt,
+              details: "Service Invoice " + invoicenum + " raised"
             }
           });
         }
 
-        // 2. Debit Cash/Bank (1110) (if paid)
-        if (paidAmt !== 0) {
+        if (salesAccount) {
+          await tx.account_ledger.create({
+            data: {
+              id: generateId(32),
+              journal_id: invoiceJournalId,
+              account_id: salesAccount.id,
+              credit: netAmt,
+              details: "Service Revenue for Invoice " + invoicenum
+            }
+          });
+        }
+
+        // -- JOURNAL 2: Payment Received (only if payment > 0) --
+        // Dr Cash/Bank (paid amount)   Cr Customer (paid amount)
+        if (paidAmt > 0) {
+          const paymentJournalId = generateId(32);
+          await tx.account_journal.create({
+            data: {
+              id: paymentJournalId,
+              date: transactionDate ? new Date(transactionDate) : new Date(),
+              description: "Payment for Service Invoice " + invoicenum,
+              reference: saleId,
+              voucher_no: invoicenum,
+              source: 'desktop',
+              createdby: userId
+            }
+          });
+
           const cashAccount = await tx.financeaccount.findFirst({ where: { code: '1110' } });
           if (cashAccount) {
             await tx.account_ledger.create({
               data: {
                 id: generateId(32),
-                journal_id: journalId,
+                journal_id: paymentJournalId,
                 account_id: cashAccount.id,
                 debit: paidAmt,
-                details: `Cash received for Invoice ${invoicenum}`
+                details: "Cash received for Service Invoice " + invoicenum
               }
             });
           }
-        }
 
-        // 3. Debit Customer (if credit/balance)
-        if (balanceAmt !== 0 && customer) {
-          const customerAccountId = await accounting.getOrCreateUserAccount(tx, customer, 'customer');
           if (customerAccountId) {
             await tx.account_ledger.create({
               data: {
                 id: generateId(32),
-                journal_id: journalId,
+                journal_id: paymentJournalId,
                 account_id: customerAccountId,
-                debit: balanceAmt > 0 ? balanceAmt : 0,
-                credit: balanceAmt < 0 ? Math.abs(balanceAmt) : 0,
-                details: balanceAmt > 0 ? `Receivable for Invoice ${invoicenum}` : `Advance/Overpayment from Invoice ${invoicenum}`
+                credit: paidAmt,
+                details: "Payment received for Service Invoice " + invoicenum
               }
             });
           }
         }
       }
-
       return { id: saleId };
     });
   },
@@ -1908,7 +1969,6 @@ const accounting = {
     if (!user) return null;
 
     // Find parent account
-    // Use 2130 (Outsource Vendors Payable) for vendors if it exists, fallback to 2110
     let parentCode = role === 'customer' ? '1130' : '2110';
     if (role === 'vendor') {
         const outsourceParent = await tx.financeaccount.findFirst({ where: { code: '2130' } });
@@ -1930,7 +1990,7 @@ const accounting = {
       }
     });
 
-    // Link user
+    // Link user to the new finance account
     await tx.user.update({
       where: { id: user.id },
       data: { fk_financeaccount_id: newAccount.id }
@@ -1946,6 +2006,21 @@ const accounting = {
     const prisma = getPrisma();
     return prisma.financeaccount.create({ data: { id: generateId(32), ...data } });
   },
+  async getPartyBalance(userId) {
+    const prisma = getPrisma();
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { fk_financeaccount_id: true }
+    });
+    if (!user || !user.fk_financeaccount_id) return null;
+    const ledgerEntries = await prisma.account_ledger.findMany({
+      where: { account_id: user.fk_financeaccount_id },
+      select: { debit: true, credit: true }
+    });
+    const totalDebit = ledgerEntries.reduce((s, e) => s + (parseFloat(e.debit) || 0), 0);
+    const totalCredit = ledgerEntries.reduce((s, e) => s + (parseFloat(e.credit) || 0), 0);
+    return parseFloat((totalDebit - totalCredit).toFixed(2));
+  },
   async postJournalEntry(tx, { description, reference, source, userId, entries }) {
     const journalId = generateId(32);
     await tx.account_journal.create({
@@ -1958,7 +2033,6 @@ const accounting = {
         createdby: userId
       }
     });
-
     for (const entry of entries) {
       await tx.account_ledger.create({
         data: {
@@ -1972,6 +2046,287 @@ const accounting = {
       });
     }
     return journalId;
+  },
+
+  async createExpense({ date, expenseAccountId, paymentAccountId, amount, description }, userId) {
+    const prisma = getPrisma();
+    const journalId = generateId(32);
+    const expenseAmount = parseFloat(amount);
+
+    return prisma.$transaction(async (tx) => {
+      // 1. Create Journal Entry
+      const journal = await tx.account_journal.create({
+        data: {
+          id: journalId,
+          date: new Date(date),
+          description: description,
+          source: 'expense',
+          createdby: userId
+        }
+      });
+
+      // 2. Debit Expense Account
+      await tx.account_ledger.create({
+        data: {
+          id: generateId(32),
+          journal_id: journalId,
+          account_id: expenseAccountId,
+          debit: expenseAmount,
+          details: description
+        }
+      });
+
+      // 3. Credit Payment Account
+      await tx.account_ledger.create({
+        data: {
+          id: generateId(32),
+          journal_id: journalId,
+          account_id: paymentAccountId,
+          credit: expenseAmount,
+          details: description
+        }
+      });
+
+      return journal;
+    });
+  },
+
+  async getExpenses(filters = {}) {
+    const prisma = getPrisma();
+    let where = { source: 'expense' };
+
+    if (filters.startDate && filters.endDate) {
+      where.date = {
+        gte: new Date(filters.startDate),
+        lte: new Date(filters.endDate)
+      };
+    }
+
+    const expenses = await prisma.account_journal.findMany({
+      where,
+      include: {
+        ledger_entries: {
+          include: {
+            account: true
+          }
+        }
+      },
+      orderBy: { date: 'desc' }
+    });
+
+    return expenses.map(journal => {
+      const debitEntry = journal.ledger_entries.find(e => parseFloat(e.debit) > 0);
+      const creditEntry = journal.ledger_entries.find(e => parseFloat(e.credit) > 0);
+
+      return {
+        id: journal.id,
+        date: journal.date,
+        description: journal.description,
+        amount: debitEntry ? parseFloat(debitEntry.debit) : 0,
+        expenseAccount: debitEntry?.account?.name || 'Unknown',
+        paymentAccount: creditEntry?.account?.name || 'Unknown'
+      };
+    });
+  },
+
+  async getAllJournals(filters = {}) {
+    const prisma = getPrisma();
+    let where = {};
+    if (filters.startDate && filters.endDate) {
+      where.date = {
+        gte: new Date(filters.startDate),
+        lte: new Date(filters.endDate)
+      };
+    }
+    const journals = await prisma.account_journal.findMany({
+      where,
+      include: {
+        ledger_entries: {
+          include: { account: true }
+        }
+      },
+      orderBy: { date: 'desc' }
+    });
+    return journals;
+  },
+
+  async saveCashClosing({ expectedCash, actualCash, note, userId }) {
+    const prisma = getPrisma();
+    const difference = parseFloat(actualCash) - parseFloat(expectedCash);
+
+    return prisma.$transaction(async (tx) => {
+      // Create cashclosing record
+      const closing = await tx.cashclosing.create({
+        data: {
+          id: generateId(32),
+          closingbalance: parseFloat(actualCash),
+          date: new Date(),
+          note: note,
+          fk_user_in_cashclosing: userId,
+          source: 'desktop'
+        }
+      });
+
+      // If there is a difference, post an adjusting journal entry
+      if (Math.abs(difference) > 0.001) {
+        // Find Cash account
+        const cashAcc = await tx.financeaccount.findFirst({
+          where: { name: { contains: 'Cash' }, type: 'asset' }
+        });
+        
+        if (cashAcc) {
+          // Find or create "Cash Short/Over" account
+          let shortOverAcc = await tx.financeaccount.findFirst({
+            where: { name: 'Cash Short/Over' }
+          });
+          
+          if (!shortOverAcc) {
+            shortOverAcc = await tx.financeaccount.create({
+              data: {
+                id: generateId(32),
+                name: 'Cash Short/Over',
+                code: 'EXP-CSO',
+                type: 'expense',
+                category: 'expense',
+                createdby: userId,
+                source: 'system'
+              }
+            });
+          }
+
+          const journalId = generateId(32);
+          await tx.account_journal.create({
+            data: {
+              id: journalId,
+              date: new Date(),
+              description: `Cash Closing Adjustment for ${new Date().toLocaleDateString()}`,
+              source: 'cash-closing',
+              createdby: userId
+            }
+          });
+
+          if (difference < 0) {
+            // Cash Shortage: Debit Expense (Short/Over), Credit Cash
+            await tx.account_ledger.create({
+              data: { id: generateId(32), journal_id: journalId, account_id: shortOverAcc.id, debit: Math.abs(difference), details: 'Cash Shortage' }
+            });
+            await tx.account_ledger.create({
+              data: { id: generateId(32), journal_id: journalId, account_id: cashAcc.id, credit: Math.abs(difference), details: 'Cash Shortage' }
+            });
+          } else {
+            // Cash Overage: Debit Cash, Credit Revenue/Expense (Short/Over)
+            await tx.account_ledger.create({
+              data: { id: generateId(32), journal_id: journalId, account_id: cashAcc.id, debit: difference, details: 'Cash Overage' }
+            });
+            await tx.account_ledger.create({
+              data: { id: generateId(32), journal_id: journalId, account_id: shortOverAcc.id, credit: difference, details: 'Cash Overage' }
+            });
+          }
+        }
+      }
+
+      return closing;
+    });
+  },
+
+  async getBalanceSheetData(asOfDate) {
+    const prisma = getPrisma();
+    const dateFilter = asOfDate ? new Date(asOfDate) : new Date();
+
+    // Fetch all finance accounts
+    const accounts = await prisma.financeaccount.findMany({
+      orderBy: { code: 'asc' }
+    });
+
+    // Fetch all ledger entries up to the date
+    const ledgerEntries = await prisma.account_ledger.findMany({
+      where: {
+        journal: {
+          date: { lte: dateFilter }
+        }
+      },
+      include: {
+        journal: true
+      }
+    });
+
+    // Aggregate debits and credits per account
+    const accountTotals = {};
+    for (const entry of ledgerEntries) {
+      if (!accountTotals[entry.account_id]) {
+        accountTotals[entry.account_id] = { debit: 0, credit: 0 };
+      }
+      accountTotals[entry.account_id].debit += parseFloat(entry.debit) || 0;
+      accountTotals[entry.account_id].credit += parseFloat(entry.credit) || 0;
+    }
+
+    let totalRevenue = 0;
+    let totalExpense = 0;
+
+    const assets = [];
+    const liabilities = [];
+    let equity = [];
+
+    // Calculate balances and group accounts
+    for (const acc of accounts) {
+      const totals = accountTotals[acc.id] || { debit: 0, credit: 0 };
+      const openingBalance = parseFloat(acc.opening_balance) || 0;
+      let balance = 0;
+
+      const accType = (acc.type || '').toLowerCase();
+      const accCategory = (acc.category || '').toLowerCase();
+
+      // Determine balance calculation based on account type
+      if (accType === 'asset' || accType === 'expense' || accCategory === 'asset' || accCategory === 'expense') {
+        balance = openingBalance + totals.debit - totals.credit;
+      } else {
+        balance = openingBalance + totals.credit - totals.debit;
+      }
+
+      // We still include zero-balance accounts if they have opening balance or activity,
+      // but typical balance sheets only show non-zero balances. Let's include if balance !== 0.
+      if (Math.abs(balance) > 0.001) {
+        const accData = {
+          id: acc.id,
+          code: acc.code,
+          name: acc.name,
+          balance: parseFloat(balance.toFixed(2))
+        };
+
+        if (accType === 'asset' || accCategory === 'asset') {
+          assets.push(accData);
+        } else if (accType === 'liability' || accCategory === 'liability') {
+          liabilities.push(accData);
+        } else if (accType === 'equity' || accCategory === 'equity') {
+          equity.push(accData);
+        } else if (accType === 'revenue' || accCategory === 'revenue') {
+          totalRevenue += balance;
+        } else if (accType === 'expense' || accCategory === 'expense') {
+          totalExpense += balance;
+        }
+      }
+    }
+
+    const netIncome = parseFloat((totalRevenue - totalExpense).toFixed(2));
+
+    // Calculate Totals
+    const totalAssets = assets.reduce((sum, a) => sum + a.balance, 0);
+    const totalLiabilities = liabilities.reduce((sum, l) => sum + l.balance, 0);
+    const totalEquityRaw = equity.reduce((sum, e) => sum + e.balance, 0);
+
+    const totalLiabilitiesAndEquity = totalLiabilities + totalEquityRaw + netIncome;
+
+    return {
+      asOfDate: dateFilter,
+      assets,
+      liabilities,
+      equity,
+      netIncome,
+      totalAssets: parseFloat(totalAssets.toFixed(2)),
+      totalLiabilities: parseFloat(totalLiabilities.toFixed(2)),
+      totalEquity: parseFloat((totalEquityRaw + netIncome).toFixed(2)),
+      totalLiabilitiesAndEquity: parseFloat(totalLiabilitiesAndEquity.toFixed(2))
+    };
   }
 };
 

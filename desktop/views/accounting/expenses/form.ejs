@@ -1,0 +1,72 @@
+<%- contentFor('body') %>
+
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0"><%= title %></h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="/accounting/expenses">Expenses</a></li>
+                    <li class="breadcrumb-item active"><%= title %></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Record Expense</h5>
+            </div>
+            <div class="card-body">
+                <form action="/accounting/expenses/save" method="POST">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="date" class="form-label">Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="date" name="date" value="<%= new Date().toISOString().split('T')[0] %>" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="amount" class="form-label">Amount (Rs.) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0" placeholder="0.00" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="expenseAccountId" class="form-label">Expense Account (Debit) <span class="text-danger">*</span></label>
+                            <select class="form-select" id="expenseAccountId" name="expenseAccountId" required>
+                                <option value="" disabled selected>Select an expense account...</option>
+                                <% expenseAccounts.forEach(function(acc) { %>
+                                    <option value="<%= acc.id %>"><%= acc.code %> - <%= acc.name %></option>
+                                <% }); %>
+                            </select>
+                            <div class="form-text">The category of the expense (e.g. Utility, Rent).</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="paymentAccountId" class="form-label">Payment Account (Credit) <span class="text-danger">*</span></label>
+                            <select class="form-select" id="paymentAccountId" name="paymentAccountId" required>
+                                <option value="" disabled selected>Select a payment account...</option>
+                                <% paymentAccounts.forEach(function(acc) { %>
+                                    <option value="<%= acc.id %>"><%= acc.code %> - <%= acc.name %></option>
+                                <% }); %>
+                            </select>
+                            <div class="form-text">How the expense was paid (e.g. Cash, Bank).</div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="description" class="form-label">Description / Reference</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Provide details about the expense..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-end">
+                        <a href="/accounting/expenses" class="btn btn-light me-2">Cancel</a>
+                        <button type="submit" class="btn btn-success">Save Expense</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

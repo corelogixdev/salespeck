@@ -173,6 +173,29 @@ exports.getUser = async (req, res) => {
             } else {
                 data.balance = 0;
             }
+
+            // Fetch the Opening Balance Journal to populate edit form
+            const obReference = `OB-${data.id.substring(0, 6)}`;
+            const obJournal = await prisma.account_journal.findFirst({
+                where: { reference: obReference },
+                include: { ledger_entries: true }
+            });
+
+            if (obJournal) {
+                data.ob_date = obJournal.date.toISOString().split('T')[0];
+                const primaryEntry = obJournal.ledger_entries.find(e => e.account_id === data.fk_financeaccount_id);
+                const contraEntry = obJournal.ledger_entries.find(e => e.account_id !== data.fk_financeaccount_id);
+
+                if (primaryEntry) {
+                    data.ob_primary_debit = primaryEntry.debit;
+                    data.ob_primary_credit = primaryEntry.credit;
+                }
+                if (contraEntry) {
+                    data.ob_contra_account = contraEntry.account_id;
+                    data.ob_contra_debit = contraEntry.debit;
+                    data.ob_contra_credit = contraEntry.credit;
+                }
+            }
         } else {
             data.balance = 0;
         }
@@ -185,6 +208,44 @@ exports.getUser = async (req, res) => {
   } catch (error) {
     console.error('Error fetching user:', error);
     res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+};
+
+exports.details = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const role = req.query.role || 'user';
+    const user = await queries.users.findById(id);
+    
+    if (!user) {
+      req.session.message = { type: 'error', text: 'Record not found' };
+      return res.redirect('/users?role=' + role);
+    }
+
+    const prisma = requirePrismaClient();
+    let balance = 0;
+
+    if ((user.role === 'customer' || user.role === 'vendor') && user.fk_financeaccount_id) {
+        const account = await prisma.financeaccount.findUnique({
+            where: { id: user.fk_financeaccount_id },
+            include: { ledger_entries: true }
+        });
+        if (account) {
+            const ledgerSum = account.ledger_entries.reduce((sum, entry) => sum + (entry.debit - entry.credit), 0);
+            balance = (parseFloat(account.opening_balance) || 0) + ledgerSum;
+        }
+    }
+
+    res.render('users/details', {
+        title: (role === 'vendor' ? 'Vendor' : (role === 'customer' ? 'Customer' : 'User')) + ' Details',
+        user,
+        role,
+        balance
+    });
+  } catch (error) {
+    console.error('Error in user details:', error);
+    req.session.message = { type: 'error', text: 'Internal Server Error' };
+    res.redirect('/users?role=' + (req.query.role || 'user'));
   }
 };
 
@@ -318,6 +379,14 @@ exports.save = async (req, res) => {
                 // Contra Account Lines
                 if (cDebit > 0) lines.push({ account_id: contraAccount.id, debit: cDebit, credit: 0, details: `Opening Balance for ${firstname} ${lastname}` });
                 if (cCredit > 0) lines.push({ account_id: contraAccount.id, debit: 0, credit: cCredit, details: `Opening Balance for ${firstname} ${lastname}` });
+
+                // Delete existing opening balance entry if any
+                await tx.account_ledger.deleteMany({
+                    where: { journal: { reference: `OB-${savedUser.id.substring(0, 6)}` } }
+                });
+                await tx.account_journal.deleteMany({
+                    where: { reference: `OB-${savedUser.id.substring(0, 6)}` }
+                });
 
                 if (lines.length >= 2) {
                     await accountingController.recordJournalEntry(tx, {

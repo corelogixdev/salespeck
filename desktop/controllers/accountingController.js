@@ -247,7 +247,8 @@ exports.getPartyLedger = async (req, res) => {
             }
         });
 
-        // Enrich ledger with invoice numbers (replaces UUIDs with invoicenum in descriptions)
+        // Enrich ledger entries: replace UUID references with invoice numbers in
+        // descriptions AND populate voucher_no for display (for legacy entries without it)
         const references = [...new Set(ledger.map(e => e.journal.reference).filter(Boolean))];
         if (references.length > 0) {
             const [purchases, sales] = await Promise.all([
@@ -275,6 +276,10 @@ exports.getPartyLedger = async (req, res) => {
                     if (entry.details) {
                         entry.details = entry.details.replace(new RegExp(ref, 'g'), invNum);
                     }
+                    // Backfill voucher_no for legacy entries that don't have it yet
+                    if (!entry.journal.voucher_no) {
+                        entry.journal.voucher_no = invNum;
+                    }
                 }
             });
         }
@@ -283,5 +288,22 @@ exports.getPartyLedger = async (req, res) => {
     } catch (error) {
         console.error("Error fetching party ledger:", error);
         res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+exports.balanceSheet = async (req, res) => {
+    try {
+        const asOfDate = req.query.date || new Date().toISOString().split('T')[0];
+        const queries = require('../prisma/queries');
+        const data = await queries.accounting.getBalanceSheetData(asOfDate);
+        
+        res.render('accounting/balancesheet', {
+            title: 'Balance Sheet',
+            data,
+            asOfDate
+        });
+    } catch (error) {
+        console.error("Error generating Balance Sheet:", error);
+        res.status(500).send("Internal Server Error: " + error.message);
     }
 };

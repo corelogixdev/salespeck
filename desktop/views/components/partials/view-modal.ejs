@@ -1,13 +1,8 @@
 <div class="modal fade" id="<%= id %>" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-xl">
+  <div class="modal-dialog modal-dialog-centered <%= typeof size !== 'undefined' ? size : 'modal-xl' %> modal-dialog-scrollable">
     <div class="modal-content shadow-lg border-0">
       <div class="modal-header bg-light border-bottom py-3">
         <h5 class="modal-title d-flex align-items-center text-primary">
-          <div class="avatar-xs me-2">
-            <span class="avatar-title bg-soft-primary text-primary rounded-circle fs-16">
-              <i class="ri-eye-line"></i>
-            </span>
-          </div>
           <span class="fw-bold"><%= typeof title !== 'undefined' ? title : 'Details' %></span>
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
