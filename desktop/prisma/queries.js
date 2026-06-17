@@ -1833,10 +1833,12 @@ const purchases = {
         const paidAmt = parseFloat(totalPayment) || 0;
         const balanceAmt = netAmt - paidAmt;
 
-        const journalId = generateId(32);
+        // -- JOURNAL 1: Invoice Raised --
+        // Dr Purchase (full net amount)   Cr Vendor (full net amount)
+        const invoiceJournalId = generateId(32);
         await tx.account_journal.create({
           data: {
-            id: journalId,
+            id: invoiceJournalId,
             date: transactionDate ? new Date(transactionDate) : new Date(),
             description: `Purchase Invoice ${invoicenum}`,
             reference: purchaseId,
@@ -1845,7 +1847,6 @@ const purchases = {
           }
         });
 
-        // 1. Debit Purchase/Inventory (Selected Account or fallback to 5100)
         let purchaseAccount = null;
         if (purchaseAccountId) {
           purchaseAccount = await tx.financeaccount.findUnique({ where: { id: purchaseAccountId } });
@@ -1854,11 +1855,16 @@ const purchases = {
           purchaseAccount = await tx.financeaccount.findFirst({ where: { code: '5100' } });
         }
 
+        let vendorAccountId = null;
+        if (vendor) {
+          vendorAccountId = await accounting.getOrCreateUserAccount(tx, vendor, 'vendor');
+        }
+
         if (purchaseAccount) {
           await tx.account_ledger.create({
             data: {
               id: generateId(32),
-              journal_id: journalId,
+              journal_id: invoiceJournalId,
               account_id: purchaseAccount.id,
               debit: netAmt,
               details: `Purchase for Invoice ${invoicenum}`
@@ -1866,34 +1872,54 @@ const purchases = {
           });
         }
 
-        // 2. Credit Cash/Bank (1110) (if paid)
-        if (paidAmt !== 0) {
+        if (vendorAccountId) {
+          await tx.account_ledger.create({
+            data: {
+              id: generateId(32),
+              journal_id: invoiceJournalId,
+              account_id: vendorAccountId,
+              credit: netAmt,
+              details: `Payable for Invoice ${invoicenum}`
+            }
+          });
+        }
+
+        // -- JOURNAL 2: Payment Made (only if payment > 0) --
+        // Dr Vendor (paid amount)   Cr Cash/Bank (paid amount)
+        if (paidAmt > 0) {
+          const paymentJournalId = generateId(32);
+          await tx.account_journal.create({
+            data: {
+              id: paymentJournalId,
+              date: transactionDate ? new Date(transactionDate) : new Date(),
+              description: `Payment for Purchase Invoice ${invoicenum}`,
+              reference: purchaseId,
+              source: 'desktop',
+              createdby: userId
+            }
+          });
+
+          if (vendorAccountId) {
+            await tx.account_ledger.create({
+              data: {
+                id: generateId(32),
+                journal_id: paymentJournalId,
+                account_id: vendorAccountId,
+                debit: paidAmt,
+                details: `Cash paid for Invoice ${invoicenum}`
+              }
+            });
+          }
+
           const cashAccount = await tx.financeaccount.findFirst({ where: { code: '1110' } });
           if (cashAccount) {
             await tx.account_ledger.create({
               data: {
                 id: generateId(32),
-                journal_id: journalId,
+                journal_id: paymentJournalId,
                 account_id: cashAccount.id,
                 credit: paidAmt,
                 details: `Cash paid for Invoice ${invoicenum}`
-              }
-            });
-          }
-        }
-
-        // 3. Credit Vendor (if credit/balance)
-        if (balanceAmt !== 0 && vendor) {
-          const vendorAccountId = await accounting.getOrCreateUserAccount(tx, vendor, 'vendor');
-          if (vendorAccountId) {
-            await tx.account_ledger.create({
-              data: {
-                id: generateId(32),
-                journal_id: journalId,
-                account_id: vendorAccountId,
-                debit: balanceAmt < 0 ? Math.abs(balanceAmt) : 0,
-                credit: balanceAmt > 0 ? balanceAmt : 0,
-                details: balanceAmt > 0 ? `Payable for Invoice ${invoicenum}` : `Advance/Overpayment for Invoice ${invoicenum}`
               }
             });
           }
