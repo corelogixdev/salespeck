@@ -13,4 +13,10 @@ router.get("/next-invoice-num", controller.getNextInvoiceNum);
 router.get("/expense-accounts", controller.getExpenseAccounts);
 router.get('/search-vendors', controller.searchVendors);
 
+// Service Purchase Routes
+router.get("/service-form", controller.serviceForm);
+router.post("/service-save", controller.serviceSave);
+router.post("/service-productsget", controller.serviceProductsget);
+router.get("/next-service-invoice-num", controller.getNextServiceInvoiceNum);
+
 module.exports = router;

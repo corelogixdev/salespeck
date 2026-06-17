@@ -1,23 +1,25 @@
 <!-- Tab Bar -->
 <div class="tab-bar-container">
     <div class="tab-bar-content">
-        <ul class="nav nav-tabs nav-tabs-custom mb-0 border-0" id="sale-tabs" role="tablist">
+        <ul class="nav nav-tabs nav-tabs-custom mb-0 border-0" id="purchase-tabs" role="tablist">
             <!-- Tabs will be dynamically added here -->
         </ul>
-        <button class="btn btn-primary new-sale-btn" id="new-sale-tab-btn" title="New Service Sale">
+        <button class="btn btn-primary new-purchase-btn" id="new-purchase-tab-btn" title="New Purchase">
             <i class="ri-add-line"></i>
         </button>
     </div>
 </div>
 
 <!-- Tab Content Container -->
-<div id="sale-tab-content-container" style="height: 85vh; margin-top: -7px;">
+<div id="purchase-tab-content-container" style="height: 85vh; margin-top: -7px;">
     <!-- Tab content will be dynamically added here -->
 </div>
 
+
+
 <script>
-    // Tab Management System
-    let saleTabs = [];
+    // Tab Management System for Purchases
+    let purchaseTabs = [];
     let currentTabId = null;
     let tabCounter = 0;
     let allProducts = [];
@@ -26,18 +28,41 @@
     document.addEventListener('DOMContentLoaded', () => {
         createNewTab();
 
-        // New Sale button handler
-        document.getElementById('new-sale-tab-btn').addEventListener('click', () => {
+        // New Purchase button handler
+        document.getElementById('new-purchase-tab-btn').addEventListener('click', () => {
             createNewTab();
         });
+
+        // Initialize clock updates
+        updateAllClocks();
+        setInterval(updateAllClocks, 1000);
     });
+
+    // Update all visible clocks
+    function updateAllClocks() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', { hour12: false });
+        const dateString = now.toLocaleDateString('en-US', {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+
+        document.querySelectorAll('.digital-clock').forEach(clock => {
+            const timeEl = clock.querySelector('.clock-time');
+            const dateEl = clock.querySelector('.clock-date');
+            if (timeEl) timeEl.textContent = timeString;
+            if (dateEl) dateEl.textContent = dateString;
+        });
+    }
 
     function createNewTab() {
         tabCounter++;
-        const tabId = `sale-tab-${tabCounter}`;
+        const tabId = `purchase-tab-${tabCounter}`;
         const tabData = {
             id: tabId,
-            customer: null,
+            vendor: null,
             products: [],
             discountpercentage: 0,
             totalPayment: 0,
@@ -46,28 +71,28 @@
             selectedProduct: null
         };
 
-        saleTabs.push(tabData);
+        purchaseTabs.push(tabData);
 
         // Create tab button
         const tabButton = document.createElement('li');
         tabButton.className = 'nav-item';
         tabButton.innerHTML = `
             <a class="nav-link" id="${tabId}-btn" data-bs-toggle="tab" href="#${tabId}" role="tab" aria-selected="false">
-                Service Sale ${tabCounter}
+                Purchase ${tabCounter}
                 <button class="tab-close-btn" onclick="closeTab('${tabId}', event)">&times;</button>
             </a>
         `;
-        document.getElementById('sale-tabs').appendChild(tabButton);
+        document.getElementById('purchase-tabs').appendChild(tabButton);
 
         // Create tab content panel
         const tabContent = document.createElement('div');
         tabContent.className = 'tab-content-panel';
         tabContent.id = tabId;
         tabContent.innerHTML = getTabContentHTML(tabId);
-        document.getElementById('sale-tab-content-container').appendChild(tabContent);
+        document.getElementById('purchase-tab-content-container').appendChild(tabContent);
 
         // Fetch next invoice number
-        fetch('/sales/next-service-invoice-num')
+        fetch('/accounting/purchase/next-service-invoice-num')
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
@@ -77,15 +102,15 @@
                 }
             });
 
-        // Fetch revenue accounts
-        fetch('/sales/revenue-accounts')
+        // Fetch expense accounts
+        fetch('/accounting/purchase/expense-accounts')
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    const select = document.getElementById(`revenue-account-${tabId}`);
+                    const select = document.getElementById(`purchase-account-${tabId}`);
                     if (select) {
                         select.innerHTML = data.accounts.map(acc => `<option value="${acc.id}">${acc.code} - ${acc.name}</option>`).join('');
-                        const defaultAcc = localStorage.getItem('default_sale_service_revenue_account');
+                        const defaultAcc = localStorage.getItem('default_purchase_service_account');
                         if(defaultAcc) select.value = defaultAcc;
                     }
                 }
@@ -94,13 +119,13 @@
         // Switch to new tab
         switchToTab(tabId);
 
-        // Initialize Select2 for customer dropdown in this tab
+        // Initialize Select2 for vendor dropdown in this tab
         setTimeout(() => {
-            $(`#customer-${tabId}`).select2({
+            $(`#vendor-${tabId}`).select2({
                 theme: 'bootstrap-5',
-                dropdownParent: $(`#customer-${tabId}`).parent(),
+                dropdownParent: $(`#vendor-${tabId}`).parent(),
                 ajax: {
-                    url: '/sales/search-customers',
+                    url: '/accounting/purchase/search-vendors',
                     dataType: 'json',
                     delay: 250,
                     data: function (params) {
@@ -108,24 +133,45 @@
                     },
                     processResults: function (data) {
                         return {
-                            results: data.map(customer => ({
-                                id: customer.id,
-                                text: `${customer.firstname} ${customer.lastname} (${customer.phone || 'No phone'})`
+                            results: data.map(vendor => ({
+                                id: vendor.id,
+                                text: `${vendor.firstname} ${vendor.lastname} (${vendor.phone || 'No phone'})`
                             }))
                         };
                     },
                     cache: true
                 },
                 minimumInputLength: 1,
-                placeholder: 'Search customer...',
+                placeholder: 'Search vendor...',
                 dropdownCssClass: 'select2-dropdown-custom',
             });
 
-            // Store customer selection
-            $(`#customer-${tabId}`).on('select2:select', function (e) {
-                const tab = saleTabs.find(t => t.id === tabId);
-                const customerId = e.params.data.id;
-                if (tab) tab.customer = customerId;
+            // Store vendor selection
+            $(`#vendor-${tabId}`).on('select2:select', function (e) {
+                const tab = purchaseTabs.find(t => t.id === tabId);
+                const vendorId = e.params.data.id;
+                if (tab) tab.vendor = vendorId;
+
+                // Fetch and show balance
+                const balanceDisplay = document.getElementById(`vendor-balance-info-${tabId}`);
+                if (balanceDisplay) {
+                    balanceDisplay.innerHTML = '<i class="ri-loader-4-line rotate"></i> Loading...';
+                    balanceDisplay.classList.remove('d-none');
+                    
+                    fetch(`/users/${vendorId}/balance`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                const balance = data.balance;
+                                // For vendors, negative is credit (we owe them), positive is debit (they owe us - unlikely but possible)
+                                const balanceClass = balance < 0 ? 'text-danger' : (balance > 0 ? 'text-success' : 'text-muted');
+                                balanceDisplay.innerHTML = `Current Balance: <span class="${balanceClass} fw-bold">Rs.${Math.abs(balance).toFixed(2)} ${balance < 0 ? '(Payable)' : (balance > 0 ? '(Receivable)' : '')}</span>`;
+                            }
+                        })
+                        .catch(err => {
+                            balanceDisplay.innerHTML = '<span class="text-danger">Failed to load balance</span>';
+                        });
+                }
             });
         }, 100);
     }
@@ -133,17 +179,26 @@
     function getTabContentHTML(tabId) {
         return `
             <div class="row g-2 mt-0" style="height: 100%;">
-                
                 <!-- Left Column: Product Search (25%) -->
                 <div class="col-lg-3">
-                    <div class="card h-100 border-primary">
+                    <div class="card h-100">
                         <div class="card-body d-flex flex-column" style="height: 100%;">
                             <div class="mb-3 p-3 bg-light rounded border-primary border" style="border-width: 2px !important;">
                                 <label class="form-label text-primary text-uppercase fw-bold mb-1" style="font-size: 13px;">Invoice Number</label>
                                 <div class="h3 mb-0 text-dark fw-bold" id="invoice-num-display-${tabId}">Loading...</div>
                             </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label for="purchase-account-${tabId}" class="form-label text-muted text-uppercase fw-semibold mb-0" style="font-size: 11px;">COGS Account (Manufacturing)</label>
+                                    <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none fs-11" onclick="setDefaultAccount('purchase_service_account', 'purchase-account-${tabId}')" title="Set selected account as default"><i class="ri-pushpin-line"></i> Set Default</button>
+                                </div>
+                                <select id="purchase-account-${tabId}" class="form-select form-select-sm border-primary">
+                                    <option value="">Loading accounts...</option>
+                                </select>
+                            </div>
 
-                            <div id="search-product-sales-page-search-seaction-${tabId}" style="position: relative;">
+                            <div id="search-product-purchase-page-search-section-${tabId}" style="position: relative;">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <label for="product-search-${tabId}" class="form-label text-muted text-uppercase fw-semibold mb-0">Search Service</label>
                                 </div>
@@ -156,18 +211,27 @@
                                 <div id="search-results-${tabId}" class="shadow-lg rounded p-3 d-none border" style="position: absolute; width: 100%; z-index: 9999; background: white; max-height: 300px; overflow-y: auto;"></div>
                             </div>
                             
+                            <!-- Spacer to push clock to bottom -->
                             <div class="flex-grow-1"></div>
+                            
+                            <!-- Digital Clock -->
+                            <div class="digital-clock-container">
+                                <div class="digital-clock" id="digital-clock-${tabId}">
+                                    <span class="clock-time">00:00:00</span>
+                                    <span class="clock-date">Loading...</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Middle Column: Selected Services (50%) -->
+                <!-- Middle Column: Selected Products (50%) -->
                 <div class="col-lg-6">
-                    <div class="card h-100 border-primary">
-                        <div class="card-header align-items-center d-flex bg-primary-subtle">
-                            <h4 class="card-title mb-0 flex-grow-1 text-primary">Selected Services</h4>
+                    <div class="card h-100">
+                        <div class="card-header align-items-center d-flex">
+                            <h4 class="card-title mb-0 flex-grow-1">Selected Products</h4>
                         </div>
-                        <div class="card-body p-0">
+                        <div class="card-body">
                             <div class="table-responsive" style="height: calc(67vh);">
                                 <table class="table table-striped table-nowrap align-middle mb-0">
                                     <thead class="table-primary" style="position: sticky; top: 0; z-index: 1;">
@@ -194,7 +258,7 @@
                             <div class="mb-4 total-bill-section">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <label class="form-label text-muted text-uppercase fw-semibold mb-0">Total Bill</label>
-                                    <h2 id="total-bill-amount-${tabId}" class="mb-0 glowing-bill text-primary">Rs.0.00</h2>
+                                    <h2 id="total-bill-amount-${tabId}" class="mb-0 glowing-bill">Rs.0.00</h2>
                                 </div>
                             </div>
 
@@ -204,37 +268,28 @@
                                     value="${new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)}">
                             </div>
 
-                            <div class="mb-3">
-                                <label for="customer-${tabId}" class="form-label text-muted text-uppercase fw-semibold">Customer</label>
-                                <select id="customer-${tabId}" class="form-select select2" data-placeholder="Select Customer">
-                                    <option value="">Select Customer</option>
+                             <div class="mb-3">
+                                <label for="vendor-${tabId}" class="form-label text-muted text-uppercase fw-semibold">Vendor</label>
+                                <select id="vendor-${tabId}" class="form-select select2" data-placeholder="Select Vendor">
+                                    <option value="">Select Vendor</option>
                                 </select>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <label for="revenue-account-${tabId}" class="form-label text-muted text-uppercase fw-semibold mb-0" style="font-size: 11px;">Sales Revenue Account</label>
-                                    <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none fs-11" onclick="setDefaultAccount('default_sale_service_revenue_account', 'revenue-account-${tabId}')" title="Set selected account as default"><i class="ri-pushpin-line"></i> Set Default</button>
-                                </div>
-                                <select id="revenue-account-${tabId}" class="form-select form-select-sm border-primary">
-                                    <option value="">Loading accounts...</option>
-                                </select>
+                                <div id="vendor-balance-info-${tabId}" class="mt-2 fs-12 d-none p-2 bg-light rounded border border-dashed"></div>
                             </div>
 
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <label for="discountpercentage-${tabId}" class="form-label text-muted text-uppercase fw-semibold mb-0">Discount %</label>
-                                    <input type="number" class="form-control form-control-sm inline-input text-end fw-bold text-primary" id="discountpercentage-${tabId}" value="0" style="width: 100px;">
+                                    <input type="number" class="form-control form-control-sm inline-input" id="discountpercentage-${tabId}" value="0" style="width: 100px;">
                                 </div>
                             </div>
 
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <label for="total-payment-${tabId}" class="form-label text-muted text-uppercase fw-semibold mb-0">Payment</label>
-                                    <input type="number" class="form-control form-control-sm inline-input text-end fw-bold text-success" id="total-payment-${tabId}" style="width: 120px;">
+                                    <input type="number" class="form-control form-control-sm inline-input" id="total-payment-${tabId}" style="width: 120px;">
                                 </div>
                                 <div class="form-check mt-2 ms-2">
-                                    <input type="checkbox" class="form-check-input" id="ledger-${tabId}" checked>
+                                    <input type="checkbox" class="form-check-input" id="ledger-${tabId}">
                                     <label class="form-check-label text-muted" for="ledger-${tabId}">Ledger Posting</label>
                                 </div>
                             </div>
@@ -246,9 +301,9 @@
                                 </div>
                             </div>
 
-                            <!-- Complete Sale Button -->
-                            <button class="btn btn-primary w-100 mt-3 fs-5" onclick="completeSale('${tabId}')" style="padding: 0.75rem;">
-                                <i class="ri-check-double-line me-2"></i>Complete Sale
+                            <!-- Complete Purchase Button -->
+                            <button class="btn btn-primary w-100 mt-3" onclick="completePurchase('${tabId}')" style="padding: 0.75rem;">
+                                <i class="ri-check-double-line me-2"></i>Complete Purchase
                             </button>
                         </div>
                     </div>
@@ -258,13 +313,25 @@
     }
 
     function switchToTab(tabId) {
-        document.querySelectorAll('.tab-content-panel').forEach(panel => panel.classList.remove('active'));
-        const tabPanel = document.getElementById(tabId);
-        if (tabPanel) tabPanel.classList.add('active');
+        // Hide all tab panels
+        document.querySelectorAll('.tab-content-panel').forEach(panel => {
+            panel.classList.remove('active');
+        });
 
-        document.querySelectorAll('#sale-tabs .nav-link').forEach(link => link.classList.remove('active'));
+        // Show selected tab panel
+        const tabPanel = document.getElementById(tabId);
+        if (tabPanel) {
+            tabPanel.classList.add('active');
+        }
+
+        // Update nav tabs
+        document.querySelectorAll('#purchase-tabs .nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
         const tabBtn = document.getElementById(`${tabId}-btn`);
-        if (tabBtn) tabBtn.classList.add('active');
+        if (tabBtn) {
+            tabBtn.classList.add('active');
+        }
 
         currentTabId = tabId;
         initializeTabEventListeners(tabId);
@@ -272,16 +339,27 @@
 
     function closeTab(tabId, event) {
         event.stopPropagation();
-        if (saleTabs.length <= 1) {
-            toastr.warning('At least one sale tab must remain open');
+
+        if (purchaseTabs.length <= 1) {
+            toastr.warning('At least one purchase tab must remain open');
             return;
         }
-        saleTabs = saleTabs.filter(t => t.id !== tabId);
+
+        // Remove tab from array
+        purchaseTabs = purchaseTabs.filter(t => t.id !== tabId);
+
+        // Remove tab button
         const tabBtn = document.getElementById(`${tabId}-btn`).closest('li');
         if (tabBtn) tabBtn.remove();
+
+        // Remove tab content
         const tabPanel = document.getElementById(tabId);
         if (tabPanel) tabPanel.remove();
-        if (saleTabs.length > 0) switchToTab(saleTabs[0].id);
+
+        // Switch to first remaining tab
+        if (purchaseTabs.length > 0) {
+            switchToTab(purchaseTabs[0].id);
+        }
     }
 
     function initializeTabEventListeners(tabId) {
@@ -303,9 +381,9 @@
 
                 productSearch.addEventListener('input', () => {
                     const query = productSearch.value.trim();
-                    const tab = saleTabs.find(t => t.id === tabId);
+                    const tab = purchaseTabs.find(t => t.id === tabId);
 
-                    fetch('/sales/service-productsget', {
+                    fetch('/accounting/purchase/service-productsget', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name: query })
@@ -331,7 +409,7 @@
                                     <div class="product-name-cell fw-bold" title="${product.name}">${product.name}</div>
                                     <small class="d-block text-muted">Service</small>
                                 </div>
-                                <span>Rs. ${parseFloat(product.saleprice || 0).toFixed(2)}</span>
+                                <span>Rs. ${parseFloat(product.purchaseprice || 0).toFixed(2)}</span>
                             `;
                             
                             productElement.addEventListener('mouseenter', () => {
@@ -382,7 +460,7 @@
                 });
 
                 document.addEventListener('click', (event) => {
-                    if (!event.target.closest(`#search-product-sales-page-search-seaction-${tabId}`)) {
+                    if (!event.target.closest(`#search-product-purchase-page-search-section-${tabId}`)) {
                         searchResults.classList.add('d-none');
                     }
                 });
@@ -395,7 +473,7 @@
         if (event.target.closest('.nav-link') && event.target.closest('.nav-link').id) {
             const tabBtn = event.target.closest('.nav-link');
             const tabId = tabBtn.id.replace('-btn', '');
-            if (saleTabs.find(t => t.id === tabId)) {
+            if (purchaseTabs.find(t => t.id === tabId)) {
                 switchToTab(tabId);
             }
         }
@@ -420,10 +498,10 @@
                 <input type="number" class="form-control text-center quantity-input fw-bold text-primary" value="1" min="1" oninput="calculateRowTotal('${rowId}', '${tabId}')" onfocus="this.select()">
             </td>
             <td>
-                <input type="number" class="form-control text-end rate-input fw-bold" value="${product.saleprice || 0}" oninput="calculateRowTotal('${rowId}', '${tabId}')" onfocus="this.select()">
+                <input type="number" class="form-control text-end rate-input fw-bold" value="${product.purchaseprice || 0}" oninput="calculateRowTotal('${rowId}', '${tabId}')" onfocus="this.select()">
             </td>
             <td>
-                <input type="text" class="form-control text-end amount-input fw-bold border-0 bg-transparent px-0" value="${product.saleprice || 0}" readonly>
+                <input type="text" class="form-control text-end amount-input fw-bold border-0 bg-transparent px-0" value="${product.purchaseprice || 0}" readonly>
             </td>
             <td class="text-center">
                 <button type="button" class="btn btn-sm btn-soft-danger rounded-circle p-2" onclick="removeRow('${rowId}', '${tabId}')">
@@ -432,7 +510,6 @@
             </td>
         `;
         
-        // Add new row to top of the table like POS Sales does
         if (tbody.firstChild) {
             tbody.insertBefore(row, tbody.firstChild);
         } else {
@@ -485,7 +562,6 @@
             totalBillAmount.textContent = `Rs. ${total.toFixed(2)}`;
         }
 
-        // Automatically sync payment input with total bill
         const totalPayment = document.getElementById(`total-payment-${tabId}`);
         if (totalPayment) {
             totalPayment.value = total.toFixed(2);
@@ -520,20 +596,19 @@
         changeEl.textContent = `Rs. ${change.toFixed(2)}`;
     }
 
-    async function completeSale(tabId) {
-        const tab = saleTabs.find(t => t.id === tabId);
+    function completePurchase(tabId) {
+        const tab = purchaseTabs.find(t => t.id === tabId);
         if (!tab) return;
 
-        const customer = document.getElementById(`customer-${tabId}`).value;
-        const discountpercentage = parseFloat(document.getElementById(`discountpercentage-${tabId}`).value) || 0;
-        const totalPayment = parseFloat(document.getElementById(`total-payment-${tabId}`).value) || 0;
-        const totalBillText = document.getElementById(`total-bill-amount-${tabId}`).textContent;
-        const totalPriceGross = parseFloat(totalBillText.replace('Rs. ', '')) / (1 - (discountpercentage / 100)); // Reverse engineer gross total
+        const vendor = document.getElementById(`vendor-${tabId}`).value || null;
+        const discountpercentage = parseFloat(document.getElementById(`discountpercentage-${tabId}`).value);
         const ledger = document.getElementById(`ledger-${tabId}`).checked;
         const transactionDate = document.getElementById(`transaction-date-${tabId}`).value;
-        const revenueAccountId = document.getElementById(`revenue-account-${tabId}`).value;
+        const totalPaymentVal = parseFloat(document.getElementById(`total-payment-${tabId}`).value) || 0;
+        const purchaseAccountId = document.getElementById(`purchase-account-${tabId}`).value;
+        const totalBillText = document.getElementById(`total-bill-amount-${tabId}`).textContent;
+        const totalPriceGross = parseFloat(totalBillText.replace('Rs. ', '')) / (1 - (discountpercentage / 100)); // Reverse engineer gross total
 
-        // Gather products
         const products = [];
         const rows = document.querySelectorAll(`#selected-products-${tabId} tr`);
         
@@ -560,67 +635,135 @@
         if (!valid) return;
 
         if (products.length === 0) {
-            toastr.warning('Please add at least one service/design to complete the sale');
+            toastr.warning('Please select products');
             return;
         }
 
-        const btn = document.querySelector(`#${tabId} button[onclick="completeSale('${tabId}')"]`);
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="ri-loader-4-line rotate me-2"></i>Processing...';
-        btn.disabled = true;
+        const totalPrice = totalPriceGross;
+        const priceWithDiscount = totalPrice - (totalPrice * discountpercentage / 100);
 
-        try {
-            const response = await fetch('/sales/service-save', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    customer,
-                    products,
-                    discountpercentage,
-                    totalPayment,
-                    totalPrice: totalPriceGross,
-                    ledger,
-                    transactionDate,
-                    revenueAccountId
-                })
-            });
-
-            const result = await response.json();
-            
-            if (result.status === 'success') {
-                toastr.success('Service Sale completed successfully!');
-                
-                // Show print preview logic (similar to regular sales)
-                const popupWin = window.open(`/sales/${result.saleId}?hidenav=true&partial=true`, '_blank', 'width=800,height=600');
-                
-                // Close this tab
-                closeTab(tabId, { stopPropagation: () => {} });
-                
-                // If no tabs left, create a new one
-                if(saleTabs.length === 0) {
-                    createNewTab();
-                }
-            } else {
-                toastr.error(result.message || 'Error completing sale');
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            toastr.error('Network error. Please try again.');
-            btn.innerHTML = originalText;
-            btn.disabled = false;
+        if (discountpercentage < 0 || discountpercentage > 100) {
+            toastr.warning('Please enter valid discount percentage');
+            return;
         }
+
+        if (totalPaymentVal < priceWithDiscount && !ledger) {
+            toastr.warning('Please check the ledger option or pay the full amount');
+            return;
+        }
+        
+        // Show confirmation modal
+        $.confirm({
+            title: '<i class="ri-information-line me-2 text-primary"></i>Confirm Transaction Accounts',
+            theme: 'material',
+            closeIcon: true,
+            boxWidth: '400px',
+            useBootstrap: false,
+            content: `
+                <div class="p-2">
+                    <p class="text-muted mb-3" style="font-size: 13px;">Please verify the accounts for this transaction before proceeding.</p>
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-uppercase fw-bold text-muted" style="font-size: 11px;">COGS Account (Manufacturing)</label>
+                        <select id="modal-purchase-account" class="form-select form-select-sm border-primary">
+                            ${document.getElementById(`purchase-account-${tabId}`).innerHTML}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-uppercase fw-bold text-muted" style="font-size: 11px;">Vendor / Party</label>
+                        <select id="modal-vendor" class="form-select form-select-sm border-primary">
+                            ${document.getElementById(`vendor-${tabId}`).innerHTML}
+                        </select>
+                    </div>
+                </div>
+            `,
+            onContentReady: function () {
+                const modalAcc = this.$content.find('#modal-purchase-account');
+                const modalVen = this.$content.find('#modal-vendor');
+                modalAcc.val(purchaseAccountId);
+                modalVen.val(vendor);
+            },
+            buttons: {
+                confirm: {
+                    text: 'Finish Purchase',
+                    btnClass: 'btn-primary',
+                    action: function () {
+                        const finalPurchaseAccountId = this.$content.find('#modal-purchase-account').val();
+                        const finalVendor = this.$content.find('#modal-vendor').val();
+
+                        if (totalPaymentVal < priceWithDiscount && !finalVendor) {
+                            toastr.warning('Please select a vendor for ledger posting');
+                            return false;
+                        }
+
+                        fetch('/accounting/purchase/service-save', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                vendor: finalVendor, 
+                                discountpercentage, 
+                                totalPrice, 
+                                ledger, 
+                                products, 
+                                totalPayment: totalPaymentVal, 
+                                transactionDate, 
+                                purchaseAccountId: finalPurchaseAccountId 
+                            }),
+                        }).then(async response => {
+                            let data = await response.json();
+                            if (response.ok) {
+                                $.alert({
+                                    title: 'Success!',
+                                    content: data.message,
+                                    theme: 'material',
+                                    useBootstrap: false,
+                                    boxWidth: '30%',
+                                    type: 'green',
+                                    buttons: {
+                                        confirm: {
+                                            text: 'Ok',
+                                            btnClass: 'btn-success',
+                                            action: function () {
+                                                window.location.href = '/accounting/purchase/view/' + data.purchaseId;
+                                            }
+                                        }
+                                    }
+                                });
+                            } else {
+                                $.alert({
+                                    title: 'Error!',
+                                    content: data.message,
+                                    theme: 'material',
+                                    useBootstrap: false,
+                                    boxWidth: '30%',
+                                    type: 'red',
+                                    buttons: {
+                                        confirm: {
+                                            text: 'Ok',
+                                            btnClass: 'btn-danger',
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                },
+                cancel: {
+                    text: 'Back',
+                    btnClass: 'btn-light'
+                }
+            }
+        });
     }
 
-    // Quick Add Service from Search Input
     async function quickAddServiceFromSearch(tabId) {
         const searchInput = document.getElementById(`product-search-${tabId}`);
         const name = searchInput ? searchInput.value.trim() : '';
         const btn = document.getElementById(`quick-add-btn-${tabId}`);
 
         if (!name) {
-            toastr.warning('Please type a Service Name or Design No. in the search box first');
+            toastr.warning('Please type a Service Name in the search box first');
             if (searchInput) searchInput.focus();
             return;
         }
@@ -637,8 +780,8 @@
                     name: name,
                     saleprice: 0,
                     is_service: 'on',
-                    saleactive: 'on',
-                    purchaseactive: 'off',
+                    saleactive: 'off',
+                    purchaseactive: 'on',
                     quantity: 0,
                     purchaseprice: 0,
                     discount: 0,
@@ -650,7 +793,6 @@
             
             if (result.success) {
                 toastr.success('Service created successfully');
-                // Trigger input event to show it in the dropdown immediately
                 if (searchInput) {
                     searchInput.dispatchEvent(new Event('input'));
                 }
@@ -665,4 +807,10 @@
             btn.disabled = false;
         }
     }
+
+// Make functions globally accessible
+    window.removeProduct = removeProduct;
+    window.completePurchase = completePurchase;
+    window.closeTab = closeTab;
+    window.createNewTab = createNewTab;
 </script>

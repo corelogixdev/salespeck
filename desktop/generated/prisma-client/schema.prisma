@@ -277,6 +277,19 @@ model user {
   profile_image_url    String?
   dashboard_config     String?  @default("{}")
   fk_financeaccount_id String?
+  fk_partytype_id      String?
   createdAt            DateTime @default(now())
   updatedAt            DateTime @default(now())
+}
+
+model partytype {
+  id          String   @id
+  name        String
+  type        String
+  description String?
+  createdby   String?
+  updatedby   String?
+  source      String?  @default("desktop")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
 }

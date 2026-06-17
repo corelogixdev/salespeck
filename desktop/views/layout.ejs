@@ -75,6 +75,7 @@
                                     <ul class="dropdown-menu">
                                         <li><a href="/products" class="dropdown-item">Products</a></li>
                                         <li><a href="/accounting/purchase/form" class="dropdown-item">New Purchase</a></li>
+                                        <li><a href="/accounting/purchase/service-form" class="dropdown-item">Purchase Services</a></li>
                                         <li><a href="/inventorylogs" class="dropdown-item">Stock Ledger</a></li>
                                         <li><a href="/brands" class="dropdown-item">Brands</a></li>
                                         <li><a href="/categories" class="dropdown-item">Categories</a></li>
@@ -113,6 +114,7 @@
                                         <li><a href="/accounting/balance-sheet" class="dropdown-item">Balance Sheet</a></li>
                                         <li><a href="/accounting/purchase" class="dropdown-item">Purchases List</a></li>
                                         <li><a href="/accounting/purchase/form" class="dropdown-item">New Purchase</a></li>
+                                        <li><a href="/accounting/purchase/service-form" class="dropdown-item">Purchase Services</a></li>
                                         <li><a href="/accounting/expenses" class="dropdown-item">Expenses</a></li>
                                         <li><a href="/accounting/transactions" class="dropdown-item">Transactions</a></li>
                                         <li><a href="/accounting/cash-closing" class="dropdown-item">Cash Closing</a></li>
@@ -398,6 +400,17 @@
                 }
                 hideLoader();
             }
+
+            // Global Account Default Setter
+            window.setDefaultAccount = function(storageKey, selectId) {
+                const el = document.getElementById(selectId);
+                if (el && el.value) {
+                    localStorage.setItem(storageKey, el.value);
+                    toastr.success('Default account saved successfully!');
+                } else {
+                    toastr.warning('Please select an account first.');
+                }
+            };
 
             // Generic Chunk Loader
             window.loadChunks = async function (targetBigPage, bigPageSize, baseUrl, totalRecords) {

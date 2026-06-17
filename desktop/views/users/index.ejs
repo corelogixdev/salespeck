@@ -18,6 +18,18 @@
         <div class="d-flex gap-2 align-items-center">
             <% if ((role=='user' && permissions.usersSearch) || (role=='vendor' && permissions.vendorsSearch) ||
                 (role=='customer' && permissions.customersSearch)) { %>
+                <form action="/users" method="GET" class="d-flex mb-0">
+                    <input type="hidden" name="role" value="<%= role %>">
+                    <div class="input-group input-group-sm" style="width: 250px;">
+                        <input type="text" name="search" class="form-control" placeholder="Search by name or phone..." value="<%= query.search || '' %>">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="ri-search-line"></i>
+                        </button>
+                    </div>
+                </form>
+            <% } %>
+            <% if ((role=='user' && permissions.usersSearch) || (role=='vendor' && permissions.vendorsSearch) ||
+                (role=='customer' && permissions.customersSearch)) { %>
                 <button class="btn btn-soft-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#partyFilters" aria-expanded="false" aria-controls="partyFilters">
                     <i class="ri-filter-3-line align-bottom me-1"></i> Filters
                 </button>
@@ -164,6 +176,19 @@ const canCreate = (role=='user' && permissions.usersCreate) || (role=='vendor' &
                             <label for="addAddress" class="form-label">Address</label>
                             <textarea class="form-control" id="addAddress" name="address" rows="1"></textarea>
                         </div>
+                        <% if (role === 'vendor' || role === 'customer') { %>
+                        <div class="col-md-6">
+                            <label for="addPartyType" class="form-label"><%= role === 'vendor' ? 'Vendor Type' : 'Client Type' %></label>
+                            <div class="input-group">
+                                <select class="form-select" id="addPartyType" name="fk_partytype_id">
+                                    <option value="">Select Type...</option>
+                                </select>
+                                <button type="button" class="btn btn-outline-secondary" onclick="managePartyTypes('<%= role %>')" title="Manage Types">
+                                    <i class="ri-add-line"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <% } %>
                         <% if (role !== 'customer' && role !== 'vendor') { %>
                         <div class="col-md-6 position-relative">
                             <label for="addPassword" class="form-label">Password</label>
@@ -275,6 +300,19 @@ const canCreate = (role=='user' && permissions.usersCreate) || (role=='vendor' &
                             <label for="editAddress" class="form-label">Address</label>
                             <textarea class="form-control" id="editAddress" name="address" rows="1"></textarea>
                         </div>
+                        <% if (role === 'vendor' || role === 'customer') { %>
+                        <div class="col-md-6">
+                            <label for="editPartyType" class="form-label"><%= role === 'vendor' ? 'Vendor Type' : 'Client Type' %></label>
+                            <div class="input-group">
+                                <select class="form-select" id="editPartyType" name="fk_partytype_id">
+                                    <option value="">Select Type...</option>
+                                </select>
+                                <button type="button" class="btn btn-outline-secondary" onclick="managePartyTypes('<%= role %>')" title="Manage Types">
+                                    <i class="ri-add-line"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <% } %>
                         <% if (role !== 'customer' && role !== 'vendor') { %>
                         <div class="col-md-6 position-relative">
                             <label for="editPassword" class="form-label">Password</label>
@@ -597,24 +635,28 @@ const canCreate = (role=='user' && permissions.usersCreate) || (role=='vendor' &
                 document.getElementById('editUsername').value = u.username || '';
                 document.getElementById('editPhone').value = u.phone || '';
                 document.getElementById('editAddress').value = u.address || '';
-                <% if (role !== 'customer' && role !== 'vendor') { %>
-                document.getElementById('editPassword').value = u.password || '';
-                // reset eye icon
-                const btn = document.querySelector('#editPassword').nextElementSibling;
-                if (btn) {
-                    btn.querySelector('i').classList.remove('ri-eye-off-line');
-                    btn.querySelector('i').classList.add('ri-eye-line');
+                if (document.getElementById('editPartyType') && u.fk_partytype_id) {
+                    document.getElementById('editPartyType').value = u.fk_partytype_id;
                 }
-                <% } else { %>
-                if (u.ob_date) document.getElementById('editObDate').value = u.ob_date;
-                if (u.ob_primary_debit !== undefined) document.getElementById('editObPrimaryDebit').value = u.ob_primary_debit;
-                if (u.ob_primary_credit !== undefined) document.getElementById('editObPrimaryCredit').value = u.ob_primary_credit;
-                if (u.ob_contra_account) document.getElementById('editObContraAccount').value = u.ob_contra_account;
-                if (u.ob_contra_debit !== undefined) document.getElementById('editObContraDebit').value = u.ob_contra_debit;
-                if (u.ob_contra_credit !== undefined) document.getElementById('editObContraCredit').value = u.ob_contra_credit;
-                // Re-evaluate badge
-                balanceOB(document.getElementById('editObPrimaryDebit'), 'primary', 'debit', 'edit');
-                <% } %>
+                const currentRole = '<%= role %>';
+                if (currentRole !== 'customer' && currentRole !== 'vendor') {
+                    document.getElementById('editPassword').value = u.password || '';
+                    // reset eye icon
+                    const btn = document.querySelector('#editPassword').nextElementSibling;
+                    if (btn) {
+                        btn.querySelector('i').classList.remove('ri-eye-off-line');
+                        btn.querySelector('i').classList.add('ri-eye-line');
+                    }
+                } else {
+                    if (u.ob_date) document.getElementById('editObDate').value = u.ob_date;
+                    if (u.ob_primary_debit !== undefined) document.getElementById('editObPrimaryDebit').value = u.ob_primary_debit;
+                    if (u.ob_primary_credit !== undefined) document.getElementById('editObPrimaryCredit').value = u.ob_primary_credit;
+                    if (u.ob_contra_account) document.getElementById('editObContraAccount').value = u.ob_contra_account;
+                    if (u.ob_contra_debit !== undefined) document.getElementById('editObContraDebit').value = u.ob_contra_debit;
+                    if (u.ob_contra_credit !== undefined) document.getElementById('editObContraCredit').value = u.ob_contra_credit;
+                    // Re-evaluate badge
+                    balanceOB(document.getElementById('editObPrimaryDebit'), 'primary', 'debit', 'edit');
+                }
                 const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
                 modal.show();
             })
@@ -717,7 +759,143 @@ const canCreate = (role=='user' && permissions.usersCreate) || (role=='vendor' &
     }
 </script>
 
-<!-- Iframe Modal for Document Viewing -->
+<!-- Party Types Management Modal -->
+<div class="modal fade" id="managePartyTypesModal" tabindex="-1" aria-hidden="true" style="z-index: 1070;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-light border-bottom py-2">
+                <h5 class="modal-title" id="managePartyTypesModalTitle">Manage Types</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addPartyTypeForm" class="d-flex mb-3">
+                    <input type="text" class="form-control form-control-sm me-2" id="newPartyTypeName" placeholder="New Type Name" required>
+                    <button type="submit" class="btn btn-primary btn-sm"><i class="ri-add-line"></i></button>
+                </form>
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table class="table table-sm table-nowrap align-middle">
+                        <tbody id="partyTypesList">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentPartyRole = '';
+    
+    function loadPartyTypes(role, selectedId = null, targetSelectId = null) {
+        if (role !== 'vendor' && role !== 'customer') return;
+        
+        fetch(`/partytypes?type=${role}`)
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    const options = '<option value="">Select Type...</option>' + 
+                        res.data.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+                    
+                    if (targetSelectId) {
+                        const select = document.getElementById(targetSelectId);
+                        if (select) {
+                            select.innerHTML = options;
+                            if (selectedId) select.value = selectedId;
+                        }
+                    } else {
+                        const addSelect = document.getElementById('addPartyType');
+                        const editSelect = document.getElementById('editPartyType');
+                        if (addSelect) {
+                            const prevVal = addSelect.value;
+                            addSelect.innerHTML = options;
+                            if (prevVal) addSelect.value = prevVal;
+                        }
+                        if (editSelect) {
+                            const prevVal = editSelect.value;
+                            editSelect.innerHTML = options;
+                            if (prevVal) editSelect.value = prevVal;
+                        }
+                    }
+                    
+                    // Populate modal list if open
+                    const listEl = document.getElementById('partyTypesList');
+                    if (listEl && currentPartyRole === role) {
+                        listEl.innerHTML = res.data.map(t => `
+                            <tr>
+                                <td>
+                                    <input type="text" class="form-control form-control-sm border-0 bg-light" id="pt_name_${t.id}" value="${t.name}">
+                                </td>
+                                <td class="text-end" style="width: 80px;">
+                                    <button class="btn btn-sm btn-link text-primary p-0 me-2" onclick="updatePartyType('${t.id}')"><i class="ri-save-line fs-16"></i></button>
+                                    <button class="btn btn-sm btn-link text-danger p-0" onclick="deletePartyType('${t.id}')"><i class="ri-delete-bin-line fs-16"></i></button>
+                                </td>
+                            </tr>
+                        `).join('');
+                    }
+                }
+            });
+    }
+
+    function managePartyTypes(role) {
+        currentPartyRole = role;
+        document.getElementById('managePartyTypesModalTitle').innerText = role === 'vendor' ? 'Manage Vendor Types' : 'Manage Client Types';
+        loadPartyTypes(role);
+        new bootstrap.Modal(document.getElementById('managePartyTypesModal')).show();
+    }
+
+    document.getElementById('addPartyTypeForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = document.getElementById('newPartyTypeName').value;
+        if (!name) return;
+        
+        fetch('/partytypes/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, type: currentPartyRole })
+        }).then(r => r.json()).then(res => {
+            if (res.success) {
+                document.getElementById('newPartyTypeName').value = '';
+                loadPartyTypes(currentPartyRole);
+            } else {
+                toastr.error(res.message);
+            }
+        });
+    });
+
+    function updatePartyType(id) {
+        const name = document.getElementById(`pt_name_${id}`).value;
+        fetch('/partytypes/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, name, type: currentPartyRole })
+        }).then(r => r.json()).then(res => {
+            if (res.success) {
+                toastr.success('Updated successfully');
+                loadPartyTypes(currentPartyRole);
+            } else {
+                toastr.error(res.message);
+            }
+        });
+    }
+
+    function deletePartyType(id) {
+        if (!confirm('Are you sure?')) return;
+        fetch(`/partytypes/${id}/delete`, { method: 'POST' })
+            .then(r => r.json()).then(res => {
+                if (res.success) {
+                    loadPartyTypes(currentPartyRole);
+                } else {
+                    toastr.error(res.message);
+                }
+            });
+    }
+    
+    // Initial load
+    document.addEventListener('DOMContentLoaded', () => {
+        loadPartyTypes('<%= role %>');
+    });
+</script><!-- Iframe Modal for Document Viewing -->
 <div class="modal fade" id="iframeModal" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
     <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" style="max-width: 90vw; height: 90vh;">
         <div class="modal-content shadow-lg border-0 h-100">

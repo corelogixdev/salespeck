@@ -113,6 +113,11 @@ export type taxes = $Result.DefaultSelection<Prisma.$taxesPayload>
  * 
  */
 export type user = $Result.DefaultSelection<Prisma.$userPayload>
+/**
+ * Model partytype
+ * 
+ */
+export type partytype = $Result.DefaultSelection<Prisma.$partytypePayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -434,6 +439,16 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.userDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.partytype`: Exposes CRUD operations for the **partytype** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Partytypes
+    * const partytypes = await prisma.partytype.findMany()
+    * ```
+    */
+  get partytype(): Prisma.partytypeDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -887,7 +902,8 @@ export namespace Prisma {
     softwaresetting: 'softwaresetting',
     soldproducts: 'soldproducts',
     taxes: 'taxes',
-    user: 'user'
+    user: 'user',
+    partytype: 'partytype'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -903,7 +919,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "sequelizeMeta" | "brand" | "cashclosing" | "category" | "financeaccount" | "account_journal" | "account_ledger" | "financetransaction" | "inventorylogs" | "product" | "productbatches" | "productsalepurchase" | "productsub" | "purchase" | "purchasedproducts" | "sale" | "softwaresetting" | "soldproducts" | "taxes" | "user"
+      modelProps: "sequelizeMeta" | "brand" | "cashclosing" | "category" | "financeaccount" | "account_journal" | "account_ledger" | "financetransaction" | "inventorylogs" | "product" | "productbatches" | "productsalepurchase" | "productsub" | "purchase" | "purchasedproducts" | "sale" | "softwaresetting" | "soldproducts" | "taxes" | "user" | "partytype"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2387,6 +2403,80 @@ export namespace Prisma {
           }
         }
       }
+      partytype: {
+        payload: Prisma.$partytypePayload<ExtArgs>
+        fields: Prisma.partytypeFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.partytypeFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$partytypePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.partytypeFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$partytypePayload>
+          }
+          findFirst: {
+            args: Prisma.partytypeFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$partytypePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.partytypeFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$partytypePayload>
+          }
+          findMany: {
+            args: Prisma.partytypeFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$partytypePayload>[]
+          }
+          create: {
+            args: Prisma.partytypeCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$partytypePayload>
+          }
+          createMany: {
+            args: Prisma.partytypeCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.partytypeCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$partytypePayload>[]
+          }
+          delete: {
+            args: Prisma.partytypeDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$partytypePayload>
+          }
+          update: {
+            args: Prisma.partytypeUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$partytypePayload>
+          }
+          deleteMany: {
+            args: Prisma.partytypeDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.partytypeUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.partytypeUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$partytypePayload>[]
+          }
+          upsert: {
+            args: Prisma.partytypeUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$partytypePayload>
+          }
+          aggregate: {
+            args: Prisma.PartytypeAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePartytype>
+          }
+          groupBy: {
+            args: Prisma.partytypeGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PartytypeGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.partytypeCountArgs<ExtArgs>
+            result: $Utils.Optional<PartytypeCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2515,6 +2605,7 @@ export namespace Prisma {
     soldproducts?: soldproductsOmit
     taxes?: taxesOmit
     user?: userOmit
+    partytype?: partytypeOmit
   }
 
   /* Types for Logging */
@@ -23444,6 +23535,7 @@ export namespace Prisma {
     profile_image_url: string | null
     dashboard_config: string | null
     fk_financeaccount_id: string | null
+    fk_partytype_id: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -23466,6 +23558,7 @@ export namespace Prisma {
     profile_image_url: string | null
     dashboard_config: string | null
     fk_financeaccount_id: string | null
+    fk_partytype_id: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -23488,6 +23581,7 @@ export namespace Prisma {
     profile_image_url: number
     dashboard_config: number
     fk_financeaccount_id: number
+    fk_partytype_id: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -23512,6 +23606,7 @@ export namespace Prisma {
     profile_image_url?: true
     dashboard_config?: true
     fk_financeaccount_id?: true
+    fk_partytype_id?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -23534,6 +23629,7 @@ export namespace Prisma {
     profile_image_url?: true
     dashboard_config?: true
     fk_financeaccount_id?: true
+    fk_partytype_id?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -23556,6 +23652,7 @@ export namespace Prisma {
     profile_image_url?: true
     dashboard_config?: true
     fk_financeaccount_id?: true
+    fk_partytype_id?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -23651,6 +23748,7 @@ export namespace Prisma {
     profile_image_url: string | null
     dashboard_config: string | null
     fk_financeaccount_id: string | null
+    fk_partytype_id: string | null
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -23690,6 +23788,7 @@ export namespace Prisma {
     profile_image_url?: boolean
     dashboard_config?: boolean
     fk_financeaccount_id?: boolean
+    fk_partytype_id?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -23712,6 +23811,7 @@ export namespace Prisma {
     profile_image_url?: boolean
     dashboard_config?: boolean
     fk_financeaccount_id?: boolean
+    fk_partytype_id?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -23734,6 +23834,7 @@ export namespace Prisma {
     profile_image_url?: boolean
     dashboard_config?: boolean
     fk_financeaccount_id?: boolean
+    fk_partytype_id?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -23756,11 +23857,12 @@ export namespace Prisma {
     profile_image_url?: boolean
     dashboard_config?: boolean
     fk_financeaccount_id?: boolean
+    fk_partytype_id?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type userOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "address" | "account_key" | "email" | "firstname" | "lastname" | "password" | "username" | "phone" | "phone2" | "role" | "createdby" | "updatedby" | "source" | "profile_image_url" | "dashboard_config" | "fk_financeaccount_id" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type userOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "address" | "account_key" | "email" | "firstname" | "lastname" | "password" | "username" | "phone" | "phone2" | "role" | "createdby" | "updatedby" | "source" | "profile_image_url" | "dashboard_config" | "fk_financeaccount_id" | "fk_partytype_id" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 
   export type $userPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "user"
@@ -23783,6 +23885,7 @@ export namespace Prisma {
       profile_image_url: string | null
       dashboard_config: string | null
       fk_financeaccount_id: string | null
+      fk_partytype_id: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -24225,6 +24328,7 @@ export namespace Prisma {
     readonly profile_image_url: FieldRef<"user", 'String'>
     readonly dashboard_config: FieldRef<"user", 'String'>
     readonly fk_financeaccount_id: FieldRef<"user", 'String'>
+    readonly fk_partytype_id: FieldRef<"user", 'String'>
     readonly createdAt: FieldRef<"user", 'DateTime'>
     readonly updatedAt: FieldRef<"user", 'DateTime'>
   }
@@ -24597,6 +24701,1056 @@ export namespace Prisma {
 
 
   /**
+   * Model partytype
+   */
+
+  export type AggregatePartytype = {
+    _count: PartytypeCountAggregateOutputType | null
+    _min: PartytypeMinAggregateOutputType | null
+    _max: PartytypeMaxAggregateOutputType | null
+  }
+
+  export type PartytypeMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    type: string | null
+    description: string | null
+    createdby: string | null
+    updatedby: string | null
+    source: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PartytypeMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    type: string | null
+    description: string | null
+    createdby: string | null
+    updatedby: string | null
+    source: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PartytypeCountAggregateOutputType = {
+    id: number
+    name: number
+    type: number
+    description: number
+    createdby: number
+    updatedby: number
+    source: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type PartytypeMinAggregateInputType = {
+    id?: true
+    name?: true
+    type?: true
+    description?: true
+    createdby?: true
+    updatedby?: true
+    source?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PartytypeMaxAggregateInputType = {
+    id?: true
+    name?: true
+    type?: true
+    description?: true
+    createdby?: true
+    updatedby?: true
+    source?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PartytypeCountAggregateInputType = {
+    id?: true
+    name?: true
+    type?: true
+    description?: true
+    createdby?: true
+    updatedby?: true
+    source?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type PartytypeAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which partytype to aggregate.
+     */
+    where?: partytypeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of partytypes to fetch.
+     */
+    orderBy?: partytypeOrderByWithRelationInput | partytypeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: partytypeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` partytypes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` partytypes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned partytypes
+    **/
+    _count?: true | PartytypeCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PartytypeMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PartytypeMaxAggregateInputType
+  }
+
+  export type GetPartytypeAggregateType<T extends PartytypeAggregateArgs> = {
+        [P in keyof T & keyof AggregatePartytype]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePartytype[P]>
+      : GetScalarType<T[P], AggregatePartytype[P]>
+  }
+
+
+
+
+  export type partytypeGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: partytypeWhereInput
+    orderBy?: partytypeOrderByWithAggregationInput | partytypeOrderByWithAggregationInput[]
+    by: PartytypeScalarFieldEnum[] | PartytypeScalarFieldEnum
+    having?: partytypeScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PartytypeCountAggregateInputType | true
+    _min?: PartytypeMinAggregateInputType
+    _max?: PartytypeMaxAggregateInputType
+  }
+
+  export type PartytypeGroupByOutputType = {
+    id: string
+    name: string
+    type: string
+    description: string | null
+    createdby: string | null
+    updatedby: string | null
+    source: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: PartytypeCountAggregateOutputType | null
+    _min: PartytypeMinAggregateOutputType | null
+    _max: PartytypeMaxAggregateOutputType | null
+  }
+
+  type GetPartytypeGroupByPayload<T extends partytypeGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PartytypeGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PartytypeGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PartytypeGroupByOutputType[P]>
+            : GetScalarType<T[P], PartytypeGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type partytypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    type?: boolean
+    description?: boolean
+    createdby?: boolean
+    updatedby?: boolean
+    source?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["partytype"]>
+
+  export type partytypeSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    type?: boolean
+    description?: boolean
+    createdby?: boolean
+    updatedby?: boolean
+    source?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["partytype"]>
+
+  export type partytypeSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    type?: boolean
+    description?: boolean
+    createdby?: boolean
+    updatedby?: boolean
+    source?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["partytype"]>
+
+  export type partytypeSelectScalar = {
+    id?: boolean
+    name?: boolean
+    type?: boolean
+    description?: boolean
+    createdby?: boolean
+    updatedby?: boolean
+    source?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type partytypeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "type" | "description" | "createdby" | "updatedby" | "source" | "createdAt" | "updatedAt", ExtArgs["result"]["partytype"]>
+
+  export type $partytypePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "partytype"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+      type: string
+      description: string | null
+      createdby: string | null
+      updatedby: string | null
+      source: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["partytype"]>
+    composites: {}
+  }
+
+  type partytypeGetPayload<S extends boolean | null | undefined | partytypeDefaultArgs> = $Result.GetResult<Prisma.$partytypePayload, S>
+
+  type partytypeCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<partytypeFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PartytypeCountAggregateInputType | true
+    }
+
+  export interface partytypeDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['partytype'], meta: { name: 'partytype' } }
+    /**
+     * Find zero or one Partytype that matches the filter.
+     * @param {partytypeFindUniqueArgs} args - Arguments to find a Partytype
+     * @example
+     * // Get one Partytype
+     * const partytype = await prisma.partytype.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends partytypeFindUniqueArgs>(args: SelectSubset<T, partytypeFindUniqueArgs<ExtArgs>>): Prisma__partytypeClient<$Result.GetResult<Prisma.$partytypePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Partytype that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {partytypeFindUniqueOrThrowArgs} args - Arguments to find a Partytype
+     * @example
+     * // Get one Partytype
+     * const partytype = await prisma.partytype.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends partytypeFindUniqueOrThrowArgs>(args: SelectSubset<T, partytypeFindUniqueOrThrowArgs<ExtArgs>>): Prisma__partytypeClient<$Result.GetResult<Prisma.$partytypePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Partytype that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {partytypeFindFirstArgs} args - Arguments to find a Partytype
+     * @example
+     * // Get one Partytype
+     * const partytype = await prisma.partytype.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends partytypeFindFirstArgs>(args?: SelectSubset<T, partytypeFindFirstArgs<ExtArgs>>): Prisma__partytypeClient<$Result.GetResult<Prisma.$partytypePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Partytype that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {partytypeFindFirstOrThrowArgs} args - Arguments to find a Partytype
+     * @example
+     * // Get one Partytype
+     * const partytype = await prisma.partytype.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends partytypeFindFirstOrThrowArgs>(args?: SelectSubset<T, partytypeFindFirstOrThrowArgs<ExtArgs>>): Prisma__partytypeClient<$Result.GetResult<Prisma.$partytypePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Partytypes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {partytypeFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Partytypes
+     * const partytypes = await prisma.partytype.findMany()
+     * 
+     * // Get first 10 Partytypes
+     * const partytypes = await prisma.partytype.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const partytypeWithIdOnly = await prisma.partytype.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends partytypeFindManyArgs>(args?: SelectSubset<T, partytypeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$partytypePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Partytype.
+     * @param {partytypeCreateArgs} args - Arguments to create a Partytype.
+     * @example
+     * // Create one Partytype
+     * const Partytype = await prisma.partytype.create({
+     *   data: {
+     *     // ... data to create a Partytype
+     *   }
+     * })
+     * 
+     */
+    create<T extends partytypeCreateArgs>(args: SelectSubset<T, partytypeCreateArgs<ExtArgs>>): Prisma__partytypeClient<$Result.GetResult<Prisma.$partytypePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Partytypes.
+     * @param {partytypeCreateManyArgs} args - Arguments to create many Partytypes.
+     * @example
+     * // Create many Partytypes
+     * const partytype = await prisma.partytype.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends partytypeCreateManyArgs>(args?: SelectSubset<T, partytypeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Partytypes and returns the data saved in the database.
+     * @param {partytypeCreateManyAndReturnArgs} args - Arguments to create many Partytypes.
+     * @example
+     * // Create many Partytypes
+     * const partytype = await prisma.partytype.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Partytypes and only return the `id`
+     * const partytypeWithIdOnly = await prisma.partytype.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends partytypeCreateManyAndReturnArgs>(args?: SelectSubset<T, partytypeCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$partytypePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Partytype.
+     * @param {partytypeDeleteArgs} args - Arguments to delete one Partytype.
+     * @example
+     * // Delete one Partytype
+     * const Partytype = await prisma.partytype.delete({
+     *   where: {
+     *     // ... filter to delete one Partytype
+     *   }
+     * })
+     * 
+     */
+    delete<T extends partytypeDeleteArgs>(args: SelectSubset<T, partytypeDeleteArgs<ExtArgs>>): Prisma__partytypeClient<$Result.GetResult<Prisma.$partytypePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Partytype.
+     * @param {partytypeUpdateArgs} args - Arguments to update one Partytype.
+     * @example
+     * // Update one Partytype
+     * const partytype = await prisma.partytype.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends partytypeUpdateArgs>(args: SelectSubset<T, partytypeUpdateArgs<ExtArgs>>): Prisma__partytypeClient<$Result.GetResult<Prisma.$partytypePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Partytypes.
+     * @param {partytypeDeleteManyArgs} args - Arguments to filter Partytypes to delete.
+     * @example
+     * // Delete a few Partytypes
+     * const { count } = await prisma.partytype.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends partytypeDeleteManyArgs>(args?: SelectSubset<T, partytypeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Partytypes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {partytypeUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Partytypes
+     * const partytype = await prisma.partytype.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends partytypeUpdateManyArgs>(args: SelectSubset<T, partytypeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Partytypes and returns the data updated in the database.
+     * @param {partytypeUpdateManyAndReturnArgs} args - Arguments to update many Partytypes.
+     * @example
+     * // Update many Partytypes
+     * const partytype = await prisma.partytype.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Partytypes and only return the `id`
+     * const partytypeWithIdOnly = await prisma.partytype.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends partytypeUpdateManyAndReturnArgs>(args: SelectSubset<T, partytypeUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$partytypePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Partytype.
+     * @param {partytypeUpsertArgs} args - Arguments to update or create a Partytype.
+     * @example
+     * // Update or create a Partytype
+     * const partytype = await prisma.partytype.upsert({
+     *   create: {
+     *     // ... data to create a Partytype
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Partytype we want to update
+     *   }
+     * })
+     */
+    upsert<T extends partytypeUpsertArgs>(args: SelectSubset<T, partytypeUpsertArgs<ExtArgs>>): Prisma__partytypeClient<$Result.GetResult<Prisma.$partytypePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Partytypes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {partytypeCountArgs} args - Arguments to filter Partytypes to count.
+     * @example
+     * // Count the number of Partytypes
+     * const count = await prisma.partytype.count({
+     *   where: {
+     *     // ... the filter for the Partytypes we want to count
+     *   }
+     * })
+    **/
+    count<T extends partytypeCountArgs>(
+      args?: Subset<T, partytypeCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PartytypeCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Partytype.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PartytypeAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PartytypeAggregateArgs>(args: Subset<T, PartytypeAggregateArgs>): Prisma.PrismaPromise<GetPartytypeAggregateType<T>>
+
+    /**
+     * Group by Partytype.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {partytypeGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends partytypeGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: partytypeGroupByArgs['orderBy'] }
+        : { orderBy?: partytypeGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, partytypeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPartytypeGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the partytype model
+   */
+  readonly fields: partytypeFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for partytype.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__partytypeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the partytype model
+   */
+  interface partytypeFieldRefs {
+    readonly id: FieldRef<"partytype", 'String'>
+    readonly name: FieldRef<"partytype", 'String'>
+    readonly type: FieldRef<"partytype", 'String'>
+    readonly description: FieldRef<"partytype", 'String'>
+    readonly createdby: FieldRef<"partytype", 'String'>
+    readonly updatedby: FieldRef<"partytype", 'String'>
+    readonly source: FieldRef<"partytype", 'String'>
+    readonly createdAt: FieldRef<"partytype", 'DateTime'>
+    readonly updatedAt: FieldRef<"partytype", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * partytype findUnique
+   */
+  export type partytypeFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the partytype
+     */
+    select?: partytypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the partytype
+     */
+    omit?: partytypeOmit<ExtArgs> | null
+    /**
+     * Filter, which partytype to fetch.
+     */
+    where: partytypeWhereUniqueInput
+  }
+
+  /**
+   * partytype findUniqueOrThrow
+   */
+  export type partytypeFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the partytype
+     */
+    select?: partytypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the partytype
+     */
+    omit?: partytypeOmit<ExtArgs> | null
+    /**
+     * Filter, which partytype to fetch.
+     */
+    where: partytypeWhereUniqueInput
+  }
+
+  /**
+   * partytype findFirst
+   */
+  export type partytypeFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the partytype
+     */
+    select?: partytypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the partytype
+     */
+    omit?: partytypeOmit<ExtArgs> | null
+    /**
+     * Filter, which partytype to fetch.
+     */
+    where?: partytypeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of partytypes to fetch.
+     */
+    orderBy?: partytypeOrderByWithRelationInput | partytypeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for partytypes.
+     */
+    cursor?: partytypeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` partytypes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` partytypes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of partytypes.
+     */
+    distinct?: PartytypeScalarFieldEnum | PartytypeScalarFieldEnum[]
+  }
+
+  /**
+   * partytype findFirstOrThrow
+   */
+  export type partytypeFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the partytype
+     */
+    select?: partytypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the partytype
+     */
+    omit?: partytypeOmit<ExtArgs> | null
+    /**
+     * Filter, which partytype to fetch.
+     */
+    where?: partytypeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of partytypes to fetch.
+     */
+    orderBy?: partytypeOrderByWithRelationInput | partytypeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for partytypes.
+     */
+    cursor?: partytypeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` partytypes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` partytypes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of partytypes.
+     */
+    distinct?: PartytypeScalarFieldEnum | PartytypeScalarFieldEnum[]
+  }
+
+  /**
+   * partytype findMany
+   */
+  export type partytypeFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the partytype
+     */
+    select?: partytypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the partytype
+     */
+    omit?: partytypeOmit<ExtArgs> | null
+    /**
+     * Filter, which partytypes to fetch.
+     */
+    where?: partytypeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of partytypes to fetch.
+     */
+    orderBy?: partytypeOrderByWithRelationInput | partytypeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing partytypes.
+     */
+    cursor?: partytypeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` partytypes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` partytypes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of partytypes.
+     */
+    distinct?: PartytypeScalarFieldEnum | PartytypeScalarFieldEnum[]
+  }
+
+  /**
+   * partytype create
+   */
+  export type partytypeCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the partytype
+     */
+    select?: partytypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the partytype
+     */
+    omit?: partytypeOmit<ExtArgs> | null
+    /**
+     * The data needed to create a partytype.
+     */
+    data: XOR<partytypeCreateInput, partytypeUncheckedCreateInput>
+  }
+
+  /**
+   * partytype createMany
+   */
+  export type partytypeCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many partytypes.
+     */
+    data: partytypeCreateManyInput | partytypeCreateManyInput[]
+  }
+
+  /**
+   * partytype createManyAndReturn
+   */
+  export type partytypeCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the partytype
+     */
+    select?: partytypeSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the partytype
+     */
+    omit?: partytypeOmit<ExtArgs> | null
+    /**
+     * The data used to create many partytypes.
+     */
+    data: partytypeCreateManyInput | partytypeCreateManyInput[]
+  }
+
+  /**
+   * partytype update
+   */
+  export type partytypeUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the partytype
+     */
+    select?: partytypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the partytype
+     */
+    omit?: partytypeOmit<ExtArgs> | null
+    /**
+     * The data needed to update a partytype.
+     */
+    data: XOR<partytypeUpdateInput, partytypeUncheckedUpdateInput>
+    /**
+     * Choose, which partytype to update.
+     */
+    where: partytypeWhereUniqueInput
+  }
+
+  /**
+   * partytype updateMany
+   */
+  export type partytypeUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update partytypes.
+     */
+    data: XOR<partytypeUpdateManyMutationInput, partytypeUncheckedUpdateManyInput>
+    /**
+     * Filter which partytypes to update
+     */
+    where?: partytypeWhereInput
+    /**
+     * Limit how many partytypes to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * partytype updateManyAndReturn
+   */
+  export type partytypeUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the partytype
+     */
+    select?: partytypeSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the partytype
+     */
+    omit?: partytypeOmit<ExtArgs> | null
+    /**
+     * The data used to update partytypes.
+     */
+    data: XOR<partytypeUpdateManyMutationInput, partytypeUncheckedUpdateManyInput>
+    /**
+     * Filter which partytypes to update
+     */
+    where?: partytypeWhereInput
+    /**
+     * Limit how many partytypes to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * partytype upsert
+   */
+  export type partytypeUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the partytype
+     */
+    select?: partytypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the partytype
+     */
+    omit?: partytypeOmit<ExtArgs> | null
+    /**
+     * The filter to search for the partytype to update in case it exists.
+     */
+    where: partytypeWhereUniqueInput
+    /**
+     * In case the partytype found by the `where` argument doesn't exist, create a new partytype with this data.
+     */
+    create: XOR<partytypeCreateInput, partytypeUncheckedCreateInput>
+    /**
+     * In case the partytype was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<partytypeUpdateInput, partytypeUncheckedUpdateInput>
+  }
+
+  /**
+   * partytype delete
+   */
+  export type partytypeDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the partytype
+     */
+    select?: partytypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the partytype
+     */
+    omit?: partytypeOmit<ExtArgs> | null
+    /**
+     * Filter which partytype to delete.
+     */
+    where: partytypeWhereUniqueInput
+  }
+
+  /**
+   * partytype deleteMany
+   */
+  export type partytypeDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which partytypes to delete
+     */
+    where?: partytypeWhereInput
+    /**
+     * Limit how many partytypes to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * partytype without action
+   */
+  export type partytypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the partytype
+     */
+    select?: partytypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the partytype
+     */
+    omit?: partytypeOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -24917,11 +26071,27 @@ export namespace Prisma {
     profile_image_url: 'profile_image_url',
     dashboard_config: 'dashboard_config',
     fk_financeaccount_id: 'fk_financeaccount_id',
+    fk_partytype_id: 'fk_partytype_id',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+  export const PartytypeScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    type: 'type',
+    description: 'description',
+    createdby: 'createdby',
+    updatedby: 'updatedby',
+    source: 'source',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type PartytypeScalarFieldEnum = (typeof PartytypeScalarFieldEnum)[keyof typeof PartytypeScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -26452,6 +27622,7 @@ export namespace Prisma {
     profile_image_url?: StringNullableFilter<"user"> | string | null
     dashboard_config?: StringNullableFilter<"user"> | string | null
     fk_financeaccount_id?: StringNullableFilter<"user"> | string | null
+    fk_partytype_id?: StringNullableFilter<"user"> | string | null
     createdAt?: DateTimeFilter<"user"> | Date | string
     updatedAt?: DateTimeFilter<"user"> | Date | string
   }
@@ -26474,6 +27645,7 @@ export namespace Prisma {
     profile_image_url?: SortOrderInput | SortOrder
     dashboard_config?: SortOrderInput | SortOrder
     fk_financeaccount_id?: SortOrderInput | SortOrder
+    fk_partytype_id?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -26499,6 +27671,7 @@ export namespace Prisma {
     profile_image_url?: StringNullableFilter<"user"> | string | null
     dashboard_config?: StringNullableFilter<"user"> | string | null
     fk_financeaccount_id?: StringNullableFilter<"user"> | string | null
+    fk_partytype_id?: StringNullableFilter<"user"> | string | null
     createdAt?: DateTimeFilter<"user"> | Date | string
     updatedAt?: DateTimeFilter<"user"> | Date | string
   }, "id">
@@ -26521,6 +27694,7 @@ export namespace Prisma {
     profile_image_url?: SortOrderInput | SortOrder
     dashboard_config?: SortOrderInput | SortOrder
     fk_financeaccount_id?: SortOrderInput | SortOrder
+    fk_partytype_id?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: userCountOrderByAggregateInput
@@ -26549,8 +27723,81 @@ export namespace Prisma {
     profile_image_url?: StringNullableWithAggregatesFilter<"user"> | string | null
     dashboard_config?: StringNullableWithAggregatesFilter<"user"> | string | null
     fk_financeaccount_id?: StringNullableWithAggregatesFilter<"user"> | string | null
+    fk_partytype_id?: StringNullableWithAggregatesFilter<"user"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"user"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"user"> | Date | string
+  }
+
+  export type partytypeWhereInput = {
+    AND?: partytypeWhereInput | partytypeWhereInput[]
+    OR?: partytypeWhereInput[]
+    NOT?: partytypeWhereInput | partytypeWhereInput[]
+    id?: StringFilter<"partytype"> | string
+    name?: StringFilter<"partytype"> | string
+    type?: StringFilter<"partytype"> | string
+    description?: StringNullableFilter<"partytype"> | string | null
+    createdby?: StringNullableFilter<"partytype"> | string | null
+    updatedby?: StringNullableFilter<"partytype"> | string | null
+    source?: StringNullableFilter<"partytype"> | string | null
+    createdAt?: DateTimeFilter<"partytype"> | Date | string
+    updatedAt?: DateTimeFilter<"partytype"> | Date | string
+  }
+
+  export type partytypeOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    type?: SortOrder
+    description?: SortOrderInput | SortOrder
+    createdby?: SortOrderInput | SortOrder
+    updatedby?: SortOrderInput | SortOrder
+    source?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type partytypeWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: partytypeWhereInput | partytypeWhereInput[]
+    OR?: partytypeWhereInput[]
+    NOT?: partytypeWhereInput | partytypeWhereInput[]
+    name?: StringFilter<"partytype"> | string
+    type?: StringFilter<"partytype"> | string
+    description?: StringNullableFilter<"partytype"> | string | null
+    createdby?: StringNullableFilter<"partytype"> | string | null
+    updatedby?: StringNullableFilter<"partytype"> | string | null
+    source?: StringNullableFilter<"partytype"> | string | null
+    createdAt?: DateTimeFilter<"partytype"> | Date | string
+    updatedAt?: DateTimeFilter<"partytype"> | Date | string
+  }, "id">
+
+  export type partytypeOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    type?: SortOrder
+    description?: SortOrderInput | SortOrder
+    createdby?: SortOrderInput | SortOrder
+    updatedby?: SortOrderInput | SortOrder
+    source?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: partytypeCountOrderByAggregateInput
+    _max?: partytypeMaxOrderByAggregateInput
+    _min?: partytypeMinOrderByAggregateInput
+  }
+
+  export type partytypeScalarWhereWithAggregatesInput = {
+    AND?: partytypeScalarWhereWithAggregatesInput | partytypeScalarWhereWithAggregatesInput[]
+    OR?: partytypeScalarWhereWithAggregatesInput[]
+    NOT?: partytypeScalarWhereWithAggregatesInput | partytypeScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"partytype"> | string
+    name?: StringWithAggregatesFilter<"partytype"> | string
+    type?: StringWithAggregatesFilter<"partytype"> | string
+    description?: StringNullableWithAggregatesFilter<"partytype"> | string | null
+    createdby?: StringNullableWithAggregatesFilter<"partytype"> | string | null
+    updatedby?: StringNullableWithAggregatesFilter<"partytype"> | string | null
+    source?: StringNullableWithAggregatesFilter<"partytype"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"partytype"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"partytype"> | Date | string
   }
 
   export type SequelizeMetaCreateInput = {
@@ -28222,6 +29469,7 @@ export namespace Prisma {
     profile_image_url?: string | null
     dashboard_config?: string | null
     fk_financeaccount_id?: string | null
+    fk_partytype_id?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -28244,6 +29492,7 @@ export namespace Prisma {
     profile_image_url?: string | null
     dashboard_config?: string | null
     fk_financeaccount_id?: string | null
+    fk_partytype_id?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -28266,6 +29515,7 @@ export namespace Prisma {
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     dashboard_config?: NullableStringFieldUpdateOperationsInput | string | null
     fk_financeaccount_id?: NullableStringFieldUpdateOperationsInput | string | null
+    fk_partytype_id?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -28288,6 +29538,7 @@ export namespace Prisma {
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     dashboard_config?: NullableStringFieldUpdateOperationsInput | string | null
     fk_financeaccount_id?: NullableStringFieldUpdateOperationsInput | string | null
+    fk_partytype_id?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -28310,6 +29561,7 @@ export namespace Prisma {
     profile_image_url?: string | null
     dashboard_config?: string | null
     fk_financeaccount_id?: string | null
+    fk_partytype_id?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -28332,6 +29584,7 @@ export namespace Prisma {
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     dashboard_config?: NullableStringFieldUpdateOperationsInput | string | null
     fk_financeaccount_id?: NullableStringFieldUpdateOperationsInput | string | null
+    fk_partytype_id?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -28354,6 +29607,91 @@ export namespace Prisma {
     profile_image_url?: NullableStringFieldUpdateOperationsInput | string | null
     dashboard_config?: NullableStringFieldUpdateOperationsInput | string | null
     fk_financeaccount_id?: NullableStringFieldUpdateOperationsInput | string | null
+    fk_partytype_id?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type partytypeCreateInput = {
+    id: string
+    name: string
+    type: string
+    description?: string | null
+    createdby?: string | null
+    updatedby?: string | null
+    source?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type partytypeUncheckedCreateInput = {
+    id: string
+    name: string
+    type: string
+    description?: string | null
+    createdby?: string | null
+    updatedby?: string | null
+    source?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type partytypeUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type partytypeUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type partytypeCreateManyInput = {
+    id: string
+    name: string
+    type: string
+    description?: string | null
+    createdby?: string | null
+    updatedby?: string | null
+    source?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type partytypeUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type partytypeUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -29498,6 +30836,7 @@ export namespace Prisma {
     profile_image_url?: SortOrder
     dashboard_config?: SortOrder
     fk_financeaccount_id?: SortOrder
+    fk_partytype_id?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -29520,6 +30859,7 @@ export namespace Prisma {
     profile_image_url?: SortOrder
     dashboard_config?: SortOrder
     fk_financeaccount_id?: SortOrder
+    fk_partytype_id?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -29542,6 +30882,43 @@ export namespace Prisma {
     profile_image_url?: SortOrder
     dashboard_config?: SortOrder
     fk_financeaccount_id?: SortOrder
+    fk_partytype_id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type partytypeCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    type?: SortOrder
+    description?: SortOrder
+    createdby?: SortOrder
+    updatedby?: SortOrder
+    source?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type partytypeMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    type?: SortOrder
+    description?: SortOrder
+    createdby?: SortOrder
+    updatedby?: SortOrder
+    source?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type partytypeMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    type?: SortOrder
+    description?: SortOrder
+    createdby?: SortOrder
+    updatedby?: SortOrder
+    source?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }

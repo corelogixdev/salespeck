@@ -282,7 +282,7 @@ exports.getBalance = async (req, res) => {
 };
 
 exports.save = async (req, res) => {
-  var { id, firstname, lastname, email, phone, username, role, password, address, ob_date } = req.body;
+  var { id, firstname, lastname, email, phone, username, role, password, address, ob_date, fk_partytype_id } = req.body;
   var password = password;
   var createdby = req.session.user.id;
 
@@ -301,6 +301,17 @@ exports.save = async (req, res) => {
       }
     }
 
+    // Validation rule: first name must be unique for vendor/client
+    if (role === 'vendor' || role === 'customer') {
+      const prisma = requirePrismaClient();
+      const existingParty = await prisma.user.findFirst({
+          where: { role, firstname }
+      });
+      if (existingParty && existingParty.id != id) {
+          return res.status(400).json({ success: false, message: `A ${role} with this first name already exists. First name must be unique.` });
+      }
+    }
+
     const userData = {
       firstname,
       lastname,
@@ -310,6 +321,7 @@ exports.save = async (req, res) => {
       role,
       password,
       address,
+      fk_partytype_id: fk_partytype_id || null,
       createdby,
       source
     };
@@ -336,11 +348,12 @@ exports.save = async (req, res) => {
           
           if (parentAccount) {
             // Create a new sub-account for this user
+            const cleanFirstName = firstname.toLowerCase().replace(/[^a-z0-9]/g, '');
             const newAccount = await tx.financeaccount.create({
               data: {
                 id: generateId(32),
-                name: `${firstname} ${lastname} (${role.charAt(0).toUpperCase() + role.slice(1)})`,
-                code: `${parentAccount.code}-${savedUser.id.substring(0, 4)}`,
+                name: `${firstname} ${lastname || ''}`.trim() + ` (${role.charAt(0).toUpperCase() + role.slice(1)})`,
+                code: `${parentAccount.code}-${cleanFirstName}`,
                 type: parentAccount.type,
                 category: parentAccount.category,
                 fk_parent_in_financeaccount: parentAccount.id,

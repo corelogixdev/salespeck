@@ -110,6 +110,8 @@
                     const select = document.getElementById(`revenue-account-${tabId}`);
                     if (select) {
                         select.innerHTML = data.accounts.map(acc => `<option value="${acc.id}">${acc.code} - ${acc.name}</option>`).join('');
+                        const defaultAcc = localStorage.getItem('default_sale_revenue_account');
+                        if(defaultAcc) select.value = defaultAcc;
                     }
                 }
             });
@@ -186,7 +188,10 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="revenue-account-${tabId}" class="form-label text-muted text-uppercase fw-semibold" style="font-size: 11px;">Sales Revenue Account</label>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label for="revenue-account-${tabId}" class="form-label text-muted text-uppercase fw-semibold mb-0" style="font-size: 11px;">Sales Revenue Account</label>
+                                    <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none fs-11" onclick="setDefaultAccount('default_sale_revenue_account', 'revenue-account-${tabId}')" title="Set selected account as default"><i class="ri-pushpin-line"></i> Set Default</button>
+                                </div>
                                 <select id="revenue-account-${tabId}" class="form-select form-select-sm border-primary">
                                     <option value="">Loading accounts...</option>
                                 </select>

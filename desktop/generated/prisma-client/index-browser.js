@@ -370,6 +370,19 @@ exports.Prisma.UserScalarFieldEnum = {
   profile_image_url: 'profile_image_url',
   dashboard_config: 'dashboard_config',
   fk_financeaccount_id: 'fk_financeaccount_id',
+  fk_partytype_id: 'fk_partytype_id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PartytypeScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  type: 'type',
+  description: 'description',
+  createdby: 'createdby',
+  updatedby: 'updatedby',
+  source: 'source',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -405,7 +418,8 @@ exports.Prisma.ModelName = {
   softwaresetting: 'softwaresetting',
   soldproducts: 'soldproducts',
   taxes: 'taxes',
-  user: 'user'
+  user: 'user',
+  partytype: 'partytype'
 };
 
 /**

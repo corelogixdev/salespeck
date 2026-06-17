@@ -2231,7 +2231,11 @@ const accounting = {
 
   async getBalanceSheetData(asOfDate) {
     const prisma = getPrisma();
-    const dateFilter = asOfDate ? new Date(asOfDate) : new Date();
+    let dateFilter = new Date();
+    if (asOfDate) {
+      dateFilter = new Date(asOfDate);
+      dateFilter.setUTCHours(23, 59, 59, 999);
+    }
 
     // Fetch all finance accounts
     const accounts = await prisma.financeaccount.findMany({

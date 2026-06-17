@@ -146,10 +146,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 
                 let viewButton = '';
                 if (entry.journal.reference) {
-                    let docTitle = entry.journal.description || (entry.journal.voucher_no ? 'Invoice ' + entry.journal.voucher_no : 'Document');
-                    if (entry.journal.description && entry.journal.description.toLowerCase().includes('sale')) {
+                    const desc = (entry.journal.description || '').toLowerCase();
+                    if (desc.includes('sale') || (role === 'customer' && desc.includes('service'))) {
                         viewButton = `<a href="/sales/${entry.journal.reference}" target="_blank" class="btn btn-outline-primary btn-sm px-2 py-0 fs-11"><i class="ri-eye-line me-1"></i>View</a>`;
-                    } else if (entry.journal.description && entry.journal.description.toLowerCase().includes('purchase')) {
+                    } else if (desc.includes('purchase') || (role === 'vendor' && desc.includes('service'))) {
                         viewButton = `<a href="/accounting/purchase/view/${entry.journal.reference}" target="_blank" class="btn btn-outline-primary btn-sm px-2 py-0 fs-11"><i class="ri-eye-line me-1"></i>View</a>`;
                     }
                 }

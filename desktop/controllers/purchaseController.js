@@ -58,10 +58,22 @@ exports.purchaseview = async (req, res) => {
   let purchase = await queries.purchases.getById(req.params.id);
   purchase.balance = purchase.totalPayment - purchase.totalAmount;
   let companySettings = await queries.common.getCompanySetting();
+
+  // Fetch vendor's current outstanding balance
+  let vendorBalance = null;
+  if (purchase.vendor) {
+    try {
+      vendorBalance = await queries.accounting.getPartyBalance(purchase.vendor);
+    } catch (e) {
+      console.error('Could not fetch vendor balance:', e.message);
+    }
+  }
+
   res.render("accounting/purchase/view", {
     title: "Purchase Details",
     purchase,
     companySettings: JSON.parse(companySettings?.value),
+    vendorBalance,
     layout:false
   });
 };
@@ -164,4 +176,67 @@ exports.getExpenseAccounts = async (req, res) => {
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
+};
+
+
+exports.serviceForm = async (_, res) => {
+  let vendors = await queries.users.listByRole("vendor");
+  res.render("accounting/purchase/service_form", {
+    title: "Purchase Services",
+    vendors,
+    hidenav: false,
+  });
+};
+
+exports.serviceSave = async (req, res) => {
+  try {
+    const { products, vendor, discountpercentage, totalPayment, totalPrice, ledger, transactionDate, purchaseAccountId } = req.body;
+    const { user } = res.locals;
+    const source = 'service-desktop';
+
+    if (!products || products.length === 0) {
+      return res.status(400).send({ status: "error", message: "Please add products/services to the purchase" });
+    }
+
+    const purchase = await queries.purchases.createPurchaseTransaction({
+      userId: user.id,
+      vendor,
+      discountpercentage,
+      totalAmount: totalPrice,
+      totalPayment,
+      ledger,
+      products,
+      source,
+      transactionDate,
+      purchaseAccountId,
+      invoicePrefix: 'PSRV'
+    });
+
+    res.send({ status: "success", message: "Service Purchase saved successfully", purchaseId: purchase.id });
+  } catch (error) {
+    console.error("Error saving service purchase:", error);
+    res.status(500).send({ status: "error", message: error.message || "Internal Server Error" });
+  }
+};
+
+exports.getNextServiceInvoiceNum = async (req, res) => {
+    try {
+        const nextNum = await queries.helpers.getNextInvoiceNumber('PSRV');
+        res.json({ success: true, nextNum });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+
+
+exports.serviceProductsget = async (req, res) => {
+  let body = req.body;
+  let search = findLike(body);
+  // Allow fetching both services and raw materials for service purchase invoices.
+  if (req.body.barcode) {
+    search = { ...search, barcode: req.body.barcode };
+  }
+  const data = await queries.products.findForPurchase(search);
+  res.json({ data });
 };
