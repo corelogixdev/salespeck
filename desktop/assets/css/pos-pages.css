@@ -257,6 +257,13 @@
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
+/* Search Results Dropdown (Product/Service Search Panel) */
+.search-results-dropdown {
+    background: var(--pos-bg-surface);
+    border-color: var(--pos-border) !important;
+    color: var(--pos-text-main);
+}
+
 .search-result-product {
     transition: all 0.2s;
     color: var(--pos-text-main);
@@ -268,7 +275,52 @@
 
 .search-result-product.selected {
     background-color: var(--pos-accent);
-    color: var(--pos-accent-text);
+    color: var(--pos-accent-text) !important;
+}
+
+[data-bs-theme="dark"] .search-result-product {
+    color: var(--pos-text-main);
+    border-color: var(--pos-border) !important;
+}
+
+[data-bs-theme="dark"] .search-result-product:hover {
+    background-color: var(--pos-bg-hover);
+}
+
+[data-bs-theme="dark"] .search-result-product.selected {
+    background-color: var(--pos-accent);
+    color: #ffffff !important;
+}
+
+/* --- POS Form Dark Mode Overrides for Bootstrap Classes --- */
+[data-bs-theme="dark"] .tab-content-panel .bg-light {
+    background-color: var(--pos-bg-hover) !important;
+    border-color: var(--pos-border) !important;
+}
+
+[data-bs-theme="dark"] .tab-content-panel .text-dark {
+    color: var(--pos-text-main) !important;
+}
+
+[data-bs-theme="dark"] .tab-content-panel .bg-primary-subtle {
+    background-color: rgba(94, 114, 228, 0.15) !important; /* using pos-accent with opacity */
+    color: var(--pos-accent) !important;
+}
+
+[data-bs-theme="dark"] .tab-content-panel .table-primary,
+[data-bs-theme="dark"] .tab-content-panel .table-light {
+    --bs-table-bg: var(--pos-bg-main);
+    --bs-table-color: var(--pos-text-main);
+    background-color: var(--pos-bg-main) !important;
+    color: var(--pos-text-main) !important;
+    border-color: var(--pos-border) !important;
+}
+
+[data-bs-theme="dark"] .tab-content-panel .table-primary th,
+[data-bs-theme="dark"] .tab-content-panel .table-light th {
+    background-color: var(--pos-bg-main) !important;
+    color: var(--pos-text-main) !important;
+    border-color: var(--pos-border) !important;
 }
 
 .tab-content-panel {

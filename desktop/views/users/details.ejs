@@ -20,16 +20,16 @@
                     <div class="flex-shrink-0">
                         <div class="avatar-md">
                             <span class="avatar-title bg-primary-subtle text-primary rounded-circle fs-3 fw-bold">
-                                <%= user.firstname ? user.firstname.charAt(0).toUpperCase() : 'U' %>
+                                <%= partyUser.firstname ? partyUser.firstname.charAt(0).toUpperCase() : 'U' %>
                             </span>
                         </div>
                     </div>
                     <div class="flex-grow-1 ms-3">
                         <h4 class="mb-1 text-dark fw-bold d-flex align-items-center">
-                            <%= user.firstname %> <%= user.lastname %>
+                            <%= partyUser.firstname %> <%= partyUser.lastname %>
                             <span class="badge bg-primary-subtle text-primary ms-2 fs-10 text-uppercase px-2 py-1 rounded-pill"><%= role %></span>
                         </h4>
-                        <p class="text-muted mb-0"><i class="ri-user-follow-line me-1"></i> Member since <%= new Date(user.createdAt).toLocaleDateString() %></p>
+                        <p class="text-muted mb-0"><i class="ri-user-follow-line me-1"></i> Member since <%= new Date(partyUser.createdAt).toLocaleDateString() %></p>
                     </div>
                     <div class="flex-shrink-0">
                         <div class="text-end">
@@ -47,7 +47,7 @@
                             <i class="ri-phone-line text-primary me-2 fs-4"></i>
                             <div>
                                 <small class="text-muted text-uppercase fw-bold fs-9 d-block ls-1">Phone</small>
-                                <h6 class="mb-0 fs-13 fw-semibold"><%= user.phone || '-' %></h6>
+                                <h6 class="mb-0 fs-13 fw-semibold"><%= partyUser.phone || '-' %></h6>
                             </div>
                         </div>
                     </div>
@@ -56,7 +56,7 @@
                             <i class="ri-mail-line text-primary me-2 fs-4"></i>
                             <div>
                                 <small class="text-muted text-uppercase fw-bold fs-9 d-block ls-1">Email</small>
-                                <h6 class="mb-0 fs-13 fw-semibold text-truncate"><%= user.email || '-' %></h6>
+                                <h6 class="mb-0 fs-13 fw-semibold text-truncate"><%= partyUser.email || '-' %></h6>
                             </div>
                         </div>
                     </div>
@@ -65,7 +65,7 @@
                             <i class="ri-map-pin-line text-primary me-2 fs-4"></i>
                             <div>
                                 <small class="text-muted text-uppercase fw-bold fs-9 d-block ls-1">Address</small>
-                                <h6 class="mb-0 fs-13 fw-semibold text-truncate"><%= user.address || 'No address' %></h6>
+                                <h6 class="mb-0 fs-13 fw-semibold text-truncate"><%= partyUser.address || 'No address' %></h6>
                             </div>
                         </div>
                     </div>
@@ -75,9 +75,21 @@
             <!-- Ledger Section -->
             <div class="card-body p-0 border-top border-top-dashed">
                 <div class="card border-0 shadow-none mb-0">
-                    <div class="card-header p-3 bg-transparent border-bottom border-bottom-dashed d-flex align-items-center">
+                    <div class="card-header p-3 bg-transparent border-bottom border-bottom-dashed d-flex align-items-center flex-wrap gap-2">
                         <h6 class="card-title mb-0 flex-grow-1"><i class="ri-file-list-3-line me-1 align-bottom text-primary"></i> Statement of Account</h6>
-                        <div class="flex-shrink-0 d-flex gap-2">
+                        <div class="flex-shrink-0 d-flex align-items-center gap-2 flex-wrap">
+                            <!-- Page size selector -->
+                            <div class="d-flex align-items-center gap-1">
+                                <label class="text-muted fs-12 mb-0">Show</label>
+                                <select id="soaPageSize" class="form-select form-select-sm" style="min-width: 75px;">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                    <option value="all">All</option>
+                                </select>
+                                <label class="text-muted fs-12 mb-0">records</label>
+                            </div>
                             <button class="btn btn-soft-primary btn-sm" onclick="doPrint()"><i class="ri-printer-line me-1"></i> Print</button>
                             <a href="/users?role=<%= role %>" class="btn btn-light btn-sm"><i class="ri-arrow-go-back-line me-1"></i> Back</a>
                         </div>
@@ -86,6 +98,15 @@
                         <div id="ledgerContainer" class="p-4 text-center">
                             <div class="spinner-border text-primary" role="status">
                                 <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <!-- Pagination controls -->
+                        <div id="soaPaginationWrapper" class="d-none px-3 pb-3">
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                <div id="soaPaginationInfo" class="text-muted fs-12"></div>
+                                <nav>
+                                    <ul class="pagination pagination-sm mb-0" id="soaPaginationControls"></ul>
+                                </nav>
                             </div>
                         </div>
                     </div>
@@ -109,81 +130,240 @@ function openInvoice(url) {
     window.location.href = url;
 }
 
+// ---- SOA State ----
+let _soaAllEntries = [];   // all sorted entries (newest first)
+let _soaRole = '';
+let _soaCurrentPage = 1;
+let _soaPageSize = 10;     // default
+
+function buildRowHtml(entry, balance, role) {
+    let viewButton = '';
+    if (entry.journal.reference) {
+        const desc = (entry.journal.description || '').toLowerCase();
+        if (desc.includes('sale') || (role === 'customer' && desc.includes('service'))) {
+            viewButton = `<a href="/sales/${entry.journal.reference}" target="_blank" class="btn btn-outline-primary btn-sm px-2 py-0 fs-11"><i class="ri-eye-line me-1"></i>View</a>`;
+        } else if (desc.includes('purchase') || (role === 'vendor' && desc.includes('service'))) {
+            viewButton = `<a href="/accounting/purchase/view/${entry.journal.reference}" target="_blank" class="btn btn-outline-primary btn-sm px-2 py-0 fs-11"><i class="ri-eye-line me-1"></i>View</a>`;
+        }
+    }
+
+    const debitVal  = (entry.debit > 0 || entry.credit < 0) ? Math.abs(entry.debit || entry.credit).toLocaleString(undefined, { minimumFractionDigits: 2 }) : '-';
+    const creditVal = (entry.credit > 0 || entry.debit < 0) ? Math.abs(entry.credit || entry.debit).toLocaleString(undefined, { minimumFractionDigits: 2 }) : '-';
+    const debitClass  = (entry.debit > 0 || entry.credit < 0) ? 'text-success' : 'text-muted';
+    const creditClass = (entry.credit > 0 || entry.debit < 0) ? 'text-danger' : 'text-muted';
+    const balLabel = role === 'customer' ? (balance >= 0 ? 'Dr' : 'Cr') : (balance >= 0 ? 'Cr' : 'Dr');
+
+    return `
+        <tr>
+            <td class="text-muted" style="white-space: nowrap;">${new Date(entry.journal.date).toLocaleDateString()}</td>
+            <td>
+                <div class="d-flex align-items-center flex-wrap gap-1">
+                    <span class="fw-semibold text-dark">${entry.journal.description || '-'}</span>
+                    ${entry.details ? `<span class="text-muted fs-12">— ${entry.details}</span>` : ''}
+                    ${entry.journal.voucher_no ? `<span class="badge bg-soft-info text-info fs-10">${entry.journal.voucher_no}</span>` : ''}
+                    ${viewButton}
+                </div>
+            </td>
+            <td class="text-end fw-medium" style="white-space: nowrap;">
+                <span class="${debitClass}">${debitVal}</span>
+            </td>
+            <td class="text-end fw-medium" style="white-space: nowrap;">
+                <span class="${creditClass}">${creditVal}</span>
+            </td>
+            <td class="text-end fw-bold bg-light-subtle" style="white-space: nowrap;">
+                <span class="text-dark">${Math.abs(balance).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                <small class="text-muted fw-normal ms-1">${balLabel}</small>
+            </td>
+        </tr>
+    `;
+}
+
+function renderSOAPage() {
+    const role = _soaRole;
+    const entries = _soaAllEntries; // newest first
+    const total = entries.length;
+
+    // Determine page slice
+    let pageEntries;
+    let startIdx = 0;
+    let endIdx = total;
+
+    if (_soaPageSize !== 'all') {
+        startIdx = (_soaCurrentPage - 1) * _soaPageSize;
+        endIdx   = Math.min(startIdx + _soaPageSize, total);
+        pageEntries = entries.slice(startIdx, endIdx);
+    } else {
+        pageEntries = entries;
+    }
+
+    // Pre-compute running balance for ALL entries (oldest→newest) to get the balance at each position
+    // Since we display newest first, we need to map each entry to its true running balance.
+    // Build a balance array indexed same as allEntries (newest-first index → cumulative balance from oldest)
+    // _soaAllEntries is newest-first, so reverse for balance computation
+    const oldestFirst = [...entries].reverse();
+    let cumulativeBalances = [];
+    let bal = 0;
+    for (const entry of oldestFirst) {
+        if (role === 'customer') {
+            bal += (entry.debit - entry.credit);
+        } else {
+            bal += (entry.credit - entry.debit);
+        }
+        cumulativeBalances.push(bal);
+    }
+    // cumulativeBalances[i] corresponds to oldestFirst[i]
+    // Map back to newest-first indexing: newestFirstIdx → cumulativeBalances[total - 1 - newestFirstIdx]
+    // So for pageEntries[j] which is entries[startIdx + j], balance = cumulativeBalances[total - 1 - (startIdx + j)]
+
+    // Build table rows for current page
+    let rowsHtml = '';
+    for (let j = 0; j < pageEntries.length; j++) {
+        const globalIdx = startIdx + j;
+        const entryBalance = cumulativeBalances[total - 1 - globalIdx];
+        rowsHtml += buildRowHtml(pageEntries[j], entryBalance, role);
+    }
+
+    // Compute totals for the current page
+    let pageTotalDebit = 0, pageTotalCredit = 0;
+    for (const entry of pageEntries) {
+        if (entry.debit > 0 || entry.credit < 0) pageTotalDebit  += Math.abs(entry.debit  || entry.credit);
+        if (entry.credit > 0 || entry.debit < 0) pageTotalCredit += Math.abs(entry.credit || entry.debit);
+    }
+    // Overall totals
+    let grandTotalDebit = 0, grandTotalCredit = 0;
+    for (const entry of entries) {
+        if (entry.debit > 0 || entry.credit < 0) grandTotalDebit  += Math.abs(entry.debit  || entry.credit);
+        if (entry.credit > 0 || entry.debit < 0) grandTotalCredit += Math.abs(entry.credit || entry.debit);
+    }
+    const grandBalance = cumulativeBalances.length > 0 ? cumulativeBalances[cumulativeBalances.length - 1] : 0;
+    const grandBalLabel = role === 'customer' ? (grandBalance >= 0 ? 'Dr' : 'Cr') : (grandBalance >= 0 ? 'Cr' : 'Dr');
+
+    const html = `
+        <div class="table-responsive">
+            <table class="table table-nowrap align-middle mb-0">
+                <thead class="table-light fs-11 text-uppercase">
+                    <tr>
+                        <th style="width: 100px;">Date</th>
+                        <th>Description</th>
+                        <th class="text-end" style="width: 120px;">Debit</th>
+                        <th class="text-end" style="width: 120px;">Credit</th>
+                        <th class="text-end" style="width: 140px;">Balance</th>
+                    </tr>
+                </thead>
+                <tbody class="fs-13">
+                    ${rowsHtml || '<tr><td colspan="5" class="text-center py-5 text-muted"><i class="ri-file-history-line fs-24 d-block mb-2"></i>No transactions found for this period</td></tr>'}
+                </tbody>
+                ${pageEntries.length > 0 ? `
+                <tfoot class="table-light fs-12 fw-bold">
+                    <tr>
+                        <td colspan="2" class="text-end text-muted text-uppercase fs-11">
+                            ${_soaPageSize !== 'all' ? `Page ${_soaCurrentPage} Totals` : 'Grand Totals'}
+                        </td>
+                        <td class="text-end text-success">${pageTotalDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                        <td class="text-end text-danger">${pageTotalCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                        <td class="text-end"></td>
+                    </tr>
+                    ${_soaPageSize !== 'all' ? `
+                    <tr class="border-top">
+                        <td colspan="2" class="text-end text-muted text-uppercase fs-11">Grand Totals</td>
+                        <td class="text-end text-success">${grandTotalDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                        <td class="text-end text-danger">${grandTotalCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                        <td class="text-end fw-bold text-dark">
+                            ${Math.abs(grandBalance).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                            <small class="text-muted fw-normal ms-1">${grandBalLabel}</small>
+                        </td>
+                    </tr>
+                    ` : ''}
+                </tfoot>
+                ` : ''}
+            </table>
+        </div>
+    `;
+
+    document.getElementById('ledgerContainer').innerHTML = html;
+
+    // Update pagination controls
+    const wrapper = document.getElementById('soaPaginationWrapper');
+    const infoEl  = document.getElementById('soaPaginationInfo');
+    const ctrlEl  = document.getElementById('soaPaginationControls');
+
+    if (_soaPageSize === 'all' || total === 0) {
+        wrapper.classList.add('d-none');
+        return;
+    }
+
+    wrapper.classList.remove('d-none');
+    const totalPages = Math.ceil(total / _soaPageSize);
+    const from = startIdx + 1;
+    const to   = endIdx;
+    infoEl.textContent = `Showing ${from} to ${to} of ${total} records`;
+
+    // Build page buttons
+    let pageBtns = '';
+    pageBtns += `<li class="page-item ${_soaCurrentPage === 1 ? 'disabled' : ''}">
+        <a class="page-link" href="#" data-page="${_soaCurrentPage - 1}">‹</a></li>`;
+
+    // Show limited page numbers with ellipsis
+    const delta = 2;
+    let pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= _soaCurrentPage - delta && i <= _soaCurrentPage + delta)) {
+            pages.push(i);
+        }
+    }
+    let prev = null;
+    for (const p of pages) {
+        if (prev !== null && p - prev > 1) {
+            pageBtns += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
+        }
+        pageBtns += `<li class="page-item ${p === _soaCurrentPage ? 'active' : ''}">
+            <a class="page-link" href="#" data-page="${p}">${p}</a></li>`;
+        prev = p;
+    }
+
+    pageBtns += `<li class="page-item ${_soaCurrentPage === totalPages ? 'disabled' : ''}">
+        <a class="page-link" href="#" data-page="${_soaCurrentPage + 1}">›</a></li>`;
+
+    ctrlEl.innerHTML = pageBtns;
+
+    // Attach click handlers
+    ctrlEl.querySelectorAll('a[data-page]').forEach(a => {
+        a.addEventListener('click', function(e) {
+            e.preventDefault();
+            const p = parseInt(this.dataset.page);
+            if (p >= 1 && p <= totalPages) {
+                _soaCurrentPage = p;
+                renderSOAPage();
+                document.getElementById('ledgerContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+}
+
 document.addEventListener('DOMContentLoaded', async function() {
-    const role = '<%= role %>';
-    const userId = '<%= user.id %>';
-    
+    _soaRole = '<%= role %>';
+    const userId = '<%= partyUser.id %>';
+
+    // Page size selector
+    const pageSizeEl = document.getElementById('soaPageSize');
+    pageSizeEl.addEventListener('change', function() {
+        _soaPageSize = this.value === 'all' ? 'all' : parseInt(this.value);
+        _soaCurrentPage = 1;
+        renderSOAPage();
+    });
+
     try {
         const ledgerResponse = await fetch('/accounting/ledger/party/' + userId);
         const ledgerResult = await ledgerResponse.json();
-        
-        let ledgerHtml = `
-            <div class="table-responsive">
-                <table class="table table-nowrap align-middle mb-0">
-                    <thead class="table-light fs-11 text-uppercase">
-                        <tr>
-                            <th style="width: 100px;">Date</th>
-                            <th>Description</th>
-                            <th class="text-end" style="width: 120px;">Debit</th>
-                            <th class="text-end" style="width: 120px;">Credit</th>
-                            <th class="text-end" style="width: 140px;">Balance</th>
-                        </tr>
-                    </thead>
-                    <tbody class="fs-13">
-        `;
-        
+
         if (ledgerResult.success && ledgerResult.ledger.length > 0) {
-            let balance = 0;
-            const sortedLedger = [...ledgerResult.ledger].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-            
-            sortedLedger.forEach(entry => {
-                const isDebit = entry.debit > 0;
-                if (role === 'customer') {
-                    balance += (entry.debit - entry.credit);
-                } else {
-                    balance += (entry.credit - entry.debit);
-                }
-
-                let viewButton = '';
-                if (entry.journal.reference) {
-                    const desc = (entry.journal.description || '').toLowerCase();
-                    if (desc.includes('sale') || (role === 'customer' && desc.includes('service'))) {
-                        viewButton = `<a href="/sales/${entry.journal.reference}" target="_blank" class="btn btn-outline-primary btn-sm px-2 py-0 fs-11"><i class="ri-eye-line me-1"></i>View</a>`;
-                    } else if (desc.includes('purchase') || (role === 'vendor' && desc.includes('service'))) {
-                        viewButton = `<a href="/accounting/purchase/view/${entry.journal.reference}" target="_blank" class="btn btn-outline-primary btn-sm px-2 py-0 fs-11"><i class="ri-eye-line me-1"></i>View</a>`;
-                    }
-                }
-
-                ledgerHtml += `
-                    <tr>
-                        <td class="text-muted" style="white-space: nowrap;">${new Date(entry.journal.date).toLocaleDateString()}</td>
-                        <td>
-                            <div class="d-flex align-items-center flex-wrap gap-1">
-                                <span class="fw-semibold text-dark">${entry.journal.description || '-'}</span>
-                                ${entry.details ? `<span class="text-muted fs-12">— ${entry.details}</span>` : ''}
-                                ${entry.journal.voucher_no ? `<span class="badge bg-soft-info text-info fs-10">${entry.journal.voucher_no}</span>` : ''}
-                                ${viewButton}
-                            </div>
-                        </td>
-                        <td class="text-end fw-medium" style="white-space: nowrap;">
-                            <span class="${ (entry.debit > 0 || entry.credit < 0) ? 'text-success' : 'text-muted'}">${ (entry.debit > 0 || entry.credit < 0) ? Math.abs(entry.debit || entry.credit).toLocaleString(undefined, { minimumFractionDigits: 2 }) : '-'}</span>
-                        </td>
-                        <td class="text-end fw-medium" style="white-space: nowrap;">
-                            <span class="${ (entry.credit > 0 || entry.debit < 0) ? 'text-danger' : 'text-muted'}">${ (entry.credit > 0 || entry.debit < 0) ? Math.abs(entry.credit || entry.debit).toLocaleString(undefined, { minimumFractionDigits: 2 }) : '-'}</span>
-                        </td>
-                        <td class="text-end fw-bold bg-light-subtle" style="white-space: nowrap;">
-                            <span class="text-dark">${Math.abs(balance).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                            <small class="text-muted fw-normal ms-1">${role === 'customer' ? (balance >= 0 ? 'Dr' : 'Cr') : (balance >= 0 ? 'Cr' : 'Dr')}</small>
-                        </td>
-                    </tr>
-                `;
-            });
+            // Sort newest first (descending by journal date)
+            _soaAllEntries = [...ledgerResult.ledger].sort((a, b) => new Date(b.journal.date) - new Date(a.journal.date));
         } else {
-            ledgerHtml += '<tr><td colspan="5" class="text-center py-5 text-muted"><i class="ri-file-history-line fs-24 d-block mb-2"></i>No transactions found for this period</td></tr>';
+            _soaAllEntries = [];
         }
-        
-        ledgerHtml += '</tbody></table></div>';
-        document.getElementById('ledgerContainer').innerHTML = ledgerHtml;
+
+        renderSOAPage();
     } catch (e) {
         console.error(e);
         document.getElementById('ledgerContainer').innerHTML = '<div class="alert alert-danger m-3">Error loading statement of account.</div>';

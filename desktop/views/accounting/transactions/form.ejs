@@ -21,19 +21,26 @@
                 <h5 class="card-title mb-0">Record Manual Journal Entry</h5>
             </div>
             <div class="card-body">
-                <form action="/accounting/transactions/save" method="POST" id="journalForm">
+                <% const isEdit = typeof journal !== 'undefined' && journal !== null; %>
+                <form action="<%= isEdit ? '/accounting/transactions/update/' + journal.id : '/accounting/transactions/save' %>" method="POST" id="journalForm">
                     <div class="row g-3 mb-4">
                         <div class="col-md-4">
                             <label class="form-label">Date <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" name="date" value="<%= new Date().toISOString().split('T')[0] %>" required>
+                            <%
+                                let dateVal = new Date().toISOString().split('T')[0];
+                                if (isEdit && journal.date) {
+                                    dateVal = new Date(journal.date).toISOString().split('T')[0];
+                                }
+                            %>
+                            <input type="date" class="form-control" name="date" value="<%= dateVal %>" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Reference</label>
-                            <input type="text" class="form-control" name="reference" placeholder="e.g. ADJ-001">
+                            <input type="text" class="form-control" name="reference" placeholder="e.g. ADJ-001" value="<%= isEdit ? (journal.reference || '') : '' %>">
                         </div>
                         <div class="col-md-12">
                             <label class="form-label">Description <span class="text-danger">*</span></label>
-                            <textarea class="form-control" name="description" rows="2" placeholder="Reason for this entry..." required></textarea>
+                            <textarea class="form-control" name="description" rows="2" placeholder="Reason for this entry..." required><%= isEdit ? (journal.description || '') : '' %></textarea>
                         </div>
                     </div>
 
@@ -50,35 +57,56 @@
                                 </tr>
                             </thead>
                             <tbody id="entriesBody">
-                                <!-- Initial Two Rows -->
-                                <tr>
-                                    <td>
-                                        <select class="form-select" name="entries[0][account_id]" required>
-                                            <option value="">Select Account...</option>
-                                            <% accounts.forEach(function(acc) { %>
-                                                <option value="<%= acc.id %>"><%= acc.code %> - <%= acc.name %></option>
-                                            <% }); %>
-                                        </select>
-                                    </td>
-                                    <td><input type="text" class="form-control" name="entries[0][details]"></td>
-                                    <td><input type="number" class="form-control debit-input" name="entries[0][debit]" step="0.01" min="0" onchange="calculateTotals()"></td>
-                                    <td><input type="number" class="form-control credit-input" name="entries[0][credit]" step="0.01" min="0" onchange="calculateTotals()"></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <select class="form-select" name="entries[1][account_id]" required>
-                                            <option value="">Select Account...</option>
-                                            <% accounts.forEach(function(acc) { %>
-                                                <option value="<%= acc.id %>"><%= acc.code %> - <%= acc.name %></option>
-                                            <% }); %>
-                                        </select>
-                                    </td>
-                                    <td><input type="text" class="form-control" name="entries[1][details]"></td>
-                                    <td><input type="number" class="form-control debit-input" name="entries[1][debit]" step="0.01" min="0" onchange="calculateTotals()"></td>
-                                    <td><input type="number" class="form-control credit-input" name="entries[1][credit]" step="0.01" min="0" onchange="calculateTotals()"></td>
-                                    <td></td>
-                                </tr>
+                                <% if (isEdit && journal.ledger_entries && journal.ledger_entries.length > 0) { %>
+                                    <% journal.ledger_entries.forEach(function(entry, idx) { %>
+                                        <tr>
+                                            <td>
+                                                <select class="form-select" name="entries[<%= idx %>][account_id]" required>
+                                                    <option value="">Select Account...</option>
+                                                    <% accounts.forEach(function(acc) { %>
+                                                        <option value="<%= acc.id %>" <%= entry.account_id === acc.id ? 'selected' : '' %>><%= acc.code %> - <%= acc.name %></option>
+                                                    <% }); %>
+                                                </select>
+                                            </td>
+                                            <td><input type="text" class="form-control" name="entries[<%= idx %>][details]" value="<%= entry.details || '' %>"></td>
+                                            <td><input type="number" class="form-control debit-input" name="entries[<%= idx %>][debit]" step="0.01" min="0" onchange="calculateTotals()" value="<%= parseFloat(entry.debit) || '' %>"></td>
+                                            <td><input type="number" class="form-control credit-input" name="entries[<%= idx %>][credit]" step="0.01" min="0" onchange="calculateTotals()" value="<%= parseFloat(entry.credit) || '' %>"></td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove(); calculateTotals();"><i class="ri-delete-bin-line"></i></button>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <!-- Initial Two Rows -->
+                                    <tr>
+                                        <td>
+                                            <select class="form-select" name="entries[0][account_id]" required>
+                                                <option value="">Select Account...</option>
+                                                <% accounts.forEach(function(acc) { %>
+                                                    <option value="<%= acc.id %>"><%= acc.code %> - <%= acc.name %></option>
+                                                <% }); %>
+                                            </select>
+                                        </td>
+                                        <td><input type="text" class="form-control" name="entries[0][details]"></td>
+                                        <td><input type="number" class="form-control debit-input" name="entries[0][debit]" step="0.01" min="0" onchange="calculateTotals()"></td>
+                                        <td><input type="number" class="form-control credit-input" name="entries[0][credit]" step="0.01" min="0" onchange="calculateTotals()"></td>
+                                        <td><button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove(); calculateTotals();"><i class="ri-delete-bin-line"></i></button></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <select class="form-select" name="entries[1][account_id]" required>
+                                                <option value="">Select Account...</option>
+                                                <% accounts.forEach(function(acc) { %>
+                                                    <option value="<%= acc.id %>"><%= acc.code %> - <%= acc.name %></option>
+                                                <% }); %>
+                                            </select>
+                                        </td>
+                                        <td><input type="text" class="form-control" name="entries[1][details]"></td>
+                                        <td><input type="number" class="form-control debit-input" name="entries[1][debit]" step="0.01" min="0" onchange="calculateTotals()"></td>
+                                        <td><input type="number" class="form-control credit-input" name="entries[1][credit]" step="0.01" min="0" onchange="calculateTotals()"></td>
+                                        <td><button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove(); calculateTotals();"><i class="ri-delete-bin-line"></i></button></td>
+                                    </tr>
+                                <% } %>
                             </tbody>
                             <tfoot class="table-light">
                                 <tr>
@@ -106,7 +134,11 @@
 </div>
 
 <script>
-    let rowIdx = 2;
+    <% if (typeof journal !== 'undefined' && journal !== null && journal.ledger_entries) { %>
+        let rowIdx = <%= journal.ledger_entries.length %>;
+    <% } else { %>
+        let rowIdx = 2;
+    <% } %>
 
     function addRow() {
         const tr = document.createElement('tr');
@@ -156,4 +188,7 @@
             }
         }
     }
+
+    // Call once on load for edit mode
+    calculateTotals();
 </script>

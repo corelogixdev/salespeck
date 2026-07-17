@@ -24,6 +24,18 @@
                 </a>
             </div>
             <div class="card-body">
+                <form action="/accounting/transactions" method="GET" class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" name="search" placeholder="Search by Ref or Description..." value="<%= typeof query !== 'undefined' ? query.search || '' : '' %>">
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" name="daterange" data-provider="flatpickr" data-mode="range" placeholder="Select Date Range..." value="<%= typeof query !== 'undefined' ? query.daterange || '' : '' %>">
+                    </div>
+                    <div class="col-md-4 d-flex">
+                        <button type="submit" class="btn btn-primary"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        <a href="/accounting/transactions" class="btn btn-soft-danger ms-2"><i class="ri-refresh-line"></i></a>
+                    </div>
+                </form>
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped align-middle">
                         <thead class="table-light">
@@ -31,7 +43,8 @@
                                 <th>Date</th>
                                 <th>Source</th>
                                 <th>Description / Reference</th>
-                                <th>Ledger Lines (Account | Debit | Credit)</th>
+                                <th>Ledger Lines</th>
+                                <th class="text-end">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -46,20 +59,34 @@
                                         </td>
                                         <td>
                                             <table class="table table-sm table-borderless mb-0">
-                                                <% journal.ledger_entries.forEach(function(entry) { %>
-                                                <tr>
-                                                    <td style="width: 50%"><%= entry.account?.name || 'Unknown Account' %></td>
-                                                    <td style="width: 25%" class="text-end text-success"><%= parseFloat(entry.debit) > 0 ? parseFloat(entry.debit).toLocaleString(undefined, {minimumFractionDigits: 2}) : '' %></td>
-                                                    <td style="width: 25%" class="text-end text-danger"><%= parseFloat(entry.credit) > 0 ? parseFloat(entry.credit).toLocaleString(undefined, {minimumFractionDigits: 2}) : '' %></td>
-                                                </tr>
-                                                <% }); %>
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th style="width: 50%">Account</th>
+                                                        <th style="width: 25%" class="text-end">Debit</th>
+                                                        <th style="width: 25%" class="text-end">Credit</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <% journal.ledger_entries.forEach(function(entry) { %>
+                                                    <tr>
+                                                        <td><%= entry.account?.name || 'Unknown Account' %></td>
+                                                        <td class="text-end text-success"><%= parseFloat(entry.debit) > 0 ? parseFloat(entry.debit).toLocaleString(undefined, {minimumFractionDigits: 2}) : '' %></td>
+                                                        <td class="text-end text-danger"><%= parseFloat(entry.credit) > 0 ? parseFloat(entry.credit).toLocaleString(undefined, {minimumFractionDigits: 2}) : '' %></td>
+                                                    </tr>
+                                                    <% }); %>
+                                                </tbody>
                                             </table>
+                                        </td>
+                                        <td class="text-end">
+                                            <% if (journal.source === 'manual' || journal.source === 'desktop') { %>
+                                                <a href="/accounting/transactions/edit/<%= journal.id %>" class="btn btn-sm btn-soft-primary"><i class="ri-pencil-fill"></i> Edit</a>
+                                            <% } %>
                                         </td>
                                     </tr>
                                 <% }); %>
                             <% } else { %>
                                 <tr>
-                                    <td colspan="4" class="text-center">No transactions recorded.</td>
+                                    <td colspan="5" class="text-center">No transactions recorded.</td>
                                 </tr>
                             <% } %>
                         </tbody>

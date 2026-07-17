@@ -536,52 +536,56 @@ const canCreate = (role=='user' && permissions.usersCreate) || (role=='vendor' &
                 // Fetch Ledger for Customers/Vendors
                 const ledgerResponse = await fetch('/accounting/ledger/party/' + id);
                 const ledgerResult = await ledgerResponse.json();
-                
-                let ledgerHtml = `
-                    <div class="card border-0 shadow-none mb-0">
-                        <div class="card-header p-0 pb-3 bg-transparent border-0 d-flex align-items-center">
-                            <h6 class="card-title mb-0 flex-grow-1"><i class="ri-file-list-3-line me-1 align-bottom text-primary"></i> Statement of Account</h6>
-                            <div class="flex-shrink-0">
-                                <button class="btn btn-soft-primary btn-sm" onclick="window.print()"><i class="ri-printer-line me-1"></i> Print Statement</button>
-                            </div>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-nowrap align-middle mb-0">
-                                <thead class="table-light fs-11 text-uppercase">
-                                    <tr>
-                                        <th style="width: 100px;">Date</th>
-                                        <th>Description</th>
-                                        <th class="text-end" style="width: 120px;">Debit</th>
-                                        <th class="text-end" style="width: 120px;">Credit</th>
-                                        <th class="text-end" style="width: 140px;">Balance</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="fs-13">
-                `;
-                
-                if (ledgerResult.success && ledgerResult.ledger.length > 0) {
-                    let balance = 0;
-                    const sortedLedger = [...ledgerResult.ledger].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-                    
-                    sortedLedger.forEach(entry => {
-                        const isDebit = entry.debit > 0;
-                        if (role === 'customer') {
-                            balance += (entry.debit - entry.credit);
-                        } else {
-                            balance += (entry.credit - entry.debit);
-                        }
+
+                // Sort newest first
+                const allEntries = (ledgerResult.success && ledgerResult.ledger.length > 0)
+                    ? [...ledgerResult.ledger].sort((a, b) => new Date(b.journal.date) - new Date(a.journal.date))
+                    : [];
+
+                // Build cumulative balances (oldest→newest direction)
+                const oldestFirst = [...allEntries].reverse();
+                const cumulativeBalances = [];
+                let bal = 0;
+                for (const entry of oldestFirst) {
+                    if (role === 'customer') bal += (entry.debit - entry.credit);
+                    else bal += (entry.credit - entry.debit);
+                    cumulativeBalances.push(bal);
+                }
+                const total = allEntries.length;
+
+                function buildModalSOAHtml(pageSize, currentPage) {
+                    let startIdx = 0, endIdx = total;
+                    let pageEntries = allEntries;
+                    if (pageSize !== 'all') {
+                        startIdx = (currentPage - 1) * pageSize;
+                        endIdx   = Math.min(startIdx + pageSize, total);
+                        pageEntries = allEntries.slice(startIdx, endIdx);
+                    }
+
+                    let rowsHtml = '';
+                    for (let j = 0; j < pageEntries.length; j++) {
+                        const entry = pageEntries[j];
+                        const globalIdx = startIdx + j;
+                        const balance = cumulativeBalances[total - 1 - globalIdx];
 
                         let viewButton = '';
                         if (entry.journal.reference) {
                             let docTitle = entry.journal.description || (entry.journal.voucher_no ? 'Invoice ' + entry.journal.voucher_no : 'Document');
-                            if (entry.journal.description && entry.journal.description.toLowerCase().includes('sale')) {
+                            const desc = (entry.journal.description || '').toLowerCase();
+                            if (desc.includes('sale')) {
                                 viewButton = `<button type="button" onclick="openIframeModal('/sales/${entry.journal.reference}', '${docTitle}')" class="btn btn-soft-primary btn-sm px-2 py-0 fs-11"><i class="ri-eye-line me-1"></i>View</button>`;
-                            } else if (entry.journal.description && entry.journal.description.toLowerCase().includes('purchase')) {
+                            } else if (desc.includes('purchase')) {
                                 viewButton = `<button type="button" onclick="openIframeModal('/accounting/purchase/view/${entry.journal.reference}', '${docTitle}')" class="btn btn-soft-primary btn-sm px-2 py-0 fs-11"><i class="ri-eye-line me-1"></i>View</button>`;
                             }
                         }
 
-                        ledgerHtml += `
+                        const debitVal  = (entry.debit > 0 || entry.credit < 0) ? Math.abs(entry.debit || entry.credit).toLocaleString(undefined, { minimumFractionDigits: 2 }) : '-';
+                        const creditVal = (entry.credit > 0 || entry.debit < 0) ? Math.abs(entry.credit || entry.debit).toLocaleString(undefined, { minimumFractionDigits: 2 }) : '-';
+                        const debitClass  = (entry.debit > 0 || entry.credit < 0) ? 'text-success' : 'text-muted';
+                        const creditClass = (entry.credit > 0 || entry.debit < 0) ? 'text-danger' : 'text-muted';
+                        const balLabel = role === 'customer' ? (balance >= 0 ? 'Dr' : 'Cr') : (balance >= 0 ? 'Cr' : 'Dr');
+
+                        rowsHtml += `
                             <tr>
                                 <td class="text-muted">${new Date(entry.journal.date).toLocaleDateString()}</td>
                                 <td>
@@ -592,28 +596,161 @@ const canCreate = (role=='user' && permissions.usersCreate) || (role=='vendor' &
                                     </div>
                                     <div class="text-muted fs-12">${entry.details || ''}</div>
                                 </td>
-                                <td class="text-end fw-medium ${ (entry.debit > 0 || entry.credit < 0) ? 'text-success' : 'text-muted'}">
-                                    ${ (entry.debit > 0 || entry.credit < 0) ? Math.abs(entry.debit || entry.credit).toLocaleString(undefined, { minimumFractionDigits: 2 }) : '-'}
-                                </td>
-                                <td class="text-end fw-medium ${ (entry.credit > 0 || entry.debit < 0) ? 'text-danger' : 'text-muted'}">
-                                    ${ (entry.credit > 0 || entry.debit < 0) ? Math.abs(entry.credit || entry.debit).toLocaleString(undefined, { minimumFractionDigits: 2 }) : '-'}
-                                </td>
+                                <td class="text-end fw-medium ${debitClass}">${debitVal}</td>
+                                <td class="text-end fw-medium ${creditClass}">${creditVal}</td>
                                 <td class="text-end fw-bold text-dark bg-light-subtle">
                                     ${Math.abs(balance).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                    <small class="text-muted fw-normal">${role === 'customer' ? (balance >= 0 ? 'Dr' : 'Cr') : (balance >= 0 ? 'Cr' : 'Dr')}</small>
+                                    <small class="text-muted fw-normal">${balLabel}</small>
                                 </td>
                             </tr>
                         `;
-                    });
-                } else {
-                    ledgerHtml += '<tr><td colspan="5" class="text-center py-5 text-muted"><i class="ri-file-history-line fs-24 d-block mb-2"></i>No transactions found for this period</td></tr>';
-                }
-                
-                ledgerHtml += '</tbody></table></div></div>';
-                
-                renderViewModal('viewUserModal', ledgerHtml, null, headerHtml);
-            }
+                    }
 
+                    // Page totals
+                    let pageTotalDebit = 0, pageTotalCredit = 0;
+                    for (const entry of pageEntries) {
+                        if (entry.debit > 0 || entry.credit < 0) pageTotalDebit  += Math.abs(entry.debit || entry.credit);
+                        if (entry.credit > 0 || entry.debit < 0) pageTotalCredit += Math.abs(entry.credit || entry.debit);
+                    }
+                    let grandTotalDebit = 0, grandTotalCredit = 0;
+                    for (const entry of allEntries) {
+                        if (entry.debit > 0 || entry.credit < 0) grandTotalDebit  += Math.abs(entry.debit || entry.credit);
+                        if (entry.credit > 0 || entry.debit < 0) grandTotalCredit += Math.abs(entry.credit || entry.debit);
+                    }
+                    const grandBalance = cumulativeBalances.length > 0 ? cumulativeBalances[cumulativeBalances.length - 1] : 0;
+                    const grandBalLabel = role === 'customer' ? (grandBalance >= 0 ? 'Dr' : 'Cr') : (grandBalance >= 0 ? 'Cr' : 'Dr');
+
+                    // Pagination controls
+                    let paginationHtml = '';
+                    if (pageSize !== 'all' && total > 0) {
+                        const totalPages = Math.ceil(total / pageSize);
+                        const from = startIdx + 1, to = endIdx;
+                        let btns = '';
+                        btns += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}"><a class="page-link soa-modal-page" href="#" data-page="${currentPage - 1}">‹</a></li>`;
+                        const delta = 2;
+                        let pages2 = [], prev2 = null;
+                        for (let i = 1; i <= totalPages; i++) {
+                            if (i === 1 || i === totalPages || (i >= currentPage - delta && i <= currentPage + delta)) pages2.push(i);
+                        }
+                        for (const p of pages2) {
+                            if (prev2 !== null && p - prev2 > 1) btns += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
+                            btns += `<li class="page-item ${p === currentPage ? 'active' : ''}"><a class="page-link soa-modal-page" href="#" data-page="${p}">${p}</a></li>`;
+                            prev2 = p;
+                        }
+                        btns += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}"><a class="page-link soa-modal-page" href="#" data-page="${currentPage + 1}">›</a></li>`;
+
+                        paginationHtml = `
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 px-2 pt-2 border-top">
+                                <div class="text-muted fs-12">Showing ${from} to ${to} of ${total} records</div>
+                                <nav><ul class="pagination pagination-sm mb-0">${btns}</ul></nav>
+                            </div>
+                        `;
+                    }
+
+                    return `
+                        <div class="card border-0 shadow-none mb-0">
+                            <div class="card-header p-0 pb-3 bg-transparent border-0 d-flex align-items-center flex-wrap gap-2">
+                                <h6 class="card-title mb-0 flex-grow-1"><i class="ri-file-list-3-line me-1 align-bottom text-primary"></i> Statement of Account</h6>
+                                <div class="d-flex align-items-center gap-2">
+                                    <label class="text-muted fs-12 mb-0">Show</label>
+                                    <select id="soaModalPageSize" class="form-select form-select-sm" style="min-width: 75px;">
+                                        <option value="10" ${pageSize === 10 ? 'selected' : ''}>10</option>
+                                        <option value="25" ${pageSize === 25 ? 'selected' : ''}>25</option>
+                                        <option value="50" ${pageSize === 50 ? 'selected' : ''}>50</option>
+                                        <option value="100" ${pageSize === 100 ? 'selected' : ''}>100</option>
+                                        <option value="all" ${pageSize === 'all' ? 'selected' : ''}>All</option>
+                                    </select>
+                                    <button class="btn btn-soft-primary btn-sm" onclick="window.print()"><i class="ri-printer-line me-1"></i> Print</button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-nowrap align-middle mb-0">
+                                    <thead class="table-light fs-11 text-uppercase">
+                                        <tr>
+                                            <th style="width: 100px;">Date</th>
+                                            <th>Description</th>
+                                            <th class="text-end" style="width: 120px;">Debit</th>
+                                            <th class="text-end" style="width: 120px;">Credit</th>
+                                            <th class="text-end" style="width: 140px;">Balance</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="fs-13">
+                                        ${rowsHtml || '<tr><td colspan="5" class="text-center py-5 text-muted"><i class="ri-file-history-line fs-24 d-block mb-2"></i>No transactions found for this period</td></tr>'}
+                                    </tbody>
+                                    ${pageEntries.length > 0 ? `
+                                    <tfoot class="table-light fs-12 fw-bold">
+                                        <tr>
+                                            <td colspan="2" class="text-end text-muted text-uppercase fs-11">${pageSize !== 'all' ? `Page ${currentPage} Totals` : 'Grand Totals'}</td>
+                                            <td class="text-end text-success">${pageTotalDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                            <td class="text-end text-danger">${pageTotalCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                            <td class="text-end"></td>
+                                        </tr>
+                                        ${pageSize !== 'all' ? `
+                                        <tr class="border-top">
+                                            <td colspan="2" class="text-end text-muted text-uppercase fs-11">Grand Totals</td>
+                                            <td class="text-end text-success">${grandTotalDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                            <td class="text-end text-danger">${grandTotalCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                            <td class="text-end fw-bold text-dark">
+                                                ${Math.abs(grandBalance).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                <small class="text-muted fw-normal ms-1">${grandBalLabel}</small>
+                                            </td>
+                                        </tr>
+                                        ` : ''}
+                                    </tfoot>
+                                    ` : ''}
+                                </table>
+                            </div>
+                            ${paginationHtml}
+                        </div>
+                    `;
+                }
+
+                // Initial render
+                let soaModalPageSize = 10;
+                let soaModalCurrentPage = 1;
+
+                const ledgerHtml = buildModalSOAHtml(soaModalPageSize, soaModalCurrentPage);
+                renderViewModal('viewUserModal', ledgerHtml, null, headerHtml);
+
+                const modal = new bootstrap.Modal(document.getElementById('viewUserModal'));
+                modal.show();
+
+                // Attach page-size and pagination handlers after modal is shown
+                setTimeout(() => {
+                    attachModalPaginationHandlers();
+
+                    function attachModalPaginationHandlers() {
+                        // Re-attach page-size select (re-rendered on each page/size change)
+                        const psSel = document.getElementById('soaModalPageSize');
+                        if (psSel) {
+                            psSel.addEventListener('change', function() {
+                                soaModalPageSize = this.value === 'all' ? 'all' : parseInt(this.value);
+                                soaModalCurrentPage = 1;
+                                const newHtml = buildModalSOAHtml(soaModalPageSize, soaModalCurrentPage);
+                                renderViewModal('viewUserModal', newHtml, null, headerHtml);
+                                attachModalPaginationHandlers();
+                            });
+                        }
+                        // Re-attach page number links
+                        document.querySelectorAll('.soa-modal-page').forEach(a => {
+                            a.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                const p = parseInt(this.dataset.page);
+                                const totalPages = Math.ceil(total / soaModalPageSize);
+                                if (p >= 1 && p <= totalPages) {
+                                    soaModalCurrentPage = p;
+                                    const newHtml = buildModalSOAHtml(soaModalPageSize, soaModalCurrentPage);
+                                    renderViewModal('viewUserModal', newHtml, null, headerHtml);
+                                    attachModalPaginationHandlers();
+                                }
+                            });
+                        });
+                    }
+                }, 300);
+
+
+                return; // modal.show() already called above
+            }
             const modal = new bootstrap.Modal(document.getElementById('viewUserModal'));
             modal.show();
         } catch (e) {

@@ -215,9 +215,9 @@ exports.details = async (req, res) => {
   try {
     const { id } = req.params;
     const role = req.query.role || 'user';
-    const user = await queries.users.findById(id);
+    const partyUser = await queries.users.findById(id);
     
-    if (!user) {
+    if (!partyUser) {
       req.session.message = { type: 'error', text: 'Record not found' };
       return res.redirect('/users?role=' + role);
     }
@@ -225,9 +225,9 @@ exports.details = async (req, res) => {
     const prisma = requirePrismaClient();
     let balance = 0;
 
-    if ((user.role === 'customer' || user.role === 'vendor') && user.fk_financeaccount_id) {
+    if ((partyUser.role === 'customer' || partyUser.role === 'vendor') && partyUser.fk_financeaccount_id) {
         const account = await prisma.financeaccount.findUnique({
-            where: { id: user.fk_financeaccount_id },
+            where: { id: partyUser.fk_financeaccount_id },
             include: { ledger_entries: true }
         });
         if (account) {
@@ -238,7 +238,7 @@ exports.details = async (req, res) => {
 
     res.render('users/details', {
         title: (role === 'vendor' ? 'Vendor' : (role === 'customer' ? 'Customer' : 'User')) + ' Details',
-        user,
+        partyUser,
         role,
         balance
     });

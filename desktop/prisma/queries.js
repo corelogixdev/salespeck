@@ -376,6 +376,32 @@ const products = {
     const prisma = getPrisma();
     return prisma.product.create({ data: { id: generateId(32), ...data } });
   },
+  async bulkCreate(dataArray) {
+    const prisma = getPrisma();
+    const dataWithIds = dataArray.map(data => ({ id: generateId(32), ...data }));
+    
+    // Give the local SQLite database driver a moment to completely release 
+    // any locks from the preceding findForSale query before attempting a bulk write
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    let retries = 8;
+    while (retries > 0) {
+      try {
+        await prisma.product.createMany({ data: dataWithIds });
+        break; // Success!
+      } catch (error) {
+        retries--;
+        if (retries === 0) {
+          console.error('Final retry failed for bulkCreate:', error);
+          throw error;
+        }
+        // Wait longer on each retry
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+    
+    return dataWithIds;
+  },
   async update(id, data) {
     const prisma = getPrisma();
     return prisma.product.update({ where: { id }, data });
@@ -1080,7 +1106,6 @@ const sales = {
             date: transactionDate ? new Date(transactionDate) : new Date(),
             description: "Service Invoice " + invoicenum,
             reference: saleId,
-            voucher_no: invoicenum,
             source: 'desktop',
             createdby: userId
           }
@@ -1120,7 +1145,6 @@ const sales = {
               date: transactionDate ? new Date(transactionDate) : new Date(),
               description: "Payment for Service Invoice " + invoicenum,
               reference: saleId,
-              voucher_no: invoicenum,
               source: 'desktop',
               createdby: userId
             }
@@ -2074,6 +2098,49 @@ const accounting = {
     return journalId;
   },
 
+  async getJournalById(id) {
+    const prisma = getPrisma();
+    return prisma.account_journal.findUnique({
+      where: { id },
+      include: {
+        ledger_entries: {
+          include: { account: true }
+        }
+      }
+    });
+  },
+
+  async updateJournalEntry(tx, journalId, { description, reference, date, entries }) {
+    // 1. Delete existing ledger entries for this journal
+    await tx.account_ledger.deleteMany({
+      where: { journal_id: journalId }
+    });
+
+    // 2. Update journal record
+    await tx.account_journal.update({
+      where: { id: journalId },
+      data: {
+        date: new Date(date),
+        description,
+        reference
+      }
+    });
+
+    // 3. Insert new ledger entries
+    for (const entry of entries) {
+      await tx.account_ledger.create({
+        data: {
+          id: generateId(32),
+          journal_id: journalId,
+          account_id: entry.accountId,
+          debit: entry.debit || 0,
+          credit: entry.credit || 0,
+          details: entry.details
+        }
+      });
+    }
+  },
+
   async createExpense({ date, expenseAccountId, paymentAccountId, amount, description }, userId) {
     const prisma = getPrisma();
     const journalId = generateId(32);
@@ -2163,6 +2230,21 @@ const accounting = {
         gte: new Date(filters.startDate),
         lte: new Date(filters.endDate)
       };
+    }
+    if (filters.daterange) {
+      const [start, end] = String(filters.daterange).split(" to ").map(d => d.trim());
+      if (start && end) {
+        where.date = {
+          gte: new Date(start),
+          lte: new Date(end)
+        };
+      }
+    }
+    if (filters.search) {
+      where.OR = [
+        { description: { contains: filters.search } },
+        { reference: { contains: filters.search } }
+      ];
     }
     const journals = await prisma.account_journal.findMany({
       where,

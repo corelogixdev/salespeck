@@ -16,5 +16,7 @@ router.get('/next-service-invoice-num', sales.getNextServiceInvoiceNum);
 router.get('/revenue-accounts', sales.getRevenueAccounts);
 router.get('/search-customers', sales.searchCustomers);
 router.get('/:id', allowed(['salesView']), sales.saleview);
+router.post('/bulk-resolve-services', allowed(['salesCreate']), sales.bulkResolveServices);
+router.post('/create-single-service', allowed(['salesCreate']), sales.createSingleService);
 
 module.exports = router;

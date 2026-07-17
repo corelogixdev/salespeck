@@ -24,3 +24,4 @@ router.use('/transactions', transactionRoutes);
 router.use('/', cashClosingRoutes);
 
 module.exports = router;
+

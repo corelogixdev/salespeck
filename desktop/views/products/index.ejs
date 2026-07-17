@@ -170,6 +170,10 @@
                   <input type="checkbox" class="form-check-input" id="addPurchaseactive" name="purchaseactive" checked>
                   <label class="form-check-label" for="addPurchaseactive">Purchase Active</label>
                 </div>
+                <div class="form-check form-switch">
+                  <input type="checkbox" class="form-check-input" id="addIsService" name="is_service">
+                  <label class="form-check-label text-primary fw-bold" for="addIsService">Is Service Design?</label>
+                </div>
               </div>
             </div>
           </div>
@@ -263,6 +267,10 @@
                 <div class="form-check form-switch">
                   <input type="checkbox" class="form-check-input" id="editPurchaseactive" name="purchaseactive">
                   <label class="form-check-label" for="editPurchaseactive">Purchase Active</label>
+                </div>
+                <div class="form-check form-switch">
+                  <input type="checkbox" class="form-check-input" id="editIsService" name="is_service">
+                  <label class="form-check-label text-primary fw-bold" for="editIsService">Is Service Design?</label>
                 </div>
               </div>
             </div>
@@ -454,6 +462,10 @@
     });
     data.saleactive = form.querySelector('[name="saleactive"]').checked ? 'on' : 'off';
     data.purchaseactive = form.querySelector('[name="purchaseactive"]').checked ? 'on' : 'off';
+    const isServiceCheckbox = form.querySelector('[name="is_service"]');
+    if (isServiceCheckbox) {
+      data.is_service = isServiceCheckbox.checked ? 'on' : 'off';
+    }
     // Ensure numeric fields are sent as numbers when possible
     ['carrycost', 'discount', 'purchaseprice', 'quantity', 'saleprice'].forEach(k => {
       if (data[k] !== undefined && data[k] !== '') data[k] = parseFloat(data[k]);
@@ -502,6 +514,9 @@
         document.getElementById('editSaleprice').value = p.saleprice || '';
         document.getElementById('editSaleactive').checked = p.saleactive;
         document.getElementById('editPurchaseactive').checked = p.purchaseactive;
+        if (document.getElementById('editIsService')) {
+          document.getElementById('editIsService').checked = p.is_service;
+        }
 
         const modal = new bootstrap.Modal(document.getElementById('editProductModal'));
         modal.show();
@@ -548,7 +563,8 @@
           { label: 'Discount', value: (p.discount || 0) + '%' },
           { label: 'Carry Cost', value: p.carrycost || 0 },
           { label: 'Sale Active', value: p.saleactive ? 'Yes' : 'No' },
-          { label: 'Purchase Active', value: p.purchaseactive ? 'Yes' : 'No' }
+          { label: 'Purchase Active', value: p.purchaseactive ? 'Yes' : 'No' },
+          { label: 'Is Service', value: p.is_service ? 'Yes' : 'No' }
         ]);
         const modal = new bootstrap.Modal(document.getElementById('viewProductModal'));
         modal.show();
