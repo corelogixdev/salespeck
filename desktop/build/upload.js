@@ -19,13 +19,16 @@ if (!GITLAB_TOKEN) {
 }
 
 console.log('Uploading executable...');
-execSync(`curl --verbose --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" --upload-file dist/openmenu.exe "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/generic/openmenu/release/openmenu.exe"`, {stdio: 'inherit'});
+// Requires GitLab generic package folder: packages/generic/stitchcore/release
+// Create it once in the project Package Registry if the first upload fails.
+const packageBase = `https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/generic/stitchcore/release`;
+execSync(`curl --verbose --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" --upload-file dist/stitchcore.exe "${packageBase}/stitchcore.exe"`, {stdio: 'inherit'});
 
 console.log('Uploading latest.yml...');
 if (!fs.existsSync('dist/latest.yml')) {
   console.error('Error: latest.yml file is missing in the dist directory.');
   process.exit(1);
 }
-execSync(`curl --verbose --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" --upload-file dist/latest.yml "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/generic/openmenu/release/latest.yml"`, {stdio: 'inherit'});
+execSync(`curl --verbose --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" --upload-file dist/latest.yml "${packageBase}/latest.yml"`, {stdio: 'inherit'});
 
 console.log('Upload complete.');

@@ -2,8 +2,8 @@ require("dotenv").config();
 const { resolveDatabaseUrl, ensureDatabaseDirectory } = require("./prismaDbConfig");
 
 function getPrismaClient() {
-  if (global.__openmenuPrismaClient) {
-    return global.__openmenuPrismaClient;
+  if (global.__stitchcorePrismaClient) {
+    return global.__stitchcorePrismaClient;
   }
 
   try {
@@ -20,13 +20,13 @@ function getPrismaClient() {
       url: databaseUrl,
     });
 
-    global.__openmenuPrismaClient = new PrismaClient({
+    global.__stitchcorePrismaClient = new PrismaClient({
       adapter,
     });
 
-    return global.__openmenuPrismaClient;
+    return global.__stitchcorePrismaClient;
   } catch (error) {
-    global.__openmenuPrismaLastError = error;
+    global.__stitchcorePrismaLastError = error;
     return null;
   }
 }
@@ -35,7 +35,7 @@ function requirePrismaClient() {
   const prisma = getPrismaClient();
   if (!prisma) {
     const baseMessage = "Prisma client could not be initialized.";
-    const errorMessage = global.__openmenuPrismaLastError?.message;
+    const errorMessage = global.__stitchcorePrismaLastError?.message;
     throw new Error(errorMessage ? `${baseMessage} ${errorMessage}` : baseMessage);
   }
   return prisma;

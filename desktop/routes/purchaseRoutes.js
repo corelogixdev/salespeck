@@ -18,5 +18,7 @@ router.get("/service-form", controller.serviceForm);
 router.post("/service-save", controller.serviceSave);
 router.post("/service-productsget", controller.serviceProductsget);
 router.get("/next-service-invoice-num", controller.getNextServiceInvoiceNum);
+router.post("/bulk-resolve-services", controller.bulkResolveServices);
+router.post("/create-single-service", controller.createSingleService);
 
 module.exports = router;

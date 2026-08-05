@@ -52,7 +52,7 @@ app.on('will-quit', cleanupAllTempPdfs);
 
 // app.setAppLogsPath();
 //log starting app and date time to log file
-logi('Starting OpenMenu Desktop...');
+logi('Starting StitchCore Desktop...');
 logi('Date:', new Date().toISOString());
 
 // Read package.json to get the version
@@ -95,7 +95,7 @@ async function showStartupErrorDialog(error) {
   const result = await dialog.showMessageBox({
     type: 'error',
     title: 'Startup Failed',
-    message: 'OpenMenu could not start.',
+    message: 'StitchCore could not start.',
     detail: `${detail}\n\nLogs folder:\n${logDir}`,
     buttons: ['Open Logs Folder', 'Close'],
     defaultId: 0,
@@ -325,7 +325,7 @@ ipcMain.handle('generate-print-preview', async (event) => {
   try {
     const pdfPath = path.join(
       os.tmpdir(),
-      `openmenu-preview-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.pdf`
+      `stitchcore-preview-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.pdf`
     );
 
     const data = await senderWindow.webContents.printToPDF({
@@ -429,7 +429,7 @@ ipcMain.on('close-preview-window', (event) => {
 async function generateAndShowPreview(sourceWindow) {
   const pdfPath = path.join(
     os.tmpdir(),
-    `openmenu-preview-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.pdf`
+    `stitchcore-preview-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.pdf`
   );
 
   logi('[PrintPreview] Generating PDF to:', pdfPath);
@@ -592,7 +592,7 @@ ipcMain.on('generate-report-pdf', async (event, url) => {
       pageSize: 'A4',
     });
 
-    const tempPdfDir = path.join(os.tmpdir(), 'openmenu-pdfs');
+    const tempPdfDir = path.join(os.tmpdir(), 'stitchcore-pdfs');
     try { fs.mkdirSync(tempPdfDir, { recursive: true }); } catch (e) {}
     const fileName = `report-${Date.now()}.pdf`;
     const pdfPath = path.join(tempPdfDir, fileName);
@@ -761,7 +761,7 @@ autoUpdater.on('update-available', (info) => {
     buttons: ['Download Now', 'Do Not Download'],
     defaultId: 0,
     title: 'Update Available',
-    message: 'A new version of openmenu is available. Do you want to download it now?',
+    message: 'A new version of StitchCore is available. Do you want to download it now?',
     detail: 'You can choose to download the update now or skip it.'
   };
 
@@ -787,7 +787,7 @@ autoUpdater.on('update-downloaded', (info) => {
     buttons: ['Install Now', 'Later'],
     defaultId: 0,
     title: 'Update Available',
-    message: 'A new version of openmenu is available. Do you want to install it now?',
+    message: 'A new version of StitchCore is available. Do you want to install it now?',
     detail: 'The update will be installed the next time you restart the application if you choose "Later".'
   };
   const appDir = path.join(app.getPath('exe'), '..'); // Get the app directory
@@ -796,7 +796,7 @@ autoUpdater.on('update-downloaded', (info) => {
     if (response.response === 0) {
       try {
         logi('quitAndInstall new version');
-        //C:\Users\IT LAND\AppData\Local\Programs\openmenu
+        //C:\Users\...\AppData\Local\Programs\stitchcore
 
         // Remove old files manually
         //deleteOldFiles(appDir); // This function will delete the old files

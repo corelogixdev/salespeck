@@ -134,9 +134,8 @@ exports.form = async (req, res) => {
   let data = null;
   if (userId) {
     data = await queries.users.findById(userId);
-    if (data.password) {
-      data.password = encrypt.decrypt(data.password);
-    }
+    // Never expose hashes; leave blank so edit keeps existing unless changed
+    if (data) data.password = '';
   }
 
   let formTitle = data ? 'Edit User' : 'Create User';
@@ -201,9 +200,7 @@ exports.getUser = async (req, res) => {
         }
     }
 
-    if (data.password) {
-      data.password = encrypt.decrypt(data.password);
-    }
+    delete data.password;
     res.json({ success: true, user: data });
   } catch (error) {
     console.error('Error fetching user:', error);
@@ -285,12 +282,15 @@ exports.save = async (req, res) => {
   var { id, firstname, lastname, email, phone, username, role, password, address, ob_date, fk_partytype_id } = req.body;
   var password = password;
   var createdby = req.session.user.id;
+  const license = require('../utils/license');
 
   // Set the source based on application
   const source = 'desktop';
 
   if (password) {
     password = encrypt.encrypt(password);
+  } else {
+    password = null;
   }
   try {
     // check if email is duplicate (only if email is provided)
@@ -319,17 +319,32 @@ exports.save = async (req, res) => {
       phone,
       username,
       role,
-      password,
       address,
       fk_partytype_id: fk_partytype_id || null,
       createdby,
       source
     };
+    if (password) {
+      userData.password = password;
+    }
 
     let savedUser;
     if (id) {
+      // Seat check when promoting/changing into a staff role
+      if (license.isStaffRole(role)) {
+        const existing = await queries.users.findById(id);
+        if (existing && !license.isStaffRole(existing.role)) {
+          await license.assertCanAddStaffSeat(1);
+        }
+      }
       savedUser = await queries.users.update(id, userData);
     } else {
+      if (role !== 'customer' && role !== 'vendor' && !password) {
+        return res.status(400).json({ success: false, message: 'Password is required for new staff users' });
+      }
+      if (license.isStaffRole(role)) {
+        await license.assertCanAddStaffSeat(1);
+      }
       savedUser = await queries.users.create(userData);
     }
 

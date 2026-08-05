@@ -115,6 +115,96 @@ exports.save = async (req, res) => {
 // Remove or comment out the existing search function since it's now merged
 // exports.search = async (req, res) => { ... }
 
+exports.returnsForm = async (req, res) => {
+  res.render("sales/returns/form", {
+    title: "Sales Return",
+    saleId: req.query.saleId || "",
+  });
+};
+
+exports.returnsLookup = async (req, res) => {
+  try {
+    const q = String(req.query.q || "").trim();
+    if (!q) {
+      return res.json({ success: true, sales: [] });
+    }
+    const sales = await queries.sales.lookupSalesForReturn(q, 15);
+    res.json({ success: true, sales });
+  } catch (error) {
+    console.error("Returns lookup error:", error);
+    res.status(500).json({ success: false, message: error.message || "Internal Server Error" });
+  }
+};
+
+exports.returnsSaleData = async (req, res) => {
+  try {
+    const sale = await queries.sales.getSaleForReturn(req.params.id);
+    if (!sale) {
+      return res.status(404).json({ success: false, message: "Sale not found" });
+    }
+    res.json({ success: true, sale });
+  } catch (error) {
+    console.error("Returns sale data error:", error);
+    res.status(500).json({ success: false, message: error.message || "Internal Server Error" });
+  }
+};
+
+exports.returnsSave = async (req, res) => {
+  try {
+    const { saleId, items, refundMode, note, ledger } = req.body;
+    const { user } = res.locals;
+    if (!saleId) {
+      return res.status(400).json({ status: "error", message: "Sale ID is required" });
+    }
+    const result = await queries.sales.createSaleReturnTransaction({
+      saleId,
+      items,
+      refundMode,
+      note,
+      userId: user.id,
+      ledger,
+    });
+    res.json({
+      status: "success",
+      message: "Return created successfully",
+      returnId: result.id,
+      invoicenum: result.invoicenum,
+      totalamount: result.totalamount,
+    });
+  } catch (error) {
+    console.error("Sale return error:", error);
+    res.status(500).json({ status: "error", message: error.message || "Internal Server Error" });
+  }
+};
+
+exports.returnsView = async (req, res) => {
+  try {
+    const ret = await queries.sales.getSaleReturnById(req.params.id);
+    if (!ret) {
+      const wantsHtml = String(req.headers.accept || "").includes("text/html");
+      if (wantsHtml) {
+        req.session.message = { type: "error", text: "Return not found" };
+        return res.redirect("/sales/returns");
+      }
+      return res.status(404).json({ status: "error", message: "Return not found" });
+    }
+
+    let companySettings = await queries.common.getCompanySetting();
+    if (!companySettings) {
+      companySettings = { value: JSON.stringify({ name: "Company", address: "", phone: "" }) };
+    }
+
+    res.render("sales/returns/view", {
+      ret,
+      companySettings: JSON.parse(companySettings.value),
+      layout: false,
+    });
+  } catch (error) {
+    console.error("Error in returnsView:", error);
+    res.status(500).json({ status: "error", message: "Internal Server Error" });
+  }
+};
+
 exports.saleview = async (req, res) => {
   try {
     const { id } = req.params;
@@ -126,6 +216,12 @@ exports.saleview = async (req, res) => {
     const sale = await queries.sales.getById(id);
     
     if (!sale) {
+      // Browser navigations should not see raw JSON (e.g. old /sales/returns link)
+      const wantsHtml = !req.xhr && (req.headers.accept || '').includes('text/html');
+      if (wantsHtml) {
+        req.session.message = { type: 'error', text: 'Sale not found.' };
+        return res.redirect('/sales');
+      }
       return res.status(404).send({ status: "error", message: "Sale not found" });
     }
     
@@ -354,6 +450,7 @@ exports.createSingleService = async (req, res) => {
 
     let product = await queries.products.findByName(name);
     if (!product) {
+      const serviceCategory = await queries.categories.getOrCreateServiceCategory();
       const newProductData = {
         name: name,
         saleprice: rate || 0,
@@ -364,6 +461,7 @@ exports.createSingleService = async (req, res) => {
         purchaseprice: 0,
         discount: 0,
         carrycost: 0,
+        category: serviceCategory.id,
         createdby: req.session.user ? req.session.user.id : null
       };
       product = await queries.products.create(newProductData);

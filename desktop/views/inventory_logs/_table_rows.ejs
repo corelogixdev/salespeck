@@ -24,7 +24,12 @@
                                                         </span>
                                                     </td>
                                                     <td>
-                                                        <span class="badge bg-<%= log.type === 'sale' ? 'danger' : 'success' %>">
+                                                        <% 
+                                                            let typeBadge = 'success';
+                                                            if (log.type === 'sale') typeBadge = 'danger';
+                                                            else if (log.type === 'return') typeBadge = 'info';
+                                                        %>
+                                                        <span class="badge bg-<%= typeBadge %>">
                                                             <%= log.type ? (log.type.charAt(0).toUpperCase() + log.type.slice(1)) : 'Unknown' %>
                                                         </span>
                                                     </td>

@@ -29,6 +29,15 @@
                     Dashboard Customization
                 </button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button
+                    class="nav-link <%= (typeof currenttab !== 'undefined' && currenttab === 'license') ? 'active' : '' %>"
+                    id="license-tab" data-bs-toggle="tab" data-bs-target="#license" type="button"
+                    role="tab" aria-controls="license"
+                    aria-selected="<%= (typeof currenttab !== 'undefined' && currenttab === 'license') ? 'true' : 'false' %>">
+                    License
+                </button>
+            </li>
         </ul>
 
         <div class="tab-content" id="myTabContent">
@@ -213,6 +222,46 @@
                             </div>
                         </form>
                     </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade <%= (typeof currenttab !== 'undefined' && currenttab === 'license') ? 'show active' : '' %>"
+                id="license" role="tabpanel" aria-labelledby="license-tab">
+                <div class="p-3 card mt-3">
+                    <% const ls = typeof licenseStatus !== 'undefined' && licenseStatus ? licenseStatus : null; %>
+                    <% if (!ls) { %>
+                        <p class="text-muted mb-0">License status unavailable.</p>
+                    <% } else { %>
+                        <div class="alert alert-<%= ls.state === 'valid' ? 'success' : (ls.state === 'grace' ? 'warning' : 'danger') %> mb-3">
+                            <strong class="text-uppercase"><%= ls.state %></strong>
+                            <div class="mt-1"><%= ls.message %></div>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <div class="text-muted text-uppercase fs-11">Client</div>
+                                <div class="fw-semibold"><%= ls.clientName || '—' %></div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-muted text-uppercase fs-11">Plan</div>
+                                <div class="fw-semibold text-capitalize"><%= ls.plan || '—' %></div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-muted text-uppercase fs-11">Expires</div>
+                                <div class="fw-semibold"><%= ls.expiresAt ? ls.expiresAt.slice(0, 10) : '—' %></div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-muted text-uppercase fs-11">Staff seats</div>
+                                <div class="fw-semibold"><%= ls.seatsUsed || 0 %> / <%= ls.seatsMax || 0 %></div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-muted text-uppercase fs-11">Days remaining</div>
+                                <div class="fw-semibold"><%= typeof ls.daysRemaining === 'number' ? ls.daysRemaining : '—' %></div>
+                            </div>
+                        </div>
+                        <a href="/license/activate" class="btn btn-soft-primary btn-sm">
+                            <i class="ri-key-2-line align-bottom me-1"></i> Activate / renew license
+                        </a>
+                    <% } %>
                 </div>
             </div>
         </div>

@@ -90,7 +90,7 @@ exports.index = async (req, res) => {
   }
   
   let currenttab = req.query.currenttab || 'env';
-  if (currenttab !== 'env' && currenttab !== 'db' && currenttab !== 'dashboard') {
+  if (currenttab !== 'env' && currenttab !== 'db' && currenttab !== 'dashboard' && currenttab !== 'license') {
     currenttab = 'env';
   }
   
@@ -107,6 +107,13 @@ exports.index = async (req, res) => {
     }
   }
 
+  let licenseStatus = null;
+  try {
+    licenseStatus = await require('../utils/license').getLicenseStatus();
+  } catch (e) {
+    licenseStatus = { state: 'invalid', message: e.message };
+  }
+
   // Consume session message if exists
   const message = req.session.message;
   req.session.message = null;
@@ -117,6 +124,7 @@ exports.index = async (req, res) => {
     currenttab,
     dashboardConfig,
     message,
+    licenseStatus,
     translations: translations.envSettings || {},
     envOnlyVars: envOnlyVars || {}
   });

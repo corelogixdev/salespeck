@@ -107,8 +107,31 @@ const loginPost = async (req, res) => {
     if (user && encrypt.compare(user.password, password)) {
       logi("User found:", user.firstname);
       logi("Login successful");
+
+      // Upgrade legacy password hashes to bcrypt after successful login
+      try {
+        if (encrypt.isLegacyHash && encrypt.isLegacyHash(user.password)) {
+          const prisma = requirePrismaClient();
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { password: encrypt.upgradeHash(password) },
+          });
+          logi("Upgraded legacy password hash for user", user.username);
+        }
+      } catch (upgradeErr) {
+        logi("Password upgrade skipped:", upgradeErr.message || upgradeErr);
+      }
+
+      // Keep cookie-session small — never store password / full row in the cookie
       req.session.user_id = user.id;
-      req.session.user = user;
+      req.session.user = {
+        id: user.id,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        username: user.username,
+        role: user.role,
+        profile_image_url: user.profile_image_url || null
+      };
       req.session.message = { type: "success", text: "Login successful!" };
       res.redirect("/");
     } else {
@@ -150,6 +173,9 @@ const registerpost = async (req, res) => {
   logi("Data:", req.body);
 
   try {
+    const license = require("../utils/license");
+    await license.assertCanAddStaffSeat(1);
+
     logi("Creating user in local database...");
     const hashedPassword = encrypt.encrypt(req.body.password);
     const { firstName, lastName, ...restBody } = req.body;
@@ -180,7 +206,7 @@ const registerpost = async (req, res) => {
     logi(e);
     req.session.message = {
       type: "error",
-      text: "An error occurred. Please try again.",
+      text: e.message || "An error occurred. Please try again.",
     };
     res.redirect("/register");
   }

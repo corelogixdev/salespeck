@@ -1,0 +1,41 @@
+<%- contentFor('body') %>
+
+<div class="row justify-content-center mt-4">
+  <div class="col-lg-7 col-xl-6">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="card-title mb-0">StitchCore License Activation</h4>
+      </div>
+      <div class="card-body">
+        <% if (error) { %>
+          <div class="alert alert-danger"><%= error %></div>
+        <% } %>
+        <% if (status && status.state && status.state !== 'missing') { %>
+          <div class="alert alert-<%= status.state === 'valid' ? 'success' : (status.state === 'grace' ? 'warning' : 'danger') %>">
+            <div><strong>Status:</strong> <%= status.state %></div>
+            <% if (status.clientName) { %><div><strong>Client:</strong> <%= status.clientName %></div><% } %>
+            <% if (status.plan) { %><div><strong>Plan:</strong> <%= status.plan %></div><% } %>
+            <% if (status.seatsMax) { %><div><strong>Seats:</strong> <%= status.seatsUsed || 0 %> / <%= status.seatsMax %></div><% } %>
+            <% if (status.expiresAt) { %><div><strong>Expires:</strong> <%= status.expiresAt.slice(0, 10) %></div><% } %>
+            <div class="mt-1"><%= status.message %></div>
+          </div>
+        <% } else { %>
+          <p class="text-muted">Paste the license key provided by your StitchCore provider. Monthly and yearly plans control renewal dates; seats limit staff logins (<code>branchmanager</code> + <code>user</code>).</p>
+        <% } %>
+
+        <form method="POST" action="/license/activate">
+          <div class="mb-3">
+            <label class="form-label" for="licenseKey">License key</label>
+            <textarea class="form-control font-monospace" id="licenseKey" name="licenseKey" rows="6" required placeholder="Paste Base64 license key here..."></textarea>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <a href="/login" class="btn btn-light">Back to login</a>
+            <button type="submit" class="btn btn-primary">
+              <i class="ri-key-2-line align-bottom me-1"></i> Activate
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

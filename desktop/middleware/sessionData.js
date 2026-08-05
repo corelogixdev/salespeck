@@ -5,7 +5,6 @@ const path = require('path');
 
 const userCache = new SimpleCache();
 
-// Get app version from package.json
 function getAppVersion() {
     try {
         const packageJsonPath = path.join(__dirname, '..', 'package.json');
@@ -16,8 +15,30 @@ function getAppVersion() {
     }
 }
 
-// Get app version (cached)
 const appVersion = getAppVersion();
+
+function leanUserFromSession(sessionUser) {
+    if (!sessionUser || typeof sessionUser !== 'object') {
+        return null;
+    }
+    return {
+        id: sessionUser.id,
+        firstname: sessionUser.firstname || sessionUser.username || 'User',
+        lastname: sessionUser.lastname || '',
+        username: sessionUser.username || '',
+        role: sessionUser.role || 'user',
+        profile_image_url: sessionUser.profile_image_url || null
+    };
+}
+
+const { permissionsForRole } = require('../utils/rolePermissions');
+
+function applyUserLocals(res, userData) {
+    res.locals.isAuthenticated = true;
+    res.locals.user = userData;
+    res.locals.user_id = userData.id;
+    res.locals.permissions = permissionsForRole(userData.role);
+}
 
 module.exports = async (req, res, next) => {
     try {
@@ -25,88 +46,66 @@ module.exports = async (req, res, next) => {
         res.locals.user = null;
         res.locals.appVersion = appVersion;
 
-        // Flash messages (e.g. registration success) should display on unauthenticated pages too.
-        // atta@2026-04-16
+        try {
+            const license = require('../utils/license');
+            res.locals.licenseStatus = await license.getLicenseStatus();
+        } catch (_) {
+            res.locals.licenseStatus = null;
+        }
+
         if (req.session?.message) {
             res.locals.message = req.session.message;
             delete req.session.message;
         }
 
-        if (!req.session?.user_id) {
+        const userId = req.session?.user_id || req.session?.user?.id;
+        if (!userId) {
+            // Last resort: session.user snapshot without id
+            const fallback = leanUserFromSession(req.session?.user);
+            if (fallback) {
+                applyUserLocals(res, fallback);
+            }
             return next();
         }
 
-        // Try to get user from cache
-        let userData = userCache.get(req.session.user_id);
+        let userData = userCache.get(userId);
 
         if (!userData) {
-            userData = await queries.users.findSessionUserById(req.session.user_id);
-
-            if (!userData) {
-                req.session = null;
-                return res.redirect("/login");
+            try {
+                userData = await queries.users.findSessionUserById(userId);
+            } catch (lookupError) {
+                console.error('Session user lookup error:', lookupError);
+                userData = null;
             }
 
-            userCache.set(req.session.user_id, userData);
+            if (!userData) {
+                // DB miss / error: keep chrome alive from cookie snapshot
+                const fallback = leanUserFromSession(req.session?.user);
+                if (fallback) {
+                    applyUserLocals(res, fallback);
+                    return next();
+                }
+                req.session = null;
+                return res.redirect('/login');
+            }
+
+            userCache.set(userId, userData);
         }
 
-        res.locals.isAuthenticated = true;
-        res.locals.user = userData;
-        res.locals.user_id = userData.id;
+        // Refresh lean cookie snapshot so oversized legacy sessions shrink
+        req.session.user_id = userData.id;
+        req.session.user = leanUserFromSession(userData);
 
-        // Set dummy permissions object - all features accessible (no permission checks)
-        res.locals.permissions = {
-            productsList: true,
-            productsCreate: true,
-            productsUpdate: true,
-            productsDelete: true,
-            productsView: true,
-            productsSearch: true,
-            salesList: true,
-            salesCreate: true,
-            salesUpdate: true,
-            salesDelete: true,
-            salesView: true,
-            salesSearch: true,
-            usersList: true,
-            usersCreate: true,
-            usersUpdate: true,
-            usersDelete: true,
-            usersView: true,
-            usersSearch: true,
-            customersList: true,
-            customersCreate: true,
-            customersUpdate: true,
-            customersDelete: true,
-            customersView: true,
-            customersSearch: true,
-            vendorsList: true,
-            vendorsCreate: true,
-            vendorsUpdate: true,
-            vendorsDelete: true,
-            vendorsView: true,
-            vendorsSearch: true,
-            settings: true,
-            purchasesList: true,
-            purchasesCreate: true,
-            purchasesUpdate: true,
-            purchasesDelete: true,
-            purchasesView: true,
-            purchasesSearch: true,
-            taxesList: true,
-            taxesView: true,
-            brandsList: true,
-            brandsView: true,
-            categoriesList: true,
-            categoriesView: true
-        };
-
+        applyUserLocals(res, userData);
         next();
     } catch (error) {
         console.error('Session middleware error:', error);
+        const fallback = leanUserFromSession(req.session?.user);
+        if (fallback) {
+            applyUserLocals(res, fallback);
+        }
         next();
     }
 };
 
-// Export cache for testing or manual cleanup
 module.exports.cache = userCache;

@@ -343,6 +343,33 @@ exports.Prisma.SoldproductsScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.SalereturnScalarFieldEnum = {
+  id: 'id',
+  sale: 'sale',
+  invoicenum: 'invoicenum',
+  customer: 'customer',
+  user: 'user',
+  totalamount: 'totalamount',
+  refundmode: 'refundmode',
+  note: 'note',
+  createdby: 'createdby',
+  source: 'source',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SalereturnitemsScalarFieldEnum = {
+  id: 'id',
+  salereturn: 'salereturn',
+  soldproduct: 'soldproduct',
+  product: 'product',
+  quantity: 'quantity',
+  price: 'price',
+  source: 'source',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.TaxesScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -417,6 +444,8 @@ exports.Prisma.ModelName = {
   sale: 'sale',
   softwaresetting: 'softwaresetting',
   soldproducts: 'soldproducts',
+  salereturn: 'salereturn',
+  salereturnitems: 'salereturnitems',
   taxes: 'taxes',
   user: 'user',
   partytype: 'partytype'

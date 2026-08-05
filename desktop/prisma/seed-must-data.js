@@ -184,7 +184,7 @@ async function upsertChartOfAccounts(prisma) {
 
 async function upsertCompanySetting(prisma) {
   const companyPayload = {
-    name: "OpenMenu Demo",
+    name: "StitchCore Demo",
     phone: "",
     address: "",
   };

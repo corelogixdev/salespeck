@@ -71,6 +71,7 @@
         render: (row) => {
           return `<div class="btn-group btn-group-sm action-group" role="group">
             <a href="/sales/${row.id}" target="_blank" class="btn btn-soft-info action-btn" title="Receipt"><i class="ri-file-text-line"></i></a>
+            <a href="/sales/returns?saleId=${row.id}" class="btn btn-soft-warning action-btn" title="Create Return"><i class="ri-arrow-go-back-line"></i></a>
             <button type="button" class="btn btn-soft-primary action-btn" onclick="openViewModal('${row.id}')" title="Quick View"><i class="ri-eye-line"></i></button>
           </div>`;
         }

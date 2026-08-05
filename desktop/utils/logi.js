@@ -68,7 +68,7 @@ function formatMessages(message) {
 function getLogDirectory() {
   return (
     (electronApp && typeof electronApp.getPath === 'function' ? electronApp.getPath('userData') : null) ||
-    path.join(os.homedir(), '.openmenu', 'logs')
+    path.join(os.homedir(), '.stitchcore', 'logs')
   );
 }
 

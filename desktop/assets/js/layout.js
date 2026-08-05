@@ -1,154 +1,298 @@
-!function(){"use strict";var t,a,e;sessionStorage.getItem("defaultAttribute")&&(t=document.documentElement.attributes,a={},Object.entries(t).forEach(function(t){var e;t[1]&&t[1].nodeName&&"undefined"!=t[1].nodeName&&(e=t[1].nodeName,a[e]=t[1].nodeValue)}),sessionStorage.getItem("defaultAttribute")!==JSON.stringify(a)?(sessionStorage.clear(),window.location.reload()):((e={})["data-layout"]=sessionStorage.getItem("data-layout"),e["data-sidebar-size"]=sessionStorage.getItem("data-sidebar-size"),e["data-bs-theme"]=sessionStorage.getItem("data-bs-theme"),e["data-layout-width"]=sessionStorage.getItem("data-layout-width"),e["data-sidebar"]=sessionStorage.getItem("data-sidebar"),e["data-sidebar-image"]=sessionStorage.getItem("data-sidebar-image"),e["data-layout-direction"]=sessionStorage.getItem("data-layout-direction"),e["data-layout-position"]=sessionStorage.getItem("data-layout-position"),e["data-layout-style"]=sessionStorage.getItem("data-layout-style"),e["data-topbar"]=sessionStorage.getItem("data-topbar"),e["data-preloader"]=sessionStorage.getItem("data-preloader"),e["data-body-image"]=sessionStorage.getItem("data-body-image"),Object.keys(e).forEach(function(t){e[t]&&document.documentElement.setAttribute(t,e[t])})))}();
-
 /**
- * Fix for menu navigation bug where clicking links in the navbar sometimes
- * requires two clicks or behaves inconsistently due to conflicting event listeners.
- * 
- * This script ensures that clicks on valid navigation links (links with real URLs)
- * always navigate immediately on the first click.
+ * POS layout bootstrap + navigation.
+ * Velzon app.js is intentionally NOT used — it repeatedly breaks the top menu.
+ *
+ * Menu destinations navigate on capture-phase mousedown so the first press
+ * always wins (hover menus cannot disappear under the cursor before click).
  */
-
 (function () {
     'use strict';
 
-    // Use capture phase to intercept the click before any other menu scripts
-    const handleNavigation = function (e) {
-        // Target any anchor link with an href inside the navbar or common navigation areas
+    var DRAWER_MAX = 991.98;
 
-        const link = e.target.closest('#navbar-nav a[href], .navbar-header a[href], .user-profile-menu a[href], .topnav-hamburger, .vertical-overlay');
+    function forceHorizontal() {
+        try {
+            sessionStorage.setItem('data-layout', 'horizontal');
+            sessionStorage.setItem('data-layout-style', 'default');
+            sessionStorage.setItem('data-layout-width', 'fluid');
+            sessionStorage.setItem('data-topbar', 'light');
+        } catch (e) { /* ignore */ }
+        document.documentElement.setAttribute('data-layout', 'horizontal');
+        document.documentElement.setAttribute('data-topbar', 'light');
+        document.documentElement.setAttribute('data-preloader', 'disable');
+        if (document.body) {
+            document.body.classList.remove('vertical-sidebar-enable');
+        }
+    }
 
-        if (!link) return;
-
-        // Hamburger menu toggle
-        if (link.id === 'topnav-hamburger-icon' || link.classList.contains('topnav-hamburger')) {
-            if (window.innerWidth < 1200) {
-                document.body.classList.toggle('menu');
-                e.preventDefault();
-                e.stopPropagation();
+    function applyTheme() {
+        try {
+            var savedTheme = localStorage.getItem('data-bs-theme');
+            if (!savedTheme) {
+                savedTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+                    ? 'dark'
+                    : 'light';
             }
-            return;
+            document.documentElement.setAttribute('data-layout-mode', savedTheme);
+            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+        } catch (e) { /* ignore */ }
+    }
+
+    try {
+        sessionStorage.removeItem('defaultAttribute');
+    } catch (e) { /* ignore */ }
+
+    applyTheme();
+    forceHorizontal();
+
+    function isDrawer() {
+        return window.innerWidth <= DRAWER_MAX;
+    }
+
+    function showTopMenu() {
+        var menu = document.querySelector('.navbar-menu');
+        var nav = document.getElementById('navbar-nav');
+        if (!menu) return;
+
+        if (isDrawer()) {
+            if (!document.body.classList.contains('menu')) {
+                menu.style.removeProperty('display');
+            }
+        } else {
+            document.body.classList.remove('menu');
+            menu.style.setProperty('display', 'flex', 'important');
+            menu.style.setProperty('visibility', 'visible', 'important');
+            menu.style.setProperty('opacity', '1', 'important');
+            menu.style.setProperty('position', 'relative', 'important');
+            menu.style.setProperty('left', 'auto', 'important');
+            menu.style.setProperty('height', '100%', 'important');
+            menu.style.setProperty('width', 'auto', 'important');
+            menu.style.setProperty('flex', '1 1 auto', 'important');
         }
 
-        // Overlay click (to close mobile menu)
-        if (link.classList.contains('vertical-overlay')) {
-            if (window.innerWidth < 1200) {
-                document.body.classList.remove('menu');
-                document.body.classList.remove('vertical-sidebar-enable');
-                e.preventDefault();
-                e.stopPropagation();
-            }
-            return;
+        if (nav) {
+            nav.classList.remove('twocolumn-nav-hide');
+            nav.style.setProperty('display', 'flex', 'important');
+            nav.style.setProperty('visibility', 'visible', 'important');
         }
+    }
 
-        // Custom dropdown toggler for mobile
-        if (link.classList.contains('dropdown-toggle') && link.closest('#navbar-nav')) {
-            if (window.innerWidth < 1200) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const dropdownMenu = link.nextElementSibling;
-                if (dropdownMenu && dropdownMenu.classList.contains('dropdown-menu')) {
-                    const isShown = dropdownMenu.classList.contains('show');
-                    
-                    // Close others
-                    document.querySelectorAll('#navbar-nav .dropdown-menu.show').forEach(menu => {
-                        if (menu !== dropdownMenu) {
-                            menu.classList.remove('show');
-                            if(menu.previousElementSibling) menu.previousElementSibling.classList.remove('show');
+    function closeDrawer() {
+        document.body.classList.remove('menu');
+        document.body.classList.remove('vertical-sidebar-enable');
+    }
+
+    function isRealHref(href) {
+        return !!(href && href !== '#' && href.charAt(0) !== '#' && href.indexOf('javascript:') !== 0);
+    }
+
+    function initNav() {
+        forceHorizontal();
+        showTopMenu();
+
+        var nav = document.getElementById('navbar-nav');
+        var menu = document.querySelector('.navbar-menu');
+        if (!nav || !menu) return;
+
+        var originalNavHtml = nav.innerHTML;
+        var restoring = false;
+        var navigating = false;
+
+        var observer = new MutationObserver(function () {
+            if (restoring) return;
+            if (document.documentElement.getAttribute('data-layout') !== 'horizontal') {
+                forceHorizontal();
+                showTopMenu();
+            }
+            if (nav.children.length < 4 && originalNavHtml) {
+                restoring = true;
+                observer.disconnect();
+                nav.innerHTML = originalNavHtml;
+                showTopMenu();
+                setTimeout(function () {
+                    restoring = false;
+                    observer.observe(nav, { childList: true, subtree: false });
+                    observer.observe(document.documentElement, {
+                        attributes: true,
+                        attributeFilter: ['data-layout']
+                    });
+                }, 50);
+            }
+        });
+
+        observer.observe(nav, { childList: true, subtree: false });
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-layout']
+        });
+
+        // Single capture handler — one event type only (mousedown), so the first
+        // press navigates before hover menus can close under the cursor.
+        document.addEventListener(
+            'mousedown',
+            function (e) {
+                if (typeof e.button === 'number' && e.button !== 0) return;
+                if (navigating) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
+
+                var burger = e.target.closest && e.target.closest('#topnav-hamburger-icon, .topnav-hamburger');
+                if (burger) {
+                    if (isDrawer()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        document.body.classList.toggle('menu');
+                    }
+                    return;
+                }
+
+                if (e.target.closest && e.target.closest('.vertical-overlay')) {
+                    if (isDrawer()) {
+                        e.preventDefault();
+                        closeDrawer();
+                    }
+                    return;
+                }
+
+                var link = e.target.closest && e.target.closest('#navbar-nav a[href], .navbar-header a[href]');
+                if (!link) return;
+
+                // Disabled menu entries (e.g. Returns)
+                if (link.classList.contains('disabled') || link.getAttribute('aria-disabled') === 'true') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
+
+                // Parent labels only expand in drawer mode
+                if (link.classList.contains('dropdown-toggle') && link.closest('#navbar-nav')) {
+                    e.preventDefault();
+                    if (!isDrawer()) return;
+
+                    var dropdownMenu = link.nextElementSibling;
+                    if (!dropdownMenu || !dropdownMenu.classList.contains('dropdown-menu')) return;
+
+                    var open = dropdownMenu.classList.contains('show');
+                    nav.querySelectorAll('.dropdown-menu.show').forEach(function (m) {
+                        m.classList.remove('show');
+                        if (m.previousElementSibling) {
+                            m.previousElementSibling.classList.remove('show');
+                            m.previousElementSibling.setAttribute('aria-expanded', 'false');
                         }
                     });
-
-                    if (isShown) {
-                        dropdownMenu.classList.remove('show');
-                        link.classList.remove('show');
-                    } else {
+                    if (!open) {
                         dropdownMenu.classList.add('show');
                         link.classList.add('show');
+                        link.setAttribute('aria-expanded', 'true');
                     }
+                    return;
                 }
-                return;
-            }
-        }
 
-        // Skip if it's a dropdown toggle (desktop) or interactive element
-        if (link.hasAttribute('data-bs-toggle') || 
-            link.classList.contains('dropdown-toggle') ||
-            e.target.closest('input, textarea, select, button')) {
-            return;
-        }
+                if (link.hasAttribute('data-bs-toggle')) return;
 
-        // Let the 'New Sale' menu link execute its own event listener (so it can open a new tab)
-        if (link.id === 'new-sale-menu-link') {
-            return;
-        }
+                var href = link.getAttribute('href');
+                if (!isRealHref(href)) return;
 
-        const href = link.getAttribute('href');
+                if (link.id === 'new-sale-menu-link' && window.location.pathname === '/sales/form') {
+                    return;
+                }
 
-        // Only handle real navigation URLs
-        if (href && href !== '#' && !href.startsWith('#') && !href.startsWith('javascript:')) {
-            if (link.classList.contains('disabled') || link.hasAttribute('disabled')) {
-                return;
-            }
-
-            // Show the global loader using the 'active' class from pos-theme.css
-            const loader = document.getElementById('global-loader');
-            if (loader) {
-                loader.classList.add('active');
-            }
-
-            // Stop other scripts from interfering and navigate immediately
-            // This bypasses the double-click bug in Velzon theme
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-
-            // Use a tiny timeout to ensure the current event loop finishes
-            // and any conflicting scripts are fully bypassed.
-            setTimeout(function() {
-                window.location.href = href;
-            }, 10);
-        }
-    };
-
-    // Use capture phase to intercept the click before any other menu scripts
-    document.addEventListener('click', handleNavigation, true);
-
-    // Fix Velzon horizontal menu bug where it incorrectly hides menu items on wide pages
-    // (e.g. Inventory Report with wide tables)
-    document.addEventListener('DOMContentLoaded', () => {
-        const navbarNav = document.getElementById('navbar-nav');
-        
-        if (navbarNav) {
-            // Backup the original menu HTML
-            const originalNavHtml = navbarNav.innerHTML;
-            
-            // Create a mutation observer to detect when Velzon tries to move items to "More"
-            const observer = new MutationObserver((mutations) => {
-                if (window.innerWidth >= 992) {
-                    // On desktop, we want all items visible. 
-                    // If Velzon removed items (we expect at least 5-6 menu items)
-                    if (navbarNav.children.length < 4) { 
-                        // Restore original HTML
-                        observer.disconnect(); 
-                        navbarNav.innerHTML = originalNavHtml;
-                        
-                        // Resume observing after a tiny delay
-                        setTimeout(() => observer.observe(navbarNav, { childList: true }), 100);
+                try {
+                    var target = new URL(href, window.location.origin);
+                    if (target.pathname === window.location.pathname && target.search === window.location.search) {
+                        e.preventDefault();
+                        return;
                     }
+                } catch (err) { /* ignore */ }
+
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+
+                navigating = true;
+                if (isDrawer()) closeDrawer();
+
+                var loader = document.getElementById('global-loader');
+                if (loader) loader.classList.add('active');
+
+                window.location.assign(href);
+            },
+            true
+        );
+
+        // Swallow the trailing click after mousedown navigation so nothing else handles it
+        document.addEventListener(
+            'click',
+            function (e) {
+                if (!navigating) return;
+                var link = e.target.closest && e.target.closest('#navbar-nav a[href], .navbar-header a[href]');
+                if (!link) return;
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+            },
+            true
+        );
+
+        // Desktop hover open with delayed close
+        nav.querySelectorAll(':scope > li.nav-item.dropdown').forEach(function (item) {
+            var dropdownMenu = item.querySelector(':scope > .dropdown-menu');
+            var toggle = item.querySelector(':scope > .dropdown-toggle');
+            var leaveTimer = null;
+            if (!dropdownMenu) return;
+
+            function openMenu() {
+                if (leaveTimer) {
+                    clearTimeout(leaveTimer);
+                    leaveTimer = null;
                 }
-            });
-            
-            // Start observing child node changes
-            observer.observe(navbarNav, { childList: true });
-            
-            // Also enforce display block on resize as a fallback
-            window.addEventListener('resize', () => {
-                if (window.innerWidth >= 992 && navbarNav.children.length < 4) {
-                    observer.disconnect();
-                    navbarNav.innerHTML = originalNavHtml;
-                    setTimeout(() => observer.observe(navbarNav, { childList: true }), 100);
+                if (isDrawer()) return;
+                dropdownMenu.classList.add('show');
+                if (toggle) {
+                    toggle.classList.add('show');
+                    toggle.setAttribute('aria-expanded', 'true');
                 }
-            });
-        }
-    });
+            }
+
+            function scheduleClose() {
+                if (isDrawer() || navigating) return;
+                if (leaveTimer) clearTimeout(leaveTimer);
+                leaveTimer = setTimeout(function () {
+                    dropdownMenu.classList.remove('show');
+                    if (toggle) {
+                        toggle.classList.remove('show');
+                        toggle.setAttribute('aria-expanded', 'false');
+                    }
+                    leaveTimer = null;
+                }, 300);
+            }
+
+            item.addEventListener('mouseenter', openMenu);
+            item.addEventListener('mouseleave', scheduleClose);
+            dropdownMenu.addEventListener('mouseenter', openMenu);
+            dropdownMenu.addEventListener('mouseleave', scheduleClose);
+        });
+
+        window.addEventListener('resize', function () {
+            forceHorizontal();
+            showTopMenu();
+            if (!isDrawer()) closeDrawer();
+        });
+
+        var pins = 0;
+        var pinTimer = setInterval(function () {
+            forceHorizontal();
+            showTopMenu();
+            pins += 1;
+            if (pins > 20) clearInterval(pinTimer);
+        }, 250);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initNav);
+    } else {
+        initNav();
+    }
 })();

@@ -202,6 +202,11 @@ exports.save = async (req, res) => {
       category: body.category
     }
 
+    if (data.is_service && !data.category) {
+      const serviceCategory = await queries.categories.getOrCreateServiceCategory();
+      data.category = serviceCategory.id;
+    }
+
     if (id) {
       // delete data.quantity;
       await queries.products.update(id, data);

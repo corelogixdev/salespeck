@@ -2,12 +2,31 @@ const queries = require("../prisma/queries");
 const moment = require("moment");
 const { getPaginationMeta } = require("../utils/paginationHelper");
 
+function withNavLocals(res, data) {
+  return Object.assign(
+    {
+      user: res.locals.user || null,
+      isAuthenticated: !!(res.locals.user || res.locals.isAuthenticated)
+    },
+    data
+  );
+}
+
+function requireUser(req, res) {
+  if (res.locals.user) {
+    return true;
+  }
+  res.redirect("/login");
+  return false;
+}
+
 // Reports index page
 exports.index = async (req, res) => {
   try {
-    res.render("reports/index", {
+    if (!requireUser(req, res)) return;
+    res.render("reports/index", withNavLocals(res, {
       title: "Reports"
-    });
+    }));
   } catch (error) {
     console.error("Reports index error:", error);
     res.status(500).send({ status: "error", message: "Internal Server Error" });
@@ -36,13 +55,13 @@ exports.salesReport = async (req, res) => {
     const isGenerating = req.query.generate === "1";
 
     if (!isGenerating) {
-      return res.render("reports/sales", {
+      return res.render("reports/sales", withNavLocals(res, {
         title: "Sales Report",
         reportData: { filters, generated: false },
         query: req.query,
         baseUrl: "/reports/sales",
         pagination: null
-      });
+      }));
     }
 
     // Export functionality uses full dataset
@@ -80,13 +99,13 @@ exports.salesReport = async (req, res) => {
       generatedAt: new Date()
     };
 
-    res.render("reports/sales", {
+    res.render("reports/sales", withNavLocals(res, {
       title: "Sales Report",
       reportData,
       pagination,
       query: req.query,
       baseUrl: "/reports/sales"
-    });
+    }));
   } catch (error) {
     console.error("Sales report error:", error);
     res.status(500).send({ status: "error", message: "Internal Server Error" });
@@ -101,13 +120,13 @@ exports.purchasesReport = async (req, res) => {
     const isGenerating = req.query.generate === "1";
 
     if (!isGenerating) {
-      return res.render("reports/purchases", {
+      return res.render("reports/purchases", withNavLocals(res, {
         title: "Purchases Report",
         reportData: { filters, generated: false },
         query: req.query,
         baseUrl: "/reports/purchases",
         pagination: null
-      });
+      }));
     }
 
     if (format) {
@@ -138,13 +157,13 @@ exports.purchasesReport = async (req, res) => {
       generatedAt: new Date()
     };
 
-    res.render("reports/purchases", {
+    res.render("reports/purchases", withNavLocals(res, {
       title: "Purchases Report",
       reportData,
       pagination,
       query: req.query,
       baseUrl: "/reports/purchases"
-    });
+    }));
   } catch (error) {
     console.error("Purchases report error:", error);
     res.status(500).send({ status: "error", message: "Internal Server Error" });
@@ -159,13 +178,13 @@ exports.inventoryReport = async (req, res) => {
     const isGenerating = req.query.generate === "1";
 
     if (!isGenerating) {
-      return res.render("reports/inventory", {
+      return res.render("reports/inventory", withNavLocals(res, {
         title: "Inventory Report",
         reportData: { filters, generated: false },
         query: req.query,
         baseUrl: "/reports/inventory",
         pagination: null
-      });
+      }));
     }
 
     if (format) {
@@ -200,13 +219,13 @@ exports.inventoryReport = async (req, res) => {
       generatedAt: new Date()
     };
 
-    res.render("reports/inventory", {
+    res.render("reports/inventory", withNavLocals(res, {
       title: "Inventory Report",
       reportData,
       pagination,
       query: req.query,
       baseUrl: "/reports/inventory"
-    });
+    }));
   } catch (error) {
     console.error("Inventory report error:", error);
     res.status(500).send({ status: "error", message: "Internal Server Error" });
@@ -221,13 +240,13 @@ exports.customerReport = async (req, res) => {
     const isGenerating = req.query.generate === "1";
 
     if (!isGenerating) {
-      return res.render("reports/customers", {
+      return res.render("reports/customers", withNavLocals(res, {
         title: "Customer Report",
         reportData: { filters, generated: false },
         query: req.query,
         baseUrl: "/reports/customers",
         pagination: null
-      });
+      }));
     }
 
     if (format) {
@@ -258,13 +277,13 @@ exports.customerReport = async (req, res) => {
       generatedAt: new Date()
     };
 
-    res.render("reports/customers", {
+    res.render("reports/customers", withNavLocals(res, {
       title: "Customer Report",
       reportData,
       pagination,
       query: req.query,
       baseUrl: "/reports/customers"
-    });
+    }));
   } catch (error) {
     console.error("Customer report error:", error);
     res.status(500).send({ status: "error", message: "Internal Server Error" });

@@ -250,6 +250,40 @@ model soldproducts {
   updatedAt DateTime @default(now())
 }
 
+model salereturn {
+  id          String   @id
+  sale        String
+  invoicenum  String?
+  customer    String?
+  user        String?
+  totalamount Float?
+  refundmode  String?
+  note        String?
+  createdby   String?
+  source      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+
+  @@index([sale])
+  @@index([invoicenum])
+  @@index([createdAt])
+}
+
+model salereturnitems {
+  id         String   @id
+  salereturn String?
+  soldproduct String?
+  product    String?
+  quantity   Int?
+  price      Float?
+  source     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+
+  @@index([salereturn])
+  @@index([soldproduct])
+}
+
 model taxes {
   id         String   @id
   name       String?

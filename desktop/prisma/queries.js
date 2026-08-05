@@ -139,6 +139,28 @@ const categories = {
     const prisma = getPrisma();
     return prisma.category.create({ data: { id: generateId(32), ...data } });
   },
+  async getOrCreateServiceCategory() {
+    const prisma = getPrisma();
+    let serviceCategory = await prisma.category.findFirst({ where: { name: "Service" } });
+    if (!serviceCategory) {
+      serviceCategory = await prisma.category.create({
+        data: { id: generateId(32), name: "Service", status: true },
+      });
+    }
+    return serviceCategory;
+  },
+  async backfillServiceProductCategories() {
+    const prisma = getPrisma();
+    const serviceCategory = await this.getOrCreateServiceCategory();
+    const result = await prisma.product.updateMany({
+      where: {
+        is_service: true,
+        OR: [{ category: null }, { category: "" }],
+      },
+      data: { category: serviceCategory.id },
+    });
+    return { categoryId: serviceCategory.id, updated: result.count };
+  },
   async update(id, data) {
     const prisma = getPrisma();
     return prisma.category.update({ where: { id }, data });
@@ -1179,6 +1201,405 @@ const sales = {
       return { id: saleId };
     });
   },
+
+  async lookupSalesForReturn(q, limit = 15) {
+    const prisma = getPrisma();
+    const term = String(q || "").trim();
+    if (!term) return [];
+
+    const or = [
+      { invoicenum: { contains: term } },
+      { id: { contains: term } },
+    ];
+
+    const matchingCustomers = await prisma.user.findMany({
+      where: {
+        OR: [
+          { firstname: { contains: term } },
+          { lastname: { contains: term } },
+          { phone: { contains: term } },
+        ],
+      },
+      select: { id: true },
+      take: 20,
+    });
+    if (matchingCustomers.length > 0) {
+      or.push({ customer: { in: matchingCustomers.map((c) => c.id) } });
+    }
+
+    const salesRows = await prisma.sale.findMany({
+      where: { OR: or },
+      orderBy: { createdAt: "desc" },
+      take: Math.min(Number(limit) || 15, 30),
+    });
+
+    const customerIds = [...new Set(salesRows.map((s) => s.customer).filter(Boolean))];
+    const customers = customerIds.length
+      ? await prisma.user.findMany({
+          where: { id: { in: customerIds } },
+          select: { id: true, firstname: true, lastname: true, phone: true },
+        })
+      : [];
+    const customerMap = new Map(customers.map((c) => [c.id, c]));
+
+    return salesRows.map((s) => {
+      const cust = s.customer ? customerMap.get(s.customer) : null;
+      return {
+        id: s.id,
+        invoicenum: s.invoicenum,
+        totalprice: s.totalprice,
+        totalpayment: s.totalpayment,
+        createdAt: s.createdAt,
+        customerName: cust
+          ? `${cust.firstname || ""} ${cust.lastname || ""}`.trim() || cust.phone || "Customer"
+          : "Walk-in",
+      };
+    });
+  },
+
+  async getSaleForReturn(saleId) {
+    const prisma = getPrisma();
+    const sale = await this.getById(saleId);
+    if (!sale) return null;
+
+    const priorReturns = await prisma.salereturn.findMany({
+      where: { sale: saleId },
+      select: { id: true },
+    });
+    const priorReturnIds = priorReturns.map((r) => r.id);
+    const priorItems = priorReturnIds.length
+      ? await prisma.salereturnitems.findMany({
+          where: { salereturn: { in: priorReturnIds } },
+        })
+      : [];
+
+    const returnedBySoldProduct = new Map();
+    for (const item of priorItems) {
+      if (!item.soldproduct) continue;
+      const prev = returnedBySoldProduct.get(item.soldproduct) || 0;
+      returnedBySoldProduct.set(item.soldproduct, prev + Number(item.quantity || 0));
+    }
+
+    const productIds = [...new Set((sale.SoldPoducts || []).map((i) => i.product).filter(Boolean))];
+    const productsMeta = productIds.length
+      ? await prisma.product.findMany({
+          where: { id: { in: productIds } },
+          select: { id: true, name: true, is_service: true, barcode: true },
+        })
+      : [];
+    const metaMap = new Map(productsMeta.map((p) => [p.id, p]));
+
+    const journals = await prisma.account_journal.findMany({
+      where: { reference: saleId },
+      select: { id: true },
+      take: 1,
+    });
+
+    const lines = (sale.SoldPoducts || []).map((item) => {
+      const alreadyReturned = returnedBySoldProduct.get(item.id) || 0;
+      const soldQty = Number(item.quantity || 0);
+      const returnableQty = Math.max(0, soldQty - alreadyReturned);
+      const meta = item.product ? metaMap.get(item.product) : null;
+      return {
+        id: item.id,
+        product: item.product,
+        quantity: soldQty,
+        price: Number(item.price || 0),
+        alreadyReturned,
+        returnableQty,
+        isService: !!(meta && meta.is_service),
+        Product: item.Product || (meta ? { id: meta.id, name: meta.name, barcode: meta.barcode } : null),
+      };
+    });
+
+    return {
+      id: sale.id,
+      invoicenum: sale.invoicenum,
+      customer: sale.customer,
+      discountpercentage: sale.discountpercentage,
+      totalprice: sale.totalprice,
+      totalpayment: sale.totalpayment,
+      createdAt: sale.createdAt,
+      Customer: sale.Customer,
+      User: sale.User,
+      hasLedger: journals.length > 0,
+      lines,
+    };
+  },
+
+  async getSaleReturnById(returnId) {
+    const prisma = getPrisma();
+    const ret = await prisma.salereturn.findUnique({ where: { id: returnId } });
+    if (!ret) return null;
+
+    const items = await prisma.salereturnitems.findMany({
+      where: { salereturn: returnId },
+      orderBy: { createdAt: "asc" },
+    });
+    const productIds = [...new Set(items.map((i) => i.product).filter(Boolean))];
+    const userIds = [...new Set([ret.customer, ret.user].filter(Boolean))];
+    const [products, users, originalSale] = await Promise.all([
+      productIds.length
+        ? prisma.product.findMany({
+            where: { id: { in: productIds } },
+            select: { id: true, name: true, barcode: true },
+          })
+        : Promise.resolve([]),
+      userIds.length
+        ? prisma.user.findMany({
+            where: { id: { in: userIds } },
+            select: { id: true, firstname: true, lastname: true, phone: true, address: true },
+          })
+        : Promise.resolve([]),
+      ret.sale ? prisma.sale.findUnique({ where: { id: ret.sale }, select: { id: true, invoicenum: true } }) : null,
+    ]);
+    const productMap = new Map(products.map((p) => [p.id, p]));
+    const userMap = new Map(users.map((u) => [u.id, u]));
+
+    return {
+      ...ret,
+      OriginalSale: originalSale,
+      Customer: ret.customer ? userMap.get(ret.customer) || null : null,
+      User: ret.user ? userMap.get(ret.user) || null : null,
+      Items: items.map((item) => ({
+        ...item,
+        Product: item.product ? productMap.get(item.product) || null : null,
+      })),
+    };
+  },
+
+  async createSaleReturnTransaction({ saleId, items, refundMode, note, userId, ledger }) {
+    const prisma = getPrisma();
+    return prisma.$transaction(async (tx) => {
+      const sale = await tx.sale.findUnique({ where: { id: saleId } });
+      if (!sale) throw new Error("Original sale not found");
+
+      const mode = String(refundMode || "").toLowerCase();
+      if (mode !== "cash" && mode !== "credit") {
+        throw new Error("Refund mode must be cash or credit");
+      }
+
+      if (!Array.isArray(items) || items.length === 0) {
+        throw new Error("No return items provided");
+      }
+
+      const soldLines = await tx.soldproducts.findMany({ where: { sale: saleId } });
+      const soldMap = new Map(soldLines.map((s) => [s.id, s]));
+
+      const priorReturns = await tx.salereturn.findMany({
+        where: { sale: saleId },
+        select: { id: true },
+      });
+      const priorReturnIds = priorReturns.map((r) => r.id);
+      const priorItems = priorReturnIds.length
+        ? await tx.salereturnitems.findMany({ where: { salereturn: { in: priorReturnIds } } })
+        : [];
+      const returnedBySoldProduct = new Map();
+      for (const item of priorItems) {
+        if (!item.soldproduct) continue;
+        returnedBySoldProduct.set(
+          item.soldproduct,
+          (returnedBySoldProduct.get(item.soldproduct) || 0) + Number(item.quantity || 0)
+        );
+      }
+
+      const productIds = [...new Set(soldLines.map((s) => s.product).filter(Boolean))];
+      const products = productIds.length
+        ? await tx.product.findMany({ where: { id: { in: productIds } } })
+        : [];
+      const productsMap = new Map(products.map((p) => [p.id, p]));
+
+      const normalizedItems = [];
+      let grossReturn = 0;
+
+      for (const raw of items) {
+        const qty = Number(raw.quantity);
+        if (!raw.soldproduct || !Number.isFinite(qty) || qty <= 0) {
+          throw new Error("Invalid return line quantity");
+        }
+        const soldLine = soldMap.get(raw.soldproduct);
+        if (!soldLine || soldLine.sale !== saleId) {
+          throw new Error("Return line does not belong to this sale");
+        }
+        const already = returnedBySoldProduct.get(soldLine.id) || 0;
+        const returnable = Math.max(0, Number(soldLine.quantity || 0) - already);
+        if (qty > returnable) {
+          const pname = productsMap.get(soldLine.product)?.name || "item";
+          throw new Error(`Return qty exceeds returnable for ${pname}. Returnable: ${returnable}`);
+        }
+        const price = Number(soldLine.price || 0);
+        grossReturn += qty * price;
+        normalizedItems.push({
+          soldproduct: soldLine.id,
+          product: soldLine.product,
+          quantity: qty,
+          price,
+          isService: !!(productsMap.get(soldLine.product)?.is_service),
+        });
+      }
+
+      const discount = parseFloat(sale.discountpercentage) || 0;
+      const netReturn = Math.round((grossReturn - (grossReturn * discount) / 100) * 100) / 100;
+
+      const invoicenum = await helpers.getNextInvoiceNumber("RET", tx);
+      const returnId = generateId(32);
+
+      await tx.salereturn.create({
+        data: {
+          id: returnId,
+          sale: saleId,
+          invoicenum,
+          customer: sale.customer || null,
+          user: userId,
+          totalamount: netReturn,
+          refundmode: mode,
+          note: note || null,
+          createdby: userId,
+          source: "desktop",
+        },
+      });
+
+      await tx.salereturnitems.createMany({
+        data: normalizedItems.map((item) => ({
+          id: generateId(32),
+          salereturn: returnId,
+          soldproduct: item.soldproduct,
+          product: item.product,
+          quantity: item.quantity,
+          price: item.price,
+          source: "desktop",
+        })),
+      });
+
+      for (const item of normalizedItems) {
+        if (item.isService || !item.product) continue;
+        const dbProduct = productsMap.get(item.product);
+        if (!dbProduct) continue;
+
+        const newQty = Number(dbProduct.quantity || 0) + Number(item.quantity);
+        await tx.product.update({
+          where: { id: item.product },
+          data: { quantity: newQty },
+        });
+        dbProduct.quantity = newQty;
+
+        await tx.productbatches.create({
+          data: {
+            id: generateId(32),
+            product: item.product,
+            quantity: Number(item.quantity),
+            source: "desktop",
+          },
+        });
+
+        await tx.inventorylogs.create({
+          data: {
+            id: generateId(32),
+            product_id: item.product,
+            quantity: Math.abs(Number(item.quantity)),
+            note: `Return via ${invoicenum} (from ${sale.invoicenum || saleId})`,
+            createdby: userId,
+            type: "return",
+            source: "desktop",
+          },
+        });
+      }
+
+      const existingJournals = await tx.account_journal.findMany({
+        where: { reference: saleId },
+        select: { id: true },
+        take: 1,
+      });
+      const shouldPostLedger = ledger === true || ledger === "true" || existingJournals.length > 0;
+
+      if (shouldPostLedger && netReturn > 0) {
+        let salesAccount = await tx.financeaccount.findFirst({ where: { code: "4100" } });
+        let customerAccountId = null;
+        if (sale.customer) {
+          customerAccountId = await accounting.getOrCreateUserAccount(tx, sale.customer, "customer");
+        }
+
+        // Journal 1: reverse invoice recognition — Dr Revenue / Cr Customer AR
+        const reverseJournalId = generateId(32);
+        await tx.account_journal.create({
+          data: {
+            id: reverseJournalId,
+            date: new Date(),
+            description: `Sales Return ${invoicenum}`,
+            reference: returnId,
+            source: "desktop",
+            createdby: userId,
+          },
+        });
+
+        if (salesAccount) {
+          await tx.account_ledger.create({
+            data: {
+              id: generateId(32),
+              journal_id: reverseJournalId,
+              account_id: salesAccount.id,
+              debit: netReturn,
+              details: `Sales return ${invoicenum} (from ${sale.invoicenum || ""})`,
+            },
+          });
+        }
+
+        if (customerAccountId) {
+          await tx.account_ledger.create({
+            data: {
+              id: generateId(32),
+              journal_id: reverseJournalId,
+              account_id: customerAccountId,
+              credit: netReturn,
+              details: `AR credit for return ${invoicenum}`,
+            },
+          });
+        }
+
+        // Journal 2: cash refund — Dr Customer AR / Cr Cash
+        if (mode === "cash") {
+          const cashJournalId = generateId(32);
+          await tx.account_journal.create({
+            data: {
+              id: cashJournalId,
+              date: new Date(),
+              description: `Cash refund ${invoicenum}`,
+              reference: returnId,
+              source: "desktop",
+              createdby: userId,
+            },
+          });
+
+          if (customerAccountId) {
+            await tx.account_ledger.create({
+              data: {
+                id: generateId(32),
+                journal_id: cashJournalId,
+                account_id: customerAccountId,
+                debit: netReturn,
+                details: `Cash refund for return ${invoicenum}`,
+              },
+            });
+          }
+
+          const cashAccount = await tx.financeaccount.findFirst({ where: { code: "1110" } });
+          if (cashAccount) {
+            await tx.account_ledger.create({
+              data: {
+                id: generateId(32),
+                journal_id: cashJournalId,
+                account_id: cashAccount.id,
+                credit: netReturn,
+                details: `Cash paid for return ${invoicenum}`,
+              },
+            });
+          }
+        }
+      }
+
+      return { id: returnId, invoicenum, totalamount: netReturn };
+    });
+  },
 };
 
 const reports = {
@@ -1623,10 +2044,16 @@ const dashboard = {
         todayStartDate
       ),
       prisma.$queryRawUnsafe(
-        `SELECT p.category, SUM(s.quantity) as total_quantity,
+        `SELECT COALESCE(NULLIF(TRIM(c.name), ''), 'Uncategorized') as category,
+         SUM(s.quantity) as total_quantity,
          SUM(CAST(s.price AS REAL) * s.quantity) as total_revenue
-         FROM soldproducts s INNER JOIN product p ON s.product = p.id
-         WHERE s.createdAt >= ? GROUP BY p.category ORDER BY total_revenue DESC LIMIT 5`,
+         FROM soldproducts s
+         INNER JOIN product p ON s.product = p.id
+         LEFT JOIN category c ON c.id = p.category
+         WHERE s.createdAt >= ?
+         GROUP BY COALESCE(NULLIF(TRIM(c.name), ''), 'Uncategorized')
+         ORDER BY total_revenue DESC
+         LIMIT 5`,
         last30DaysISO
       ),
     ]);
@@ -1639,7 +2066,11 @@ const dashboard = {
     const weeklySummaryResult = (weeklyMonthlySummaryResult || []).find((item) => item.period === "weekly") || {};
     const monthlySummaryResult = (weeklyMonthlySummaryResult || []).find((item) => item.period === "monthly") || {};
     const hourlySalesResult = todayHourlySalesResult || [];
-    const categorySalesResult = topCategorySalesResult || [];
+    const categorySalesResult = (topCategorySalesResult || []).map((row) => ({
+      category: row.category || "Uncategorized",
+      total_quantity: row.total_quantity,
+      total_revenue: row.total_revenue,
+    }));
 
     function calculatePercentageChange(previous = 0, current = 0) {
       if (previous > 0) {
@@ -1960,7 +2391,7 @@ const helpers = {
   toLike,
   async getNextInvoiceNumber(prefix, tx = null) {
     const prisma = tx || getPrisma();
-    const table = prefix === 'PUR' ? 'purchase' : 'sale';
+    const table = prefix === 'PUR' ? 'purchase' : prefix === 'RET' ? 'salereturn' : 'sale';
     const lastRecord = await prisma[table].findFirst({
       where: { invoicenum: { startsWith: prefix } },
       orderBy: { createdAt: 'desc' },

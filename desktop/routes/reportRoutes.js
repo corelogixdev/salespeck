@@ -1,11 +1,12 @@
 const router = require("express").Router();
 const reportsController = require("../controllers/reportsController");
+const { allowed } = require("../middleware/isAllowed.js");
 
-router.get("/", reportsController.index);
-router.get("/sales", reportsController.salesReport);
-router.get("/purchases", reportsController.purchasesReport);
-router.get("/inventory", reportsController.inventoryReport);
-router.get("/customers", reportsController.customerReport);
-router.get("/pdf-viewer", reportsController.pdfViewer);
+router.get("/", allowed(["reportsView"]), reportsController.index);
+router.get("/sales", allowed(["reportsView"]), reportsController.salesReport);
+router.get("/purchases", allowed(["reportsView"]), reportsController.purchasesReport);
+router.get("/inventory", allowed(["reportsView"]), reportsController.inventoryReport);
+router.get("/customers", allowed(["reportsView"]), reportsController.customerReport);
+router.get("/pdf-viewer", allowed(["reportsView"]), reportsController.pdfViewer);
 
 module.exports = router;

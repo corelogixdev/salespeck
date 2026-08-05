@@ -1,5 +1,7 @@
 # Dev Mode Quickstart
 
+For **client packaging, seat limits, and subscription licensing**, see [CLIENT_DEPLOYMENT_ROADMAP.md](./CLIENT_DEPLOYMENT_ROADMAP.md). For release uploads after a version bump, see [update-release.md](./update-release.md).
+
 ## Start Development
 Run inside `desktop`:
 

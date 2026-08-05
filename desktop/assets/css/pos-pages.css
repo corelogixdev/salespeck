@@ -1,5 +1,5 @@
 /**
- * OpenMenu POS Page-Specific Styling
+ * StitchCore POS Page-Specific Styling
  * This file contains consolidated CSS extracted from EJS templates.
  */
 
@@ -823,15 +823,82 @@
     opacity: 0.6;
 }
 
-/* --- Navigation Menu Refinements --- */
-.navbar-menu {
-    width: auto;
-    flex-grow: 1;
-    position: relative;
-    box-shadow: none;
-    margin-top: 0;
-    background-color: transparent;
+/* --- POS horizontal nav LOCK (must win over Velzon vendor CSS) --- */
+html[data-layout="horizontal"] #page-topbar .navbar-menu,
+html[data-layout="horizontal"] .navbar-header .navbar-menu {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    height: 100% !important;
+    width: auto !important;
+    flex: 1 1 auto !important;
+    margin: 0 12px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
     overflow: visible !important;
+    z-index: 2 !important;
+}
+
+html[data-layout="horizontal"] #navbar-nav {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: 100% !important;
+    width: auto !important;
+    margin: 0 !important;
+    gap: 4px !important;
+}
+
+html[data-layout="horizontal"] #navbar-nav > .nav-item {
+    display: flex !important;
+    align-items: center !important;
+    visibility: visible !important;
+}
+
+html[data-layout="horizontal"] #navbar-nav > .nav-item > .nav-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: var(--pos-text-main) !important;
+}
+
+@media (max-width: 991.98px) {
+    html[data-layout="horizontal"] #page-topbar .navbar-menu,
+    html[data-layout="horizontal"] .navbar-header .navbar-menu {
+        display: none !important;
+        position: fixed !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 280px !important;
+        height: 100vh !important;
+        flex: none !important;
+        margin: 0 !important;
+        padding-top: 20px !important;
+        background: var(--pos-bg-surface) !important;
+        z-index: 1050 !important;
+        overflow-y: auto !important;
+    }
+
+    html[data-layout="horizontal"] body.menu #page-topbar .navbar-menu,
+    html[data-layout="horizontal"] body.menu .navbar-header .navbar-menu {
+        display: block !important;
+    }
+
+    html[data-layout="horizontal"] body.menu #navbar-nav {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        height: auto !important;
+    }
 }
 
 .navbar-nav {
@@ -842,15 +909,15 @@
     gap: 4px;
 }
 
-/* Hide hamburger on large screens */
-@media (min-width: 1200px) {
+/* Hide hamburger on screens that show the horizontal top menu */
+@media (min-width: 992px) {
     #topnav-hamburger-icon {
         display: none !important;
     }
 }
 
-/* Mobile Navigation Overrides */
-@media (max-width: 1199.98px) {
+/* Mobile / compact Navigation Overrides */
+@media (max-width: 991.98px) {
     #page-topbar {
         z-index: 1055 !important;
     }
@@ -959,17 +1026,25 @@
     color: var(--pos-text-muted);
 }
 
-@media (max-width: 1199.98px) {
+@media (max-width: 991.98px) {
     .navbar-menu {
         display: none !important;
     }
     #topnav-hamburger-icon {
-        display: block !important;
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        min-height: 40px;
+        border: 1px solid var(--pos-border) !important;
+        border-radius: var(--pos-border-radius);
+        background: var(--pos-bg-hover) !important;
+        color: var(--pos-text-main) !important;
     }
 }
 
-/* Stronger Header Integration */
-@media (min-width: 1200px) {
+/* Stronger Header Integration — show top menu whenever not in drawer mode */
+@media (min-width: 992px) {
     #page-topbar {
         height: 70px !important;
     }
@@ -987,10 +1062,14 @@
         align-items: center !important;
         position: relative !important;
         top: 0 !important;
+        left: auto !important;
+        bottom: auto !important;
         height: 100% !important;
         margin: 0 20px !important;
+        padding-top: 0 !important;
         background: transparent !important;
         box-shadow: none !important;
+        overflow: visible !important;
     }
 
     .navbar-nav {
@@ -1000,6 +1079,8 @@
         height: 100% !important;
         margin: 0 !important;
         gap: 15px !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
     
     .navbar-nav .nav-item {
@@ -1042,7 +1123,7 @@
 }
 
 /* Ensure the menu items are vertical in the side bar and centered */
-@media (max-width: 1199.98px) {
+@media (max-width: 991.98px) {
     .navbar-menu {
         padding-top: 10px !important;
         background: var(--pos-bg-surface) !important;
@@ -1067,7 +1148,7 @@
 }
 
 /* Ensure mobile menu doesn't have forced dark background if sidebar is light */
-@media (max-width: 1199.98px) {
+@media (max-width: 991.98px) {
     .navbar-menu {
         background-color: var(--pos-bg-surface) !important;
         border-right: 1px solid var(--pos-border);
@@ -1087,4 +1168,236 @@
     flex-wrap: nowrap !important;
     display: flex !important;
     align-items: center !important;
+}
+
+/* --- Cash Closing Denomination Calculator --- */
+.cash-denom-panel {
+    background: var(--pos-bg-main);
+    border: 1px solid var(--pos-border);
+    border-radius: var(--pos-border-radius);
+    padding: 0;
+    overflow: hidden;
+}
+
+.cash-denom-panel-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: 100%;
+    margin: 0;
+    padding: 0.75rem 1rem;
+    border: none;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.cash-denom-panel-toggle:hover {
+    background: var(--pos-bg-hover);
+}
+
+.cash-denom-panel-toggle-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.cash-denom-panel-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--pos-text-main);
+}
+
+.cash-denom-panel-sub {
+    font-size: 12px;
+    color: var(--pos-text-muted);
+}
+
+.cash-denom-chevron {
+    font-size: 1.25rem;
+    color: var(--pos-text-muted);
+    flex-shrink: 0;
+    transition: transform 0.15s ease;
+}
+
+.cash-denom-panel.is-open .cash-denom-chevron {
+    transform: rotate(180deg);
+}
+
+.cash-denom-body {
+    padding: 0 1rem 0.875rem;
+    border-top: 1px solid var(--pos-border);
+}
+
+.cash-denom-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.cash-denom-group-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--pos-text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.cash-denom-rows {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+}
+
+@media (min-width: 576px) {
+    .cash-denom-group:first-child .cash-denom-rows {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.cash-denom-row {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.5rem;
+    border-radius: var(--pos-border-radius);
+    background: var(--pos-bg-surface);
+    border: 1px solid var(--pos-border);
+}
+
+.cash-denom-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    height: 28px;
+    padding: 0 0.4rem;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--pos-accent-text);
+    background: var(--pos-accent);
+}
+
+.cash-denom-coin .cash-denom-badge {
+    background: transparent;
+    color: var(--pos-text-main);
+    border: 1px solid var(--pos-border-strong);
+}
+
+.cash-denom-stepper {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    height: var(--pos-control-height);
+    border: 1px solid var(--pos-border);
+    border-radius: var(--pos-border-radius);
+    overflow: hidden;
+    background: var(--pos-bg-main);
+}
+
+.cash-denom-btn {
+    width: 28px;
+    height: var(--pos-control-height);
+    border: none;
+    background: transparent;
+    color: var(--pos-text-main);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+}
+
+.cash-denom-btn:hover {
+    background: var(--pos-bg-hover);
+    color: var(--pos-accent);
+}
+
+.cash-denom-qty {
+    width: 48px;
+    height: var(--pos-control-height);
+    border: none;
+    border-left: 1px solid var(--pos-border);
+    border-right: 1px solid var(--pos-border);
+    background: var(--pos-bg-surface);
+    color: var(--pos-text-main);
+    text-align: center;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    -moz-appearance: textfield;
+}
+
+.cash-denom-qty::-webkit-outer-spin-button,
+.cash-denom-qty::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.cash-denom-qty:focus {
+    outline: none;
+    box-shadow: inset 0 0 0 1px var(--pos-accent);
+}
+
+.cash-denom-line-total {
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--pos-text-muted);
+    white-space: nowrap;
+    min-width: 4.5rem;
+    text-align: right;
+}
+
+.cash-denom-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 0.875rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--pos-border);
+    flex-wrap: wrap;
+}
+
+.cash-denom-total-label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--pos-text-muted);
+}
+
+.cash-denom-total-value {
+    font-size: 15px;
+    color: var(--pos-text-main);
+    font-variant-numeric: tabular-nums;
+}
+
+.cash-denom-mismatch {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.65rem;
+    padding: 0.5rem 0.65rem;
+    border-radius: var(--pos-border-radius);
+    background: var(--pos-bg-hover);
+    border: 1px solid var(--pos-border);
+    font-size: 12px;
+    color: var(--pos-text-muted);
+}
+
+.btn-soft-primary {
+    color: var(--pos-accent) !important;
+    background: color-mix(in srgb, var(--pos-accent) 14%, transparent) !important;
+    border: 1px solid transparent !important;
+}
+
+.btn-soft-primary:hover {
+    background: color-mix(in srgb, var(--pos-accent) 22%, transparent) !important;
 }

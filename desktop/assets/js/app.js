@@ -1,5 +1,6 @@
 !(function () {
-  var d = document.querySelector(".navbar-menu").innerHTML,
+  var navbarMenuEl = document.querySelector(".navbar-menu");
+  var d = navbarMenuEl ? navbarMenuEl.innerHTML : "",
     M = 7,
     t = "en",
     a = localStorage.getItem("language");

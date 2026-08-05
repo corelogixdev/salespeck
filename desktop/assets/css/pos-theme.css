@@ -1,5 +1,5 @@
 /**
- * OpenMenu POS Desktop Theme
+ * StitchCore POS Desktop Theme
  * Clean, flat, high-performance design system with desktop-native aesthetics.
  */
 
@@ -414,24 +414,14 @@ body {
 }
 /* --- NAVIGATION & DROPDOWNS --- */
 
-/* Horizontal Menu Interaction */
+/* Horizontal Menu Interaction — match drawer breakpoint (<992) */
 @media (min-width: 992px) {
-    /* Enable Hover for Top Bar */
-    .navbar-nav .nav-item.dropdown:hover > .dropdown-menu {
-        display: block !important;
-        margin-top: 0;
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-        transition: all 0.2s ease;
-    }
-
     .navbar-nav .nav-item.dropdown > .dropdown-menu {
         display: none;
         position: absolute;
         top: 100%;
         left: 0;
-        z-index: 1000;
+        z-index: 1055;
         min-width: 200px;
         padding: 0.5rem 0;
         margin: 0;
@@ -446,7 +436,39 @@ body {
         box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
         opacity: 0;
         visibility: hidden;
-        transform: translateY(10px);
+        transform: translateY(0);
+        pointer-events: none;
+    }
+
+    .navbar-nav .nav-item.dropdown > .dropdown-menu.dropdown-menu-end {
+        left: auto;
+        right: 0;
+    }
+
+    /* Invisible bridge so the menu does not close in the gap before a click lands */
+    .navbar-nav .nav-item.dropdown > .dropdown-menu::before {
+        content: "";
+        position: absolute;
+        top: -20px;
+        left: 0;
+        right: 0;
+        height: 20px;
+    }
+
+    .navbar-nav .nav-item.dropdown:hover > .dropdown-menu,
+    .navbar-nav .nav-item.dropdown > .dropdown-menu.show {
+        display: block !important;
+        margin-top: 0;
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+        pointer-events: auto;
+        transition: opacity 0.15s ease, visibility 0.15s ease;
+    }
+
+    .navbar-nav .nav-item.dropdown > .dropdown-menu .dropdown-item {
+        pointer-events: auto;
+        cursor: pointer;
     }
 }
 
@@ -469,9 +491,11 @@ body {
     color: var(--pos-accent) !important;
 }
 
-.dropdown-item.active, .dropdown-item:active {
-    background-color: var(--pos-accent) !important;
-    color: #fff !important;
+.dropdown-item.disabled,
+.dropdown-item[aria-disabled="true"] {
+    pointer-events: none !important;
+    opacity: 0.45 !important;
+    cursor: not-allowed !important;
 }
 
 /* Hide Sidebar elements in Horizontal Header */

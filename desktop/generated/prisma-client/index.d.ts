@@ -104,6 +104,16 @@ export type softwaresetting = $Result.DefaultSelection<Prisma.$softwaresettingPa
  */
 export type soldproducts = $Result.DefaultSelection<Prisma.$soldproductsPayload>
 /**
+ * Model salereturn
+ * 
+ */
+export type salereturn = $Result.DefaultSelection<Prisma.$salereturnPayload>
+/**
+ * Model salereturnitems
+ * 
+ */
+export type salereturnitems = $Result.DefaultSelection<Prisma.$salereturnitemsPayload>
+/**
  * Model taxes
  * 
  */
@@ -419,6 +429,26 @@ export class PrismaClient<
     * ```
     */
   get soldproducts(): Prisma.soldproductsDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.salereturn`: Exposes CRUD operations for the **salereturn** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Salereturns
+    * const salereturns = await prisma.salereturn.findMany()
+    * ```
+    */
+  get salereturn(): Prisma.salereturnDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.salereturnitems`: Exposes CRUD operations for the **salereturnitems** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Salereturnitems
+    * const salereturnitems = await prisma.salereturnitems.findMany()
+    * ```
+    */
+  get salereturnitems(): Prisma.salereturnitemsDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.taxes`: Exposes CRUD operations for the **taxes** model.
@@ -901,6 +931,8 @@ export namespace Prisma {
     sale: 'sale',
     softwaresetting: 'softwaresetting',
     soldproducts: 'soldproducts',
+    salereturn: 'salereturn',
+    salereturnitems: 'salereturnitems',
     taxes: 'taxes',
     user: 'user',
     partytype: 'partytype'
@@ -919,7 +951,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "sequelizeMeta" | "brand" | "cashclosing" | "category" | "financeaccount" | "account_journal" | "account_ledger" | "financetransaction" | "inventorylogs" | "product" | "productbatches" | "productsalepurchase" | "productsub" | "purchase" | "purchasedproducts" | "sale" | "softwaresetting" | "soldproducts" | "taxes" | "user" | "partytype"
+      modelProps: "sequelizeMeta" | "brand" | "cashclosing" | "category" | "financeaccount" | "account_journal" | "account_ledger" | "financetransaction" | "inventorylogs" | "product" | "productbatches" | "productsalepurchase" | "productsub" | "purchase" | "purchasedproducts" | "sale" | "softwaresetting" | "soldproducts" | "salereturn" | "salereturnitems" | "taxes" | "user" | "partytype"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2255,6 +2287,154 @@ export namespace Prisma {
           }
         }
       }
+      salereturn: {
+        payload: Prisma.$salereturnPayload<ExtArgs>
+        fields: Prisma.salereturnFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.salereturnFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.salereturnFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnPayload>
+          }
+          findFirst: {
+            args: Prisma.salereturnFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.salereturnFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnPayload>
+          }
+          findMany: {
+            args: Prisma.salereturnFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnPayload>[]
+          }
+          create: {
+            args: Prisma.salereturnCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnPayload>
+          }
+          createMany: {
+            args: Prisma.salereturnCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.salereturnCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnPayload>[]
+          }
+          delete: {
+            args: Prisma.salereturnDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnPayload>
+          }
+          update: {
+            args: Prisma.salereturnUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnPayload>
+          }
+          deleteMany: {
+            args: Prisma.salereturnDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.salereturnUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.salereturnUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnPayload>[]
+          }
+          upsert: {
+            args: Prisma.salereturnUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnPayload>
+          }
+          aggregate: {
+            args: Prisma.SalereturnAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSalereturn>
+          }
+          groupBy: {
+            args: Prisma.salereturnGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SalereturnGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.salereturnCountArgs<ExtArgs>
+            result: $Utils.Optional<SalereturnCountAggregateOutputType> | number
+          }
+        }
+      }
+      salereturnitems: {
+        payload: Prisma.$salereturnitemsPayload<ExtArgs>
+        fields: Prisma.salereturnitemsFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.salereturnitemsFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnitemsPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.salereturnitemsFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnitemsPayload>
+          }
+          findFirst: {
+            args: Prisma.salereturnitemsFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnitemsPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.salereturnitemsFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnitemsPayload>
+          }
+          findMany: {
+            args: Prisma.salereturnitemsFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnitemsPayload>[]
+          }
+          create: {
+            args: Prisma.salereturnitemsCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnitemsPayload>
+          }
+          createMany: {
+            args: Prisma.salereturnitemsCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.salereturnitemsCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnitemsPayload>[]
+          }
+          delete: {
+            args: Prisma.salereturnitemsDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnitemsPayload>
+          }
+          update: {
+            args: Prisma.salereturnitemsUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnitemsPayload>
+          }
+          deleteMany: {
+            args: Prisma.salereturnitemsDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.salereturnitemsUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.salereturnitemsUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnitemsPayload>[]
+          }
+          upsert: {
+            args: Prisma.salereturnitemsUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salereturnitemsPayload>
+          }
+          aggregate: {
+            args: Prisma.SalereturnitemsAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSalereturnitems>
+          }
+          groupBy: {
+            args: Prisma.salereturnitemsGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SalereturnitemsGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.salereturnitemsCountArgs<ExtArgs>
+            result: $Utils.Optional<SalereturnitemsCountAggregateOutputType> | number
+          }
+        }
+      }
       taxes: {
         payload: Prisma.$taxesPayload<ExtArgs>
         fields: Prisma.taxesFieldRefs
@@ -2603,6 +2783,8 @@ export namespace Prisma {
     sale?: saleOmit
     softwaresetting?: softwaresettingOmit
     soldproducts?: soldproductsOmit
+    salereturn?: salereturnOmit
+    salereturnitems?: salereturnitemsOmit
     taxes?: taxesOmit
     user?: userOmit
     partytype?: partytypeOmit
@@ -22463,6 +22645,2217 @@ export namespace Prisma {
 
 
   /**
+   * Model salereturn
+   */
+
+  export type AggregateSalereturn = {
+    _count: SalereturnCountAggregateOutputType | null
+    _avg: SalereturnAvgAggregateOutputType | null
+    _sum: SalereturnSumAggregateOutputType | null
+    _min: SalereturnMinAggregateOutputType | null
+    _max: SalereturnMaxAggregateOutputType | null
+  }
+
+  export type SalereturnAvgAggregateOutputType = {
+    totalamount: number | null
+  }
+
+  export type SalereturnSumAggregateOutputType = {
+    totalamount: number | null
+  }
+
+  export type SalereturnMinAggregateOutputType = {
+    id: string | null
+    sale: string | null
+    invoicenum: string | null
+    customer: string | null
+    user: string | null
+    totalamount: number | null
+    refundmode: string | null
+    note: string | null
+    createdby: string | null
+    source: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SalereturnMaxAggregateOutputType = {
+    id: string | null
+    sale: string | null
+    invoicenum: string | null
+    customer: string | null
+    user: string | null
+    totalamount: number | null
+    refundmode: string | null
+    note: string | null
+    createdby: string | null
+    source: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SalereturnCountAggregateOutputType = {
+    id: number
+    sale: number
+    invoicenum: number
+    customer: number
+    user: number
+    totalamount: number
+    refundmode: number
+    note: number
+    createdby: number
+    source: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SalereturnAvgAggregateInputType = {
+    totalamount?: true
+  }
+
+  export type SalereturnSumAggregateInputType = {
+    totalamount?: true
+  }
+
+  export type SalereturnMinAggregateInputType = {
+    id?: true
+    sale?: true
+    invoicenum?: true
+    customer?: true
+    user?: true
+    totalamount?: true
+    refundmode?: true
+    note?: true
+    createdby?: true
+    source?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SalereturnMaxAggregateInputType = {
+    id?: true
+    sale?: true
+    invoicenum?: true
+    customer?: true
+    user?: true
+    totalamount?: true
+    refundmode?: true
+    note?: true
+    createdby?: true
+    source?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SalereturnCountAggregateInputType = {
+    id?: true
+    sale?: true
+    invoicenum?: true
+    customer?: true
+    user?: true
+    totalamount?: true
+    refundmode?: true
+    note?: true
+    createdby?: true
+    source?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SalereturnAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which salereturn to aggregate.
+     */
+    where?: salereturnWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of salereturns to fetch.
+     */
+    orderBy?: salereturnOrderByWithRelationInput | salereturnOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: salereturnWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` salereturns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` salereturns.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned salereturns
+    **/
+    _count?: true | SalereturnCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SalereturnAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SalereturnSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SalereturnMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SalereturnMaxAggregateInputType
+  }
+
+  export type GetSalereturnAggregateType<T extends SalereturnAggregateArgs> = {
+        [P in keyof T & keyof AggregateSalereturn]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSalereturn[P]>
+      : GetScalarType<T[P], AggregateSalereturn[P]>
+  }
+
+
+
+
+  export type salereturnGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: salereturnWhereInput
+    orderBy?: salereturnOrderByWithAggregationInput | salereturnOrderByWithAggregationInput[]
+    by: SalereturnScalarFieldEnum[] | SalereturnScalarFieldEnum
+    having?: salereturnScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SalereturnCountAggregateInputType | true
+    _avg?: SalereturnAvgAggregateInputType
+    _sum?: SalereturnSumAggregateInputType
+    _min?: SalereturnMinAggregateInputType
+    _max?: SalereturnMaxAggregateInputType
+  }
+
+  export type SalereturnGroupByOutputType = {
+    id: string
+    sale: string
+    invoicenum: string | null
+    customer: string | null
+    user: string | null
+    totalamount: number | null
+    refundmode: string | null
+    note: string | null
+    createdby: string | null
+    source: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: SalereturnCountAggregateOutputType | null
+    _avg: SalereturnAvgAggregateOutputType | null
+    _sum: SalereturnSumAggregateOutputType | null
+    _min: SalereturnMinAggregateOutputType | null
+    _max: SalereturnMaxAggregateOutputType | null
+  }
+
+  type GetSalereturnGroupByPayload<T extends salereturnGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SalereturnGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SalereturnGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SalereturnGroupByOutputType[P]>
+            : GetScalarType<T[P], SalereturnGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type salereturnSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sale?: boolean
+    invoicenum?: boolean
+    customer?: boolean
+    user?: boolean
+    totalamount?: boolean
+    refundmode?: boolean
+    note?: boolean
+    createdby?: boolean
+    source?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["salereturn"]>
+
+  export type salereturnSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sale?: boolean
+    invoicenum?: boolean
+    customer?: boolean
+    user?: boolean
+    totalamount?: boolean
+    refundmode?: boolean
+    note?: boolean
+    createdby?: boolean
+    source?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["salereturn"]>
+
+  export type salereturnSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sale?: boolean
+    invoicenum?: boolean
+    customer?: boolean
+    user?: boolean
+    totalamount?: boolean
+    refundmode?: boolean
+    note?: boolean
+    createdby?: boolean
+    source?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["salereturn"]>
+
+  export type salereturnSelectScalar = {
+    id?: boolean
+    sale?: boolean
+    invoicenum?: boolean
+    customer?: boolean
+    user?: boolean
+    totalamount?: boolean
+    refundmode?: boolean
+    note?: boolean
+    createdby?: boolean
+    source?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type salereturnOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sale" | "invoicenum" | "customer" | "user" | "totalamount" | "refundmode" | "note" | "createdby" | "source" | "createdAt" | "updatedAt", ExtArgs["result"]["salereturn"]>
+
+  export type $salereturnPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "salereturn"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      sale: string
+      invoicenum: string | null
+      customer: string | null
+      user: string | null
+      totalamount: number | null
+      refundmode: string | null
+      note: string | null
+      createdby: string | null
+      source: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["salereturn"]>
+    composites: {}
+  }
+
+  type salereturnGetPayload<S extends boolean | null | undefined | salereturnDefaultArgs> = $Result.GetResult<Prisma.$salereturnPayload, S>
+
+  type salereturnCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<salereturnFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SalereturnCountAggregateInputType | true
+    }
+
+  export interface salereturnDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['salereturn'], meta: { name: 'salereturn' } }
+    /**
+     * Find zero or one Salereturn that matches the filter.
+     * @param {salereturnFindUniqueArgs} args - Arguments to find a Salereturn
+     * @example
+     * // Get one Salereturn
+     * const salereturn = await prisma.salereturn.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends salereturnFindUniqueArgs>(args: SelectSubset<T, salereturnFindUniqueArgs<ExtArgs>>): Prisma__salereturnClient<$Result.GetResult<Prisma.$salereturnPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Salereturn that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {salereturnFindUniqueOrThrowArgs} args - Arguments to find a Salereturn
+     * @example
+     * // Get one Salereturn
+     * const salereturn = await prisma.salereturn.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends salereturnFindUniqueOrThrowArgs>(args: SelectSubset<T, salereturnFindUniqueOrThrowArgs<ExtArgs>>): Prisma__salereturnClient<$Result.GetResult<Prisma.$salereturnPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Salereturn that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salereturnFindFirstArgs} args - Arguments to find a Salereturn
+     * @example
+     * // Get one Salereturn
+     * const salereturn = await prisma.salereturn.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends salereturnFindFirstArgs>(args?: SelectSubset<T, salereturnFindFirstArgs<ExtArgs>>): Prisma__salereturnClient<$Result.GetResult<Prisma.$salereturnPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Salereturn that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salereturnFindFirstOrThrowArgs} args - Arguments to find a Salereturn
+     * @example
+     * // Get one Salereturn
+     * const salereturn = await prisma.salereturn.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends salereturnFindFirstOrThrowArgs>(args?: SelectSubset<T, salereturnFindFirstOrThrowArgs<ExtArgs>>): Prisma__salereturnClient<$Result.GetResult<Prisma.$salereturnPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Salereturns that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salereturnFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Salereturns
+     * const salereturns = await prisma.salereturn.findMany()
+     * 
+     * // Get first 10 Salereturns
+     * const salereturns = await prisma.salereturn.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const salereturnWithIdOnly = await prisma.salereturn.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends salereturnFindManyArgs>(args?: SelectSubset<T, salereturnFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$salereturnPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Salereturn.
+     * @param {salereturnCreateArgs} args - Arguments to create a Salereturn.
+     * @example
+     * // Create one Salereturn
+     * const Salereturn = await prisma.salereturn.create({
+     *   data: {
+     *     // ... data to create a Salereturn
+     *   }
+     * })
+     * 
+     */
+    create<T extends salereturnCreateArgs>(args: SelectSubset<T, salereturnCreateArgs<ExtArgs>>): Prisma__salereturnClient<$Result.GetResult<Prisma.$salereturnPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Salereturns.
+     * @param {salereturnCreateManyArgs} args - Arguments to create many Salereturns.
+     * @example
+     * // Create many Salereturns
+     * const salereturn = await prisma.salereturn.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends salereturnCreateManyArgs>(args?: SelectSubset<T, salereturnCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Salereturns and returns the data saved in the database.
+     * @param {salereturnCreateManyAndReturnArgs} args - Arguments to create many Salereturns.
+     * @example
+     * // Create many Salereturns
+     * const salereturn = await prisma.salereturn.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Salereturns and only return the `id`
+     * const salereturnWithIdOnly = await prisma.salereturn.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends salereturnCreateManyAndReturnArgs>(args?: SelectSubset<T, salereturnCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$salereturnPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Salereturn.
+     * @param {salereturnDeleteArgs} args - Arguments to delete one Salereturn.
+     * @example
+     * // Delete one Salereturn
+     * const Salereturn = await prisma.salereturn.delete({
+     *   where: {
+     *     // ... filter to delete one Salereturn
+     *   }
+     * })
+     * 
+     */
+    delete<T extends salereturnDeleteArgs>(args: SelectSubset<T, salereturnDeleteArgs<ExtArgs>>): Prisma__salereturnClient<$Result.GetResult<Prisma.$salereturnPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Salereturn.
+     * @param {salereturnUpdateArgs} args - Arguments to update one Salereturn.
+     * @example
+     * // Update one Salereturn
+     * const salereturn = await prisma.salereturn.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends salereturnUpdateArgs>(args: SelectSubset<T, salereturnUpdateArgs<ExtArgs>>): Prisma__salereturnClient<$Result.GetResult<Prisma.$salereturnPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Salereturns.
+     * @param {salereturnDeleteManyArgs} args - Arguments to filter Salereturns to delete.
+     * @example
+     * // Delete a few Salereturns
+     * const { count } = await prisma.salereturn.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends salereturnDeleteManyArgs>(args?: SelectSubset<T, salereturnDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Salereturns.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salereturnUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Salereturns
+     * const salereturn = await prisma.salereturn.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends salereturnUpdateManyArgs>(args: SelectSubset<T, salereturnUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Salereturns and returns the data updated in the database.
+     * @param {salereturnUpdateManyAndReturnArgs} args - Arguments to update many Salereturns.
+     * @example
+     * // Update many Salereturns
+     * const salereturn = await prisma.salereturn.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Salereturns and only return the `id`
+     * const salereturnWithIdOnly = await prisma.salereturn.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends salereturnUpdateManyAndReturnArgs>(args: SelectSubset<T, salereturnUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$salereturnPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Salereturn.
+     * @param {salereturnUpsertArgs} args - Arguments to update or create a Salereturn.
+     * @example
+     * // Update or create a Salereturn
+     * const salereturn = await prisma.salereturn.upsert({
+     *   create: {
+     *     // ... data to create a Salereturn
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Salereturn we want to update
+     *   }
+     * })
+     */
+    upsert<T extends salereturnUpsertArgs>(args: SelectSubset<T, salereturnUpsertArgs<ExtArgs>>): Prisma__salereturnClient<$Result.GetResult<Prisma.$salereturnPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Salereturns.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salereturnCountArgs} args - Arguments to filter Salereturns to count.
+     * @example
+     * // Count the number of Salereturns
+     * const count = await prisma.salereturn.count({
+     *   where: {
+     *     // ... the filter for the Salereturns we want to count
+     *   }
+     * })
+    **/
+    count<T extends salereturnCountArgs>(
+      args?: Subset<T, salereturnCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SalereturnCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Salereturn.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SalereturnAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SalereturnAggregateArgs>(args: Subset<T, SalereturnAggregateArgs>): Prisma.PrismaPromise<GetSalereturnAggregateType<T>>
+
+    /**
+     * Group by Salereturn.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salereturnGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends salereturnGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: salereturnGroupByArgs['orderBy'] }
+        : { orderBy?: salereturnGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, salereturnGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSalereturnGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the salereturn model
+   */
+  readonly fields: salereturnFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for salereturn.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__salereturnClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the salereturn model
+   */
+  interface salereturnFieldRefs {
+    readonly id: FieldRef<"salereturn", 'String'>
+    readonly sale: FieldRef<"salereturn", 'String'>
+    readonly invoicenum: FieldRef<"salereturn", 'String'>
+    readonly customer: FieldRef<"salereturn", 'String'>
+    readonly user: FieldRef<"salereturn", 'String'>
+    readonly totalamount: FieldRef<"salereturn", 'Float'>
+    readonly refundmode: FieldRef<"salereturn", 'String'>
+    readonly note: FieldRef<"salereturn", 'String'>
+    readonly createdby: FieldRef<"salereturn", 'String'>
+    readonly source: FieldRef<"salereturn", 'String'>
+    readonly createdAt: FieldRef<"salereturn", 'DateTime'>
+    readonly updatedAt: FieldRef<"salereturn", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * salereturn findUnique
+   */
+  export type salereturnFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturn
+     */
+    select?: salereturnSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturn
+     */
+    omit?: salereturnOmit<ExtArgs> | null
+    /**
+     * Filter, which salereturn to fetch.
+     */
+    where: salereturnWhereUniqueInput
+  }
+
+  /**
+   * salereturn findUniqueOrThrow
+   */
+  export type salereturnFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturn
+     */
+    select?: salereturnSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturn
+     */
+    omit?: salereturnOmit<ExtArgs> | null
+    /**
+     * Filter, which salereturn to fetch.
+     */
+    where: salereturnWhereUniqueInput
+  }
+
+  /**
+   * salereturn findFirst
+   */
+  export type salereturnFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturn
+     */
+    select?: salereturnSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturn
+     */
+    omit?: salereturnOmit<ExtArgs> | null
+    /**
+     * Filter, which salereturn to fetch.
+     */
+    where?: salereturnWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of salereturns to fetch.
+     */
+    orderBy?: salereturnOrderByWithRelationInput | salereturnOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for salereturns.
+     */
+    cursor?: salereturnWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` salereturns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` salereturns.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of salereturns.
+     */
+    distinct?: SalereturnScalarFieldEnum | SalereturnScalarFieldEnum[]
+  }
+
+  /**
+   * salereturn findFirstOrThrow
+   */
+  export type salereturnFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturn
+     */
+    select?: salereturnSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturn
+     */
+    omit?: salereturnOmit<ExtArgs> | null
+    /**
+     * Filter, which salereturn to fetch.
+     */
+    where?: salereturnWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of salereturns to fetch.
+     */
+    orderBy?: salereturnOrderByWithRelationInput | salereturnOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for salereturns.
+     */
+    cursor?: salereturnWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` salereturns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` salereturns.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of salereturns.
+     */
+    distinct?: SalereturnScalarFieldEnum | SalereturnScalarFieldEnum[]
+  }
+
+  /**
+   * salereturn findMany
+   */
+  export type salereturnFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturn
+     */
+    select?: salereturnSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturn
+     */
+    omit?: salereturnOmit<ExtArgs> | null
+    /**
+     * Filter, which salereturns to fetch.
+     */
+    where?: salereturnWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of salereturns to fetch.
+     */
+    orderBy?: salereturnOrderByWithRelationInput | salereturnOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing salereturns.
+     */
+    cursor?: salereturnWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` salereturns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` salereturns.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of salereturns.
+     */
+    distinct?: SalereturnScalarFieldEnum | SalereturnScalarFieldEnum[]
+  }
+
+  /**
+   * salereturn create
+   */
+  export type salereturnCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturn
+     */
+    select?: salereturnSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturn
+     */
+    omit?: salereturnOmit<ExtArgs> | null
+    /**
+     * The data needed to create a salereturn.
+     */
+    data: XOR<salereturnCreateInput, salereturnUncheckedCreateInput>
+  }
+
+  /**
+   * salereturn createMany
+   */
+  export type salereturnCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many salereturns.
+     */
+    data: salereturnCreateManyInput | salereturnCreateManyInput[]
+  }
+
+  /**
+   * salereturn createManyAndReturn
+   */
+  export type salereturnCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturn
+     */
+    select?: salereturnSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturn
+     */
+    omit?: salereturnOmit<ExtArgs> | null
+    /**
+     * The data used to create many salereturns.
+     */
+    data: salereturnCreateManyInput | salereturnCreateManyInput[]
+  }
+
+  /**
+   * salereturn update
+   */
+  export type salereturnUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturn
+     */
+    select?: salereturnSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturn
+     */
+    omit?: salereturnOmit<ExtArgs> | null
+    /**
+     * The data needed to update a salereturn.
+     */
+    data: XOR<salereturnUpdateInput, salereturnUncheckedUpdateInput>
+    /**
+     * Choose, which salereturn to update.
+     */
+    where: salereturnWhereUniqueInput
+  }
+
+  /**
+   * salereturn updateMany
+   */
+  export type salereturnUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update salereturns.
+     */
+    data: XOR<salereturnUpdateManyMutationInput, salereturnUncheckedUpdateManyInput>
+    /**
+     * Filter which salereturns to update
+     */
+    where?: salereturnWhereInput
+    /**
+     * Limit how many salereturns to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * salereturn updateManyAndReturn
+   */
+  export type salereturnUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturn
+     */
+    select?: salereturnSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturn
+     */
+    omit?: salereturnOmit<ExtArgs> | null
+    /**
+     * The data used to update salereturns.
+     */
+    data: XOR<salereturnUpdateManyMutationInput, salereturnUncheckedUpdateManyInput>
+    /**
+     * Filter which salereturns to update
+     */
+    where?: salereturnWhereInput
+    /**
+     * Limit how many salereturns to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * salereturn upsert
+   */
+  export type salereturnUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturn
+     */
+    select?: salereturnSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturn
+     */
+    omit?: salereturnOmit<ExtArgs> | null
+    /**
+     * The filter to search for the salereturn to update in case it exists.
+     */
+    where: salereturnWhereUniqueInput
+    /**
+     * In case the salereturn found by the `where` argument doesn't exist, create a new salereturn with this data.
+     */
+    create: XOR<salereturnCreateInput, salereturnUncheckedCreateInput>
+    /**
+     * In case the salereturn was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<salereturnUpdateInput, salereturnUncheckedUpdateInput>
+  }
+
+  /**
+   * salereturn delete
+   */
+  export type salereturnDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturn
+     */
+    select?: salereturnSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturn
+     */
+    omit?: salereturnOmit<ExtArgs> | null
+    /**
+     * Filter which salereturn to delete.
+     */
+    where: salereturnWhereUniqueInput
+  }
+
+  /**
+   * salereturn deleteMany
+   */
+  export type salereturnDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which salereturns to delete
+     */
+    where?: salereturnWhereInput
+    /**
+     * Limit how many salereturns to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * salereturn without action
+   */
+  export type salereturnDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturn
+     */
+    select?: salereturnSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturn
+     */
+    omit?: salereturnOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model salereturnitems
+   */
+
+  export type AggregateSalereturnitems = {
+    _count: SalereturnitemsCountAggregateOutputType | null
+    _avg: SalereturnitemsAvgAggregateOutputType | null
+    _sum: SalereturnitemsSumAggregateOutputType | null
+    _min: SalereturnitemsMinAggregateOutputType | null
+    _max: SalereturnitemsMaxAggregateOutputType | null
+  }
+
+  export type SalereturnitemsAvgAggregateOutputType = {
+    quantity: number | null
+    price: number | null
+  }
+
+  export type SalereturnitemsSumAggregateOutputType = {
+    quantity: number | null
+    price: number | null
+  }
+
+  export type SalereturnitemsMinAggregateOutputType = {
+    id: string | null
+    salereturn: string | null
+    soldproduct: string | null
+    product: string | null
+    quantity: number | null
+    price: number | null
+    source: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SalereturnitemsMaxAggregateOutputType = {
+    id: string | null
+    salereturn: string | null
+    soldproduct: string | null
+    product: string | null
+    quantity: number | null
+    price: number | null
+    source: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SalereturnitemsCountAggregateOutputType = {
+    id: number
+    salereturn: number
+    soldproduct: number
+    product: number
+    quantity: number
+    price: number
+    source: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SalereturnitemsAvgAggregateInputType = {
+    quantity?: true
+    price?: true
+  }
+
+  export type SalereturnitemsSumAggregateInputType = {
+    quantity?: true
+    price?: true
+  }
+
+  export type SalereturnitemsMinAggregateInputType = {
+    id?: true
+    salereturn?: true
+    soldproduct?: true
+    product?: true
+    quantity?: true
+    price?: true
+    source?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SalereturnitemsMaxAggregateInputType = {
+    id?: true
+    salereturn?: true
+    soldproduct?: true
+    product?: true
+    quantity?: true
+    price?: true
+    source?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SalereturnitemsCountAggregateInputType = {
+    id?: true
+    salereturn?: true
+    soldproduct?: true
+    product?: true
+    quantity?: true
+    price?: true
+    source?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SalereturnitemsAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which salereturnitems to aggregate.
+     */
+    where?: salereturnitemsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of salereturnitems to fetch.
+     */
+    orderBy?: salereturnitemsOrderByWithRelationInput | salereturnitemsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: salereturnitemsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` salereturnitems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` salereturnitems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned salereturnitems
+    **/
+    _count?: true | SalereturnitemsCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SalereturnitemsAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SalereturnitemsSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SalereturnitemsMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SalereturnitemsMaxAggregateInputType
+  }
+
+  export type GetSalereturnitemsAggregateType<T extends SalereturnitemsAggregateArgs> = {
+        [P in keyof T & keyof AggregateSalereturnitems]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSalereturnitems[P]>
+      : GetScalarType<T[P], AggregateSalereturnitems[P]>
+  }
+
+
+
+
+  export type salereturnitemsGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: salereturnitemsWhereInput
+    orderBy?: salereturnitemsOrderByWithAggregationInput | salereturnitemsOrderByWithAggregationInput[]
+    by: SalereturnitemsScalarFieldEnum[] | SalereturnitemsScalarFieldEnum
+    having?: salereturnitemsScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SalereturnitemsCountAggregateInputType | true
+    _avg?: SalereturnitemsAvgAggregateInputType
+    _sum?: SalereturnitemsSumAggregateInputType
+    _min?: SalereturnitemsMinAggregateInputType
+    _max?: SalereturnitemsMaxAggregateInputType
+  }
+
+  export type SalereturnitemsGroupByOutputType = {
+    id: string
+    salereturn: string | null
+    soldproduct: string | null
+    product: string | null
+    quantity: number | null
+    price: number | null
+    source: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: SalereturnitemsCountAggregateOutputType | null
+    _avg: SalereturnitemsAvgAggregateOutputType | null
+    _sum: SalereturnitemsSumAggregateOutputType | null
+    _min: SalereturnitemsMinAggregateOutputType | null
+    _max: SalereturnitemsMaxAggregateOutputType | null
+  }
+
+  type GetSalereturnitemsGroupByPayload<T extends salereturnitemsGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SalereturnitemsGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SalereturnitemsGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SalereturnitemsGroupByOutputType[P]>
+            : GetScalarType<T[P], SalereturnitemsGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type salereturnitemsSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    salereturn?: boolean
+    soldproduct?: boolean
+    product?: boolean
+    quantity?: boolean
+    price?: boolean
+    source?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["salereturnitems"]>
+
+  export type salereturnitemsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    salereturn?: boolean
+    soldproduct?: boolean
+    product?: boolean
+    quantity?: boolean
+    price?: boolean
+    source?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["salereturnitems"]>
+
+  export type salereturnitemsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    salereturn?: boolean
+    soldproduct?: boolean
+    product?: boolean
+    quantity?: boolean
+    price?: boolean
+    source?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["salereturnitems"]>
+
+  export type salereturnitemsSelectScalar = {
+    id?: boolean
+    salereturn?: boolean
+    soldproduct?: boolean
+    product?: boolean
+    quantity?: boolean
+    price?: boolean
+    source?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type salereturnitemsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "salereturn" | "soldproduct" | "product" | "quantity" | "price" | "source" | "createdAt" | "updatedAt", ExtArgs["result"]["salereturnitems"]>
+
+  export type $salereturnitemsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "salereturnitems"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      salereturn: string | null
+      soldproduct: string | null
+      product: string | null
+      quantity: number | null
+      price: number | null
+      source: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["salereturnitems"]>
+    composites: {}
+  }
+
+  type salereturnitemsGetPayload<S extends boolean | null | undefined | salereturnitemsDefaultArgs> = $Result.GetResult<Prisma.$salereturnitemsPayload, S>
+
+  type salereturnitemsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<salereturnitemsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SalereturnitemsCountAggregateInputType | true
+    }
+
+  export interface salereturnitemsDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['salereturnitems'], meta: { name: 'salereturnitems' } }
+    /**
+     * Find zero or one Salereturnitems that matches the filter.
+     * @param {salereturnitemsFindUniqueArgs} args - Arguments to find a Salereturnitems
+     * @example
+     * // Get one Salereturnitems
+     * const salereturnitems = await prisma.salereturnitems.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends salereturnitemsFindUniqueArgs>(args: SelectSubset<T, salereturnitemsFindUniqueArgs<ExtArgs>>): Prisma__salereturnitemsClient<$Result.GetResult<Prisma.$salereturnitemsPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Salereturnitems that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {salereturnitemsFindUniqueOrThrowArgs} args - Arguments to find a Salereturnitems
+     * @example
+     * // Get one Salereturnitems
+     * const salereturnitems = await prisma.salereturnitems.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends salereturnitemsFindUniqueOrThrowArgs>(args: SelectSubset<T, salereturnitemsFindUniqueOrThrowArgs<ExtArgs>>): Prisma__salereturnitemsClient<$Result.GetResult<Prisma.$salereturnitemsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Salereturnitems that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salereturnitemsFindFirstArgs} args - Arguments to find a Salereturnitems
+     * @example
+     * // Get one Salereturnitems
+     * const salereturnitems = await prisma.salereturnitems.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends salereturnitemsFindFirstArgs>(args?: SelectSubset<T, salereturnitemsFindFirstArgs<ExtArgs>>): Prisma__salereturnitemsClient<$Result.GetResult<Prisma.$salereturnitemsPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Salereturnitems that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salereturnitemsFindFirstOrThrowArgs} args - Arguments to find a Salereturnitems
+     * @example
+     * // Get one Salereturnitems
+     * const salereturnitems = await prisma.salereturnitems.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends salereturnitemsFindFirstOrThrowArgs>(args?: SelectSubset<T, salereturnitemsFindFirstOrThrowArgs<ExtArgs>>): Prisma__salereturnitemsClient<$Result.GetResult<Prisma.$salereturnitemsPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Salereturnitems that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salereturnitemsFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Salereturnitems
+     * const salereturnitems = await prisma.salereturnitems.findMany()
+     * 
+     * // Get first 10 Salereturnitems
+     * const salereturnitems = await prisma.salereturnitems.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const salereturnitemsWithIdOnly = await prisma.salereturnitems.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends salereturnitemsFindManyArgs>(args?: SelectSubset<T, salereturnitemsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$salereturnitemsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Salereturnitems.
+     * @param {salereturnitemsCreateArgs} args - Arguments to create a Salereturnitems.
+     * @example
+     * // Create one Salereturnitems
+     * const Salereturnitems = await prisma.salereturnitems.create({
+     *   data: {
+     *     // ... data to create a Salereturnitems
+     *   }
+     * })
+     * 
+     */
+    create<T extends salereturnitemsCreateArgs>(args: SelectSubset<T, salereturnitemsCreateArgs<ExtArgs>>): Prisma__salereturnitemsClient<$Result.GetResult<Prisma.$salereturnitemsPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Salereturnitems.
+     * @param {salereturnitemsCreateManyArgs} args - Arguments to create many Salereturnitems.
+     * @example
+     * // Create many Salereturnitems
+     * const salereturnitems = await prisma.salereturnitems.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends salereturnitemsCreateManyArgs>(args?: SelectSubset<T, salereturnitemsCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Salereturnitems and returns the data saved in the database.
+     * @param {salereturnitemsCreateManyAndReturnArgs} args - Arguments to create many Salereturnitems.
+     * @example
+     * // Create many Salereturnitems
+     * const salereturnitems = await prisma.salereturnitems.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Salereturnitems and only return the `id`
+     * const salereturnitemsWithIdOnly = await prisma.salereturnitems.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends salereturnitemsCreateManyAndReturnArgs>(args?: SelectSubset<T, salereturnitemsCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$salereturnitemsPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Salereturnitems.
+     * @param {salereturnitemsDeleteArgs} args - Arguments to delete one Salereturnitems.
+     * @example
+     * // Delete one Salereturnitems
+     * const Salereturnitems = await prisma.salereturnitems.delete({
+     *   where: {
+     *     // ... filter to delete one Salereturnitems
+     *   }
+     * })
+     * 
+     */
+    delete<T extends salereturnitemsDeleteArgs>(args: SelectSubset<T, salereturnitemsDeleteArgs<ExtArgs>>): Prisma__salereturnitemsClient<$Result.GetResult<Prisma.$salereturnitemsPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Salereturnitems.
+     * @param {salereturnitemsUpdateArgs} args - Arguments to update one Salereturnitems.
+     * @example
+     * // Update one Salereturnitems
+     * const salereturnitems = await prisma.salereturnitems.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends salereturnitemsUpdateArgs>(args: SelectSubset<T, salereturnitemsUpdateArgs<ExtArgs>>): Prisma__salereturnitemsClient<$Result.GetResult<Prisma.$salereturnitemsPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Salereturnitems.
+     * @param {salereturnitemsDeleteManyArgs} args - Arguments to filter Salereturnitems to delete.
+     * @example
+     * // Delete a few Salereturnitems
+     * const { count } = await prisma.salereturnitems.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends salereturnitemsDeleteManyArgs>(args?: SelectSubset<T, salereturnitemsDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Salereturnitems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salereturnitemsUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Salereturnitems
+     * const salereturnitems = await prisma.salereturnitems.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends salereturnitemsUpdateManyArgs>(args: SelectSubset<T, salereturnitemsUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Salereturnitems and returns the data updated in the database.
+     * @param {salereturnitemsUpdateManyAndReturnArgs} args - Arguments to update many Salereturnitems.
+     * @example
+     * // Update many Salereturnitems
+     * const salereturnitems = await prisma.salereturnitems.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Salereturnitems and only return the `id`
+     * const salereturnitemsWithIdOnly = await prisma.salereturnitems.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends salereturnitemsUpdateManyAndReturnArgs>(args: SelectSubset<T, salereturnitemsUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$salereturnitemsPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Salereturnitems.
+     * @param {salereturnitemsUpsertArgs} args - Arguments to update or create a Salereturnitems.
+     * @example
+     * // Update or create a Salereturnitems
+     * const salereturnitems = await prisma.salereturnitems.upsert({
+     *   create: {
+     *     // ... data to create a Salereturnitems
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Salereturnitems we want to update
+     *   }
+     * })
+     */
+    upsert<T extends salereturnitemsUpsertArgs>(args: SelectSubset<T, salereturnitemsUpsertArgs<ExtArgs>>): Prisma__salereturnitemsClient<$Result.GetResult<Prisma.$salereturnitemsPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Salereturnitems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salereturnitemsCountArgs} args - Arguments to filter Salereturnitems to count.
+     * @example
+     * // Count the number of Salereturnitems
+     * const count = await prisma.salereturnitems.count({
+     *   where: {
+     *     // ... the filter for the Salereturnitems we want to count
+     *   }
+     * })
+    **/
+    count<T extends salereturnitemsCountArgs>(
+      args?: Subset<T, salereturnitemsCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SalereturnitemsCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Salereturnitems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SalereturnitemsAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SalereturnitemsAggregateArgs>(args: Subset<T, SalereturnitemsAggregateArgs>): Prisma.PrismaPromise<GetSalereturnitemsAggregateType<T>>
+
+    /**
+     * Group by Salereturnitems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salereturnitemsGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends salereturnitemsGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: salereturnitemsGroupByArgs['orderBy'] }
+        : { orderBy?: salereturnitemsGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, salereturnitemsGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSalereturnitemsGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the salereturnitems model
+   */
+  readonly fields: salereturnitemsFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for salereturnitems.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__salereturnitemsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the salereturnitems model
+   */
+  interface salereturnitemsFieldRefs {
+    readonly id: FieldRef<"salereturnitems", 'String'>
+    readonly salereturn: FieldRef<"salereturnitems", 'String'>
+    readonly soldproduct: FieldRef<"salereturnitems", 'String'>
+    readonly product: FieldRef<"salereturnitems", 'String'>
+    readonly quantity: FieldRef<"salereturnitems", 'Int'>
+    readonly price: FieldRef<"salereturnitems", 'Float'>
+    readonly source: FieldRef<"salereturnitems", 'String'>
+    readonly createdAt: FieldRef<"salereturnitems", 'DateTime'>
+    readonly updatedAt: FieldRef<"salereturnitems", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * salereturnitems findUnique
+   */
+  export type salereturnitemsFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturnitems
+     */
+    select?: salereturnitemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturnitems
+     */
+    omit?: salereturnitemsOmit<ExtArgs> | null
+    /**
+     * Filter, which salereturnitems to fetch.
+     */
+    where: salereturnitemsWhereUniqueInput
+  }
+
+  /**
+   * salereturnitems findUniqueOrThrow
+   */
+  export type salereturnitemsFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturnitems
+     */
+    select?: salereturnitemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturnitems
+     */
+    omit?: salereturnitemsOmit<ExtArgs> | null
+    /**
+     * Filter, which salereturnitems to fetch.
+     */
+    where: salereturnitemsWhereUniqueInput
+  }
+
+  /**
+   * salereturnitems findFirst
+   */
+  export type salereturnitemsFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturnitems
+     */
+    select?: salereturnitemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturnitems
+     */
+    omit?: salereturnitemsOmit<ExtArgs> | null
+    /**
+     * Filter, which salereturnitems to fetch.
+     */
+    where?: salereturnitemsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of salereturnitems to fetch.
+     */
+    orderBy?: salereturnitemsOrderByWithRelationInput | salereturnitemsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for salereturnitems.
+     */
+    cursor?: salereturnitemsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` salereturnitems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` salereturnitems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of salereturnitems.
+     */
+    distinct?: SalereturnitemsScalarFieldEnum | SalereturnitemsScalarFieldEnum[]
+  }
+
+  /**
+   * salereturnitems findFirstOrThrow
+   */
+  export type salereturnitemsFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturnitems
+     */
+    select?: salereturnitemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturnitems
+     */
+    omit?: salereturnitemsOmit<ExtArgs> | null
+    /**
+     * Filter, which salereturnitems to fetch.
+     */
+    where?: salereturnitemsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of salereturnitems to fetch.
+     */
+    orderBy?: salereturnitemsOrderByWithRelationInput | salereturnitemsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for salereturnitems.
+     */
+    cursor?: salereturnitemsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` salereturnitems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` salereturnitems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of salereturnitems.
+     */
+    distinct?: SalereturnitemsScalarFieldEnum | SalereturnitemsScalarFieldEnum[]
+  }
+
+  /**
+   * salereturnitems findMany
+   */
+  export type salereturnitemsFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturnitems
+     */
+    select?: salereturnitemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturnitems
+     */
+    omit?: salereturnitemsOmit<ExtArgs> | null
+    /**
+     * Filter, which salereturnitems to fetch.
+     */
+    where?: salereturnitemsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of salereturnitems to fetch.
+     */
+    orderBy?: salereturnitemsOrderByWithRelationInput | salereturnitemsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing salereturnitems.
+     */
+    cursor?: salereturnitemsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` salereturnitems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` salereturnitems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of salereturnitems.
+     */
+    distinct?: SalereturnitemsScalarFieldEnum | SalereturnitemsScalarFieldEnum[]
+  }
+
+  /**
+   * salereturnitems create
+   */
+  export type salereturnitemsCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturnitems
+     */
+    select?: salereturnitemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturnitems
+     */
+    omit?: salereturnitemsOmit<ExtArgs> | null
+    /**
+     * The data needed to create a salereturnitems.
+     */
+    data: XOR<salereturnitemsCreateInput, salereturnitemsUncheckedCreateInput>
+  }
+
+  /**
+   * salereturnitems createMany
+   */
+  export type salereturnitemsCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many salereturnitems.
+     */
+    data: salereturnitemsCreateManyInput | salereturnitemsCreateManyInput[]
+  }
+
+  /**
+   * salereturnitems createManyAndReturn
+   */
+  export type salereturnitemsCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturnitems
+     */
+    select?: salereturnitemsSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturnitems
+     */
+    omit?: salereturnitemsOmit<ExtArgs> | null
+    /**
+     * The data used to create many salereturnitems.
+     */
+    data: salereturnitemsCreateManyInput | salereturnitemsCreateManyInput[]
+  }
+
+  /**
+   * salereturnitems update
+   */
+  export type salereturnitemsUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturnitems
+     */
+    select?: salereturnitemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturnitems
+     */
+    omit?: salereturnitemsOmit<ExtArgs> | null
+    /**
+     * The data needed to update a salereturnitems.
+     */
+    data: XOR<salereturnitemsUpdateInput, salereturnitemsUncheckedUpdateInput>
+    /**
+     * Choose, which salereturnitems to update.
+     */
+    where: salereturnitemsWhereUniqueInput
+  }
+
+  /**
+   * salereturnitems updateMany
+   */
+  export type salereturnitemsUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update salereturnitems.
+     */
+    data: XOR<salereturnitemsUpdateManyMutationInput, salereturnitemsUncheckedUpdateManyInput>
+    /**
+     * Filter which salereturnitems to update
+     */
+    where?: salereturnitemsWhereInput
+    /**
+     * Limit how many salereturnitems to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * salereturnitems updateManyAndReturn
+   */
+  export type salereturnitemsUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturnitems
+     */
+    select?: salereturnitemsSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturnitems
+     */
+    omit?: salereturnitemsOmit<ExtArgs> | null
+    /**
+     * The data used to update salereturnitems.
+     */
+    data: XOR<salereturnitemsUpdateManyMutationInput, salereturnitemsUncheckedUpdateManyInput>
+    /**
+     * Filter which salereturnitems to update
+     */
+    where?: salereturnitemsWhereInput
+    /**
+     * Limit how many salereturnitems to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * salereturnitems upsert
+   */
+  export type salereturnitemsUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturnitems
+     */
+    select?: salereturnitemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturnitems
+     */
+    omit?: salereturnitemsOmit<ExtArgs> | null
+    /**
+     * The filter to search for the salereturnitems to update in case it exists.
+     */
+    where: salereturnitemsWhereUniqueInput
+    /**
+     * In case the salereturnitems found by the `where` argument doesn't exist, create a new salereturnitems with this data.
+     */
+    create: XOR<salereturnitemsCreateInput, salereturnitemsUncheckedCreateInput>
+    /**
+     * In case the salereturnitems was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<salereturnitemsUpdateInput, salereturnitemsUncheckedUpdateInput>
+  }
+
+  /**
+   * salereturnitems delete
+   */
+  export type salereturnitemsDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturnitems
+     */
+    select?: salereturnitemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturnitems
+     */
+    omit?: salereturnitemsOmit<ExtArgs> | null
+    /**
+     * Filter which salereturnitems to delete.
+     */
+    where: salereturnitemsWhereUniqueInput
+  }
+
+  /**
+   * salereturnitems deleteMany
+   */
+  export type salereturnitemsDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which salereturnitems to delete
+     */
+    where?: salereturnitemsWhereInput
+    /**
+     * Limit how many salereturnitems to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * salereturnitems without action
+   */
+  export type salereturnitemsDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salereturnitems
+     */
+    select?: salereturnitemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salereturnitems
+     */
+    omit?: salereturnitemsOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Model taxes
    */
 
@@ -26041,6 +28434,39 @@ export namespace Prisma {
   export type SoldproductsScalarFieldEnum = (typeof SoldproductsScalarFieldEnum)[keyof typeof SoldproductsScalarFieldEnum]
 
 
+  export const SalereturnScalarFieldEnum: {
+    id: 'id',
+    sale: 'sale',
+    invoicenum: 'invoicenum',
+    customer: 'customer',
+    user: 'user',
+    totalamount: 'totalamount',
+    refundmode: 'refundmode',
+    note: 'note',
+    createdby: 'createdby',
+    source: 'source',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SalereturnScalarFieldEnum = (typeof SalereturnScalarFieldEnum)[keyof typeof SalereturnScalarFieldEnum]
+
+
+  export const SalereturnitemsScalarFieldEnum: {
+    id: 'id',
+    salereturn: 'salereturn',
+    soldproduct: 'soldproduct',
+    product: 'product',
+    quantity: 'quantity',
+    price: 'price',
+    source: 'source',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SalereturnitemsScalarFieldEnum = (typeof SalereturnitemsScalarFieldEnum)[keyof typeof SalereturnitemsScalarFieldEnum]
+
+
   export const TaxesScalarFieldEnum: {
     id: 'id',
     name: 'name',
@@ -27540,6 +29966,169 @@ export namespace Prisma {
     source?: StringNullableWithAggregatesFilter<"soldproducts"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"soldproducts"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"soldproducts"> | Date | string
+  }
+
+  export type salereturnWhereInput = {
+    AND?: salereturnWhereInput | salereturnWhereInput[]
+    OR?: salereturnWhereInput[]
+    NOT?: salereturnWhereInput | salereturnWhereInput[]
+    id?: StringFilter<"salereturn"> | string
+    sale?: StringFilter<"salereturn"> | string
+    invoicenum?: StringNullableFilter<"salereturn"> | string | null
+    customer?: StringNullableFilter<"salereturn"> | string | null
+    user?: StringNullableFilter<"salereturn"> | string | null
+    totalamount?: FloatNullableFilter<"salereturn"> | number | null
+    refundmode?: StringNullableFilter<"salereturn"> | string | null
+    note?: StringNullableFilter<"salereturn"> | string | null
+    createdby?: StringNullableFilter<"salereturn"> | string | null
+    source?: StringNullableFilter<"salereturn"> | string | null
+    createdAt?: DateTimeFilter<"salereturn"> | Date | string
+    updatedAt?: DateTimeFilter<"salereturn"> | Date | string
+  }
+
+  export type salereturnOrderByWithRelationInput = {
+    id?: SortOrder
+    sale?: SortOrder
+    invoicenum?: SortOrderInput | SortOrder
+    customer?: SortOrderInput | SortOrder
+    user?: SortOrderInput | SortOrder
+    totalamount?: SortOrderInput | SortOrder
+    refundmode?: SortOrderInput | SortOrder
+    note?: SortOrderInput | SortOrder
+    createdby?: SortOrderInput | SortOrder
+    source?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type salereturnWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: salereturnWhereInput | salereturnWhereInput[]
+    OR?: salereturnWhereInput[]
+    NOT?: salereturnWhereInput | salereturnWhereInput[]
+    sale?: StringFilter<"salereturn"> | string
+    invoicenum?: StringNullableFilter<"salereturn"> | string | null
+    customer?: StringNullableFilter<"salereturn"> | string | null
+    user?: StringNullableFilter<"salereturn"> | string | null
+    totalamount?: FloatNullableFilter<"salereturn"> | number | null
+    refundmode?: StringNullableFilter<"salereturn"> | string | null
+    note?: StringNullableFilter<"salereturn"> | string | null
+    createdby?: StringNullableFilter<"salereturn"> | string | null
+    source?: StringNullableFilter<"salereturn"> | string | null
+    createdAt?: DateTimeFilter<"salereturn"> | Date | string
+    updatedAt?: DateTimeFilter<"salereturn"> | Date | string
+  }, "id">
+
+  export type salereturnOrderByWithAggregationInput = {
+    id?: SortOrder
+    sale?: SortOrder
+    invoicenum?: SortOrderInput | SortOrder
+    customer?: SortOrderInput | SortOrder
+    user?: SortOrderInput | SortOrder
+    totalamount?: SortOrderInput | SortOrder
+    refundmode?: SortOrderInput | SortOrder
+    note?: SortOrderInput | SortOrder
+    createdby?: SortOrderInput | SortOrder
+    source?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: salereturnCountOrderByAggregateInput
+    _avg?: salereturnAvgOrderByAggregateInput
+    _max?: salereturnMaxOrderByAggregateInput
+    _min?: salereturnMinOrderByAggregateInput
+    _sum?: salereturnSumOrderByAggregateInput
+  }
+
+  export type salereturnScalarWhereWithAggregatesInput = {
+    AND?: salereturnScalarWhereWithAggregatesInput | salereturnScalarWhereWithAggregatesInput[]
+    OR?: salereturnScalarWhereWithAggregatesInput[]
+    NOT?: salereturnScalarWhereWithAggregatesInput | salereturnScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"salereturn"> | string
+    sale?: StringWithAggregatesFilter<"salereturn"> | string
+    invoicenum?: StringNullableWithAggregatesFilter<"salereturn"> | string | null
+    customer?: StringNullableWithAggregatesFilter<"salereturn"> | string | null
+    user?: StringNullableWithAggregatesFilter<"salereturn"> | string | null
+    totalamount?: FloatNullableWithAggregatesFilter<"salereturn"> | number | null
+    refundmode?: StringNullableWithAggregatesFilter<"salereturn"> | string | null
+    note?: StringNullableWithAggregatesFilter<"salereturn"> | string | null
+    createdby?: StringNullableWithAggregatesFilter<"salereturn"> | string | null
+    source?: StringNullableWithAggregatesFilter<"salereturn"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"salereturn"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"salereturn"> | Date | string
+  }
+
+  export type salereturnitemsWhereInput = {
+    AND?: salereturnitemsWhereInput | salereturnitemsWhereInput[]
+    OR?: salereturnitemsWhereInput[]
+    NOT?: salereturnitemsWhereInput | salereturnitemsWhereInput[]
+    id?: StringFilter<"salereturnitems"> | string
+    salereturn?: StringNullableFilter<"salereturnitems"> | string | null
+    soldproduct?: StringNullableFilter<"salereturnitems"> | string | null
+    product?: StringNullableFilter<"salereturnitems"> | string | null
+    quantity?: IntNullableFilter<"salereturnitems"> | number | null
+    price?: FloatNullableFilter<"salereturnitems"> | number | null
+    source?: StringNullableFilter<"salereturnitems"> | string | null
+    createdAt?: DateTimeFilter<"salereturnitems"> | Date | string
+    updatedAt?: DateTimeFilter<"salereturnitems"> | Date | string
+  }
+
+  export type salereturnitemsOrderByWithRelationInput = {
+    id?: SortOrder
+    salereturn?: SortOrderInput | SortOrder
+    soldproduct?: SortOrderInput | SortOrder
+    product?: SortOrderInput | SortOrder
+    quantity?: SortOrderInput | SortOrder
+    price?: SortOrderInput | SortOrder
+    source?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type salereturnitemsWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: salereturnitemsWhereInput | salereturnitemsWhereInput[]
+    OR?: salereturnitemsWhereInput[]
+    NOT?: salereturnitemsWhereInput | salereturnitemsWhereInput[]
+    salereturn?: StringNullableFilter<"salereturnitems"> | string | null
+    soldproduct?: StringNullableFilter<"salereturnitems"> | string | null
+    product?: StringNullableFilter<"salereturnitems"> | string | null
+    quantity?: IntNullableFilter<"salereturnitems"> | number | null
+    price?: FloatNullableFilter<"salereturnitems"> | number | null
+    source?: StringNullableFilter<"salereturnitems"> | string | null
+    createdAt?: DateTimeFilter<"salereturnitems"> | Date | string
+    updatedAt?: DateTimeFilter<"salereturnitems"> | Date | string
+  }, "id">
+
+  export type salereturnitemsOrderByWithAggregationInput = {
+    id?: SortOrder
+    salereturn?: SortOrderInput | SortOrder
+    soldproduct?: SortOrderInput | SortOrder
+    product?: SortOrderInput | SortOrder
+    quantity?: SortOrderInput | SortOrder
+    price?: SortOrderInput | SortOrder
+    source?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: salereturnitemsCountOrderByAggregateInput
+    _avg?: salereturnitemsAvgOrderByAggregateInput
+    _max?: salereturnitemsMaxOrderByAggregateInput
+    _min?: salereturnitemsMinOrderByAggregateInput
+    _sum?: salereturnitemsSumOrderByAggregateInput
+  }
+
+  export type salereturnitemsScalarWhereWithAggregatesInput = {
+    AND?: salereturnitemsScalarWhereWithAggregatesInput | salereturnitemsScalarWhereWithAggregatesInput[]
+    OR?: salereturnitemsScalarWhereWithAggregatesInput[]
+    NOT?: salereturnitemsScalarWhereWithAggregatesInput | salereturnitemsScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"salereturnitems"> | string
+    salereturn?: StringNullableWithAggregatesFilter<"salereturnitems"> | string | null
+    soldproduct?: StringNullableWithAggregatesFilter<"salereturnitems"> | string | null
+    product?: StringNullableWithAggregatesFilter<"salereturnitems"> | string | null
+    quantity?: IntNullableWithAggregatesFilter<"salereturnitems"> | number | null
+    price?: FloatNullableWithAggregatesFilter<"salereturnitems"> | number | null
+    source?: StringNullableWithAggregatesFilter<"salereturnitems"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"salereturnitems"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"salereturnitems"> | Date | string
   }
 
   export type taxesWhereInput = {
@@ -29388,6 +31977,195 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type salereturnCreateInput = {
+    id: string
+    sale: string
+    invoicenum?: string | null
+    customer?: string | null
+    user?: string | null
+    totalamount?: number | null
+    refundmode?: string | null
+    note?: string | null
+    createdby?: string | null
+    source?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type salereturnUncheckedCreateInput = {
+    id: string
+    sale: string
+    invoicenum?: string | null
+    customer?: string | null
+    user?: string | null
+    totalamount?: number | null
+    refundmode?: string | null
+    note?: string | null
+    createdby?: string | null
+    source?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type salereturnUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sale?: StringFieldUpdateOperationsInput | string
+    invoicenum?: NullableStringFieldUpdateOperationsInput | string | null
+    customer?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: NullableStringFieldUpdateOperationsInput | string | null
+    totalamount?: NullableFloatFieldUpdateOperationsInput | number | null
+    refundmode?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type salereturnUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sale?: StringFieldUpdateOperationsInput | string
+    invoicenum?: NullableStringFieldUpdateOperationsInput | string | null
+    customer?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: NullableStringFieldUpdateOperationsInput | string | null
+    totalamount?: NullableFloatFieldUpdateOperationsInput | number | null
+    refundmode?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type salereturnCreateManyInput = {
+    id: string
+    sale: string
+    invoicenum?: string | null
+    customer?: string | null
+    user?: string | null
+    totalamount?: number | null
+    refundmode?: string | null
+    note?: string | null
+    createdby?: string | null
+    source?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type salereturnUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sale?: StringFieldUpdateOperationsInput | string
+    invoicenum?: NullableStringFieldUpdateOperationsInput | string | null
+    customer?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: NullableStringFieldUpdateOperationsInput | string | null
+    totalamount?: NullableFloatFieldUpdateOperationsInput | number | null
+    refundmode?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type salereturnUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sale?: StringFieldUpdateOperationsInput | string
+    invoicenum?: NullableStringFieldUpdateOperationsInput | string | null
+    customer?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: NullableStringFieldUpdateOperationsInput | string | null
+    totalamount?: NullableFloatFieldUpdateOperationsInput | number | null
+    refundmode?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type salereturnitemsCreateInput = {
+    id: string
+    salereturn?: string | null
+    soldproduct?: string | null
+    product?: string | null
+    quantity?: number | null
+    price?: number | null
+    source?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type salereturnitemsUncheckedCreateInput = {
+    id: string
+    salereturn?: string | null
+    soldproduct?: string | null
+    product?: string | null
+    quantity?: number | null
+    price?: number | null
+    source?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type salereturnitemsUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    salereturn?: NullableStringFieldUpdateOperationsInput | string | null
+    soldproduct?: NullableStringFieldUpdateOperationsInput | string | null
+    product?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: NullableIntFieldUpdateOperationsInput | number | null
+    price?: NullableFloatFieldUpdateOperationsInput | number | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type salereturnitemsUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    salereturn?: NullableStringFieldUpdateOperationsInput | string | null
+    soldproduct?: NullableStringFieldUpdateOperationsInput | string | null
+    product?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: NullableIntFieldUpdateOperationsInput | number | null
+    price?: NullableFloatFieldUpdateOperationsInput | number | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type salereturnitemsCreateManyInput = {
+    id: string
+    salereturn?: string | null
+    soldproduct?: string | null
+    product?: string | null
+    quantity?: number | null
+    price?: number | null
+    source?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type salereturnitemsUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    salereturn?: NullableStringFieldUpdateOperationsInput | string | null
+    soldproduct?: NullableStringFieldUpdateOperationsInput | string | null
+    product?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: NullableIntFieldUpdateOperationsInput | number | null
+    price?: NullableFloatFieldUpdateOperationsInput | number | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type salereturnitemsUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    salereturn?: NullableStringFieldUpdateOperationsInput | string | null
+    soldproduct?: NullableStringFieldUpdateOperationsInput | string | null
+    product?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: NullableIntFieldUpdateOperationsInput | number | null
+    price?: NullableFloatFieldUpdateOperationsInput | number | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type taxesCreateInput = {
     id: string
     name?: string | null
@@ -30779,6 +33557,105 @@ export namespace Prisma {
   }
 
   export type soldproductsSumOrderByAggregateInput = {
+    quantity?: SortOrder
+    price?: SortOrder
+  }
+
+  export type salereturnCountOrderByAggregateInput = {
+    id?: SortOrder
+    sale?: SortOrder
+    invoicenum?: SortOrder
+    customer?: SortOrder
+    user?: SortOrder
+    totalamount?: SortOrder
+    refundmode?: SortOrder
+    note?: SortOrder
+    createdby?: SortOrder
+    source?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type salereturnAvgOrderByAggregateInput = {
+    totalamount?: SortOrder
+  }
+
+  export type salereturnMaxOrderByAggregateInput = {
+    id?: SortOrder
+    sale?: SortOrder
+    invoicenum?: SortOrder
+    customer?: SortOrder
+    user?: SortOrder
+    totalamount?: SortOrder
+    refundmode?: SortOrder
+    note?: SortOrder
+    createdby?: SortOrder
+    source?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type salereturnMinOrderByAggregateInput = {
+    id?: SortOrder
+    sale?: SortOrder
+    invoicenum?: SortOrder
+    customer?: SortOrder
+    user?: SortOrder
+    totalamount?: SortOrder
+    refundmode?: SortOrder
+    note?: SortOrder
+    createdby?: SortOrder
+    source?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type salereturnSumOrderByAggregateInput = {
+    totalamount?: SortOrder
+  }
+
+  export type salereturnitemsCountOrderByAggregateInput = {
+    id?: SortOrder
+    salereturn?: SortOrder
+    soldproduct?: SortOrder
+    product?: SortOrder
+    quantity?: SortOrder
+    price?: SortOrder
+    source?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type salereturnitemsAvgOrderByAggregateInput = {
+    quantity?: SortOrder
+    price?: SortOrder
+  }
+
+  export type salereturnitemsMaxOrderByAggregateInput = {
+    id?: SortOrder
+    salereturn?: SortOrder
+    soldproduct?: SortOrder
+    product?: SortOrder
+    quantity?: SortOrder
+    price?: SortOrder
+    source?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type salereturnitemsMinOrderByAggregateInput = {
+    id?: SortOrder
+    salereturn?: SortOrder
+    soldproduct?: SortOrder
+    product?: SortOrder
+    quantity?: SortOrder
+    price?: SortOrder
+    source?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type salereturnitemsSumOrderByAggregateInput = {
     quantity?: SortOrder
     price?: SortOrder
   }

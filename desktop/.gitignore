@@ -61,13 +61,20 @@ typings/
 .next
 
 db/database.sqlite
+db/backups/
 
 # electron-builder
 dist/
 /zothers/local-update-server
 dev-app-update.yml
-openmenu.exe
+stitchcore.exe
 latest.yml
 .settings
+license.json
+
+# License signing (never commit private key or issued log)
+config/license-keys/private.pem
+config/license-keys/issued-licenses.csv
+config/license-keys/*.json
 
 /generated/prisma

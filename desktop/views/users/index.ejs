@@ -777,9 +777,10 @@ const canCreate = (role=='user' && permissions.usersCreate) || (role=='vendor' &
                 }
                 const currentRole = '<%= role %>';
                 if (currentRole !== 'customer' && currentRole !== 'vendor') {
-                    document.getElementById('editPassword').value = u.password || '';
-                    // reset eye icon
-                    const btn = document.querySelector('#editPassword').nextElementSibling;
+                    const pw = document.getElementById('editPassword');
+                    pw.value = '';
+                    pw.placeholder = 'Leave blank to keep current';
+                    const btn = pw.nextElementSibling;
                     if (btn) {
                         btn.querySelector('i').classList.remove('ri-eye-off-line');
                         btn.querySelector('i').classList.add('ri-eye-line');

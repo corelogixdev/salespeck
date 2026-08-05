@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>OpenMenu</title>
+    <title>StitchCore</title>
     <link rel="icon" href="/assets/img/icon.png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -202,6 +202,9 @@
                                     <% if(typeof hidenav === 'undefined' || !hidenav) { %>
                                     <button onclick="window.history.back()" class="btn btn-light">Back</button>
                                     <% } %>
+                                    <a href="/sales/returns?saleId=<%= sale.id %>" class="btn btn-soft-warning">
+                                        <i class="ri-arrow-go-back-line align-bottom me-1"></i> Create Return
+                                    </a>
                                     <button onclick="printReceipt()" class="btn btn-success">
                                         <i class="ri-printer-line align-bottom me-1"></i> Print
                                     </button>

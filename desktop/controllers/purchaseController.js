@@ -240,3 +240,91 @@ exports.serviceProductsget = async (req, res) => {
   const data = await queries.products.findForPurchase(search);
   res.json({ data });
 };
+
+exports.bulkResolveServices = async (req, res) => {
+  try {
+    const { services } = req.body;
+    if (!services || !Array.isArray(services)) {
+      return res.json({ success: false, message: "Invalid services data" });
+    }
+
+    const resolvedProducts = [];
+    const names = [...new Set(services.filter((s) => s.name).map((s) => s.name))];
+    const existingProducts = await queries.products.findForSale({ name: { in: names } }, 5000);
+    const existingMap = new Map(existingProducts.map((p) => [p.name, p]));
+
+    for (const item of services) {
+      if (!item.name) continue;
+
+      const product = existingMap.get(item.name);
+      if (product) {
+        const defaultRate = product.purchaseprice ?? product.saleprice ?? 0;
+        resolvedProducts.push({
+          id: product.id,
+          name: product.name,
+          saleprice: product.saleprice,
+          purchaseprice: product.purchaseprice ?? defaultRate,
+          qty: item.qty || 1,
+          rate: item.rate !== "" && item.rate !== undefined && item.rate !== null
+            ? item.rate
+            : defaultRate,
+          isNew: false,
+        });
+      } else {
+        resolvedProducts.push({
+          id: null,
+          name: item.name,
+          saleprice: item.rate || 0,
+          purchaseprice: item.rate || 0,
+          qty: item.qty || 1,
+          rate: item.rate || 0,
+          isNew: true,
+        });
+      }
+    }
+
+    res.json({ success: true, products: resolvedProducts });
+  } catch (error) {
+    console.error("Error resolving bulk purchase services:", error);
+    res.json({ success: false, message: error.message || "Internal Server Error" });
+  }
+};
+
+exports.createSingleService = async (req, res) => {
+  try {
+    const { name, rate } = req.body;
+    if (!name) return res.json({ success: false, message: "Name is required" });
+
+    let product = await queries.products.findByName(name);
+    if (!product) {
+      const serviceCategory = await queries.categories.getOrCreateServiceCategory();
+      const newProductData = {
+        name,
+        saleprice: 0,
+        purchaseprice: rate || 0,
+        is_service: true,
+        saleactive: false,
+        purchaseactive: true,
+        quantity: 0,
+        discount: 0,
+        carrycost: 0,
+        category: serviceCategory.id,
+        createdby: req.session.user ? req.session.user.id : null,
+      };
+      product = await queries.products.create(newProductData);
+    }
+
+    res.json({
+      success: true,
+      product: {
+        id: product.id,
+        name: product.name,
+        saleprice: product.saleprice,
+        purchaseprice: product.purchaseprice,
+      },
+    });
+  } catch (error) {
+    console.error("Error creating single purchase service:", error);
+    res.json({ success: false, message: error.message || "Internal Server Error" });
+  }
+};

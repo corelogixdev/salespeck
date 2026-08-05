@@ -19,7 +19,7 @@ function getUploadsBaseDir() {
       || (process.platform === 'darwin'
         ? path.join(os.homedir(), 'Library', 'Application Support')
         : path.join(os.homedir(), '.config'));
-    return path.join(appDataPath, 'openmenu', 'uploads');
+    return path.join(appDataPath, 'stitchcore', 'uploads');
   }
 
   return path.join(__dirname, '..', 'uploads');
@@ -49,7 +49,7 @@ app.use('/uploads', express.static(getUploadsBaseDir()));
 app.use('/node_modules', express.static(path.join(__dirname, '..', 'node_modules')));
 
 // Serve generated report PDFs from temp directory
-const tempPdfDir = path.join(os.tmpdir(), 'openmenu-pdfs');
+const tempPdfDir = path.join(os.tmpdir(), 'stitchcore-pdfs');
 try { require('fs').mkdirSync(tempPdfDir, { recursive: true }); } catch (e) {}
 app.use('/temp-pdfs', express.static(tempPdfDir));
 // Set view engine
@@ -60,17 +60,21 @@ if (!__dirname.includes('app.asar')) {
 }
 app.set('view cache', false);
 
-// Use express-ejs-layouts
-app.use(expressLayouts);
-// Session middleware
+// Session must run before layouts so res.locals.user is available to every view
 app.use(
   session({
     name: 'session',
-    secret: 'your-secret',
+    secret: config.session_secret || require('crypto').randomBytes(48).toString('hex'),
     maxAge: 3600000 // 1 hour
   })
 );
 app.use(sessionDataMiddleware);
+
+const licenseGate = require('../middleware/licenseGate');
+app.use(licenseGate);
+
+// Use express-ejs-layouts
+app.use(expressLayouts);
 
 // Add these route imports
 const brandRoutes = require('../routes/brandRoutes');
@@ -82,6 +86,7 @@ app.get('/api/verify-server', (req, res) => {
 });
 
 // Routes
+app.use('/license', require('../routes/licenseRoutes'));
 app.use('/', routes.mainRoutes);
 app.use('/products', routes.productRoutes);
 app.use('/users', routes.userRoutes);

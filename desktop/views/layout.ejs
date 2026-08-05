@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>OpenMenu v<%= typeof appVersion !=='undefined' ? appVersion : '1.0.0' %>
+    <title>StitchCore v<%= typeof appVersion !=='undefined' ? appVersion : '1.0.0' %>
     </title>
     <link rel="icon" href="/assets/img/icon.png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,7 +32,7 @@
     <div id="layout-wrapper">
         <header id="page-topbar">
             <div class="navbar-header">
-                <% if (typeof user !=='undefined' && user) { %>
+                <% if ((typeof isAuthenticated !== 'undefined' && isAuthenticated) || (typeof user !== 'undefined' && user)) { %>
                     <div class="d-flex align-items-center flex-grow-1">
                         <div class="navbar-brand-box horizontal-logo" style="padding-right: 15px;">
                             <a href="/" class="logo logo-dark">
@@ -69,13 +69,15 @@
                                 </li>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link menu-link dropdown-toggle" href="#"
-                                        data-bs-toggle="dropdown" role="button" aria-expanded="false">
+                                        role="button" aria-expanded="false" aria-haspopup="true">
                                         <i class="las la-box"></i> <span>Stock</span>
                                     </a>
                                     <ul class="dropdown-menu">
                                         <li><a href="/products" class="dropdown-item">Products</a></li>
+                                        <% if (typeof permissions !== 'undefined' && permissions.purchasesCreate) { %>
                                         <li><a href="/accounting/purchase/form" class="dropdown-item">New Purchase</a></li>
                                         <li><a href="/accounting/purchase/service-form" class="dropdown-item">Purchase Services</a></li>
+                                        <% } %>
                                         <li><a href="/inventorylogs" class="dropdown-item">Stock Ledger</a></li>
                                         <li><a href="/brands" class="dropdown-item">Brands</a></li>
                                         <li><a href="/categories" class="dropdown-item">Categories</a></li>
@@ -83,51 +85,53 @@
                                 </li>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link menu-link dropdown-toggle" href="#"
-                                        data-bs-toggle="dropdown" role="button" aria-expanded="false">
+                                        role="button" aria-expanded="false" aria-haspopup="true">
                                         <i class="las la-users"></i> <span>Parties</span>
                                     </a>
                                     <ul class="dropdown-menu">
                                         <li><a href="/users?role=customer" class="dropdown-item">Customers</a></li>
+                                        <% if (typeof permissions !== 'undefined' && permissions.usersList) { %>
                                         <li><a href="/users?role=user" class="dropdown-item">Users</a></li>
+                                        <% } %>
                                         <li><a href="/users?role=vendor" class="dropdown-item">Vendors</a></li>
                                     </ul>
                                 </li>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link menu-link dropdown-toggle" href="#"
-                                        data-bs-toggle="dropdown" role="button" aria-expanded="false">
+                                        role="button" aria-expanded="false" aria-haspopup="true">
                                         <i class="las la-shopping-cart"></i> <span>Sales</span>
                                     </a>
                                     <ul class="dropdown-menu">
                                         <li><a href="/sales" class="dropdown-item">POS Sales</a></li>
                                         <li><a href="/sales/form" class="dropdown-item" id="new-sale-menu-link">New Sale</a></li>
                                         <li><a href="/sales/service-form" class="dropdown-item">Service Sales</a></li>
-                                        <li><a href="/sales/returns" class="dropdown-item disabled">Returns</a></li>
+                                        <li><a href="/sales/returns" class="dropdown-item">Returns</a></li>
                                     </ul>
                                 </li>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link menu-link dropdown-toggle" href="#"
-                                        data-bs-toggle="dropdown" role="button" aria-expanded="false">
+                                        role="button" aria-expanded="false" aria-haspopup="true">
                                         <i class="las la-calculator"></i> <span>Accounting</span>
                                     </a>
                                     <ul class="dropdown-menu">
                                         <li><a href="/accounting/coa" class="dropdown-item">Chart of Accounts</a></li>
                                         <li><a href="/accounting/balance-sheet" class="dropdown-item">Balance Sheet</a></li>
                                         <li><a href="/accounting/purchase" class="dropdown-item">Purchases List</a></li>
-                                        <li><a href="/accounting/purchase/form" class="dropdown-item">New Purchase</a></li>
-                                        <li><a href="/accounting/purchase/service-form" class="dropdown-item">Purchase Services</a></li>
                                         <li><a href="/accounting/expenses" class="dropdown-item">Expenses</a></li>
                                         <li><a href="/accounting/transactions" class="dropdown-item">Transactions</a></li>
+                                        <% if (typeof permissions !== 'undefined' && permissions.accountingCreate) { %>
                                         <li><a href="/accounting/cash-closing" class="dropdown-item">Cash Closing</a></li>
+                                        <% } %>
                                         <li><a href="/accounting/cash-closing-report" class="dropdown-item">Cash Closing Report</a></li>
                                         <li><a href="/accounting/taxes" class="dropdown-item">Taxes</a></li>
                                     </ul>
                                 </li>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link menu-link dropdown-toggle" href="#"
-                                        data-bs-toggle="dropdown" role="button" aria-expanded="false">
+                                        role="button" aria-expanded="false" aria-haspopup="true">
                                         <i class="ri-file-chart-line"></i> <span>Reports</span>
                                     </a>
-                                    <ul class="dropdown-menu">
+                                    <ul class="dropdown-menu dropdown-menu-end">
                                         <li><a href="/reports" class="dropdown-item">All Reports</a></li>
                                         <li><a href="/reports/sales" class="dropdown-item">Sales Report</a></li>
                                         <li><a href="/reports/purchases" class="dropdown-item">Purchases Report</a></li>
@@ -135,16 +139,18 @@
                                         <li><a href="/reports/customers" class="dropdown-item">Customer Report</a></li>
                                     </ul>
                                 </li>
+                                <% if (typeof permissions !== 'undefined' && (permissions.settings || permissions.all)) { %>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link menu-link dropdown-toggle" href="#"
-                                        data-bs-toggle="dropdown" role="button" aria-expanded="false">
+                                        role="button" aria-expanded="false" aria-haspopup="true">
                                         <span>Others</span>
                                     </a>
-                                    <ul class="dropdown-menu">
+                                    <ul class="dropdown-menu dropdown-menu-end">
                                         <li><a href="/settings" class="dropdown-item">Settings</a></li>
                                         <li><a href="/export-db" class="dropdown-item">Export DB</a></li>
                                     </ul>
                                 </li>
+                                <% } %>
                             </ul>
                         </div>
                     </div>
@@ -159,7 +165,7 @@
                                             </button>
                                         </div>
 
-                                        <% if (typeof user !=='undefined' && user) { %>
+                                        <% if ((typeof isAuthenticated !== 'undefined' && isAuthenticated) || (typeof user !== 'undefined' && user)) { %>
                                             <!-- Notifications -->
                                             <div class="dropdown topbar-head-dropdown ms-1 header-item" id="notificationDropdown">
                                                 <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"
@@ -196,21 +202,23 @@
                                             <div class="ms-1 header-item d-none d-sm-flex user-profile-card" id="userProfileDropdown">
                                                 <div class="user-profile-trigger">
                                                     <div class="user-avatar">
-                                                        <% if (user.profile_image_url) { %>
+                                                        <% if (user && user.profile_image_url) { %>
                                                             <img src="<%= user.profile_image_url %>" alt="User Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                                                        <% } else if (user) { %>
+                                                            <%= (user.firstname || 'U').charAt(0).toUpperCase() + (user.lastname || '').charAt(0).toUpperCase() %>
                                                         <% } else { %>
-                                                            <%= user.firstname.charAt(0).toUpperCase() + user.lastname.charAt(0).toUpperCase() %>
+                                                            U
                                                         <% } %>
                                                     </div>
                                                     <div class="user-info">
                                                         <p class="user-greeting">Welcome back,</p>
-                                                        <p class="user-name"><%= user.firstname %></p>
+                                                        <p class="user-name"><%= user ? user.firstname : 'User' %></p>
                                                     </div>
                                                     <i class='bx bx-chevron-down dropdown-arrow'></i>
                                                 </div>
                                                 <div class="user-profile-menu">
                                                     <div class="user-profile-menu-header">
-                                                        <p class="menu-user-name"><%= user.firstname + " " + user.lastname %></p>
+                                                        <p class="menu-user-name"><%= user ? (user.firstname + " " + (user.lastname || '')) : 'User' %></p>
                                                         <p class="menu-user-role">Administrator</p>
                                                     </div>
                                                     <a href="#profile-modal" class="user-profile-menu-item">
@@ -258,6 +266,12 @@
     </div>
     <div class="main-content">
         <div class="page-content">
+            <% if (typeof licenseStatus !== 'undefined' && licenseStatus && licenseStatus.state === 'grace') { %>
+            <div class="alert alert-warning mx-3 mt-3 mb-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <span><%= licenseStatus.message %></span>
+                <a href="/license/activate" class="btn btn-sm btn-warning">Renew license</a>
+            </div>
+            <% } %>
             <%- body %>
         </div>
     </div>
@@ -587,8 +601,13 @@
     <script src="/assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
     <script src="/assets/js/vendor/moment.min.js"></script>
     <script src="/assets/js/plugins.js"></script>
+    <script>
+        if (window.feather && typeof window.feather.replace === 'function') {
+            try { window.feather.replace(); } catch (e) {}
+        }
+    </script>
     <% if (typeof hidenav==='undefined' || hidenav !==true) { %>
-        <script src="/assets/js/app.js"></script>
+        <!-- Velzon app.js intentionally omitted: it rewrites the navbar and causes missing menu / double-clicks -->
         <% } %>
             <script src="/assets/libs/chartjs/chart.umd.min.js"></script>
             <script>
@@ -780,7 +799,7 @@
 
                 <script src="/assets/js/profile-modal.js"></script>
 
-                <% if (typeof user !=='undefined' && user) { %>
+                <% if ((typeof isAuthenticated !== 'undefined' && isAuthenticated) || (typeof user !== 'undefined' && user)) { %>
                     <script>
                         // Maximize window after login
                         document.addEventListener('DOMContentLoaded', function () {

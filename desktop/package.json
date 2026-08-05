@@ -21,6 +21,8 @@
     "build": "electron-builder",
     "postbuild": "rimraf dist/win-unpacked",
     "upload": "node build/upload.js",
+    "license:keys": "node scripts/generate-license-keys.js",
+    "license:issue": "node scripts/issue-license.js",
     "test-local-installed-update": "node scripts/test-local-installed-update.js",
     "local-update:installed": "node scripts/test-local-installed-update.js",
     "test:update": "node scripts/test-local-installed-update.js"
@@ -56,12 +58,13 @@
       "installEnv.js",
       "main.js",
       "preload.js",
-      ".env"
+      "!.env",
+      "!**/.env"
     ],
     "publish": [
       {
         "provider": "generic",
-        "url": "https://gitlab.com/api/v4/projects/62990895/packages/generic/openmenu/release"
+        "url": "https://gitlab.com/api/v4/projects/62990895/packages/generic/stitchcore/release"
       }
     ],
     "win": {
@@ -91,6 +94,7 @@
     "@prisma/adapter-libsql": "^7.7.0",
     "@prisma/client": "^7.7.0",
     "@prisma/client-runtime-utils": "^7.7.0",
+    "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.10.0",
     "cookie-session": "^2.1.0",
     "cors": "^2.8.5",

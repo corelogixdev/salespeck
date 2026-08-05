@@ -1,197 +1,87 @@
-# OpenMenu
+# StitchCore
 
-OpenMenu is a desktop-first POS, inventory, and invoicing system built with Electron, Express, EJS, Sequelize, and SQLite.
+Desktop POS for stitching businesses — stock, sales (product and service/design), returns, purchases, parties, accounting, and reports.
 
-It is optimized for offline-friendly local operation, fast billing flows, and incremental feature expansion for restaurants and retail businesses.
+## Stack
 
-## Product Overview
+- **Electron** desktop shell
+- **Express** + **EJS** UI
+- **Prisma** + **SQLite** (local, offline-first)
+- Optional marketing site under `website/` (separate from the desktop app)
 
-- Primary app: `desktop/` (Electron + Express + EJS MVC stack)
-- Reporting/web extension target: `web/`
-- Current focus: fast POS, inventory control, accounting visibility, and operational reliability
-- Architecture direction: modular, feature-flag-ready, and prepared for phased Sequelize to Prisma migration
+## Repository layout
 
-## How The Desktop App Works
+| Path | Purpose |
+|------|---------|
+| `desktop/` | Main Electron + Express application |
+| `desktop/prisma/` | Schema, migrations, seeds, query layer |
+| `desktop/db/` | Dev SQLite DB (`stitch.sqlite`); dated copies in `db/backups/` |
+| `website/` | Public/marketing Next.js site |
+| `z-docs/` | Dev, release, and client-delivery documentation |
 
-Request/runtime flow:
+## Features (desktop)
 
-1. Electron starts from `desktop/main.js`
-2. `main.js` boots the Express app and opens the desktop window
-3. Browser window loads local server UI (EJS views)
-4. Routes map URLs to controllers
-5. Controllers call Sequelize models and utilities
-6. Views render paginated data and reusable components
-7. IPC events handle desktop-specific actions (focus lock, close, maximize, switch server, updater events)
+- Dashboard (sales metrics, category revenue, low stock)
+- Stock: products, batches, inventory logs, purchases / purchase services
+- Parties: customers and vendors
+- Sales: POS sale, service/design sales (Excel bulk import), sales returns
+- Accounting: chart of accounts, journals, expenses, cash closing
+- Reports: sales, purchases, inventory, customers (PDF export)
+- Settings: company, printer, server switch (LAN)
 
-## Desktop Structure (Detailed)
+## Quick start (development)
 
-The desktop application follows a layered MVC-style structure in `desktop/`:
+```bash
+cd desktop
+npm install
+npm run prisma:generate
+npm run dev
+```
 
-- `main.js`: Electron lifecycle, updater behavior, IPC handlers, server switching.
-- `preload.js`: Secure context bridge for renderer-safe desktop actions.
-- `server/`: Express initialization, middlewares, app wiring.
-- `routes/`: Route modules for each domain (sales, products, users, reports, settings, accounting, taxes, profile).
-- `controllers/`: Business logic and request processing.
-- `models/`: Sequelize models and associations.
-- `migrations/`: Database schema changes and table definitions.
-- `views/`: EJS pages and shared partials.
-- `middleware/`: Authentication and request-level access checks.
-- `utils/`: Shared services (`pagination`, permissions, formatting, search query helpers, cache, encryption, id generation).
-- `assets/`: CSS/JS/images/fonts/vendors.
-- `build/`: Build and package upload utilities.
-- `z-docs/`: Local development and update testing notes.
+Details: [z-docs/dev-quickstart.md](z-docs/dev-quickstart.md).
 
-## Existing Features (Current State)
+Ensure `desktop/.settings` has `env=development` when developing locally.
 
-### Authentication And User Access
+## Common scripts (`desktop/`)
 
-- Login, logout, registration flow.
-- Profile management APIs and profile image upload.
-- Route-level authorization checks with permissions middleware.
+| Script | Purpose |
+|--------|---------|
+| `npm run dev` | Nodemon + Electron |
+| `npm run start:electron` | Electron only |
+| `npm run prisma:generate` | Generate Prisma client |
+| `npm run prisma:push` / `prisma:migrate` | Schema sync / migrate |
+| `npm run prisma:seed` | Must-data seed (COA, company defaults) |
+| `npm run build` | Windows NSIS installer → `dist/stitchcore.exe` |
+| `npm run upload` | Upload `stitchcore.exe` + `latest.yml` to GitLab package `stitchcore/release` |
 
-### Sales And Billing
+Release flow: [z-docs/update-release.md](z-docs/update-release.md).  
+**Full from-scratch build & deploy:** [z-docs/BUILD_AND_DEPLOY.md](z-docs/BUILD_AND_DEPLOY.md).
 
-- Create and save sales with product selection.
-- Customer search support in sales workflow.
-- Sale detail and list views with table-driven UI.
+## Data locations
 
-### Purchases And Vendors
+| Runtime | SQLite | Settings / uploads |
+|---------|--------|--------------------|
+| Development | `desktop/db/stitch.sqlite` | `desktop/.settings` (local) |
+| Installed (Windows) | `%APPDATA%\stitchcore\stitch.sqlite` | `%APPDATA%\stitchcore\` |
 
-- Purchase create/save flow.
-- Vendor search, purchase detail view, and purchase listing.
+## Documentation
 
-### Products, Categories, Brands
+- [**Build & deploy (from scratch)**](z-docs/BUILD_AND_DEPLOY.md) — full release + client install procedure
+- [Client deployment & licensing roadmap](z-docs/CLIENT_DEPLOYMENT_ROADMAP.md)
+- [Client onboarding checklist](z-docs/CLIENT_ONBOARDING.md)
+- [Licensing (issue & activate keys)](z-docs/LICENSING.md)
+- [Backup & restore](z-docs/BACKUP_RESTORE.md)
+- [Update release guide](z-docs/update-release.md)
+- [Windows code signing](z-docs/CODE_SIGNING.md)
+- [Local installed update test](z-docs/test-local-installed-update.md)
+- [Dev quickstart](z-docs/dev-quickstart.md)
 
-- Product list/search/create/view/update quantity.
-- Category CRUD and search.
-- Brand CRUD and search.
+## Current gaps (honest)
 
-### Inventory And Accounting
+- **Code signing certificate** — process documented; you still need a real Authenticode cert on the release PC
+- **Cloud sync** — not implemented (desktop is offline SQLite)
+- **Full packaged update smoke test** — run [test-local-installed-update.md](z-docs/test-local-installed-update.md) on a clean Windows install before wide rollout
 
-- Inventory logs listing and searchable history.
-- Tax management.
-- Accounting-related routes and views for transaction visibility.
+## Product identity
 
-### Reporting
-
-- Sales, purchases, inventory, and customer reports.
-- Export templates for PDF-based reporting outputs.
-
-### Desktop Runtime Features
-
-- Server switch capability from desktop UI.
-- Auto-updater integration and release checks.
-- IPC-based window behaviors for scanner-focused operations.
-
-## Data Domains (Core Models)
-
-Major data entities include:
-
-- `user`, `taxes`
-- `brand`, `category`, `product`, `productsub`, `productbatches`
-- `purchase`, `purchasedproducts`
-- `sale`, `soldproducts`
-- `inventorylogs`
-- `financeaccount`, `financetransaction`, `productsalepurchase`, `cashclosing`
-- `softwaresetting`
-
-Schema bootstrap is currently centered in `desktop/migrations/20260131000000-init-all-tables.js`.
-
-## Important Files
-
-- `desktop/main.js`: Electron runtime entry point.
-- `desktop/routes/index.js`: Auto-loads route modules.
-- `desktop/prisma/queries.js`: Centralized Prisma query-layer for all controllers.
-- `desktop/utils/prismaStartupBootstrap.js`: Prisma migrate+seed startup bootstrap for installed/packaged runs.
-- `desktop/prisma/seed.js`: Default Prisma seeding (startup-safe).
-- `desktop/migrations/20260131000000-init-all-tables.js`: Primary schema migration.
-- `desktop/middleware/isAuthenticated.js`: Session authentication middleware.
-- `desktop/utils/permissions.js`: Permission validation helpers.
-- `desktop/utils/pagination.js` and `desktop/utils/paginationHelper.js`: Pagination utilities.
-- `desktop/controllers/`: Domain logic for each module.
-- `desktop/views/components/partials/`: Shared table/filter/pagination/modal components.
-- `z-docs/dev-mode.md`: Development mode notes.
-- `z-docs/update-release.md`: Update testing and release guide.
-- `z-docs/test-local-installed-update.md`: Local installed-app update testing guide.
-
-## Local Testing And Publish
-
-- Run in local development mode: `cd desktop && npm run dev`
-- Run migration scripts: `cd desktop && npm run prisma:migrate`
-- Seed default data (optional): `cd desktop && npm run prisma:seed`
-- Seed test small dataset (optional): `cd desktop && npm run prisma:seed:test-small`
-- Seed test large dataset (optional): `cd desktop && npm run prisma:seed:test-large`
-- Build desktop app: `cd desktop && npm run build`
-- Upload/publish package: `cd desktop && npm run upload`
-- Release verification helper: `cd desktop && npm run test-local-installed-update`
-- Local installed-app update testing guide: `z-docs/test-local-installed-update.md`
-- Update testing workflow: `z-docs/update-release.md`
-
-## Performance And Scalability Principles
-
-- Keep design sleek and simple so operators can move fast.
-- Optimize queries for high-volume datasets (millions of rows).
-- Use pagination for all large-list pages.
-- Keep list endpoints selective and index-friendly.
-- Keep UI responsive during billing and scanning operations.
-- Apply caching carefully for repeated read-heavy lookups.
-
-## Change Management Rules
-
-- Any schema change must propagate to:
-  - migration files
-  - models and associations
-  - controllers and validations
-  - routes and API contracts
-  - views and table columns
-  - reports and export templates
-- Remove debug logs before release builds.
-- Prefer reusable partials and utility methods over copy-paste implementations.
-
-
-
-## Future Roadmap
-
-- Chart of accounts improvents
- - Standard flow for sales/returns/purchase/ledger payments/cash closing/Expences
- - cash payment check in sales
- 
-
-- Check and database structure for Preformance 
-
-- Change design to simple sleek, remove gradiants, one css files and it should look like pos
-
-- country and currency symbols setting for company
-
-- add staff and assign permissions
-
-- Kitchen & Operations:
-  - Kitchen Display System (KDS) with live order state tracking.
-  - Delivery options with queue management.
-  - Table operations for dine-in workflows.
-  - Shift and handover support for cashier/floor teams.
-- Advanced Inventory:
-  - Low-stock alerts and reorder suggestions.
-  - Supplier performance and lead-time tracking.
-  - Recipe/BOM based inventory deduction on every sale.
-  - Inventory movement analytics for fast/slow moving items.
-- Customer & Growth:
-  - WhatsApp integration for customer communications and order updates.
-  - Customer history and segmentation for better targeting.
-  - Repeat customer and basket-size insight dashboards.
-- Platform & Integrations:
-  - Settlement and payment reconciliation screens.
-  - Website/online reporting for OpenMenu Desktop in `web/`.
-- AI-Focused Enhancements (minimal showcase):
-  - Demand forecast preview for top products.
-  - Basic anomaly alerts for unusual refunds/voids.
-  - Natural-language report helper for quick management questions.
-- Mobile & Omnichannel:
-  - Local mobile app for menu display and QR/mobile scan selling.
-  - Staff mobile app for table/order handling.
-  - Owner mobile dashboard for daily KPIs and alerts.
-- Features Control:
-  - Feature flags to enable/disable modules by business type.
-  - Branch-wise feature controls.
-  - Role-aware feature visibility for safe rollout.
-  - Add FBR API integration for tax invoice/reporting compliance workflows.
+This product is **StitchCore** (package/app id `stitchcore`). It is no longer branded OpenMenu.
