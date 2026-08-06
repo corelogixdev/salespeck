@@ -23,7 +23,7 @@ You also do not need to edit the installed app `.settings` file manually for thi
 The helper script updates the installed app `.settings` file for you and restores it after the test.
 
 ## Installed App Test
-1. Make sure StitchCore `1.0.7` is already installed in Windows.
+1. Make sure SalesPeck `1.0.7` is already installed in Windows.
 2. Close any dev app started with `npm run dev` or `npm run start:electron`.
 3. Start the installed app from the Start menu or desktop shortcut.
 4. Wait for the installed app to check `http://localhost:8000`.

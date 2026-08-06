@@ -40,4 +40,12 @@ contextBridge.exposeInMainWorld('electron', {
      * Open the given PDF file path in the system's default PDF viewer.
      */
     openPdfInViewer: (filePath) => ipcRenderer.invoke('open-pdf-in-viewer', filePath),
+    /**
+     * Native folder picker (returns absolute path or null if cancelled).
+     */
+    selectDirectory: (defaultPath) => ipcRenderer.invoke('select-directory', defaultPath),
+    /**
+     * Reveal a path in the OS file manager.
+     */
+    openPath: (targetPath) => ipcRenderer.invoke('open-path', targetPath),
 });

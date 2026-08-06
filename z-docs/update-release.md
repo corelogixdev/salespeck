@@ -17,9 +17,9 @@ Result: schema changes and required must-data are applied automatically on app s
 This automatic backup + `migrate deploy` flow is for installed/packaged app updates.
 It is intentionally skipped during `npm run dev`.
 
-## Brand / upload (StitchCore)
-- Build artifact: **`stitchcore.exe`** (`productName` in `desktop/package.json`).
-- Upload target: GitLab generic package `packages/generic/stitchcore/release` (`stitchcore.exe` + `latest.yml`).
+## Brand / upload (SalesPeck)
+- Build artifact: **`salespeck.exe`** (`productName` in `desktop/package.json`).
+- Upload target: GitLab generic package `packages/generic/salespeck/release` (`salespeck.exe` + `latest.yml`).
 - Create that package folder on GitLab if it does not exist yet (do not upload a lone file at the package root).
 - **Code signing:** see [CODE_SIGNING.md](./CODE_SIGNING.md) before shipping to clients.
 - Packaged builds **do not** include `.env` (developer tokens stay on the build machine only).
@@ -39,11 +39,11 @@ npm run build
 ```bash
 npm run upload
 ```
-Uploads to `https://gitlab.com/api/v4/projects/<CI_PROJECT_ID>/packages/generic/stitchcore/release`.
+Uploads to `https://gitlab.com/api/v4/projects/<CI_PROJECT_ID>/packages/generic/salespeck/release`.
 
 ## Other installer notes
 1. Clear or replace previous package files under the GitLab package registry until update flow is verified.
-2. Files must live under a folder such as `.../stitchcore/release/`, not at the bare package root.
+2. Files must live under a folder such as `.../salespeck/release/`, not at the bare package root.
 
 ## Pre-Release Checklist
 - `desktop/prisma/schema.prisma` and migrations are committed.
@@ -58,8 +58,8 @@ Uploads to `https://gitlab.com/api/v4/projects/<CI_PROJECT_ID>/packages/generic/
 3. Test: dashboard, products, sales, purchases, reports, settings.
 
 ## Install locations (Windows)
-With `productName` / app data folder **`stitchcore`**:
+With `productName` / app data folder **`salespeck`**:
 
-1. `%LOCALAPPDATA%\Programs\stitchcore` — installed application
-2. `%LOCALAPPDATA%\stitchcore-updater` — updater cache (electron-updater)
-3. `%APPDATA%\stitchcore` — `.settings`, uploads, logs, and `stitch.sqlite`
+1. `%LOCALAPPDATA%\Programs\salespeck` — installed application
+2. `%LOCALAPPDATA%\salespeck-updater` — updater cache (electron-updater)
+3. `%APPDATA%\salespeck` — `.settings`, uploads, logs, and `stitch.sqlite`

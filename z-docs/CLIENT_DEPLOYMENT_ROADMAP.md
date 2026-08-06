@@ -1,4 +1,4 @@
-# StitchCore — Client Deployment & Licensing Roadmap
+# SalesPeck — Client Deployment & Licensing Roadmap
 
 Operational guide for packaging, delivering, and commercially gating the desktop POS for clients.
 
@@ -39,7 +39,7 @@ Operational guide for packaging, delivering, and commercially gating the desktop
 ```mermaid
 flowchart TD
   dev[Developer issues signed license] --> key[License: seats plan expiry machineId]
-  key --> client[Client installs stitchcore.exe]
+  key --> client[Client installs salespeck.exe]
   client --> activate[Activation screen stores license locally]
   activate --> gate[App start and login gate]
   gate --> seats[Create user checks seat count]
@@ -53,7 +53,7 @@ flowchart TD
 |-----------|----------------|
 | Developer CLI / script | Issue signed payload (`maxUsers`, `plan`, `expiresAt`, client id) |
 | App public key (embedded) | Verify signature; reject tampered licenses |
-| `%APPDATA%\stitchcore\license.json` | Persist activated license + signature |
+| `%APPDATA%\salespeck\license.json` | Persist activated license + signature |
 | Startup / login middleware | Require valid, non-expired license |
 | User create / register | Reject when staff count ≥ `maxUsers` |
 | Settings UI | Show plan, seats used/remaining, expiry |
@@ -101,25 +101,25 @@ Sign the canonical JSON with the developer private key; store `{ payload, signat
 | Area | Status | Touchpoints |
 |------|--------|-------------|
 | Electron + Express POS | Working | `desktop/main.js`, `desktop/server/app.js` |
-| Local SQLite (Prisma) | Working | `desktop/prisma/`, `%APPDATA%\stitchcore\stitch.sqlite` |
-| Windows NSIS build | Working | `desktop/package.json` → `npm run build` → `dist/stitchcore.exe` |
+| Local SQLite (Prisma) | Working | `desktop/prisma/`, `%APPDATA%\salespeck\stitch.sqlite` |
+| Windows NSIS build | Working | `desktop/package.json` → `npm run build` → `dist/salespeck.exe` |
 | Auto-update plumbing | Partial | `electron-updater`, `update_url` in `.settings` |
 | Multi staff logins | Working (unlimited) | `user` table, login/register |
 | Post-update migrate + DB backup | Working (packaged) | See [update-release.md](./update-release.md) |
 
 ### 4.2 Brand / packaging (updated)
 
-OpenMenu branding has been unified to **StitchCore** / **`stitchcore`** (paths, upload artifact, AppData, docs).
+OpenMenu branding has been unified to **SalesPeck** / **`salespeck`** (paths, upload artifact, AppData, docs).
 
 | Item | Status |
 |------|--------|
 | Product / AppData / upload names | Done |
-| GitLab package folder | Ops: create `packages/generic/stitchcore/release` on first upload |
-| Legacy `%APPDATA%\openmenu` | Manual migrate if an old install exists |
+| GitLab package folder | Ops: create `packages/generic/salespeck/release` on first upload |
+| Legacy installs | Older `%APPDATA%\stitchcore` or `%APPDATA%\openmenu` — migrate settings/DB manually if needed |
 | Session secret / `.env` exclusion | Done (Phase A) |
 | Authenticode signing | Documented; needs a cert on the release PC |
 
-**Paths:** installer/`productName` `stitchcore`; settings/uploads/DB under `%APPDATA%\stitchcore`; upload `dist/stitchcore.exe`.
+**Paths:** installer/`productName` `salespeck`; settings/uploads/DB under `%APPDATA%\salespeck`; upload `dist/salespeck.exe`.
 
 Full procedure: [BUILD_AND_DEPLOY.md](./BUILD_AND_DEPLOY.md).
 
@@ -159,8 +159,8 @@ Full procedure: [BUILD_AND_DEPLOY.md](./BUILD_AND_DEPLOY.md).
 
 ### Phase A — Packaging & brand hygiene
 
-- [x] Align product names/paths to **`stitchcore`** / **StitchCore** (done in prep rebrand)
-- [x] Document GitLab `packages/generic/stitchcore/release` requirement (create folder on first upload; see [update-release.md](./update-release.md))
+- [x] Align product names/paths to **`salespeck`** / **SalesPeck** (done in prep rebrand)
+- [x] Document GitLab `packages/generic/salespeck/release` requirement (create folder on first upload; see [update-release.md](./update-release.md))
 - [x] Per-install `session_secret` generated into writable `.settings` (not hardcoded; hidden from Settings UI)
 - [x] Exclude developer `.env` from electron-builder packaged `files`
 - [x] Document Authenticode signing — [CODE_SIGNING.md](./CODE_SIGNING.md)
@@ -208,9 +208,9 @@ Documented in [CLIENT_ONBOARDING.md](./CLIENT_ONBOARDING.md). Order: **activate 
 1. Update version in [`desktop/package.json`](../desktop/package.json).
 2. Ensure Prisma schema/migrations committed.
 3. `cd desktop && npm run prisma:generate`
-4. `npm run build` → expect installer under `desktop/dist/` (today: `stitchcore.exe` / NSIS).
+4. `npm run build` → expect installer under `desktop/dist/` (today: `salespeck.exe` / NSIS).
 5. Sign the installer (Authenticode) when certificates are available.
-6. `npm run upload` — uploads `stitchcore.exe` + `latest.yml` to GitLab `stitchcore/release`.
+6. `npm run upload` — uploads `salespeck.exe` + `latest.yml` to GitLab `salespeck/release`.
 7. Smoke-test update feed URL used in client `.settings` `update_url`.
 
 Step-by-step from scratch: [BUILD_AND_DEPLOY.md](./BUILD_AND_DEPLOY.md).
@@ -218,7 +218,7 @@ Step-by-step from scratch: [BUILD_AND_DEPLOY.md](./BUILD_AND_DEPLOY.md).
 ### Fresh client machine
 
 1. Run installer (admin if NSIS requires it).
-2. Launch app; confirm DB created under stitchcore app data.
+2. Launch app; confirm DB created under salespeck app data.
 3. Activate license (Phase B).
 4. Register branch manager / create staff within seat limit.
 5. Verify: login, sale, purchase, report, settings.
@@ -228,10 +228,10 @@ Step-by-step from scratch: [BUILD_AND_DEPLOY.md](./BUILD_AND_DEPLOY.md).
 
 | Purpose | Path |
 |---------|------|
-| Installer / programs | `%LOCALAPPDATA%\Programs\stitchcore` |
-| Updater cache | `%LOCALAPPDATA%\stitchcore-updater` |
-| Settings / uploads / logs | `%APPDATA%\stitchcore` |
-| SQLite DB | `%APPDATA%\stitchcore\stitch.sqlite` (dev: `desktop/db/stitch.sqlite`) |
+| Installer / programs | `%LOCALAPPDATA%\Programs\salespeck` |
+| Updater cache | `%LOCALAPPDATA%\salespeck-updater` |
+| Settings / uploads / logs | `%APPDATA%\salespeck` |
+| SQLite DB | `%APPDATA%\salespeck\stitch.sqlite` (dev: `desktop/db/stitch.sqlite`) |
 
 Brand paths are unified. Remaining ops before wide rollout: Authenticode cert, first GitLab package folder, packaged update smoke test — see [BUILD_AND_DEPLOY.md](./BUILD_AND_DEPLOY.md).
 

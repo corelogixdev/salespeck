@@ -68,7 +68,7 @@ function formatMessages(message) {
 function getLogDirectory() {
   return (
     (electronApp && typeof electronApp.getPath === 'function' ? electronApp.getPath('userData') : null) ||
-    path.join(os.homedir(), '.stitchcore', 'logs')
+    path.join(os.homedir(), '.salespeck', 'logs')
   );
 }
 
@@ -122,4 +122,4 @@ function log(...message) {
 
 module.exports = log;
 module.exports.getLogDirectory = getLogDirectory;
-module.exports.deleteOldLogs = deleteOldLogs;
+module.exports.deleteOldLogs = deleteOldLogs;

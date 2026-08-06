@@ -2,7 +2,7 @@
 "use strict";
 
 /**
- * Issue a signed StitchCore license key.
+ * Issue a signed SalesPeck license key.
  *
  * Usage:
  *   node scripts/issue-license.js --seats 5 --plan yearly --client "Acme" --days 365

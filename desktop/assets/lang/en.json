@@ -39,6 +39,7 @@
         "logging": "Logging",
         "logger": "Logger",
         "env": "Environment",
+        "backup_path": "Database Backup Folder",
         "printer": {
             "printer": "Printer",
             "paper": "Paper",

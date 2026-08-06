@@ -325,9 +325,28 @@ const settings = {
   },
   async updateSettingByName(name, value) {
     const prisma = getPrisma();
-    const existing = await prisma.softwaresetting.findFirst({ where: { name } });
-    if (!existing) return null;
-    return prisma.softwaresetting.update({ where: { id: existing.id }, data: { value } });
+    const existingRows = await prisma.softwaresetting.findMany({ where: { name } });
+    if (!existingRows.length) {
+      return prisma.softwaresetting.create({
+        data: {
+          id: generateId(32),
+          name,
+          value,
+          source: "settings-ui",
+        },
+      });
+    }
+    const primary = existingRows[0];
+    const updated = await prisma.softwaresetting.update({
+      where: { id: primary.id },
+      data: { value },
+    });
+    if (existingRows.length > 1) {
+      await prisma.softwaresetting.deleteMany({
+        where: { id: { in: existingRows.slice(1).map((r) => r.id) } },
+      });
+    }
+    return updated;
   },
   async updateUserDashboardConfig(userId, dashboardConfig) {
     const prisma = getPrisma();
@@ -2058,18 +2077,31 @@ const dashboard = {
       ),
     ]);
 
-    const todaysSalesAmountValue = parseFloat(todaySalesResult[0]?.total || 0);
-    const yesterdaySalesAmount = parseFloat(yesterdaySalesResult[0]?.total || 0);
-    const todayCustomersCount = parseInt(todayCustomersResult[0]?.today_count || 0, 10);
-    const yesterdayCustomersCount = parseInt(yesterdayCustomersResult[0]?.yesterday_count || 0, 10);
-    const totalSalesCount = (salesByDayResult || []).reduce((sum, day) => sum + (parseInt(day.total || 0, 10) || 0), 0);
+    const todaysSalesAmountValue = Number(todaySalesResult[0]?.total || 0);
+    const yesterdaySalesAmount = Number(yesterdaySalesResult[0]?.total || 0);
+    const todayCustomersCount = Number(todayCustomersResult[0]?.today_count || 0);
+    const yesterdayCustomersCount = Number(yesterdayCustomersResult[0]?.yesterday_count || 0);
+    const salesByDayNormalized = (salesByDayResult || []).map((day) => ({
+      date: day.date,
+      total: Number(day.total || 0),
+      revenue: Number(day.revenue || 0),
+    }));
+    const totalSalesCount = salesByDayNormalized.reduce((sum, day) => sum + day.total, 0);
     const weeklySummaryResult = (weeklyMonthlySummaryResult || []).find((item) => item.period === "weekly") || {};
     const monthlySummaryResult = (weeklyMonthlySummaryResult || []).find((item) => item.period === "monthly") || {};
-    const hourlySalesResult = todayHourlySalesResult || [];
+    const hourlySalesResult = (todayHourlySalesResult || []).map((row) => ({
+      hour: row.hour != null ? String(row.hour) : row.hour,
+      revenue: Number(row.revenue || 0),
+    }));
+    const topProductsNormalized = (topProductsResult || []).map((row) => ({
+      product_name: row.product_name,
+      times_added: Number(row.times_added || 0),
+      total_quantity: Number(row.total_quantity || 0),
+    }));
     const categorySalesResult = (topCategorySalesResult || []).map((row) => ({
       category: row.category || "Uncategorized",
-      total_quantity: row.total_quantity,
-      total_revenue: row.total_revenue,
+      total_quantity: Number(row.total_quantity || 0),
+      total_revenue: Number(row.total_revenue || 0),
     }));
 
     function calculatePercentageChange(previous = 0, current = 0) {
@@ -2087,20 +2119,20 @@ const dashboard = {
       customerPercentageChange: calculatePercentageChange(yesterdayCustomersCount, todayCustomersCount).toFixed(2),
       customerArrowDirection: todayCustomersCount >= yesterdayCustomersCount ? "up" : "down",
       totalSalesCount,
-      topFiveSoldProductsWithSoldQuantity: topProductsResult || [],
-      salesCountByDay: salesByDayResult || [],
+      topFiveSoldProductsWithSoldQuantity: topProductsNormalized,
+      salesCountByDay: salesByDayNormalized,
       todaysSalesAmount: todaysSalesAmountValue > 0 ? todaysSalesAmountValue.toFixed(2) : 0,
       salesPercentageChange: calculatePercentageChange(yesterdaySalesAmount, todaysSalesAmountValue).toFixed(2),
       salesArrowDirection: todaysSalesAmountValue >= yesterdaySalesAmount ? "up" : "down",
       weeklySalesSummary: {
-        total_orders: parseInt(weeklySummaryResult.total_orders || 0, 10),
-        total_revenue: parseFloat(weeklySummaryResult.total_revenue || 0),
-        avg_order_value: parseFloat(weeklySummaryResult.avg_order_value || 0),
+        total_orders: Number(weeklySummaryResult.total_orders || 0),
+        total_revenue: Number(weeklySummaryResult.total_revenue || 0),
+        avg_order_value: Number(weeklySummaryResult.avg_order_value || 0),
       },
       monthlySalesSummary: {
-        total_orders: parseInt(monthlySummaryResult.total_orders || 0, 10),
-        total_revenue: parseFloat(monthlySummaryResult.total_revenue || 0),
-        avg_order_value: parseFloat(monthlySummaryResult.avg_order_value || 0),
+        total_orders: Number(monthlySummaryResult.total_orders || 0),
+        total_revenue: Number(monthlySummaryResult.total_revenue || 0),
+        avg_order_value: Number(monthlySummaryResult.avg_order_value || 0),
       },
       lowStockProducts: lowStockResult || [],
       hourlySales: hourlySalesResult,

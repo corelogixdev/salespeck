@@ -8,13 +8,14 @@ const os = require('os');
 // Note: session_secret is generated on first run and is NOT listed here (not shown on Settings UI).
 const DEFAULT_SETTINGS = [
   { key: 'install_date', value: new Date().toISOString() },
-  { key: 'update_url', value: 'https://gitlab.com/api/v4/projects/62990895/packages/generic/stitchcore/release' },
+  { key: 'update_url', value: 'https://gitlab.com/api/v4/projects/62990895/packages/generic/salespeck/release' },
   { key: 'CI_PROJECT_ID', value: 62990895 },
   { key: 'SERVER_IP', value: 'localhost' },
   { key: 'port', value: 5783 },
   { key: 'logging', value: false },
   { key: 'logger', value: 'file' },
   { key: 'env', value: 'production' },
+  { key: 'backup_path', value: '' }, // filled with default on first load
   { key: 'printer', value: JSON.stringify({
     printer: 'Default',
     paper: '58mm',
@@ -32,6 +33,10 @@ function generateSessionSecret() {
   return crypto.randomBytes(48).toString('hex');
 }
 
+function toSettingsPathFallback() {
+  return path.join(__dirname, 'db', 'backups').replace(/\\/g, '/');
+}
+
 // Determine the path for .settings file
 // In packaged Electron apps, __dirname points to app.asar which is read-only
 // So we need to use a writable location outside app.asar
@@ -43,7 +48,7 @@ function getSettingsPath() {
       (process.platform === 'darwin'
         ? path.join(os.homedir(), 'Library', 'Application Support')
         : path.join(os.homedir(), '.config'));
-    const settingsDir = path.join(appDataPath, 'stitchcore');
+    const settingsDir = path.join(appDataPath, 'salespeck');
     // Ensure directory exists
     if (!fs.existsSync(settingsDir)) {
       fs.mkdirSync(settingsDir, { recursive: true });
@@ -99,6 +104,25 @@ function loadSettings() {
     }
   });
 
+  // Default backup folder = <database-dir>/backups (same as prior built-in location)
+  if (!settings.backup_path || String(settings.backup_path).trim() === '') {
+    try {
+      const { getDefaultBackupDir, toSettingsPath } = require('./utils/dbBackup');
+      settings.backup_path = toSettingsPath(getDefaultBackupDir());
+      hasChanges = true;
+    } catch (e) {
+      settings.backup_path = toSettingsPathFallback();
+      hasChanges = true;
+    }
+  } else {
+    // Normalize stored path to forward slashes for dotenv safety
+    const normalized = String(settings.backup_path).replace(/\\/g, '/');
+    if (normalized !== settings.backup_path) {
+      settings.backup_path = normalized;
+      hasChanges = true;
+    }
+  }
+
   // Per-install session secret (never ship a shared hardcoded secret)
   const envSecret = process.env.session_secret || process.env.SESSION_SECRET;
   if (envSecret) {
@@ -142,10 +166,11 @@ const config = {
   logger: getConfigValue('logger', 'file'),
   env: getConfigValue('env', 'production'),
   install_date: getConfigValue('install_date', new Date().toISOString()),
-  update_url: getConfigValue('update_url', 'https://gitlab.com/api/v4/projects/62990895/packages/generic/stitchcore/release'),
+  update_url: getConfigValue('update_url', 'https://gitlab.com/api/v4/projects/62990895/packages/generic/salespeck/release'),
   CI_PROJECT_ID: parseInt(getConfigValue('CI_PROJECT_ID', 62990895)),
   SERVER_IP: getConfigValue('SERVER_IP', 'localhost'),
   session_secret: getConfigValue('session_secret', generateSessionSecret()),
+  backup_path: getConfigValue('backup_path', ''),
   printer: (() => {
     const printerValue = getConfigValue('printer', null);
     if (printerValue) {
@@ -205,7 +230,20 @@ config.updateAllSettings = function(newSettings) {
       return;
     }
 
-    const value = newSettings[key];
+    let value = newSettings[key];
+    if (key === 'backup_path') {
+      const trimmed = String(value || '').trim();
+      if (!trimmed) {
+        try {
+          const { getDefaultBackupDir, toSettingsPath } = require('./utils/dbBackup');
+          value = toSettingsPath(getDefaultBackupDir());
+        } catch {
+          value = toSettingsPathFallback();
+        }
+      } else {
+        value = String(trimmed).replace(/\\/g, '/');
+      }
+    }
     const valueToStore = typeof value === 'object' && value !== null ? JSON.stringify(value) : value;
     currentSettings[key] = valueToStore;
   });

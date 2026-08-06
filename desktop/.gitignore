@@ -76,5 +76,7 @@ license.json
 config/license-keys/private.pem
 config/license-keys/issued-licenses.csv
 config/license-keys/*.json
+config/license-keys/*activate-key*.txt
+config/license-keys/LENOVO_HANDOFF.txt
 
 /generated/prisma

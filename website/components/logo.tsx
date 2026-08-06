@@ -4,6 +4,7 @@ type LogoProps = {
   size?: number;
   showWordmark?: boolean;
   className?: string;
+  inverted?: boolean;
 };
 
 export function LogoIcon({ size = 36, className = "" }: { size?: number; className?: string }) {
@@ -22,10 +23,7 @@ export function LogoIcon({ size = 36, className = "" }: { size?: number; classNa
         d="M11 11h15.5l2.5 4.2V29a2 2 0 0 1-2 2H11a2 2 0 0 1-2-2V13a2 2 0 0 1 2-2z"
         fill="white"
       />
-      <path
-        d="M26.5 11L29 15.2H26a2 2 0 0 1-2-2V11z"
-        fill="#e2e8f0"
-      />
+      <path d="M26.5 11L29 15.2H26a2 2 0 0 1-2-2V11z" fill="#c7d0e8" />
       <path
         d="M14 18.5h12M14 22h9"
         stroke="#405189"
@@ -34,7 +32,7 @@ export function LogoIcon({ size = 36, className = "" }: { size?: number; classNa
       />
       <path
         d="M15.5 26.5l3-3.2 2.5 2.2 4.5-5"
-        stroke="#16a34a"
+        stroke="#3d9b8f"
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -48,8 +46,11 @@ export function Logo({ size = 36, showWordmark = true, className = "" }: LogoPro
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <LogoIcon size={size} />
       {showWordmark && (
-        <span className="text-base font-semibold tracking-tight text-slate-900">
-          Salespeck
+        <span
+          className="text-lg font-semibold tracking-tight text-text"
+          style={{ fontFamily: "var(--font-display)" }}
+        >
+          SalesPeck
         </span>
       )}
     </span>

@@ -4,17 +4,43 @@ const fs = require('fs');
 const path = require('path');
 
 exports.index = async (req, res) => {
-  // Get database settings
+  // Get database settings (dedupe by name; prefer richer company payload)
   let dbSettings = await queries.settings.getAllSoftwareSettings();
   let dbSettingsObj = {};
   dbSettings.forEach((setting) => {
+    let parsed;
     try {
-      dbSettingsObj[setting.name] = JSON.parse(setting.value);
+      parsed = JSON.parse(setting.value);
     } catch (e) {
-      dbSettingsObj[setting.name] = setting.value;
+      parsed = setting.value;
+    }
+    // Skip non-object settings (seed markers, plain strings)
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return;
+    }
+    const prev = dbSettingsObj[setting.name];
+    if (!prev) {
+      dbSettingsObj[setting.name] = parsed;
+      return;
+    }
+    const score = (o) =>
+      Object.keys(o || {}).reduce((n, k) => n + (o[k] ? 1 : 0), 0);
+    if (score(parsed) >= score(prev)) {
+      dbSettingsObj[setting.name] = { ...prev, ...parsed };
+    } else {
+      dbSettingsObj[setting.name] = { ...parsed, ...prev };
     }
   });
-  
+
+  // Ensure company always exposes name / phone / address fields in the UI
+  if (dbSettingsObj.company) {
+    const c = dbSettingsObj.company;
+    dbSettingsObj.company = {
+      name: c.name != null ? String(c.name) : "",
+      phone: c.phone != null ? String(c.phone) : "",
+      address: c.address != null ? String(c.address) : "",
+    };
+  }
   // Get DEFAULT_SETTINGS from installEnv.js (single source of truth)
   // Only show variables that are defined in DEFAULT_SETTINGS
   const defaultSettings = config.getDefaultSettings();
@@ -114,6 +140,17 @@ exports.index = async (req, res) => {
     licenseStatus = { state: 'invalid', message: e.message };
   }
 
+  let defaultBackupPath = '';
+  try {
+    const { getDefaultBackupDir, toSettingsPath } = require('../utils/dbBackup');
+    defaultBackupPath = toSettingsPath(getDefaultBackupDir());
+    if (!envSettings.backup_path) {
+      envSettings.backup_path = defaultBackupPath;
+    }
+  } catch (e) {
+    defaultBackupPath = '';
+  }
+
   // Consume session message if exists
   const message = req.session.message;
   req.session.message = null;
@@ -125,6 +162,7 @@ exports.index = async (req, res) => {
     dashboardConfig,
     message,
     licenseStatus,
+    defaultBackupPath,
     translations: translations.envSettings || {},
     envOnlyVars: envOnlyVars || {}
   });
@@ -219,8 +257,14 @@ exports.save = async (req, res) => {
     // Save all settings at once (only variables from DEFAULT_SETTINGS)
     config.updateAllSettings(updatedSettings);
   } else if (tabType === 'db' && settingName) {
-    // Save database settings
-    let values = JSON.stringify(req.body);
+    // Save database settings (normalize company keys)
+    const payload = { ...req.body };
+    if (settingName === 'company') {
+      payload.name = payload.name != null ? String(payload.name) : '';
+      payload.phone = payload.phone != null ? String(payload.phone) : '';
+      payload.address = payload.address != null ? String(payload.address) : '';
+    }
+    let values = JSON.stringify(payload);
     await queries.settings.updateSettingByName(settingName, values);
   } else if (tabType === 'dashboard') {
     // Save dashboard settings to User model

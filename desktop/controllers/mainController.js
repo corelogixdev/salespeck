@@ -74,20 +74,24 @@ const loginGet = async (req, res) => {
     return res.redirect("/dashboard");
   }
 
-  const prisma = requirePrismaClient();
-  let user = null;
   try {
-    user = await prisma.user.findFirst({ where: { role: "branchmanager" } });
-  } catch (error) {
-    logi("Prisma loginGet error:", error.message || error);
-    throw error;
-  }
+    const prisma = requirePrismaClient();
+    let user = null;
+    try {
+      user = await prisma.user.findFirst({ where: { role: "branchmanager" } });
+    } catch (error) {
+      logi("Prisma loginGet error:", error.message || error);
+    }
 
-  if (!user) {
-    logi("User was not found in local database. Redirecting to login...");
+    if (!user) {
+      logi("User was not found in local database. Redirecting to register...");
+      return res.redirect("/register");
+    }
+    return res.render("login", { hidenav: true, errors: req.session?.errors || {} });
+  } catch (error) {
+    logi("loginGet failed:", error.message || error);
     return res.redirect("/register");
   }
-  res.render("login", { hidenav: true, errors: req.session?.errors || {} });
 };
 
 const loginPost = async (req, res) => {
@@ -214,13 +218,53 @@ const registerpost = async (req, res) => {
 
 const exportDb = async (req, res) => {
   try {
-    let file = config.storage;
-    if (file) {
-      res.download(file);
+    const { writeDatabaseBackup } = require("../utils/dbBackup");
+    const result = writeDatabaseBackup({ prefix: "salespeck-backup" });
+    const wantsDownload = req.query.download === "1";
+    const wantsJson =
+      !wantsDownload &&
+      (req.xhr ||
+        String(req.headers.accept || "").includes("application/json") ||
+        req.query.json === "1" ||
+        req.query.json === "true");
+
+    if (!result.ok) {
+      if (wantsJson || !wantsDownload) {
+        return res.status(404).json({ success: false, message: result.error });
+      }
+      req.session.message = {
+        type: "error",
+        text: result.error || "Database file not found. Nothing to export.",
+      };
+      return res.redirect("/dashboard");
     }
+
+    // Default: save to backup folder only (no file dialog). Use ?download=1 for attachment.
+    if (!wantsDownload) {
+      return res.json({
+        success: true,
+        message: "Database backup saved",
+        path: result.path,
+        dir: result.dir,
+        filename: result.filename,
+      });
+    }
+
+    return res.download(result.path, result.filename, (err) => {
+      if (err && !res.headersSent) {
+        logi("Export DB error:", err);
+        req.session.message = {
+          type: "error",
+          text: "Could not export the database. Please try again.",
+        };
+        return res.redirect("/dashboard");
+      }
+    });
   } catch (error) {
     logi("Error:", error);
-    res.json({ error: "An error occurred. Please try again" });
+    if (!res.headersSent) {
+      return res.status(500).json({ success: false, message: "Export failed" });
+    }
   }
 };
 

@@ -19,7 +19,7 @@ function getUploadsBaseDir() {
       || (process.platform === 'darwin'
         ? path.join(os.homedir(), 'Library', 'Application Support')
         : path.join(os.homedir(), '.config'));
-    return path.join(appDataPath, 'stitchcore', 'uploads');
+    return path.join(appDataPath, 'salespeck', 'uploads');
   }
 
   return path.join(__dirname, '..', 'uploads');
@@ -49,7 +49,7 @@ app.use('/uploads', express.static(getUploadsBaseDir()));
 app.use('/node_modules', express.static(path.join(__dirname, '..', 'node_modules')));
 
 // Serve generated report PDFs from temp directory
-const tempPdfDir = path.join(os.tmpdir(), 'stitchcore-pdfs');
+const tempPdfDir = path.join(os.tmpdir(), 'salespeck-pdfs');
 try { require('fs').mkdirSync(tempPdfDir, { recursive: true }); } catch (e) {}
 app.use('/temp-pdfs', express.static(tempPdfDir));
 // Set view engine
@@ -106,8 +106,21 @@ app.use('/', require('../routes/profile')); // Profile routes
 //   res.redirect('/');
 // });
 
-app.listen(config.port, () => {
-  logi('Express server listening on http://localhost:' + config.port);
-});
+// Start HTTP server and export a ready promise so Electron can wait before loadURL.
+function listenAsync() {
+  return new Promise((resolve, reject) => {
+    const port = Number(config.port) || 5783;
+    const server = app.listen(port, '127.0.0.1', () => {
+      logi('Express server listening on http://127.0.0.1:' + port);
+      resolve(server);
+    });
+    server.on('error', (err) => {
+      reject(err);
+    });
+  });
+}
+
+const serverReady = listenAsync();
 
 module.exports = app;
+module.exports.serverReady = serverReady;

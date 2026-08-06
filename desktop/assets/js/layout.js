@@ -195,6 +195,47 @@
                 var href = link.getAttribute('href');
                 if (!isRealHref(href)) return;
 
+                // Backup to configured folder only — no browser/Electron save dialog
+                try {
+                    var downloadUrl = new URL(href, window.location.origin);
+                    if (downloadUrl.pathname === '/export-db') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                        navigating = true; // swallow the trailing click (avoids download dialog)
+                        if (isDrawer()) closeDrawer();
+                        var loaderEl = document.getElementById('global-loader');
+                        if (loaderEl) loaderEl.classList.add('active');
+                        fetch('/export-db?json=1', {
+                            credentials: 'same-origin',
+                            headers: { Accept: 'application/json' }
+                        })
+                            .then(function (response) {
+                                return response.json().then(function (data) {
+                                    if (!response.ok || !data.success) {
+                                        throw new Error((data && data.message) || 'Export failed');
+                                    }
+                                    return data;
+                                });
+                            })
+                            .then(function (data) {
+                                if (window.toastr) {
+                                    toastr.success('Backup saved to: ' + (data.dir || data.path || 'backup folder'));
+                                }
+                            })
+                            .catch(function (err) {
+                                console.error(err);
+                                if (window.toastr) toastr.error(err.message || 'Could not export the database');
+                            })
+                            .finally(function () {
+                                if (loaderEl) loaderEl.classList.remove('active');
+                                if (typeof window.hideLoader === 'function') window.hideLoader();
+                                setTimeout(function () { navigating = false; }, 400);
+                            });
+                        return;
+                    }
+                } catch (exportErr) { /* fall through to normal nav */ }
+
                 if (link.id === 'new-sale-menu-link' && window.location.pathname === '/sales/form') {
                     return;
                 }

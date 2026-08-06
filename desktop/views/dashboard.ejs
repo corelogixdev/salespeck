@@ -402,11 +402,15 @@
 </div>
 
 <!-- Hidden data containers -->
-<div id="products-data" data-products='<%- JSON.stringify(topFiveSoldProductsWithSoldQuantity).replace(/' /g, "&#39;" )
-  %>' style="display: none;"></div>
-<div id="sales-data" data-sales='<%- JSON.stringify(salesCountByDay).replace(/' /g, "&#39;" ) %>' style="display: none;"></div>
-<div id="hourly-sales-data" data-hourly='<%- JSON.stringify(hourlySales).replace(/' /g, "&#39;" ) %>' style="display: none;"></div>
-<div id="category-sales-data" data-category='<%- JSON.stringify(categorySales).replace(/' /g, "&#39;" ) %>' style="display: none;"></div>
+<% 
+  function jsonForAttr(value) {
+    return JSON.stringify(value, (_key, v) => typeof v === 'bigint' ? Number(v) : v).replace(/'/g, '&#39;');
+  }
+%>
+<div id="products-data" data-products='<%- jsonForAttr(topFiveSoldProductsWithSoldQuantity) %>' style="display: none;"></div>
+<div id="sales-data" data-sales='<%- jsonForAttr(salesCountByDay) %>' style="display: none;"></div>
+<div id="hourly-sales-data" data-hourly='<%- jsonForAttr(hourlySales) %>' style="display: none;"></div>
+<div id="category-sales-data" data-category='<%- jsonForAttr(categorySales) %>' style="display: none;"></div>
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {

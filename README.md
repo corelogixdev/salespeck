@@ -1,4 +1,4 @@
-# StitchCore
+# SalesPeck
 
 Desktop POS for stitching businesses — stock, sales (product and service/design), returns, purchases, parties, accounting, and reports.
 
@@ -16,7 +16,7 @@ Desktop POS for stitching businesses — stock, sales (product and service/desig
 | `desktop/` | Main Electron + Express application |
 | `desktop/prisma/` | Schema, migrations, seeds, query layer |
 | `desktop/db/` | Dev SQLite DB (`stitch.sqlite`); dated copies in `db/backups/` |
-| `website/` | Public/marketing Next.js site |
+| `website/` | Public marketing / sales / support site (Next.js) |
 | `z-docs/` | Dev, release, and client-delivery documentation |
 
 ## Features (desktop)
@@ -51,8 +51,8 @@ Ensure `desktop/.settings` has `env=development` when developing locally.
 | `npm run prisma:generate` | Generate Prisma client |
 | `npm run prisma:push` / `prisma:migrate` | Schema sync / migrate |
 | `npm run prisma:seed` | Must-data seed (COA, company defaults) |
-| `npm run build` | Windows NSIS installer → `dist/stitchcore.exe` |
-| `npm run upload` | Upload `stitchcore.exe` + `latest.yml` to GitLab package `stitchcore/release` |
+| `npm run build` | Windows NSIS installer → `dist/salespeck.exe` |
+| `npm run upload` | Upload `salespeck.exe` + `latest.yml` to GitLab package `salespeck/release` |
 
 Release flow: [z-docs/update-release.md](z-docs/update-release.md).  
 **Full from-scratch build & deploy:** [z-docs/BUILD_AND_DEPLOY.md](z-docs/BUILD_AND_DEPLOY.md).
@@ -62,7 +62,7 @@ Release flow: [z-docs/update-release.md](z-docs/update-release.md).
 | Runtime | SQLite | Settings / uploads |
 |---------|--------|--------------------|
 | Development | `desktop/db/stitch.sqlite` | `desktop/.settings` (local) |
-| Installed (Windows) | `%APPDATA%\stitchcore\stitch.sqlite` | `%APPDATA%\stitchcore\` |
+| Installed (Windows) | `%APPDATA%\salespeck\stitch.sqlite` | `%APPDATA%\salespeck\` |
 
 ## Documentation
 
@@ -84,4 +84,4 @@ Release flow: [z-docs/update-release.md](z-docs/update-release.md).
 
 ## Product identity
 
-This product is **StitchCore** (package/app id `stitchcore`). It is no longer branded OpenMenu.
+This product is **SalesPeck** (package/app id `salespeck`). It is no longer branded OpenMenu.

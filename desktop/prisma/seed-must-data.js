@@ -183,29 +183,69 @@ async function upsertChartOfAccounts(prisma) {
 }
 
 async function upsertCompanySetting(prisma) {
-  const companyPayload = {
-    name: "StitchCore Demo",
+  const defaults = {
+    name: "SalesPeck Demo",
     phone: "",
     address: "",
   };
 
-  const existing = await prisma.softwaresetting.findFirst({ where: { name: "company" } });
-  const value = JSON.stringify(companyPayload);
+  const existingRows = await prisma.softwaresetting.findMany({ where: { name: "company" } });
 
-  if (existing) {
-    await prisma.softwaresetting.update({
-      where: { id: existing.id },
-      data: { value, source: existing.source || "must-data-seeder" },
-    });
-  } else {
+  if (existingRows.length === 0) {
     await prisma.softwaresetting.create({
       data: {
         id: generateId(32),
         name: "company",
-        value,
+        value: JSON.stringify(defaults),
         source: "must-data-seeder",
       },
     });
+    return;
+  }
+
+  // Prefer the row with the most filled fields; never wipe client data with demo blanks
+  let best = existingRows[0];
+  let bestScore = -1;
+  for (const row of existingRows) {
+    let parsed = {};
+    try {
+      parsed = JSON.parse(row.value || "{}");
+    } catch {
+      parsed = {};
+    }
+    const score =
+      (parsed.name ? 1 : 0) + (parsed.phone ? 2 : 0) + (parsed.address ? 2 : 0);
+    if (score > bestScore) {
+      bestScore = score;
+      best = row;
+    }
+  }
+
+  let current = {};
+  try {
+    current = JSON.parse(best.value || "{}");
+  } catch {
+    current = {};
+  }
+
+  const merged = {
+    name: current.name || defaults.name,
+    phone: current.phone != null ? String(current.phone) : defaults.phone,
+    address: current.address != null ? String(current.address) : defaults.address,
+  };
+
+  await prisma.softwaresetting.update({
+    where: { id: best.id },
+    data: {
+      value: JSON.stringify(merged),
+      source: best.source || "must-data-seeder",
+    },
+  });
+
+  // Remove duplicate company rows left from older seeds
+  const duplicateIds = existingRows.filter((r) => r.id !== best.id).map((r) => r.id);
+  if (duplicateIds.length) {
+    await prisma.softwaresetting.deleteMany({ where: { id: { in: duplicateIds } } });
   }
 }
 
@@ -229,9 +269,9 @@ if (require.main === module) {
       logi({ prismaMustDataError: err?.message || String(err) });
       process.exit(1);
     });
-} else {
-  module.exports = seedMustData;
 }
+
+// Note: final exports are at end of file (with test seed helpers)
 
 
 const encrypt = require("../utils/encrypt");
@@ -722,11 +762,11 @@ async function seedLargeData() {
   return { skipped: false, customers: CUSTOMERS_COUNT, products: PRODUCTS_COUNT, sales: SALES_COUNT };
 }
 
-module.exports = {
-  seedMustData,
-  seedTestSmallData,
-  seedLargeData
-};
+module.exports = seedMustData;
+module.exports.seedMustData = seedMustData;
+module.exports.upsertCompanySetting = upsertCompanySetting;
+module.exports.seedTestSmallData = seedTestSmallData;
+module.exports.seedLargeData = seedLargeData;
 
 if (require.main === module) {
   const args = process.argv.slice(2);

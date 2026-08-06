@@ -21,7 +21,7 @@ const PROJECT_ROOT = __dirname;
 const UPDATE_DIR = PROJECT_ROOT;
 const DIST_DIR = path.join(PROJECT_ROOT, 'dist');
 const PACKAGE_JSON_PATH = path.join(PROJECT_ROOT, 'package.json');
-const INSTALLED_SETTINGS_PATH = path.join(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), 'stitchcore', '.settings');
+const INSTALLED_SETTINGS_PATH = path.join(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), 'salespeck', '.settings');
 const LOCAL_UPDATE_URL = 'http://localhost:8000';
 const PORT = 8000;
 
@@ -167,7 +167,7 @@ function copyBuildFiles() {
   logStep('4', 'Copying build files to update server...');
 
   const filesToCopy = [
-    { src: 'stitchcore.exe', dest: 'stitchcore.exe' },
+    { src: 'salespeck.exe', dest: 'salespeck.exe' },
     { src: 'latest.yml', dest: 'latest.yml' },
     { src: 'latest.yml', dest: 'dev-app-update.yml' }
   ];
@@ -253,7 +253,7 @@ function showInstructions() {
   log(`Local update URL: ${LOCAL_UPDATE_URL}`, 'cyan');
   log('\nNext steps:', 'cyan');
   log('1. Close any dev app windows.', 'yellow');
-  log('2. Open the installed StitchCore app.', 'yellow');
+  log('2. Open the installed SalesPeck app.', 'yellow');
   log('3. Accept the update from 1.0.7 to the new version.', 'yellow');
   log('4. Reopen the app and verify migration + startup.', 'yellow');
   log('\nKeep this server terminal open during the test.', 'yellow');

@@ -4,7 +4,6 @@ const crypto = require("crypto");
 const { spawnSync } = require("child_process");
 const logi = require("./logi");
 const { generateId } = require("./idGenerator");
-const seedMustData = require("../prisma/seed-must-data");
 const { resolveDatabasePath, resolveDatabaseUrl, ensureDatabaseDirectory } = require("./prismaDbConfig");
 const { requirePrismaClient } = require("./prismaClient");
 
@@ -108,6 +107,47 @@ async function ensureMigrationTable(prisma) {
   `);
 }
 
+function isAlreadyAppliedSqlError(err) {
+  const msg = String(err && (err.message || err) || "");
+  return (
+    /already exists/i.test(msg) ||
+    /duplicate column name/i.test(msg) ||
+    /duplicate column/i.test(msg)
+  );
+}
+
+/**
+ * Run one migration statement. Skip no-ops when restoring a DB that already
+ * has schema but incomplete `_prisma_migrations` history (common backup restore).
+ */
+async function executeMigrationStatement(prisma, statement) {
+  try {
+    await prisma.$executeRawUnsafe(statement);
+    return { skipped: false };
+  } catch (err) {
+    if (isAlreadyAppliedSqlError(err)) {
+      logi("Migration SQL already present, skipping:", statement.slice(0, 120).replace(/\s+/g, " "));
+      return { skipped: true };
+    }
+    throw err;
+  }
+}
+
+async function recordMigrationApplied(prisma, { migrationId, checksum, name, startedAt, appliedStepsCount, logs }) {
+  await prisma.$executeRawUnsafe(
+    `INSERT INTO "_prisma_migrations" ("id", "checksum", "finished_at", "migration_name", "logs", "rolled_back_at", "started_at", "applied_steps_count")
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    migrationId,
+    checksum,
+    new Date().toISOString(),
+    name,
+    logs || "",
+    null,
+    startedAt,
+    appliedStepsCount
+  );
+}
+
 async function applyBundledMigrations(prisma) {
   const entries = listMigrationEntries();
   if (entries.length === 0) {
@@ -128,23 +168,32 @@ async function applyBundledMigrations(prisma) {
     const startedAt = new Date().toISOString();
     const checksum = crypto.createHash("sha256").update(sql).digest("hex");
     const migrationId = generateId(32);
+    let skippedCount = 0;
 
     for (const statement of statements) {
-      await prisma.$executeRawUnsafe(statement);
+      const result = await executeMigrationStatement(prisma, statement);
+      if (result.skipped) skippedCount += 1;
     }
 
-    await prisma.$executeRawUnsafe(
-      `INSERT INTO "_prisma_migrations" ("id", "checksum", "finished_at", "migration_name", "logs", "rolled_back_at", "started_at", "applied_steps_count")
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    const logs =
+      skippedCount > 0
+        ? `baseline-restore: ${skippedCount}/${statements.length} statements already present`
+        : "";
+
+    await recordMigrationApplied(prisma, {
       migrationId,
       checksum,
-      new Date().toISOString(),
-      entry.name,
-      "",
-      null,
+      name: entry.name,
       startedAt,
-      statements.length
-    );
+      appliedStepsCount: statements.length,
+      logs,
+    });
+
+    if (skippedCount > 0) {
+      logi(
+        `Migration ${entry.name} recorded after restore baseline (${skippedCount}/${statements.length} already present).`
+      );
+    }
   }
 }
 
@@ -207,23 +256,13 @@ function runPrismaCli(args) {
 
 function backupDatabaseIfExists() {
   try {
-    const databasePath = resolveDatabasePath();
-    if (!fs.existsSync(databasePath)) return;
-
-    const stats = fs.statSync(databasePath);
-    if (!stats || stats.size === 0) return;
-
-    const backupDir = path.join(path.dirname(databasePath), "backups");
-    if (!fs.existsSync(backupDir)) {
-      fs.mkdirSync(backupDir, { recursive: true });
+    const { writeDatabaseBackup } = require("./dbBackup");
+    const result = writeDatabaseBackup({ prefix: "database" });
+    if (result.ok) {
+      logi("Database backup saved:", result.path);
+    } else {
+      logi("Backup skipped:", result.error);
     }
-
-    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const backupPath = path.join(backupDir, `database-${stamp}.sqlite`);
-    
-    // Copy synchronously only if small (< 50MB); otherwise we'll eventually move to async
-    // High performance: we only backup if it's been more than 24 hours (implemented later)
-    fs.copyFileSync(databasePath, backupPath);
   } catch (err) {
     logi("Backup failed (non-critical):", err.message);
   }
@@ -235,19 +274,21 @@ async function prismaStartupBootstrap() {
 
   if (isPackagedRuntime()) {
     backupDatabaseIfExists();
+    // Prefer in-process SQL migrations. Spawning Prisma CLI inside Electron is brittle
+    // (native engines / asar paths). Keep CLI as a secondary attempt only.
     try {
-      runPrismaCli(["migrate", "deploy"]);
-    } catch (error) {
-      logi("Prisma migrate deploy failed, trying bundled migrations:", error.message || error);
-
+      const prismaForMigrate = requirePrismaClient();
+      await applyBundledMigrations(prismaForMigrate);
+      logi("Bundled migrations applied successfully.");
+    } catch (bundledError) {
+      logi("Bundled migrations failed, trying Prisma CLI migrate deploy:", bundledError.message || bundledError);
       try {
-        const prisma = requirePrismaClient();
-        await applyBundledMigrations(prisma);
-        logi("Bundled migrations applied successfully.");
-      } catch (fallbackError) {
+        runPrismaCli(["migrate", "deploy"]);
+        logi("Prisma migrate deploy completed.");
+      } catch (cliError) {
         throw new Error(
-          `Database migration failed. Prisma CLI error: ${error.message || error}. Fallback error: ${
-            fallbackError.message || fallbackError
+          `Database migration failed. Bundled error: ${bundledError.message || bundledError}. Prisma CLI error: ${
+            cliError.message || cliError
           }`
         );
       }
@@ -257,13 +298,21 @@ async function prismaStartupBootstrap() {
   }
 
   const prisma = requirePrismaClient();
+  const seedModule = require("../prisma/seed-must-data");
+  const runSeed =
+    typeof seedModule === "function" ? seedModule : seedModule.seedMustData;
+  const upsertCompany =
+    typeof seedModule.upsertCompanySetting === "function"
+      ? seedModule.upsertCompanySetting
+      : null;
+
   const seedMarker = await prisma.softwaresetting.findFirst({
     where: { name: SEED_MARKER },
   });
 
   if (!seedMarker) {
     try {
-      await seedMustData({ disconnect: false });
+      await runSeed({ disconnect: false });
       await prisma.softwaresetting.create({
         data: {
           id: generateId(32),
@@ -279,7 +328,7 @@ async function prismaStartupBootstrap() {
   }
 
   // Even when the seed marker exists, ensure must-have data is present.
-  // This protects already-installed databases that may have seeded earlier before financeaccount/chart-of-accounts existed.
+  // Company upsert merges / dedupes — it does not wipe client phone/address.
   try {
     const [companySetting, hasFinanceAccounts] = await Promise.all([
       prisma.softwaresetting.findFirst({ where: { name: "company" } }),
@@ -287,8 +336,10 @@ async function prismaStartupBootstrap() {
     ]);
 
     if (!companySetting || !hasFinanceAccounts) {
-      await seedMustData({ disconnect: false });
+      await runSeed({ disconnect: false });
       logi("Prisma must-data seed applied.");
+    } else if (upsertCompany) {
+      await upsertCompany(prisma);
     }
   } catch (error) {
     logi("Prisma must-data check skipped:", error.message || error);

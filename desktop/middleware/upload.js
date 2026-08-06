@@ -9,7 +9,7 @@ function getUploadsBaseDir() {
             || (process.platform === 'darwin'
                 ? path.join(os.homedir(), 'Library', 'Application Support')
                 : path.join(os.homedir(), '.config'));
-        return path.join(appDataPath, 'stitchcore', 'uploads');
+        return path.join(appDataPath, 'salespeck', 'uploads');
     }
 
     return path.join(__dirname, '..', 'uploads');

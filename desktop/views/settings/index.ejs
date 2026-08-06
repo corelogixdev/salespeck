@@ -54,6 +54,9 @@
                                 // Handle printer settings separately
                                 return;
                             }
+                            if (key === 'backup_path') {
+                                return; // rendered below with Browse / Reset
+                            }
                             
                             // Get label from translations if available, otherwise use key name
                             const label = translations[key] || key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
@@ -86,6 +89,35 @@
                                 </div>
                             </div>
                         <% }) %>
+                    </div>
+
+                    <hr class="my-4">
+                    <h6 class="mb-2">Database Backup</h6>
+                    <p class="text-muted fs-13 mb-3">
+                        Folder where Export DB and automatic update backups are saved.
+                        Leave as default or choose another drive/folder (e.g. external disk).
+                    </p>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label" for="backup_path">
+                                    <%= translations.backup_path || 'Database Backup Folder' %>:
+                                </label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="backup_path" name="backup_path"
+                                        value="<%= envSettings.backup_path || '' %>"
+                                        placeholder="<%= typeof defaultBackupPath !== 'undefined' ? defaultBackupPath : '' %>"
+                                        data-default-path="<%= typeof defaultBackupPath !== 'undefined' ? defaultBackupPath : '' %>">
+                                    <button type="button" class="btn btn-outline-secondary" id="backup-path-browse" title="Browse folder">
+                                        Browse
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" id="backup-path-reset" title="Reset to default">
+                                        Default
+                                    </button>
+                                </div>
+                                <small class="text-muted">Default: <code id="backup-path-default-label"><%= typeof defaultBackupPath !== 'undefined' ? defaultBackupPath : '' %></code></small>
+                            </div>
+                        </div>
                     </div>
 
                     <% if (translations.printer) { %>
@@ -149,7 +181,7 @@
                                                     <% if (typeof dbSettings[setting][key] === 'boolean') { %>
                                                         <input type="checkbox" class="form-check-input" id="<%= setting %>-<%= key %>" name="<%= key %>" <%= dbSettings[setting][key] ? 'checked' : '' %>>
                                                     <% } else { %>
-                                                        <input type="text" class="form-control" id="<%= setting %>-<%= key %>" name="<%= key %>" value="<%= dbSettings[setting][key] %>">
+                                                        <input type="text" class="form-control" id="<%= setting %>-<%= key %>" name="<%= key %>" value="<%= (dbSettings[setting][key] != null ? String(dbSettings[setting][key]) : '').replace(/"/g, '&quot;') %>">
                                                     <% } %>
                                                 </div>
                                             </div>
@@ -232,7 +264,7 @@
                     <% if (!ls) { %>
                         <p class="text-muted mb-0">License status unavailable.</p>
                     <% } else { %>
-                        <div class="alert alert-<%= ls.state === 'valid' ? 'success' : (ls.state === 'grace' ? 'warning' : 'danger') %> mb-3">
+                        <div class="alert alert-<%= (ls.state === 'valid') ? 'success' : ((ls.state === 'grace') ? 'warning' : 'danger') %> mb-3">
                             <strong class="text-uppercase"><%= ls.state %></strong>
                             <div class="mt-1"><%= ls.message %></div>
                         </div>
@@ -257,6 +289,18 @@
                                 <div class="text-muted text-uppercase fs-11">Days remaining</div>
                                 <div class="fw-semibold"><%= typeof ls.daysRemaining === 'number' ? ls.daysRemaining : '—' %></div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="text-muted text-uppercase fs-11">Machine bind</div>
+                                <div class="fw-semibold"><%= ls.bindMode || '—' %></div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-muted text-uppercase fs-11">Clock check</div>
+                                <div class="fw-semibold"><%= ls.clockState || 'ok' %></div>
+                            </div>
+                            <div class="col-12">
+                                <div class="text-muted text-uppercase fs-11">This PC fingerprint</div>
+                                <code class="user-select-all"><%= ls.fingerprint || '—' %></code>
+                            </div>
                         </div>
                         <a href="/license/activate" class="btn btn-soft-primary btn-sm">
                             <i class="ri-key-2-line align-bottom me-1"></i> Activate / renew license
@@ -267,3 +311,34 @@
         </div>
     </div>
 </div>
+<script>
+(function () {
+    const input = document.getElementById('backup_path');
+    const browseBtn = document.getElementById('backup-path-browse');
+    const resetBtn = document.getElementById('backup-path-reset');
+    if (!input) return;
+
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function () {
+            const def = input.getAttribute('data-default-path') || '';
+            input.value = def;
+        });
+    }
+
+    if (browseBtn) {
+        browseBtn.addEventListener('click', async function () {
+            try {
+                if (window.electron && typeof window.electron.selectDirectory === 'function') {
+                    const selected = await window.electron.selectDirectory(input.value || undefined);
+                    if (selected) input.value = selected;
+                } else {
+                    toastr.info('Folder browse is available in the desktop app. Type or paste a path instead.');
+                }
+            } catch (e) {
+                console.error(e);
+                toastr.error('Could not open folder picker');
+            }
+        });
+    }
+})();
+</script>

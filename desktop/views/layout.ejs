@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>StitchCore v<%= typeof appVersion !=='undefined' ? appVersion : '1.0.0' %>
+    <title>SalesPeck v<%= typeof appVersion !=='undefined' ? appVersion : '1.0.0' %>
     </title>
     <link rel="icon" href="/assets/img/icon.png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -54,7 +54,7 @@
                             </a>
                         </div>
                         <a href="/" style="display: block; min-width: fit-content;" class="fs-2 me-md-4 me-2 d-none d-md-block brand-text">
-                            Corelogix
+                            SalesPeck
                         </a>
                         <button type="button" class="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger" id="topnav-hamburger-icon">
                             <i class="ri-menu-2-line"></i>
@@ -147,7 +147,7 @@
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end">
                                         <li><a href="/settings" class="dropdown-item">Settings</a></li>
-                                        <li><a href="/export-db" class="dropdown-item">Export DB</a></li>
+                                        <li><a href="/export-db" class="dropdown-item" id="export-db-menu-link">Export DB</a></li>
                                     </ul>
                                 </li>
                                 <% } %>

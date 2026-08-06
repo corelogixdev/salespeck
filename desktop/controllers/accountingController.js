@@ -63,7 +63,8 @@ exports.coa = async (req, res) => {
         });
     } catch (error) {
         logi("Error fetching COA:", error);
-        res.status(500).send("Internal Server Error");
+        const detail = error?.message || String(error);
+        res.status(500).send("Internal Server Error: " + detail);
     }
 };
 

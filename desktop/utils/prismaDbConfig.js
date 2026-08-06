@@ -8,7 +8,7 @@ function resolveProductionBaseDir() {
       ? path.join(os.homedir(), "Library", "Application Support")
       : path.join(os.homedir(), ".config"));
 
-  return path.join(appDataPath, "stitchcore");
+  return path.join(appDataPath, "salespeck");
 }
 
 function resolveDatabasePath() {

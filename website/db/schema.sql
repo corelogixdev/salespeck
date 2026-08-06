@@ -1,6 +1,6 @@
 PRAGMA foreign_keys = ON;
 
--- Basic tables for Salespeck desktop features site
+-- Basic tables for SalesPeck desktop features site
 CREATE TABLE IF NOT EXISTS features (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   title TEXT NOT NULL,

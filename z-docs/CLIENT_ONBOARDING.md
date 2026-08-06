@@ -1,6 +1,6 @@
 # Client onboarding checklist (Phase C)
 
-Operational steps to deliver StitchCore to a client. Licensing must be activated **before** first register when the gate is enabled.
+Operational steps to deliver SalesPeck to a client. Licensing must be activated **before** first register when the gate is enabled.
 
 ## Before the visit
 
@@ -16,22 +16,22 @@ Operational steps to deliver StitchCore to a client. Licensing must be activated
    cd desktop
    npm run prisma:generate
    npm run build
-   # sign dist/stitchcore.exe, then:
+   # sign dist/salespeck.exe, then:
    npm run upload
    ```
-4. Host the installer (GitLab `packages/generic/stitchcore/release` or a private download link).
+4. Host the installer (GitLab `packages/generic/salespeck/release` or a private download link).
 5. Prepare company details (name, phone, address) and the staff username list (within seat pack).
 
 ## On the client PC
 
-1. Install `stitchcore.exe` (admin if NSIS requires it).
+1. Install `salespeck.exe` (admin if NSIS requires it).
 2. Launch the app — you should land on **License Activation** if no license is present.
 3. Paste the signed license key → Activate.
 4. Register the branch manager (uses **1 seat**).
 5. Log in; open Settings → company / printer; confirm COA must-data is present.
 6. Create remaining staff users up to `maxUsers` (Settings / Users). Customers and vendors do **not** use seats.
 7. Walk through: product or service sale, optional return, a simple report.
-8. Explain backup location: `%APPDATA%\stitchcore\stitch.sqlite` (see [BACKUP_RESTORE.md](./BACKUP_RESTORE.md)).
+8. Explain backup folder: Settings → Database Backup Folder (default `%APPDATA%\salespeck\backups`) — see [BACKUP_RESTORE.md](./BACKUP_RESTORE.md).
 9. Hand off credentials, support contact, and the renewal date (`expiresAt`).
 
 ## After handoff

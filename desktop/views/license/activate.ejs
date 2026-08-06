@@ -4,7 +4,7 @@
   <div class="col-lg-7 col-xl-6">
     <div class="card">
       <div class="card-header">
-        <h4 class="card-title mb-0">StitchCore License Activation</h4>
+        <h4 class="card-title mb-0">SalesPeck License Activation</h4>
       </div>
       <div class="card-body">
         <% if (error) { %>
@@ -20,13 +20,42 @@
             <div class="mt-1"><%= status.message %></div>
           </div>
         <% } else { %>
-          <p class="text-muted">Paste the license key provided by your StitchCore provider. Monthly and yearly plans control renewal dates; seats limit staff logins (<code>branchmanager</code> + <code>user</code>).</p>
+          <p class="text-muted">Paste the license key provided by your SalesPeck provider. Monthly and yearly plans control renewal dates; seats limit staff logins (<code>branchmanager</code> + <code>user</code>).</p>
         <% } %>
+
+        <div class="mb-3 p-2 rounded border border-secondary border-opacity-25">
+          <div class="text-muted text-uppercase fs-11 mb-1">This PC fingerprint</div>
+          <code class="user-select-all" id="machineFingerprint"><%= typeof fingerprint !== 'undefined' && fingerprint ? fingerprint : '' %></code>
+          <div class="form-text mt-1 mb-0">Send this to your provider for a machine-bound key. Activation also binds the key to this PC.</div>
+        </div>
 
         <form method="POST" action="/license/activate">
           <div class="mb-3">
             <label class="form-label" for="licenseKey">License key</label>
-            <textarea class="form-control font-monospace" id="licenseKey" name="licenseKey" rows="6" required placeholder="Paste Base64 license key here..."></textarea>
+            <textarea class="form-control font-monospace" id="licenseKey" name="licenseKey" rows="6" required placeholder="Paste Base64 license key here (starts with eyJ)..."><%= typeof licenseKey !== 'undefined' && licenseKey ? licenseKey : '' %></textarea>
+            <div class="mt-2 d-flex flex-wrap gap-2 align-items-center">
+              <label class="btn btn-soft-secondary btn-sm mb-0" for="licenseKeyFile">
+                <i class="ri-file-upload-line align-bottom me-1"></i> Load key from file
+              </label>
+              <input type="file" id="licenseKeyFile" accept=".txt,.key,.lic,text/plain" class="d-none" />
+              <span class="form-text mb-0">Or paste the <strong>entire</strong> key (must start with <code>eyJ</code>, ~460 chars).</span>
+            </div>
+            <script>
+              (function () {
+                var input = document.getElementById('licenseKeyFile');
+                var area = document.getElementById('licenseKey');
+                if (!input || !area) return;
+                input.addEventListener('change', function () {
+                  var file = input.files && input.files[0];
+                  if (!file) return;
+                  var reader = new FileReader();
+                  reader.onload = function () {
+                    area.value = String(reader.result || '').replace(/^\uFEFF/, '').trim();
+                  };
+                  reader.readAsText(file);
+                });
+              })();
+            </script>
           </div>
           <div class="d-flex justify-content-between align-items-center">
             <a href="/login" class="btn btn-light">Back to login</a>

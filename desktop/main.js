@@ -52,7 +52,7 @@ app.on('will-quit', cleanupAllTempPdfs);
 
 // app.setAppLogsPath();
 //log starting app and date time to log file
-logi('Starting StitchCore Desktop...');
+logi('Starting SalesPeck Desktop...');
 logi('Date:', new Date().toISOString());
 
 // Read package.json to get the version
@@ -95,7 +95,7 @@ async function showStartupErrorDialog(error) {
   const result = await dialog.showMessageBox({
     type: 'error',
     title: 'Startup Failed',
-    message: 'StitchCore could not start.',
+    message: 'SalesPeck could not start.',
     detail: `${detail}\n\nLogs folder:\n${logDir}`,
     buttons: ['Open Logs Folder', 'Close'],
     defaultId: 0,
@@ -130,6 +130,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1000,
     height: 900,
+    title: `SalesPeck v${packageJson.version || ''}`,
     icon: path.join(__dirname, 'assets', 'img', 'icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -211,10 +212,22 @@ function createWindow() {
     `).catch(() => {});
   });
 
-  //to open dev tools
-  //win.webContents.openDevTools();
-  const serverUrl = `${config.SERVER_IP || 'localhost'}:${config.port || 3000}`;
-  mainWindow.loadURL(`http://${serverUrl}`); // Serve Express on localhost:3000
+  // Always hit the local Express server (packaged default port 5783).
+  const port = Number(config.port) || 5783;
+  const appHome = `http://127.0.0.1:${port}`;
+  let loadAttempts = 0;
+  const tryLoadApp = () => {
+    loadAttempts += 1;
+    logi('Loading UI:', appHome, `(attempt ${loadAttempts})`);
+    mainWindow.loadURL(appHome);
+  };
+  mainWindow.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL) => {
+    logi('Window failed to load:', errorCode, errorDescription, validatedURL);
+    if (loadAttempts < 10 && mainWindow && !mainWindow.isDestroyed()) {
+      setTimeout(tryLoadApp, 500);
+    }
+  });
+  tryLoadApp();
   ipcMain.on('close-app', () => {
     mainWindow.close();
   });
@@ -231,6 +244,25 @@ ipcMain.on('perform-action', (event, arg) => {
     app.quit();
   }
   event.reply('action-response', 'Action completed successfully!');
+});
+
+ipcMain.handle('select-directory', async (event, defaultPath) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  const result = await dialog.showOpenDialog(win || undefined, {
+    title: 'Select database backup folder',
+    defaultPath: defaultPath || undefined,
+    properties: ['openDirectory', 'createDirectory'],
+  });
+  if (result.canceled || !result.filePaths || !result.filePaths[0]) {
+    return null;
+  }
+  return result.filePaths[0].replace(/\\/g, '/');
+});
+
+ipcMain.handle('open-path', async (event, targetPath) => {
+  if (!targetPath) return { success: false };
+  const err = await shell.openPath(String(targetPath));
+  return { success: !err, error: err || null };
 });
 
 ipcMain.on('switch-server', async (event, serverIp) => {
@@ -325,7 +357,7 @@ ipcMain.handle('generate-print-preview', async (event) => {
   try {
     const pdfPath = path.join(
       os.tmpdir(),
-      `stitchcore-preview-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.pdf`
+      `salespeck-preview-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.pdf`
     );
 
     const data = await senderWindow.webContents.printToPDF({
@@ -429,7 +461,7 @@ ipcMain.on('close-preview-window', (event) => {
 async function generateAndShowPreview(sourceWindow) {
   const pdfPath = path.join(
     os.tmpdir(),
-    `stitchcore-preview-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.pdf`
+    `salespeck-preview-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.pdf`
   );
 
   logi('[PrintPreview] Generating PDF to:', pdfPath);
@@ -592,7 +624,7 @@ ipcMain.on('generate-report-pdf', async (event, url) => {
       pageSize: 'A4',
     });
 
-    const tempPdfDir = path.join(os.tmpdir(), 'stitchcore-pdfs');
+    const tempPdfDir = path.join(os.tmpdir(), 'salespeck-pdfs');
     try { fs.mkdirSync(tempPdfDir, { recursive: true }); } catch (e) {}
     const fileName = `report-${Date.now()}.pdf`;
     const pdfPath = path.join(tempPdfDir, fileName);
@@ -612,7 +644,22 @@ ipcMain.on('generate-report-pdf', async (event, url) => {
 app.whenReady().then(async () => {
   try {
     await prismaStartupBootstrap();
-    require('./server/app'); // Keep server startup after DB bootstrap.
+    try {
+      const license = require('./utils/license');
+      license.ensureLicenseImported();
+      const licenseStatus = await license.getLicenseStatus();
+      logi(
+        'License status:',
+        licenseStatus.state,
+        licenseStatus.clockState || '',
+        licenseStatus.bindMode || '',
+        licenseStatus.message || ''
+      );
+    } catch (licenseImportError) {
+      logi('License import/status skipped:', licenseImportError.message || licenseImportError);
+    }
+    const serverApp = require('./server/app'); // Keep server startup after DB bootstrap.
+    await serverApp.serverReady;
 
     // Register custom protocol handler for serving PDF previews to renderer iframes
     protocol.handle('app-print', async (request) => {
@@ -761,7 +808,7 @@ autoUpdater.on('update-available', (info) => {
     buttons: ['Download Now', 'Do Not Download'],
     defaultId: 0,
     title: 'Update Available',
-    message: 'A new version of StitchCore is available. Do you want to download it now?',
+    message: 'A new version of SalesPeck is available. Do you want to download it now?',
     detail: 'You can choose to download the update now or skip it.'
   };
 
@@ -787,7 +834,7 @@ autoUpdater.on('update-downloaded', (info) => {
     buttons: ['Install Now', 'Later'],
     defaultId: 0,
     title: 'Update Available',
-    message: 'A new version of StitchCore is available. Do you want to install it now?',
+    message: 'A new version of SalesPeck is available. Do you want to install it now?',
     detail: 'The update will be installed the next time you restart the application if you choose "Later".'
   };
   const appDir = path.join(app.getPath('exe'), '..'); // Get the app directory
@@ -796,7 +843,7 @@ autoUpdater.on('update-downloaded', (info) => {
     if (response.response === 0) {
       try {
         logi('quitAndInstall new version');
-        //C:\Users\...\AppData\Local\Programs\stitchcore
+        //C:\Users\...\AppData\Local\Programs\salespeck
 
         // Remove old files manually
         //deleteOldFiles(appDir); // This function will delete the old files
