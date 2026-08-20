@@ -211,7 +211,7 @@
                                 </div>
                                 <input type="text" class="form-control mb-2" id="product-search-${tabId}" placeholder="Enter product name or barcode">
                                 <div class="d-flex justify-content-between align-items-center mb-3 mt-1">
-                                    <a href="/products" class="btn btn-soft-primary btn-sm px-2 py-0 fs-11 rounded-pill">
+                                    <a href="/products" target="_blank" class="btn btn-soft-primary btn-sm px-2 py-0 fs-11 rounded-pill" title="Opens products list in new window so active purchase tabs stay open">
                                         <i class="ri-add-line align-bottom"></i> New Product
                                     </a>
                                 </div>
@@ -276,7 +276,12 @@
                             </div>
 
                              <div class="mb-3">
-                                <label for="vendor-${tabId}" class="form-label text-muted text-uppercase fw-semibold">Vendor</label>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label for="vendor-${tabId}" class="form-label text-muted text-uppercase fw-semibold mb-0">Vendor</label>
+                                    <a href="/users?role=vendor" target="_blank" class="btn btn-soft-primary btn-sm px-2 py-0 fs-11 rounded-pill" title="Opens vendors list in new window so active purchase tabs stay open">
+                                        <i class="ri-add-line align-bottom"></i> New Vendor
+                                    </a>
+                                </div>
                                 <select id="vendor-${tabId}" class="form-select select2" data-placeholder="Select Vendor">
                                     <option value="">Select Vendor</option>
                                 </select>
@@ -988,19 +993,30 @@
                         }).then(async response => {
                             let data = await response.json();
                             if (response.ok) {
-                                $.alert({
-                                    title: 'Success!',
-                                    content: data.message,
+                                $.confirm({
+                                    title: '<i class="ri-checkbox-circle-fill text-success me-2"></i>Transaction Completed!',
+                                    content: 'Purchase recorded successfully. Would you like to view & print the invoice now?',
                                     theme: 'material',
+                                    closeIcon: false,
+                                    boxWidth: '420px',
                                     useBootstrap: false,
-                                    boxWidth: '30%',
                                     type: 'green',
                                     buttons: {
-                                        confirm: {
-                                            text: 'Ok',
+                                        print: {
+                                            text: '<i class="ri-printer-line me-1"></i> View & Print Invoice',
                                             btnClass: 'btn-success',
                                             action: function () {
                                                 window.location.href = '/accounting/purchase/view/' + data.purchaseId;
+                                            }
+                                        },
+                                        newTab: {
+                                            text: 'New Transaction',
+                                            btnClass: 'btn-light',
+                                            action: function () {
+                                                closeTab(tabId, { stopPropagation: () => {} });
+                                                if(purchaseTabs.length === 0) {
+                                                    createNewTab();
+                                                }
                                             }
                                         }
                                     }

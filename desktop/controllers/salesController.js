@@ -3,6 +3,7 @@ var moment = require("moment");
 const { findLike } = require("../utils/searchquery");
 const { getPaginationMeta } = require('../utils/paginationHelper');
 const config = require("../installEnv");
+const { attachTransactionFinancials } = require('../utils/financials');
 
 exports.index = async (req, res) => {
   const query = { ...req.body, ...req.query };
@@ -30,7 +31,7 @@ exports.index = async (req, res) => {
   const sortDir = sortOrder.toLowerCase() === 'asc' ? 'ASC' : 'DESC';
 
   try {
-    const { count, rows: sales } = await queries.sales.listIndex({
+    const { count, rows: rawSales } = await queries.sales.listIndex({
       page,
       pageSize: limit,
       customer,
@@ -39,7 +40,8 @@ exports.index = async (req, res) => {
       sortBy: sortColumn,
       sortOrder: sortDir.toLowerCase()
     });
-    
+
+    const sales = rawSales.map(s => attachTransactionFinancials(s));
     const pagination = getPaginationMeta(page, limit, count);
 
     if (req.query.partial) {
@@ -71,6 +73,7 @@ exports.getSale = async (req, res) => {
       return res.status(404).json({ success: false, message: "Sale not found" });
     }
 
+    attachTransactionFinancials(sale, sale.SoldPoducts);
     res.json({ success: true, sale });
   } catch (error) {
     console.error("Error fetching sale:", error);
@@ -225,22 +228,7 @@ exports.saleview = async (req, res) => {
       return res.status(404).send({ status: "error", message: "Sale not found" });
     }
     
-    let result = JSON.parse(JSON.stringify(sale));
-    result.totalprice = parseFloat(result.totalprice || 0).toFixed(2);
-    result.totalpayment = parseFloat(result.totalpayment || 0).toFixed(2);
-
-    let totalPrice = parseFloat(result.totalprice || 0);
-    let discount = parseFloat(result.discountpercentage || 0);
-    let priceAfterDiscount = totalPrice - totalPrice * (discount / 100);
-
-    let userPaid = parseFloat(result.totalpayment || 0);
-
-    let change = userPaid > priceAfterDiscount ? userPaid - priceAfterDiscount : 0;
-    let balance = priceAfterDiscount > userPaid ? priceAfterDiscount - userPaid : 0;
-
-    result.balance = balance.toFixed(2);
-    result.change = change.toFixed(2);
-
+    attachTransactionFinancials(sale, sale.SoldPoducts);
     let companySettings = await queries.common.getCompanySetting();
     
     if (!companySettings) {
@@ -254,9 +242,9 @@ exports.saleview = async (req, res) => {
 
     // Fetch customer's current outstanding balance
     let customerBalance = null;
-    if (result.customer && result.Customer) {
+    if (sale.customer && sale.Customer) {
       try {
-        const ledgerBalance = await queries.accounting.getPartyBalance(result.customer);
+        const ledgerBalance = await queries.accounting.getPartyBalance(sale.customer);
         customerBalance = ledgerBalance;
       } catch (e) {
         console.error('Could not fetch customer balance:', e.message);
@@ -264,7 +252,7 @@ exports.saleview = async (req, res) => {
     }
     
     res.render("sales/saleview", {
-      sale: result,
+      sale: sale,
       companySettings: JSON.parse(companySettings.value),
       customerBalance,
       printerConfig: config.printer || {

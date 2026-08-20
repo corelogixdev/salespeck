@@ -1621,6 +1621,26 @@ const sales = {
   },
 };
 
+function buildDateRangeFilter(startDate, endDate) {
+  const range = {};
+  if (startDate) {
+    const dStart = new Date(startDate);
+    if (!isNaN(dStart.getTime())) {
+      range.gte = dStart;
+    }
+  }
+  if (endDate) {
+    const dEnd = new Date(endDate);
+    if (!isNaN(dEnd.getTime())) {
+      if (typeof endDate === 'string' && endDate.length <= 10) {
+        dEnd.setHours(23, 59, 59, 999);
+      }
+      range.lte = dEnd;
+    }
+  }
+  return Object.keys(range).length > 0 ? range : null;
+}
+
 const reports = {
   async getSalesReport(filters) {
     const salesRows = await sales.listReport(filters);
@@ -1630,9 +1650,8 @@ const reports = {
     const prisma = getPrisma();
     const { skip, take } = normalizePagination(page, pageSize);
     const where = {};
-    if (filters.startDate && filters.endDate) {
-      where.createdAt = { gte: new Date(filters.startDate), lte: new Date(filters.endDate) };
-    }
+    const dateRange = buildDateRangeFilter(filters.startDate, filters.endDate);
+    if (dateRange) where.createdAt = dateRange;
     if (filters.customer) where.customer = filters.customer;
 
     const [count, saleRows] = await Promise.all([
@@ -1675,18 +1694,23 @@ const reports = {
   async getSalesReportTotals(filters) {
     const prisma = getPrisma();
     const where = {};
-    if (filters.startDate && filters.endDate) {
-      where.createdAt = { gte: new Date(filters.startDate), lte: new Date(filters.endDate) };
-    }
+    const dateRange = buildDateRangeFilter(filters.startDate, filters.endDate);
+    if (dateRange) where.createdAt = dateRange;
     if (filters.customer) where.customer = filters.customer;
 
     const count = await prisma.sale.count({ where });
 
     const conditions = [];
     const replacements = [];
-    if (filters.startDate && filters.endDate) {
-      conditions.push("createdAt >= ? AND createdAt <= ?");
-      replacements.push(new Date(filters.startDate), new Date(filters.endDate));
+    if (dateRange) {
+      if (dateRange.gte) {
+        conditions.push("createdAt >= ?");
+        replacements.push(dateRange.gte);
+      }
+      if (dateRange.lte) {
+        conditions.push("createdAt <= ?");
+        replacements.push(dateRange.lte);
+      }
     }
     if (filters.customer) {
       conditions.push("customer = ?");
@@ -1707,9 +1731,8 @@ const reports = {
   async getPurchasesReport({ startDate, endDate, vendor }) {
     const prisma = getPrisma();
     const where = {};
-    if (startDate && endDate) {
-      where.createdAt = { gte: new Date(startDate), lte: new Date(endDate) };
-    }
+    const dateRange = buildDateRangeFilter(startDate, endDate);
+    if (dateRange) where.createdAt = dateRange;
     if (vendor) where.vendor = vendor;
     const purchaseRows = await prisma.purchase.findMany({ where, orderBy: { createdAt: "desc" } });
 
@@ -1748,9 +1771,8 @@ const reports = {
     const prisma = getPrisma();
     const { skip, take } = normalizePagination(page, pageSize);
     const where = {};
-    if (filters.startDate && filters.endDate) {
-      where.createdAt = { gte: new Date(filters.startDate), lte: new Date(filters.endDate) };
-    }
+    const dateRange = buildDateRangeFilter(filters.startDate, filters.endDate);
+    if (dateRange) where.createdAt = dateRange;
     if (filters.vendor) where.vendor = filters.vendor;
 
     const [count, purchaseRows] = await Promise.all([
@@ -1793,9 +1815,8 @@ const reports = {
   async getPurchasesReportTotals(filters) {
     const prisma = getPrisma();
     const where = {};
-    if (filters.startDate && filters.endDate) {
-      where.createdAt = { gte: new Date(filters.startDate), lte: new Date(filters.endDate) };
-    }
+    const dateRange = buildDateRangeFilter(filters.startDate, filters.endDate);
+    if (dateRange) where.createdAt = dateRange;
     if (filters.vendor) where.vendor = filters.vendor;
 
     const [count, agg] = await Promise.all([
@@ -1891,9 +1912,9 @@ const reports = {
 
     const customerIds = customers.map((item) => item.id);
     const saleWhere = { customer: { in: customerIds } };
-    if (startDate && endDate) {
-      saleWhere.createdAt = { gte: new Date(startDate), lte: new Date(endDate) };
-    }
+    const dateRange = buildDateRangeFilter(startDate, endDate);
+    if (dateRange) saleWhere.createdAt = dateRange;
+
     const salesRows = customerIds.length > 0 ? await prisma.sale.findMany({ where: saleWhere }) : [];
     const salesByCustomer = new Map();
     for (const sale of salesRows) {
@@ -1930,9 +1951,8 @@ const reports = {
 
     const customerIds = customers.map((item) => item.id);
     const saleWhere = { customer: { in: customerIds } };
-    if (filters.startDate && filters.endDate) {
-      saleWhere.createdAt = { gte: new Date(filters.startDate), lte: new Date(filters.endDate) };
-    }
+    const dateRange = buildDateRangeFilter(filters.startDate, filters.endDate);
+    if (dateRange) saleWhere.createdAt = dateRange;
 
     const salesRows = customerIds.length > 0
       ? await prisma.sale.findMany({ where: saleWhere, select: { customer: true, totalpayment: true, createdAt: true } })
@@ -2905,6 +2925,188 @@ const accounting = {
   }
 };
 
+const invoices = {
+  async markPrinted(type, id) {
+    const prisma = getPrisma();
+    if (type === 'purchase') {
+      const p = await prisma.purchase.findUnique({ where: { id } });
+      if (p) {
+        return prisma.purchase.update({
+          where: { id },
+          data: { printCount: (p.printCount || 0) + 1 }
+        });
+      }
+    } else {
+      const s = await prisma.sale.findUnique({ where: { id } });
+      if (s) {
+        return prisma.sale.update({
+          where: { id },
+          data: { printCount: (s.printCount || 0) + 1 }
+        });
+      }
+    }
+    return null;
+  },
+
+  async listAll({ type, printedStatus, search, daterange, page = 1, pageSize = 10 }) {
+    const prisma = getPrisma();
+    let sales = [];
+    let purchasesList = [];
+
+    let dateFilter = {};
+    if (daterange) {
+      const parts = daterange.split(' to ');
+      if (parts.length === 2) {
+        const start = new Date(parts[0]);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(parts[1]);
+        end.setHours(23, 59, 59, 999);
+        dateFilter = { gte: start, lte: end };
+      } else if (parts.length === 1 && parts[0].trim()) {
+        const start = new Date(parts[0]);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(parts[0]);
+        end.setHours(23, 59, 59, 999);
+        dateFilter = { gte: start, lte: end };
+      }
+    }
+
+    const fetchSales = !type || type === 'all' || type === 'sale' || type === 'service';
+    const fetchPurchases = !type || type === 'all' || type === 'purchase';
+
+    if (fetchSales) {
+      sales = await prisma.sale.findMany({
+        where: {
+          createdAt: Object.keys(dateFilter).length ? dateFilter : undefined,
+          invoicenum: search ? { contains: search } : undefined
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 1000
+      });
+    }
+
+    if (fetchPurchases) {
+      purchasesList = await prisma.purchase.findMany({
+        where: {
+          createdAt: Object.keys(dateFilter).length ? dateFilter : undefined,
+          invoicenum: search ? { contains: search } : undefined
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 1000
+      });
+    }
+
+    const partyIds = [
+      ...new Set([
+        ...sales.map(s => s.customer).filter(Boolean),
+        ...purchasesList.map(p => p.vendor).filter(Boolean)
+      ])
+    ];
+
+    let partyMap = new Map();
+    if (partyIds.length > 0) {
+      const users = await prisma.user.findMany({
+        where: { id: { in: partyIds } }
+      });
+      users.forEach(u => partyMap.set(u.id, `${u.firstname || ''} ${u.lastname || ''}`.trim() || u.username));
+    }
+
+    let combined = [];
+
+    sales.forEach(s => {
+      const isService = s.invoicenum && s.invoicenum.startsWith('SRV');
+      const transactionType = isService ? 'service' : 'sale';
+      if (type && type !== 'all' && type !== transactionType) return;
+
+      const printCount = s.printCount || 0;
+      if (printedStatus === 'printed' && printCount === 0) return;
+      if (printedStatus === 'unprinted' && printCount > 0) return;
+
+      const partyName = partyMap.get(s.customer) || 'Walk-in Customer';
+
+      if (search) {
+        const searchLower = search.toLowerCase();
+        const matchesInv = s.invoicenum && s.invoicenum.toLowerCase().includes(searchLower);
+        const matchesParty = partyName.toLowerCase().includes(searchLower);
+        if (!matchesInv && !matchesParty) return;
+      }
+
+      combined.push({
+        id: s.id,
+        invoicenum: s.invoicenum,
+        type: transactionType,
+        typeLabel: isService ? 'Service Sale' : 'Product Sale',
+        partyName,
+        partyType: 'Customer',
+        discountpercentage: s.discountpercentage,
+        totalAmount: parseFloat(s.totalprice || 0),
+        totalprice: parseFloat(s.totalprice || 0),
+        totalPayment: parseFloat(s.totalpayment || 0),
+        totalpayment: parseFloat(s.totalpayment || 0),
+        printCount,
+        isPrinted: printCount > 0,
+        createdAt: s.createdAt,
+        viewUrl: `/sales/${s.id}`
+      });
+    });
+
+    purchasesList.forEach(p => {
+      const transactionType = 'purchase';
+      if (type && type !== 'all' && type !== transactionType) return;
+
+      const printCount = p.printCount || 0;
+      if (printedStatus === 'printed' && printCount === 0) return;
+      if (printedStatus === 'unprinted' && printCount > 0) return;
+
+      const partyName = partyMap.get(p.vendor) || 'Default Vendor';
+
+      if (search) {
+        const searchLower = search.toLowerCase();
+        const matchesInv = p.invoicenum && p.invoicenum.toLowerCase().includes(searchLower);
+        const matchesParty = partyName.toLowerCase().includes(searchLower);
+        if (!matchesInv && !matchesParty) return;
+      }
+
+      combined.push({
+        id: p.id,
+        invoicenum: p.invoicenum,
+        type: transactionType,
+        typeLabel: 'Purchase Order',
+        partyName,
+        partyType: 'Vendor',
+        discountpercentage: p.discountpercentage,
+        totalAmount: parseFloat(p.totalAmount || 0),
+        totalprice: parseFloat(p.totalAmount || 0),
+        totalPayment: parseFloat(p.totalPayment || 0),
+        totalpayment: parseFloat(p.totalPayment || 0),
+        printCount,
+        isPrinted: printCount > 0,
+        createdAt: p.createdAt,
+        viewUrl: `/accounting/purchase/view/${p.id}`
+      });
+    });
+
+    combined.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    const totalCount = combined.length;
+    const offset = (page - 1) * pageSize;
+    const pagedRows = combined.slice(offset, offset + pageSize);
+
+    const { attachTransactionFinancials } = require('../utils/financials');
+    pagedRows.forEach(row => attachTransactionFinancials(row));
+
+    return {
+      count: totalCount,
+      rows: pagedRows,
+      stats: {
+        totalInvoices: totalCount,
+        printedInvoices: combined.filter(r => r.isPrinted).length,
+        unprintedInvoices: combined.filter(r => !r.isPrinted).length
+      }
+    };
+  }
+};
+
 module.exports = {
   auth,
   users,
@@ -2923,6 +3125,7 @@ module.exports = {
   dashboard,
   accounting,
   helpers,
+  invoices,
 };
 
 // --- Test Execution Block ---

@@ -1,6 +1,7 @@
 const queries = require("../prisma/queries");
 const moment = require("moment");
 const { getPaginationMeta, buildSortClause } = require('../utils/paginationHelper');
+const { attachTransactionFinancials } = require('../utils/financials');
 
 exports.index = async (req, res) => {
   try {
@@ -13,7 +14,7 @@ exports.index = async (req, res) => {
     const order = buildSortClause(sortBy, sortOrder, 'createdAt');
 
     const { daterange, vendor, invoicenum } = query;
-    const { count, rows: purchases } = await queries.purchases.list({
+    const { count, rows: rawPurchases } = await queries.purchases.list({
       page,
       pageSize,
       daterange,
@@ -23,6 +24,7 @@ exports.index = async (req, res) => {
       sortOrder
     });
 
+    const purchases = rawPurchases.map(p => attachTransactionFinancials(p));
     const pagination = getPaginationMeta(page, pageSize, count);
 
     res.render("accounting/purchase/index", {
@@ -47,6 +49,7 @@ exports.getPurchase = async (req, res) => {
       return res.status(404).json({ success: false, message: "Purchase not found" });
     }
 
+    attachTransactionFinancials(purchase, purchase.PurchasedItems);
     res.json({ success: true, purchase });
   } catch (error) {
     console.error("Error fetching purchase:", error);
@@ -56,7 +59,11 @@ exports.getPurchase = async (req, res) => {
 
 exports.purchaseview = async (req, res) => {
   let purchase = await queries.purchases.getById(req.params.id);
-  purchase.balance = purchase.totalPayment - purchase.totalAmount;
+  if (!purchase) {
+    return res.status(404).send("Purchase not found");
+  }
+
+  attachTransactionFinancials(purchase, purchase.PurchasedItems);
   let companySettings = await queries.common.getCompanySetting();
 
   // Fetch vendor's current outstanding balance
@@ -72,20 +79,24 @@ exports.purchaseview = async (req, res) => {
   res.render("accounting/purchase/view", {
     title: "Purchase Details",
     purchase,
-    companySettings: JSON.parse(companySettings?.value),
+    companySettings: JSON.parse(companySettings?.value || "{}"),
     vendorBalance,
-    layout:false
+    layout: false
   });
 };
 
 exports.purchaseDetails = async (req, res) => {
   let purchase = await queries.purchases.getById(req.params.id);
-  purchase.balance = purchase.totalAmount - purchase.totalPayment;
+  if (!purchase) {
+    return res.status(404).send("Purchase not found");
+  }
+
+  attachTransactionFinancials(purchase, purchase.PurchasedItems);
   let companySettings = await queries.common.getCompanySetting();
   res.render("accounting/purchase/details", {
     title: "Purchase Details",
     purchase,
-    companySettings: JSON.parse(companySettings?.value),
+    companySettings: JSON.parse(companySettings?.value || "{}"),
     hidenav: true,
   });
 };

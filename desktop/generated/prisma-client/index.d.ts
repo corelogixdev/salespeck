@@ -17291,11 +17291,13 @@ export namespace Prisma {
   export type PurchaseAvgAggregateOutputType = {
     totalAmount: number | null
     totalPayment: number | null
+    printCount: number | null
   }
 
   export type PurchaseSumAggregateOutputType = {
     totalAmount: number | null
     totalPayment: number | null
+    printCount: number | null
   }
 
   export type PurchaseMinAggregateOutputType = {
@@ -17309,6 +17311,7 @@ export namespace Prisma {
     ledger: boolean | null
     invoicenum: string | null
     source: string | null
+    printCount: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -17324,6 +17327,7 @@ export namespace Prisma {
     ledger: boolean | null
     invoicenum: string | null
     source: string | null
+    printCount: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -17339,6 +17343,7 @@ export namespace Prisma {
     ledger: number
     invoicenum: number
     source: number
+    printCount: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -17348,11 +17353,13 @@ export namespace Prisma {
   export type PurchaseAvgAggregateInputType = {
     totalAmount?: true
     totalPayment?: true
+    printCount?: true
   }
 
   export type PurchaseSumAggregateInputType = {
     totalAmount?: true
     totalPayment?: true
+    printCount?: true
   }
 
   export type PurchaseMinAggregateInputType = {
@@ -17366,6 +17373,7 @@ export namespace Prisma {
     ledger?: true
     invoicenum?: true
     source?: true
+    printCount?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -17381,6 +17389,7 @@ export namespace Prisma {
     ledger?: true
     invoicenum?: true
     source?: true
+    printCount?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -17396,6 +17405,7 @@ export namespace Prisma {
     ledger?: true
     invoicenum?: true
     source?: true
+    printCount?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -17498,6 +17508,7 @@ export namespace Prisma {
     ledger: boolean | null
     invoicenum: string | null
     source: string | null
+    printCount: number | null
     createdAt: Date
     updatedAt: Date
     _count: PurchaseCountAggregateOutputType | null
@@ -17532,6 +17543,7 @@ export namespace Prisma {
     ledger?: boolean
     invoicenum?: boolean
     source?: boolean
+    printCount?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["purchase"]>
@@ -17547,6 +17559,7 @@ export namespace Prisma {
     ledger?: boolean
     invoicenum?: boolean
     source?: boolean
+    printCount?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["purchase"]>
@@ -17562,6 +17575,7 @@ export namespace Prisma {
     ledger?: boolean
     invoicenum?: boolean
     source?: boolean
+    printCount?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["purchase"]>
@@ -17577,11 +17591,12 @@ export namespace Prisma {
     ledger?: boolean
     invoicenum?: boolean
     source?: boolean
+    printCount?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type purchaseOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdby" | "updatedby" | "vendor" | "discountpercentage" | "totalAmount" | "totalPayment" | "ledger" | "invoicenum" | "source" | "createdAt" | "updatedAt", ExtArgs["result"]["purchase"]>
+  export type purchaseOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdby" | "updatedby" | "vendor" | "discountpercentage" | "totalAmount" | "totalPayment" | "ledger" | "invoicenum" | "source" | "printCount" | "createdAt" | "updatedAt", ExtArgs["result"]["purchase"]>
 
   export type $purchasePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "purchase"
@@ -17597,6 +17612,7 @@ export namespace Prisma {
       ledger: boolean | null
       invoicenum: string | null
       source: string | null
+      printCount: number | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["purchase"]>
@@ -18032,6 +18048,7 @@ export namespace Prisma {
     readonly ledger: FieldRef<"purchase", 'Boolean'>
     readonly invoicenum: FieldRef<"purchase", 'String'>
     readonly source: FieldRef<"purchase", 'String'>
+    readonly printCount: FieldRef<"purchase", 'Int'>
     readonly createdAt: FieldRef<"purchase", 'DateTime'>
     readonly updatedAt: FieldRef<"purchase", 'DateTime'>
   }
@@ -19501,8 +19518,18 @@ export namespace Prisma {
 
   export type AggregateSale = {
     _count: SaleCountAggregateOutputType | null
+    _avg: SaleAvgAggregateOutputType | null
+    _sum: SaleSumAggregateOutputType | null
     _min: SaleMinAggregateOutputType | null
     _max: SaleMaxAggregateOutputType | null
+  }
+
+  export type SaleAvgAggregateOutputType = {
+    printCount: number | null
+  }
+
+  export type SaleSumAggregateOutputType = {
+    printCount: number | null
   }
 
   export type SaleMinAggregateOutputType = {
@@ -19516,6 +19543,7 @@ export namespace Prisma {
     createdby: string | null
     updatedby: string | null
     source: string | null
+    printCount: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -19531,6 +19559,7 @@ export namespace Prisma {
     createdby: string | null
     updatedby: string | null
     source: string | null
+    printCount: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -19546,11 +19575,20 @@ export namespace Prisma {
     createdby: number
     updatedby: number
     source: number
+    printCount: number
     createdAt: number
     updatedAt: number
     _all: number
   }
 
+
+  export type SaleAvgAggregateInputType = {
+    printCount?: true
+  }
+
+  export type SaleSumAggregateInputType = {
+    printCount?: true
+  }
 
   export type SaleMinAggregateInputType = {
     id?: true
@@ -19563,6 +19601,7 @@ export namespace Prisma {
     createdby?: true
     updatedby?: true
     source?: true
+    printCount?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -19578,6 +19617,7 @@ export namespace Prisma {
     createdby?: true
     updatedby?: true
     source?: true
+    printCount?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -19593,6 +19633,7 @@ export namespace Prisma {
     createdby?: true
     updatedby?: true
     source?: true
+    printCount?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -19636,6 +19677,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: SaleAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SaleSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: SaleMinAggregateInputType
@@ -19666,6 +19719,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: SaleCountAggregateInputType | true
+    _avg?: SaleAvgAggregateInputType
+    _sum?: SaleSumAggregateInputType
     _min?: SaleMinAggregateInputType
     _max?: SaleMaxAggregateInputType
   }
@@ -19681,9 +19736,12 @@ export namespace Prisma {
     createdby: string | null
     updatedby: string | null
     source: string | null
+    printCount: number | null
     createdAt: Date
     updatedAt: Date
     _count: SaleCountAggregateOutputType | null
+    _avg: SaleAvgAggregateOutputType | null
+    _sum: SaleSumAggregateOutputType | null
     _min: SaleMinAggregateOutputType | null
     _max: SaleMaxAggregateOutputType | null
   }
@@ -19713,6 +19771,7 @@ export namespace Prisma {
     createdby?: boolean
     updatedby?: boolean
     source?: boolean
+    printCount?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["sale"]>
@@ -19728,6 +19787,7 @@ export namespace Prisma {
     createdby?: boolean
     updatedby?: boolean
     source?: boolean
+    printCount?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["sale"]>
@@ -19743,6 +19803,7 @@ export namespace Prisma {
     createdby?: boolean
     updatedby?: boolean
     source?: boolean
+    printCount?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["sale"]>
@@ -19758,11 +19819,12 @@ export namespace Prisma {
     createdby?: boolean
     updatedby?: boolean
     source?: boolean
+    printCount?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type saleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user" | "customer" | "invoicenum" | "discountpercentage" | "totalprice" | "totalpayment" | "createdby" | "updatedby" | "source" | "createdAt" | "updatedAt", ExtArgs["result"]["sale"]>
+  export type saleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user" | "customer" | "invoicenum" | "discountpercentage" | "totalprice" | "totalpayment" | "createdby" | "updatedby" | "source" | "printCount" | "createdAt" | "updatedAt", ExtArgs["result"]["sale"]>
 
   export type $salePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "sale"
@@ -19778,6 +19840,7 @@ export namespace Prisma {
       createdby: string | null
       updatedby: string | null
       source: string | null
+      printCount: number | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["sale"]>
@@ -20213,6 +20276,7 @@ export namespace Prisma {
     readonly createdby: FieldRef<"sale", 'String'>
     readonly updatedby: FieldRef<"sale", 'String'>
     readonly source: FieldRef<"sale", 'String'>
+    readonly printCount: FieldRef<"sale", 'Int'>
     readonly createdAt: FieldRef<"sale", 'DateTime'>
     readonly updatedAt: FieldRef<"sale", 'DateTime'>
   }
@@ -28370,6 +28434,7 @@ export namespace Prisma {
     ledger: 'ledger',
     invoicenum: 'invoicenum',
     source: 'source',
+    printCount: 'printCount',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -28403,6 +28468,7 @@ export namespace Prisma {
     createdby: 'createdby',
     updatedby: 'updatedby',
     source: 'source',
+    printCount: 'printCount',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -29616,6 +29682,7 @@ export namespace Prisma {
     ledger?: BoolNullableFilter<"purchase"> | boolean | null
     invoicenum?: StringNullableFilter<"purchase"> | string | null
     source?: StringNullableFilter<"purchase"> | string | null
+    printCount?: IntNullableFilter<"purchase"> | number | null
     createdAt?: DateTimeFilter<"purchase"> | Date | string
     updatedAt?: DateTimeFilter<"purchase"> | Date | string
   }
@@ -29631,6 +29698,7 @@ export namespace Prisma {
     ledger?: SortOrderInput | SortOrder
     invoicenum?: SortOrderInput | SortOrder
     source?: SortOrderInput | SortOrder
+    printCount?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -29649,6 +29717,7 @@ export namespace Prisma {
     ledger?: BoolNullableFilter<"purchase"> | boolean | null
     invoicenum?: StringNullableFilter<"purchase"> | string | null
     source?: StringNullableFilter<"purchase"> | string | null
+    printCount?: IntNullableFilter<"purchase"> | number | null
     createdAt?: DateTimeFilter<"purchase"> | Date | string
     updatedAt?: DateTimeFilter<"purchase"> | Date | string
   }, "id">
@@ -29664,6 +29733,7 @@ export namespace Prisma {
     ledger?: SortOrderInput | SortOrder
     invoicenum?: SortOrderInput | SortOrder
     source?: SortOrderInput | SortOrder
+    printCount?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: purchaseCountOrderByAggregateInput
@@ -29687,6 +29757,7 @@ export namespace Prisma {
     ledger?: BoolNullableWithAggregatesFilter<"purchase"> | boolean | null
     invoicenum?: StringNullableWithAggregatesFilter<"purchase"> | string | null
     source?: StringNullableWithAggregatesFilter<"purchase"> | string | null
+    printCount?: IntNullableWithAggregatesFilter<"purchase"> | number | null
     createdAt?: DateTimeWithAggregatesFilter<"purchase"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"purchase"> | Date | string
   }
@@ -29779,6 +29850,7 @@ export namespace Prisma {
     createdby?: StringNullableFilter<"sale"> | string | null
     updatedby?: StringNullableFilter<"sale"> | string | null
     source?: StringNullableFilter<"sale"> | string | null
+    printCount?: IntNullableFilter<"sale"> | number | null
     createdAt?: DateTimeFilter<"sale"> | Date | string
     updatedAt?: DateTimeFilter<"sale"> | Date | string
   }
@@ -29794,6 +29866,7 @@ export namespace Prisma {
     createdby?: SortOrderInput | SortOrder
     updatedby?: SortOrderInput | SortOrder
     source?: SortOrderInput | SortOrder
+    printCount?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -29812,6 +29885,7 @@ export namespace Prisma {
     createdby?: StringNullableFilter<"sale"> | string | null
     updatedby?: StringNullableFilter<"sale"> | string | null
     source?: StringNullableFilter<"sale"> | string | null
+    printCount?: IntNullableFilter<"sale"> | number | null
     createdAt?: DateTimeFilter<"sale"> | Date | string
     updatedAt?: DateTimeFilter<"sale"> | Date | string
   }, "id">
@@ -29827,11 +29901,14 @@ export namespace Prisma {
     createdby?: SortOrderInput | SortOrder
     updatedby?: SortOrderInput | SortOrder
     source?: SortOrderInput | SortOrder
+    printCount?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: saleCountOrderByAggregateInput
+    _avg?: saleAvgOrderByAggregateInput
     _max?: saleMaxOrderByAggregateInput
     _min?: saleMinOrderByAggregateInput
+    _sum?: saleSumOrderByAggregateInput
   }
 
   export type saleScalarWhereWithAggregatesInput = {
@@ -29848,6 +29925,7 @@ export namespace Prisma {
     createdby?: StringNullableWithAggregatesFilter<"sale"> | string | null
     updatedby?: StringNullableWithAggregatesFilter<"sale"> | string | null
     source?: StringNullableWithAggregatesFilter<"sale"> | string | null
+    printCount?: IntNullableWithAggregatesFilter<"sale"> | number | null
     createdAt?: DateTimeWithAggregatesFilter<"sale"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"sale"> | Date | string
   }
@@ -31568,6 +31646,7 @@ export namespace Prisma {
     ledger?: boolean | null
     invoicenum?: string | null
     source?: string | null
+    printCount?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -31583,6 +31662,7 @@ export namespace Prisma {
     ledger?: boolean | null
     invoicenum?: string | null
     source?: string | null
+    printCount?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -31598,6 +31678,7 @@ export namespace Prisma {
     ledger?: NullableBoolFieldUpdateOperationsInput | boolean | null
     invoicenum?: NullableStringFieldUpdateOperationsInput | string | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
+    printCount?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -31613,6 +31694,7 @@ export namespace Prisma {
     ledger?: NullableBoolFieldUpdateOperationsInput | boolean | null
     invoicenum?: NullableStringFieldUpdateOperationsInput | string | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
+    printCount?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -31628,6 +31710,7 @@ export namespace Prisma {
     ledger?: boolean | null
     invoicenum?: string | null
     source?: string | null
+    printCount?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -31643,6 +31726,7 @@ export namespace Prisma {
     ledger?: NullableBoolFieldUpdateOperationsInput | boolean | null
     invoicenum?: NullableStringFieldUpdateOperationsInput | string | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
+    printCount?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -31658,6 +31742,7 @@ export namespace Prisma {
     ledger?: NullableBoolFieldUpdateOperationsInput | boolean | null
     invoicenum?: NullableStringFieldUpdateOperationsInput | string | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
+    printCount?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -31757,6 +31842,7 @@ export namespace Prisma {
     createdby?: string | null
     updatedby?: string | null
     source?: string | null
+    printCount?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -31772,6 +31858,7 @@ export namespace Prisma {
     createdby?: string | null
     updatedby?: string | null
     source?: string | null
+    printCount?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -31787,6 +31874,7 @@ export namespace Prisma {
     createdby?: NullableStringFieldUpdateOperationsInput | string | null
     updatedby?: NullableStringFieldUpdateOperationsInput | string | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
+    printCount?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -31802,6 +31890,7 @@ export namespace Prisma {
     createdby?: NullableStringFieldUpdateOperationsInput | string | null
     updatedby?: NullableStringFieldUpdateOperationsInput | string | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
+    printCount?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -31817,6 +31906,7 @@ export namespace Prisma {
     createdby?: string | null
     updatedby?: string | null
     source?: string | null
+    printCount?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -31832,6 +31922,7 @@ export namespace Prisma {
     createdby?: NullableStringFieldUpdateOperationsInput | string | null
     updatedby?: NullableStringFieldUpdateOperationsInput | string | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
+    printCount?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -31847,6 +31938,7 @@ export namespace Prisma {
     createdby?: NullableStringFieldUpdateOperationsInput | string | null
     updatedby?: NullableStringFieldUpdateOperationsInput | string | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
+    printCount?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -33322,6 +33414,17 @@ export namespace Prisma {
     quantity?: SortOrder
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type purchaseCountOrderByAggregateInput = {
     id?: SortOrder
     createdby?: SortOrder
@@ -33333,6 +33436,7 @@ export namespace Prisma {
     ledger?: SortOrder
     invoicenum?: SortOrder
     source?: SortOrder
+    printCount?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -33340,6 +33444,7 @@ export namespace Prisma {
   export type purchaseAvgOrderByAggregateInput = {
     totalAmount?: SortOrder
     totalPayment?: SortOrder
+    printCount?: SortOrder
   }
 
   export type purchaseMaxOrderByAggregateInput = {
@@ -33353,6 +33458,7 @@ export namespace Prisma {
     ledger?: SortOrder
     invoicenum?: SortOrder
     source?: SortOrder
+    printCount?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -33368,6 +33474,7 @@ export namespace Prisma {
     ledger?: SortOrder
     invoicenum?: SortOrder
     source?: SortOrder
+    printCount?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -33375,9 +33482,10 @@ export namespace Prisma {
   export type purchaseSumOrderByAggregateInput = {
     totalAmount?: SortOrder
     totalPayment?: SortOrder
+    printCount?: SortOrder
   }
 
-  export type IntNullableFilter<$PrismaModel = never> = {
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | null
     notIn?: number[] | null
@@ -33385,7 +33493,12 @@ export namespace Prisma {
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type purchasedproductsCountOrderByAggregateInput = {
@@ -33436,22 +33549,6 @@ export namespace Prisma {
     totalAmount?: SortOrder
   }
 
-  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
   export type saleCountOrderByAggregateInput = {
     id?: SortOrder
     user?: SortOrder
@@ -33463,8 +33560,13 @@ export namespace Prisma {
     createdby?: SortOrder
     updatedby?: SortOrder
     source?: SortOrder
+    printCount?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type saleAvgOrderByAggregateInput = {
+    printCount?: SortOrder
   }
 
   export type saleMaxOrderByAggregateInput = {
@@ -33478,6 +33580,7 @@ export namespace Prisma {
     createdby?: SortOrder
     updatedby?: SortOrder
     source?: SortOrder
+    printCount?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -33493,8 +33596,13 @@ export namespace Prisma {
     createdby?: SortOrder
     updatedby?: SortOrder
     source?: SortOrder
+    printCount?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type saleSumOrderByAggregateInput = {
+    printCount?: SortOrder
   }
 
   export type softwaresettingCountOrderByAggregateInput = {

@@ -98,6 +98,7 @@ app.use('/reports', routes.reportRoutes);
 // Add these routes
 app.use('/brands', brandRoutes);
 app.use('/categories', categoryRoutes);
+app.use('/invoices', routes.invoiceRoutes);
 const partyTypeRoutes = require('../routes/partyTypeRoutes');
 app.use('/partytypes', partyTypeRoutes);
 app.use('/', require('../routes/profile')); // Profile routes

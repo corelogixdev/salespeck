@@ -53,7 +53,7 @@
         label: 'Total', 
         sortable: true,
         render: (row) => {
-          const total = parseFloat(row.totalprice || 0) - (parseFloat(row.totalprice || 0) * ((row.discountpercentage || 0) / 100));
+          const total = row.netAmount !== undefined ? row.netAmount : (parseFloat(row.totalprice || 0) - (parseFloat(row.totalprice || 0) * ((row.discountpercentage || 0) / 100)));
           return `Rs. ${total.toFixed(2)}`;
         }
       },

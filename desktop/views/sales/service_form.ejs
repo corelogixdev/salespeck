@@ -596,16 +596,34 @@
             if (result.status === 'success') {
                 toastr.success('Service Sale completed successfully!');
                 
-                // Show print preview logic (similar to regular sales)
-                const popupWin = window.open(`/sales/${result.saleId}?hidenav=true&partial=true`, '_blank', 'width=800,height=600');
-                
-                // Close this tab
-                closeTab(tabId, { stopPropagation: () => {} });
-                
-                // If no tabs left, create a new one
-                if(saleTabs.length === 0) {
-                    createNewTab();
-                }
+                $.confirm({
+                    title: '<i class="ri-checkbox-circle-fill text-success me-2"></i>Transaction Completed!',
+                    content: 'Service Sale recorded successfully. Would you like to view & print the invoice now?',
+                    theme: 'material',
+                    closeIcon: false,
+                    boxWidth: '420px',
+                    useBootstrap: false,
+                    type: 'green',
+                    buttons: {
+                        print: {
+                            text: '<i class="ri-printer-line me-1"></i> View & Print Invoice',
+                            btnClass: 'btn-success',
+                            action: function () {
+                                window.location.href = `/sales/${result.saleId}`;
+                            }
+                        },
+                        newTab: {
+                            text: 'New Transaction',
+                            btnClass: 'btn-light',
+                            action: function () {
+                                closeTab(tabId, { stopPropagation: () => {} });
+                                if(saleTabs.length === 0) {
+                                    createNewTab();
+                                }
+                            }
+                        }
+                    }
+                });
             } else {
                 toastr.error(result.message || 'Error completing sale');
                 btn.innerHTML = originalText;

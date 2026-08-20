@@ -1,117 +1,71 @@
 <%- contentFor('body') %>
-<div class="row">
-  <div class="col-lg-12">
-    <div class="card">
-      <div class="card-header">
-        <h4 class="card-title mb-0">Reports</h4>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <!-- Sales Report Card -->
-          <div class="col-xl-3 col-md-6">
-            <div class="card card-animate border border-primary">
-              <div class="card-body">
-                <div class="d-flex align-items-center">
-                  <div class="flex-shrink-0 me-3">
-                    <div class="avatar-sm">
-                      <div class="avatar-title bg-primary-subtle text-primary rounded fs-18">
-                        <i class="ri-shopping-cart-line"></i>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="flex-grow-1">
-                    <h6 class="mb-1">Sales Report</h6>
-                    <p class="text-muted mb-0">View sales transactions</p>
-                  </div>
-                </div>
-                <div class="mt-3">
-                  <a href="/reports/sales" class="btn btn-primary btn-sm w-100">
-                    <i class="ri-file-list-3-line me-1"></i> View Report
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
+<div class="bi-report-container">
+  <div class="bi-header-row">
+    <h2 class="bi-page-title">SalesPeck BI Reports Hub</h2>
+    <div class="bi-conceptual-date">
+      <i class="ri-time-line fs-16"></i> Comprehensive Financial Insights
+    </div>
+  </div>
 
-          <!-- Purchases Report Card -->
-          <div class="col-xl-3 col-md-6">
-            <div class="card card-animate border border-info">
-              <div class="card-body">
-                <div class="d-flex align-items-center">
-                  <div class="flex-shrink-0 me-3">
-                    <div class="avatar-sm">
-                      <div class="avatar-title bg-info-subtle text-info rounded fs-18">
-                        <i class="ri-shopping-bag-line"></i>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="flex-grow-1">
-                    <h6 class="mb-1">Purchases Report</h6>
-                    <p class="text-muted mb-0">View purchase transactions</p>
-                  </div>
-                </div>
-                <div class="mt-3">
-                  <a href="/reports/purchases" class="btn btn-info btn-sm w-100">
-                    <i class="ri-file-list-3-line me-1"></i> View Report
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Inventory Report Card -->
-          <div class="col-xl-3 col-md-6">
-            <div class="card card-animate border border-success">
-              <div class="card-body">
-                <div class="d-flex align-items-center">
-                  <div class="flex-shrink-0 me-3">
-                    <div class="avatar-sm">
-                      <div class="avatar-title bg-success-subtle text-success rounded fs-18">
-                        <i class="ri-stack-line"></i>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="flex-grow-1">
-                    <h6 class="mb-1">Inventory Report</h6>
-                    <p class="text-muted mb-0">View product inventory</p>
-                  </div>
-                </div>
-                <div class="mt-3">
-                  <a href="/reports/inventory" class="btn btn-success btn-sm w-100">
-                    <i class="ri-file-list-3-line me-1"></i> View Report
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Customer Report Card -->
-          <div class="col-xl-3 col-md-6">
-            <div class="card card-animate border border-warning">
-              <div class="card-body">
-                <div class="d-flex align-items-center">
-                  <div class="flex-shrink-0 me-3">
-                    <div class="avatar-sm">
-                      <div class="avatar-title bg-warning-subtle text-warning rounded fs-18">
-                        <i class="ri-user-line"></i>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="flex-grow-1">
-                    <h6 class="mb-1">Customer Report</h6>
-                    <p class="text-muted mb-0">View customer analytics</p>
-                  </div>
-                </div>
-                <div class="mt-3">
-                  <a href="/reports/customers" class="btn btn-warning btn-sm w-100">
-                    <i class="ri-file-list-3-line me-1"></i> View Report
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
+  <div class="row g-4 mt-1">
+    <!-- Sales Report -->
+    <div class="col-xl-3 col-md-6">
+      <div class="bi-kpi-card text-center p-4">
+        <div class="bi-kpi-icon-circle bi-kpi-icon-blue mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.5rem;">
+          <i class="ri-shopping-cart-line"></i>
         </div>
+        <h5 class="fw-bold text-dark mb-2">Sales Report</h5>
+        <p class="text-muted fs-13 mb-4">Analyze revenue, invoice details, payment statuses, and monthly sales trends.</p>
+        <a href="/reports/sales" class="bi-filter-btn-apply w-100 text-decoration-none">
+          <i class="ri-bar-chart-2-line me-1"></i> Open Sales BI
+        </a>
       </div>
     </div>
+
+    <!-- Purchases Report -->
+    <div class="col-xl-3 col-md-6">
+      <div class="bi-kpi-card text-center p-4">
+        <div class="bi-kpi-icon-circle bi-kpi-icon-indigo mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.5rem;">
+          <i class="ri-shopping-bag-line"></i>
+        </div>
+        <h5 class="fw-bold text-dark mb-2">Purchases Report</h5>
+        <p class="text-muted fs-13 mb-4">Track vendor payables, procurement totals, and monthly purchase trends.</p>
+        <a href="/reports/purchases" class="bi-filter-btn-apply w-100 text-decoration-none" style="background-color: #4338ca;">
+          <i class="ri-bar-chart-2-line me-1"></i> Open Purchases BI
+        </a>
+      </div>
+    </div>
+
+    <!-- Inventory Report -->
+    <div class="col-xl-3 col-md-6">
+      <div class="bi-kpi-card text-center p-4">
+        <div class="bi-kpi-icon-circle bi-kpi-icon-green mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.5rem;">
+          <i class="ri-stack-line"></i>
+        </div>
+        <h5 class="fw-bold text-dark mb-2">Inventory Report</h5>
+        <p class="text-muted fs-13 mb-4">Monitor stock valuations, low stock alerts, and category distributions.</p>
+        <a href="/reports/inventory" class="bi-filter-btn-apply w-100 text-decoration-none" style="background-color: #15803d;">
+          <i class="ri-bar-chart-2-line me-1"></i> Open Inventory BI
+        </a>
+      </div>
+    </div>
+
+    <!-- Customer Report -->
+    <div class="col-xl-3 col-md-6">
+      <div class="bi-kpi-card text-center p-4">
+        <div class="bi-kpi-icon-circle bi-kpi-icon-amber mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.5rem;">
+          <i class="ri-user-line"></i>
+        </div>
+        <h5 class="fw-bold text-dark mb-2">Customer Report</h5>
+        <p class="text-muted fs-13 mb-4">Review customer purchase history, top spenders, and acquisition metrics.</p>
+        <a href="/reports/customers" class="bi-filter-btn-apply w-100 text-decoration-none" style="background-color: #d97706;">
+          <i class="ri-bar-chart-2-line me-1"></i> Open Customer BI
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="bi-footer-banner mt-5">
+    Powered by SalesPeck BI: Comprehensive Financial Insights
   </div>
 </div>

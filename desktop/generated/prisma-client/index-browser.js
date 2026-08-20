@@ -294,6 +294,7 @@ exports.Prisma.PurchaseScalarFieldEnum = {
   ledger: 'ledger',
   invoicenum: 'invoicenum',
   source: 'source',
+  printCount: 'printCount',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -321,6 +322,7 @@ exports.Prisma.SaleScalarFieldEnum = {
   createdby: 'createdby',
   updatedby: 'updatedby',
   source: 'source',
+  printCount: 'printCount',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

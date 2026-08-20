@@ -81,7 +81,7 @@
                                 <div class="d-flex">
                                     <div class="flex-grow-1">
                                         <p class="text-muted fw-medium">Total Amount</p>
-                                        <h4 class="mb-0">Rs.<%= purchase.totalAmount %></h4>
+                                        <h4 class="mb-0">Rs.<%= purchase.formattedNetAmount %></h4>
                                     </div>
                                     <div class="avatar-sm rounded-circle bg-success align-self-center mini-stat-icon">
                                         <span class="avatar-title rounded-circle bg-success">
@@ -119,16 +119,31 @@
                         <tfoot class="table-light">
                             <tr>
                                 <td colspan="4" class="text-end fw-bold">Sub Total:</td>
-                                <td class="text-end">Rs.<%= purchase.totalAmount %></td>
+                                <td class="text-end">Rs.<%= purchase.formattedSubTotal %></td>
                             </tr>
-                            <% if(parseFloat(purchase.balance)) { %>
+                            <% if(purchase.discountPercentage > 0) { %>
+                            <tr>
+                                <td colspan="4" class="text-end fw-bold text-danger">Discount (<%= purchase.formattedDiscountPercentage %>%):</td>
+                                <td class="text-end text-danger">- Rs.<%= purchase.formattedDiscountAmount %></td>
+                            </tr>
+                            <% } %>
+                            <tr class="fw-bold">
+                                <td colspan="4" class="text-end fs-15">Net Total:</td>
+                                <td class="text-end fs-15">Rs.<%= purchase.formattedNetAmount %></td>
+                            </tr>
                             <tr>
                                 <td colspan="4" class="text-end fw-bold">Paid Amount:</td>
-                                <td class="text-end">Rs. <%= parseFloat(purchase.totalPayment || 0).toFixed(2) %></td>
+                                <td class="text-end">Rs. <%= purchase.formattedTotalPayment %></td>
                             </tr>
+                            <% if(purchase.balance > 0) { %>
                             <tr>
-                                <td colspan="4" class="text-end fw-bold">Balance:</td>
-                                <td class="text-end">Rs.<%= purchase.balance %></td>
+                                <td colspan="4" class="text-end fw-bold text-warning">Balance Due:</td>
+                                <td class="text-end text-warning">Rs.<%= purchase.formattedBalance %></td>
+                            </tr>
+                            <% } else if(purchase.change > 0) { %>
+                            <tr>
+                                <td colspan="4" class="text-end fw-bold text-success">Change / Excess:</td>
+                                <td class="text-end text-success">Rs.<%= purchase.formattedChange %></td>
                             </tr>
                             <% } %>
                         </tfoot>

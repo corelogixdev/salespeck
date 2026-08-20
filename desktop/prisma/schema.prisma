@@ -198,6 +198,7 @@ model purchase {
   ledger             Boolean? @default(false)
   invoicenum         String?
   source             String?
+  printCount         Int?     @default(0)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @default(now())
 }
@@ -225,6 +226,7 @@ model sale {
   createdby          String?
   updatedby          String?
   source             String?
+  printCount         Int?     @default(0)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @default(now())
 

@@ -23,6 +23,37 @@
     <style>
         @media print {
             .no-print { display: none !important; }
+            .duplicate-watermark {
+                color: #e57373 !important;
+                border-color: #e57373 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                opacity: 0.65 !important;
+            }
+        }
+        .duplicate-watermark {
+            display: none;
+            position: absolute;
+            top: 35%;
+            left: 8%;
+            right: 8%;
+            text-align: center;
+            transform: rotate(-25deg);
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #e57373 !important;
+            border: 5px dashed #e57373 !important;
+            padding: 12px 24px;
+            pointer-events: none;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            z-index: 999;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            opacity: 0.65;
+        }
+        .show-duplicate .duplicate-watermark {
+            display: block !important;
         }
     </style>
 </head>
@@ -35,7 +66,7 @@
                 <h4 class="mb-sm-0">Invoice Details</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="/accounting/sale">sale</a></li>
+                        <li class="breadcrumb-item"><a href="/sales">Sales</a></li>
                         <li class="breadcrumb-item active">Invoice Details</li>
                     </ol>
                 </div>
@@ -44,7 +75,8 @@
     </div>
     <div class="row px-4 pb-4">
         <div class="col-lg-12">
-            <div class="card" id="demo">
+            <div class="card position-relative" id="demo">
+                <div class="duplicate-watermark" id="duplicateWatermark">DUPLICATE INVOICE</div>
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card-header border-bottom-dashed px-4">
@@ -103,7 +135,7 @@
                                         Total Amount
                                     </p>
                                     <h5 class="fs-14 mb-0">
-                                        Rs.<%= sale.totalprice %>
+                                        Rs.<%= sale.formattedNetAmount %>
                                     </h5>
                                 </div>
                             </div>
@@ -155,22 +187,31 @@
                                     <tbody>
                                         <tr>
                                             <td class="p-1 text-end">Sub Total</td>
-                                            <td class="text-end code p-1">Rs.<%= sale.totalprice %></td>
+                                            <td class="text-end code p-1">Rs.<%= sale.formattedSubTotal %></td>
                                         </tr>
-                                        <% if(parseFloat(sale.balance)) { %>
+                                        <% if(sale.discountPercentage > 0) { %>
                                             <tr>
-                                                <td class="fw-bold p-1 text-end">Paid</td>
-                                                <td class="text-end code p-1">Rs.<%= parseFloat(sale.totalpayment || 0).toFixed(2) %></td>
+                                                <td class="p-1 text-end text-danger">Discount (<%= sale.formattedDiscountPercentage %>%)</td>
+                                                <td class="text-end code p-1 text-danger">- Rs.<%= sale.formattedDiscountAmount %></td>
                                             </tr>
                                         <% } %>
-                                        <tr class="border-top border-top-dashed fs-15">
+                                        <tr class="border-top border-top-dashed fs-15 fw-bold">
                                             <th scope="row" class="p-1 text-end">Total</th>
-                                            <th class="text-end code p-1">Rs.<%= sale.totalprice %></th>
+                                            <th class="text-end code p-1">Rs.<%= sale.formattedNetAmount %></th>
                                         </tr>
-                                        <% if(parseFloat(sale.balance)) { %>
+                                        <tr>
+                                            <td class="fw-bold p-1 text-end">Paid</td>
+                                            <td class="text-end code p-1">Rs.<%= sale.formattedTotalPayment %></td>
+                                        </tr>
+                                        <% if(sale.balance > 0) { %>
                                             <tr>
-                                                <th class="p-1 text-end">Balance</th>
-                                                <th class="text-end code p-1">Rs.<%= sale.balance %></th>
+                                                <th class="p-1 text-end text-warning">Balance Due</th>
+                                                <th class="text-end code p-1 text-warning">Rs.<%= sale.formattedBalance %></th>
+                                            </tr>
+                                        <% } else if(sale.change > 0) { %>
+                                            <tr>
+                                                <th class="p-1 text-end text-success">Change / Excess</th>
+                                                <th class="text-end code p-1 text-success">Rs.<%= sale.formattedChange %></th>
                                             </tr>
                                         <% } %>
                                         <% if (typeof customerBalance !== 'undefined' && customerBalance !== null) { %>
@@ -190,13 +231,19 @@
                             </div>
 
                             <div class="d-flex justify-content-between align-items-center mt-4 no-print">
-                                <div>
+                                <div class="d-flex align-items-center gap-3">
                                     <% if (typeof customerBalance !== 'undefined' && customerBalance !== null) { %>
                                     <div class="form-check form-switch form-switch-success form-switch-md">
                                         <input class="form-check-input" type="checkbox" role="switch" id="showBalanceToggle">
                                         <label class="form-check-label fs-13" for="showBalanceToggle">Show Current Balance on Print</label>
                                     </div>
                                     <% } %>
+                                    <div class="form-check form-switch form-switch-danger form-switch-md">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="duplicateToggle">
+                                        <label class="form-check-label fs-13 fw-semibold text-danger" for="duplicateToggle">
+                                            <i class="ri-file-copy-2-line me-1"></i>Print as Duplicate Invoice
+                                        </label>
+                                    </div>
                                 </div>
                                 <div class="d-flex gap-2">
                                     <% if(typeof hidenav === 'undefined' || !hidenav) { %>
@@ -223,7 +270,29 @@
     // Printer configuration from settings
     const printerConfig = <%- JSON.stringify(typeof printerConfig !== 'undefined' ? printerConfig : { silentPrinting: false, numberOfPrints: 1 }) %>;
     
+    function markInvoicePrinted() {
+        try {
+            const data = JSON.stringify({ type: 'sale', id: '<%= sale.id %>' });
+            if (navigator.sendBeacon) {
+                const blob = new Blob([data], { type: 'application/json' });
+                navigator.sendBeacon('/invoices/mark-printed', blob);
+            } else {
+                fetch('/invoices/mark-printed', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: data,
+                    keepalive: true
+                }).catch(err => console.error('Error marking invoice printed:', err));
+            }
+        } catch(e) {
+            console.error(e);
+        }
+    }
+
+    window.addEventListener('beforeprint', markInvoicePrinted);
+
     function printReceipt() {
+        markInvoicePrinted();
         const numberOfPrints = parseInt(printerConfig.numberOfPrints || 1);
         const silentPrinting = printerConfig.silentPrinting === true || printerConfig.silentPrinting === 'true';
         
@@ -246,6 +315,7 @@
                     styles += styleEl.innerHTML + '\n';
                 });
                 
+                const isDuplicateActive = document.getElementById('demo').classList.contains('show-duplicate');
                 printWindow.document.write(`
                     <!DOCTYPE html>
                     <html>
@@ -255,11 +325,20 @@
                             ${styles}
                             @media print {
                                 .no-print { display: none !important; }
+                                .duplicate-watermark {
+                                    color: #e57373 !important;
+                                    border-color: #e57373 !important;
+                                    -webkit-print-color-adjust: exact !important;
+                                    print-color-adjust: exact !important;
+                                    opacity: 0.65 !important;
+                                }
                             }
                         </style>
                     </head>
-                    <body>
-                        ${printContent}
+                    <body class="${isDuplicateActive ? 'show-duplicate' : ''}">
+                        <div id="demo" class="card position-relative ${isDuplicateActive ? 'show-duplicate' : ''}">
+                            ${printContent}
+                        </div>
                     </body>
                     </html>
                 `);
@@ -310,6 +389,24 @@
                 $('#print-balance-row').addClass('d-none');
             }
         });
+
+        $('#duplicateToggle').on('change', function() {
+            if ($(this).is(':checked')) {
+                $('#demo').addClass('show-duplicate');
+            } else {
+                $('#demo').removeClass('show-duplicate');
+            }
+        });
+
+        // Auto check duplicate toggle if query param duplicate=true or printCount > 0
+        const urlParams = new URLSearchParams(window.location.search);
+        const isDuplicateParam = urlParams.get('duplicate') === 'true';
+        const hasBeenPrintedBefore = <%= (sale.printCount > 0) ? 'true' : 'false' %>;
+
+        if (isDuplicateParam || hasBeenPrintedBefore) {
+            $('#duplicateToggle').prop('checked', true);
+            $('#demo').addClass('show-duplicate');
+        }
     });
 </script>
 

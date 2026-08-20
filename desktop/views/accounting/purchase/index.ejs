@@ -54,7 +54,7 @@
                 key: 'totalAmount', 
                 label: 'Amount', 
                 sortable: true, 
-                render: (row) => `Rs. ${formatNumber(row.totalAmount || 0)}`
+                render: (row) => `Rs. ${formatNumber(row.netAmount || row.totalAmount || 0)}`
             },
             { 
                 key: 'invoicenum', 

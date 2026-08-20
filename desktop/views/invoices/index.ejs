@@ -1,0 +1,214 @@
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Invoices Management</h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Invoices</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-3">
+    <div class="col-xl-4 col-md-4">
+        <div class="card card-animate border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1 overflow-hidden">
+                        <p class="text-uppercase fw-semibold text-muted text-truncate mb-0" style="font-size: 11px;">Total Invoices</p>
+                    </div>
+                </div>
+                <div class="d-flex align-items-end justify-content-between mt-2">
+                    <div>
+                        <h4 class="fs-22 fw-bold me-2 mb-0"><%= stats.totalInvoices %></h4>
+                    </div>
+                    <div class="avatar-sm flex-shrink-0">
+                        <span class="avatar-title bg-soft-primary text-primary rounded-circle fs-3">
+                            <i class="ri-file-list-3-line"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-4">
+        <div class="card card-animate border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1 overflow-hidden">
+                        <p class="text-uppercase fw-semibold text-muted text-truncate mb-0" style="font-size: 11px;">Printed Invoices</p>
+                    </div>
+                </div>
+                <div class="d-flex align-items-end justify-content-between mt-2">
+                    <div>
+                        <h4 class="fs-22 fw-bold text-success me-2 mb-0"><%= stats.printedInvoices %></h4>
+                    </div>
+                    <div class="avatar-sm flex-shrink-0">
+                        <span class="avatar-title bg-soft-success text-success rounded-circle fs-3">
+                            <i class="ri-checkbox-circle-line"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-4">
+        <div class="card card-animate border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1 overflow-hidden">
+                        <p class="text-uppercase fw-semibold text-muted text-truncate mb-0" style="font-size: 11px;">Unprinted Invoices</p>
+                    </div>
+                </div>
+                <div class="d-flex align-items-end justify-content-between mt-2">
+                    <div>
+                        <h4 class="fs-22 fw-bold text-warning me-2 mb-0"><%= stats.unprintedInvoices %></h4>
+                    </div>
+                    <div class="avatar-sm flex-shrink-0">
+                        <span class="avatar-title bg-soft-warning text-warning rounded-circle fs-3">
+                            <i class="ri-error-warning-line"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header align-items-center d-flex">
+        <h4 class="card-title mb-0 flex-grow-1">All Sales & Purchases Invoices</h4>
+        <div class="d-flex gap-2">
+            <button class="btn btn-soft-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#invoiceFilters">
+                <i class="ri-filter-3-line align-bottom me-1"></i> Filters
+            </button>
+            <button onclick="window.location.reload()" class="btn btn-soft-success btn-sm" title="Refresh">
+                <i class="ri-refresh-line align-middle"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="collapse show mb-3" id="invoiceFilters">
+            <form method="GET" action="/invoices" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label text-muted fs-12 fw-semibold">Invoice Type</label>
+                    <select name="type" class="form-select form-select-sm">
+                        <option value="all" <%= type === 'all' ? 'selected' : '' %>>All Types</option>
+                        <option value="sale" <%= type === 'sale' ? 'selected' : '' %>>Product Sale</option>
+                        <option value="service" <%= type === 'service' ? 'selected' : '' %>>Service Sale</option>
+                        <option value="purchase" <%= type === 'purchase' ? 'selected' : '' %>>Purchase Order</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-muted fs-12 fw-semibold">Print Status</label>
+                    <select name="printedStatus" class="form-select form-select-sm">
+                        <option value="all" <%= printedStatus === 'all' ? 'selected' : '' %>>All Statuses</option>
+                        <option value="printed" <%= printedStatus === 'printed' ? 'selected' : '' %>>🟢 Printed</option>
+                        <option value="unprinted" <%= printedStatus === 'unprinted' ? 'selected' : '' %>>🟡 Unprinted</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-muted fs-12 fw-semibold">Search</label>
+                    <input type="text" name="search" class="form-control form-control-sm" placeholder="Invoice # or Party Name..." value="<%= query.search || '' %>">
+                </div>
+                <div class="col-md-3 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm w-100">
+                        <i class="ri-search-line me-1"></i> Filter
+                    </button>
+                    <a href="/invoices" class="btn btn-light btn-sm">Reset</a>
+                </div>
+            </form>
+        </div>
+
+        <%
+        const tableColumns = [
+            { 
+                key: 'createdAt', 
+                label: 'Date', 
+                sortable: true, 
+                render: (row) => moment(row.createdAt).format('D MMM YYYY, h:mm A')
+            },
+            { 
+                key: 'invoicenum', 
+                label: 'Invoice #', 
+                sortable: true,
+                render: (row) => `<span class="fw-semibold text-primary">${row.invoicenum || '-'}</span>`
+            },
+            { 
+                key: 'type', 
+                label: 'Type', 
+                sortable: false,
+                render: (row) => {
+                    if (row.type === 'service') {
+                        return `<span class="badge bg-soft-secondary text-secondary px-2 py-1"><i class="ri-customer-service-2-line me-1"></i>Service Sale</span>`;
+                    } else if (row.type === 'sale') {
+                        return `<span class="badge bg-soft-info text-info px-2 py-1"><i class="ri-shopping-cart-2-line me-1"></i>Product Sale</span>`;
+                    } else {
+                        return `<span class="badge bg-soft-warning text-warning px-2 py-1"><i class="ri-truck-line me-1"></i>Purchase</span>`;
+                    }
+                }
+            },
+            { 
+                key: 'partyName', 
+                label: 'Customer / Vendor', 
+                sortable: false,
+                render: (row) => `<span class="fw-medium">${row.partyName}</span> <small class="text-muted">(${row.partyType})</small>`
+            },
+            { 
+                key: 'netAmount', 
+                label: 'Net Amount', 
+                sortable: true,
+                render: (row) => `<span class="fw-bold">Rs. ${formatNumber(row.netAmount || row.totalAmount || 0)}</span>`
+            },
+            { 
+                key: 'isPrinted', 
+                label: 'Print Status', 
+                sortable: false,
+                render: (row) => {
+                    if (row.isPrinted) {
+                        return `<span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" title="Printed ${row.printCount} time(s)"><i class="ri-checkbox-circle-fill me-1"></i>Printed (${row.printCount})</span>`;
+                    } else {
+                        return `<span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1"><i class="ri-time-line me-1"></i>Unprinted</span>`;
+                    }
+                }
+            },
+            {
+                key: 'actions',
+                label: 'Actions',
+                sortable: false,
+                class: 'text-end',
+                render: (row) => {
+                    const printBtn = row.isPrinted 
+                        ? `<a href="${row.viewUrl}?duplicate=true" class="btn btn-soft-warning action-btn" title="Print Duplicate Invoice"><i class="ri-printer-line me-1"></i>Duplicate</a>`
+                        : `<a href="${row.viewUrl}" class="btn btn-soft-success action-btn" title="Print Invoice"><i class="ri-printer-line me-1"></i>Print</a>`;
+
+                    return `<div class="btn-group btn-group-sm action-group" role="group">
+                        <a href="${row.viewUrl}" class="btn btn-soft-primary action-btn" title="View Invoice"><i class="ri-eye-line me-1"></i>View</a>
+                        ${printBtn}
+                    </div>`;
+                }
+            }
+        ];
+        %>
+
+        <%- include('../components/partials/data-table', {
+            columns: tableColumns,
+            data: invoices,
+            sortBy: 'createdAt',
+            sortOrder: 'desc',
+            baseUrl: '/invoices',
+            query: query
+        }) %>
+
+        <%- include('../components/partials/pagination', {
+            pagination: pagination,
+            baseUrl: '/invoices',
+            query: query
+        }) %>
+    </div>
+</div>

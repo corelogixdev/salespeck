@@ -14,7 +14,7 @@ const ISSUED_AT_SKEW_MS = 24 * 60 * 60 * 1000; // 1 day
 const LICENSE_LAST_SEEN_SETTING = "license_last_seen";
 
 const EMBEDDED_PUBLIC_KEY_PEM = `-----BEGIN PUBLIC KEY-----
-MCowBQYDK2VwAyEA27sp2LaMP01J/vwfaVyyM7Alekh0oNAINgLVpuqP3+Q=
+MCowBQYDK2VwAyEAEtDfxwOmpxH4IzrCn63gINlmAHhsK3YA3YYvzrMBmhY=
 -----END PUBLIC KEY-----
 `;
 
