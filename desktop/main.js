@@ -341,7 +341,46 @@ ipcMain.on('unlock-window-focus', (event) => {
 ipcMain.on('maximize-window', (event) => {
   if (!mainWindow || mainWindow.isDestroyed()) return;
   mainWindow.maximize();
-});
+});/**
+ * Helper to calculate receipt height for PDF Preview dialog rendering
+ * Clones the receipt offscreen at 80mm width (302px) to get true receipt height.
+ */
+async function calculatePreviewHeightMm(targetWebContents) {
+  if (!targetWebContents || targetWebContents.isDestroyed()) return 180;
+  try {
+    const contentPx = await targetWebContents.executeJavaScript(`
+      (function() {
+        var el = document.querySelector('#demo') || document.querySelector('.card');
+        if (!el) return 0;
+        
+        var clone = el.cloneNode(true);
+        var noPrints = clone.querySelectorAll('.no-print, button, .btn');
+        for (var i = 0; i < noPrints.length; i++) {
+          if (noPrints[i] && noPrints[i].parentNode) {
+            noPrints[i].parentNode.removeChild(noPrints[i]);
+          }
+        }
+        clone.style.width = '302px';
+        clone.style.position = 'absolute';
+        clone.style.visibility = 'hidden';
+        clone.style.left = '-9999px';
+        clone.style.top = '0';
+        document.body.appendChild(clone);
+        var h = clone.offsetHeight || clone.scrollHeight;
+        document.body.removeChild(clone);
+        return h;
+      })();
+    `);
+    if (contentPx && contentPx > 0) {
+      // 1px at 96 DPI = 25.4 / 96 mm = 0.26458mm. Add 14mm buffer for logo/margins.
+      const mm = Math.ceil((contentPx * 25.4) / 96) + 14;
+      return Math.max(80, Math.min(mm, 600));
+    }
+  } catch (err) {
+    logi('[PrintPreview] Height measurement error:', err.message);
+  }
+  return 180;
+}
 
 /**
  * IPC: generate-print-preview
@@ -358,7 +397,12 @@ ipcMain.handle('generate-print-preview', async (event) => {
     const printerSettings = config.printer || {};
     const isThermal = printerSettings.printerType === 'thermal' || printerSettings.paper === '58mm' || printerSettings.paper === '80mm';
     const widthMm = Number(printerSettings.width) || (printerSettings.paper === '58mm' ? 58 : 80);
-    const heightMm = Number(printerSettings.height) > 0 ? Number(printerSettings.height) : 200;
+    let heightMm = Number(printerSettings.height);
+
+    if (isThermal && (!heightMm || heightMm <= 0)) {
+      heightMm = await calculatePreviewHeightMm(senderWindow.webContents);
+    }
+    if (!heightMm || heightMm <= 0) heightMm = 180;
 
     const pdfOptions = {
       marginsType: 1,
@@ -444,7 +488,6 @@ ipcMain.handle('trigger-print', async (event, customOptions = {}) => {
     const printOptions = {
       silent: true,
       printBackground: true,
-      preferCSSPageSize: true,
       copies: customOptions.copies || Number(printerSettings.numberOfPrints) || 1,
     };
 
@@ -470,7 +513,6 @@ ipcMain.handle('trigger-print', async (event, customOptions = {}) => {
       const printOptions = {
         silent: false,
         printBackground: true,
-        preferCSSPageSize: true,
         copies: customOptions.copies || Number(printerSettings.numberOfPrints) || 1,
       };
       if (deviceName && deviceName !== 'Default' && deviceName !== '') {
@@ -512,7 +554,6 @@ ipcMain.handle('trigger-print-original', async (event) => {
     const printOptions = {
       silent: isSilent,
       printBackground: true,
-      preferCSSPageSize: true,
       copies: Number(printerSettings.numberOfPrints) || 1,
     };
     if (deviceName && deviceName !== 'Default' && deviceName !== '') {
@@ -537,11 +578,6 @@ ipcMain.on('close-preview-window', (event) => {
 });
 
 /**
- * Open a dedicated print-preview window and load the given app-print:// URL.
- * This is a helper; renderer pages can also call generatePrintPreview()
- * and then ask the main process to open the window.
- */
-/**
  * Shared helper: generate PDF from a window and open the preview window.
  */
 async function generateAndShowPreview(sourceWindow) {
@@ -555,7 +591,12 @@ async function generateAndShowPreview(sourceWindow) {
   const printerSettings = config.printer || {};
   const isThermal = printerSettings.printerType === 'thermal' || printerSettings.paper === '58mm' || printerSettings.paper === '80mm';
   const widthMm = Number(printerSettings.width) || (printerSettings.paper === '58mm' ? 58 : 80);
-  const heightMm = Number(printerSettings.height) > 0 ? Number(printerSettings.height) : 200;
+  let heightMm = Number(printerSettings.height);
+
+  if (isThermal && (!heightMm || heightMm <= 0)) {
+    heightMm = await calculatePreviewHeightMm(sourceWindow.webContents);
+  }
+  if (!heightMm || heightMm <= 0) heightMm = 180;
 
   const pdfOptions = {
     marginsType: 1,
@@ -575,11 +616,20 @@ async function generateAndShowPreview(sourceWindow) {
   fs.writeFileSync(pdfPath, data);
   printPreviewTempFiles.add(pdfPath);
 
+  const token = `preview-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  previewTokenMap.set(token, pdfPath);
+
+  // Auto-expire after 10 minutes
+  setTimeout(() => {
+    previewTokenMap.delete(token);
+    cleanupTempPdf(pdfPath);
+  }, 10 * 60 * 1000);
+
   logi('[PrintPreview] PDF generated, size:', data.length);
-  openPrintPreviewWindow(sourceWindow, data, pdfPath);
+  openPrintPreviewWindow(sourceWindow, data, pdfPath, token);
 }
 
-function openPrintPreviewWindow(parentWindow, pdfBuffer, filePath) {
+function openPrintPreviewWindow(parentWindow, pdfBuffer, filePath, token) {
   const printerSettings = config.printer || {};
   const isThermal = printerSettings.printerType === 'thermal' || printerSettings.paper === '58mm' || printerSettings.paper === '80mm';
 
@@ -600,8 +650,7 @@ function openPrintPreviewWindow(parentWindow, pdfBuffer, filePath) {
     previewWin._originalWindowId = parentWindow.id;
   }
 
-  const pdfBase64 = pdfBuffer.toString('base64');
-  const pdfDataUrl = 'data:application/pdf;base64,' + pdfBase64;
+  const iframeSrc = token ? `app-print://${token}#view=FitW` : ('data:application/pdf;base64,' + pdfBuffer.toString('base64'));
   const safePath = (filePath || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
   const maxIframeWidth = isThermal ? '480px' : '850px';
 
@@ -633,7 +682,7 @@ function openPrintPreviewWindow(parentWindow, pdfBuffer, filePath) {
   </div>
 </div>
 <div class="preview-container">
-  <iframe id="pdfFrame" src="${pdfDataUrl}"></iframe>
+  <iframe id="pdfFrame" src="${iframeSrc}"></iframe>
 </div>
 <script>
   document.getElementById('btnPrint').addEventListener('click', async function() {

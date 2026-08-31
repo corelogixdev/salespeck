@@ -34,15 +34,12 @@
         const paper = cfg.paper || '80mm';
         const fontSize = parseInt(cfg.fontSize) || 11;
         const widthMm = parseInt(cfg.width) || (paper === '58mm' ? 58 : 80);
-        const heightMm = parseInt(cfg.height) || 0;
 
         let css = '';
         if (printerType === 'thermal' || paper === '58mm' || paper === '80mm') {
-            const pageHeightCss = heightMm > 0 ? `${heightMm}mm` : 'auto';
             css = `
                 @media print {
                     @page {
-                        size: ${widthMm}mm ${pageHeightCss};
                         margin: 0;
                     }
                     /* Hide outer app navigation, topbars, footers, buttons & breadcrumbs */
