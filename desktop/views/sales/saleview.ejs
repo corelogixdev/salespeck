@@ -159,8 +159,7 @@
                                                 <th scope="row">
                                                     <%= index + 1 %>
                                                 </th>
-                                                <td class="text-center"
-                                                    style="max-width: 8mm; overflow-wrap: break-word; white-space: unset;">
+                                                <td class="text-center" style="word-break: break-word; white-space: normal;">
                                                     <span class="fw-medium">
                                                         <%= product.Product.name %>
                                                     </span>
@@ -269,7 +268,7 @@
 <script src="/assets/js/print-helper.js"></script>
 <script>
     // Printer configuration from settings
-    const printerConfig = <%- JSON.stringify(typeof printerConfig !== 'undefined' ? printerConfig : { printer: 'Default', printerType: 'thermal', paper: '58mm', width: 58, height: 200, fontSize: 12, silentPrinting: false, numberOfPrints: 1 }) %>;
+    const printerConfig = <%- JSON.stringify(typeof printerConfig !== 'undefined' ? printerConfig : { printer: 'Default', printerType: 'thermal', paper: '80mm', width: 80, height: 0, fontSize: 11, silentPrinting: false, numberOfPrints: 1 }) %>;
     window.printerConfig = printerConfig;
     
     function markInvoicePrinted() {

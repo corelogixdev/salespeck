@@ -37,6 +37,10 @@ contextBridge.exposeInMainWorld('electron', {
      */
     triggerPrint: (options) => ipcRenderer.invoke('trigger-print', options),
     /**
+     * Print original content window from inside a print preview dialog.
+     */
+    triggerPrintOriginal: () => ipcRenderer.invoke('trigger-print-original'),
+    /**
      * One-shot: generate PDF preview AND open the dedicated preview window.
      */
     openPrintPreviewWindow: () => ipcRenderer.invoke('open-print-preview-window'),

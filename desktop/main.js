@@ -355,16 +355,30 @@ ipcMain.handle('generate-print-preview', async (event) => {
   }
 
   try {
+    const printerSettings = config.printer || {};
+    const isThermal = printerSettings.printerType === 'thermal' || printerSettings.paper === '58mm' || printerSettings.paper === '80mm';
+    const widthMm = Number(printerSettings.width) || (printerSettings.paper === '58mm' ? 58 : 80);
+    const heightMm = Number(printerSettings.height) > 0 ? Number(printerSettings.height) : 200;
+
+    const pdfOptions = {
+      marginsType: 1,
+      printBackground: true,
+      preferCSSPageSize: true,
+    };
+
+    if (isThermal) {
+      pdfOptions.pageSize = {
+        width: widthMm * 1000,
+        height: heightMm * 1000
+      };
+    }
+
     const pdfPath = path.join(
       os.tmpdir(),
       `salespeck-preview-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.pdf`
     );
 
-    const data = await senderWindow.webContents.printToPDF({
-      marginsType: 1,
-      printBackground: true,
-      preferCSSPageSize: true,
-    });
+    const data = await senderWindow.webContents.printToPDF(pdfOptions);
 
     fs.writeFileSync(pdfPath, data);
     printPreviewTempFiles.add(pdfPath);
@@ -490,14 +504,25 @@ ipcMain.handle('trigger-print-original', async (event) => {
     throw new Error('Original window is no longer available');
   }
 
+  const printerSettings = config.printer || {};
+  const deviceName = printerSettings.printer;
+  const isSilent = printerSettings.silentPrinting === true || printerSettings.silentPrinting === 'true';
+
   try {
-    await originalWin.webContents.print({
-      silent: false,
+    const printOptions = {
+      silent: isSilent,
       printBackground: true,
       preferCSSPageSize: true,
-    });
+      copies: Number(printerSettings.numberOfPrints) || 1,
+    };
+    if (deviceName && deviceName !== 'Default' && deviceName !== '') {
+      printOptions.deviceName = deviceName;
+    }
+    await originalWin.webContents.print(printOptions);
+    logi('[PrintPreview] Original window printed to device:', deviceName || 'Default');
     return { success: true };
   } catch (err) {
+    logi('[PrintPreview] Original print error:', err.message);
     throw new Error(err.message || 'Print failed or was cancelled.');
   }
 });
@@ -527,11 +552,25 @@ async function generateAndShowPreview(sourceWindow) {
 
   logi('[PrintPreview] Generating PDF to:', pdfPath);
 
-  const data = await sourceWindow.webContents.printToPDF({
+  const printerSettings = config.printer || {};
+  const isThermal = printerSettings.printerType === 'thermal' || printerSettings.paper === '58mm' || printerSettings.paper === '80mm';
+  const widthMm = Number(printerSettings.width) || (printerSettings.paper === '58mm' ? 58 : 80);
+  const heightMm = Number(printerSettings.height) > 0 ? Number(printerSettings.height) : 200;
+
+  const pdfOptions = {
     marginsType: 1,
     printBackground: true,
     preferCSSPageSize: true,
-  });
+  };
+
+  if (isThermal) {
+    pdfOptions.pageSize = {
+      width: widthMm * 1000,
+      height: heightMm * 1000
+    };
+  }
+
+  const data = await sourceWindow.webContents.printToPDF(pdfOptions);
 
   fs.writeFileSync(pdfPath, data);
   printPreviewTempFiles.add(pdfPath);
@@ -541,9 +580,12 @@ async function generateAndShowPreview(sourceWindow) {
 }
 
 function openPrintPreviewWindow(parentWindow, pdfBuffer, filePath) {
+  const printerSettings = config.printer || {};
+  const isThermal = printerSettings.printerType === 'thermal' || printerSettings.paper === '58mm' || printerSettings.paper === '80mm';
+
   const previewWin = new BrowserWindow({
-    width: 900,
-    height: 1100,
+    width: isThermal ? 580 : 900,
+    height: 1000,
     parent: parentWindow || undefined,
     title: 'Print Preview',
     autoHideMenuBar: true,
@@ -558,11 +600,10 @@ function openPrintPreviewWindow(parentWindow, pdfBuffer, filePath) {
     previewWin._originalWindowId = parentWindow.id;
   }
 
-  // Embed the PDF as a base64 data URI inside the iframe.
-  // This avoids file:// CORS issues and custom protocol complexity.
   const pdfBase64 = pdfBuffer.toString('base64');
   const pdfDataUrl = 'data:application/pdf;base64,' + pdfBase64;
   const safePath = (filePath || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  const maxIframeWidth = isThermal ? '480px' : '850px';
 
   const html = `<!DOCTYPE html>
 <html>
@@ -580,7 +621,7 @@ function openPrintPreviewWindow(parentWindow, pdfBuffer, filePath) {
   .btn-primary{background:#2563eb;color:#fff;border-color:#2563eb}
   .btn-primary:hover:not(:disabled){background:#1d4ed8;border-color:#1d4ed8}
   .preview-container{flex:1;padding:16px;overflow:auto;display:flex;justify-content:center;background:#e5e7eb}
-  iframe{width:100%;max-width:850px;height:100%;border:none;background:#fff;box-shadow:0 4px 6px -1px rgba(0,0,0,.1);border-radius:4px}
+  iframe{width:100%;max-width:${maxIframeWidth};height:100%;border:none;background:#fff;box-shadow:0 4px 6px -1px rgba(0,0,0,.1);border-radius:4px}
 </style>
 </head>
 <body>
@@ -595,13 +636,22 @@ function openPrintPreviewWindow(parentWindow, pdfBuffer, filePath) {
   <iframe id="pdfFrame" src="${pdfDataUrl}"></iframe>
 </div>
 <script>
-  document.getElementById('btnPrint').addEventListener('click', function() {
-    if (window.electron && window.electron.openPdfInViewer) {
-      window.electron.openPdfInViewer("${safePath}").catch(function(err) {
-        alert('Could not open PDF viewer: ' + (err.message || 'Unknown error'));
-      });
-    } else {
-      alert('Preview API not available');
+  document.getElementById('btnPrint').addEventListener('click', async function() {
+    try {
+      this.disabled = true;
+      this.textContent = 'Printing...';
+      if (window.electron && window.electron.triggerPrintOriginal) {
+        await window.electron.triggerPrintOriginal();
+      } else if (window.electron && window.electron.openPdfInViewer) {
+        await window.electron.openPdfInViewer("${safePath}");
+      } else {
+        window.print();
+      }
+    } catch (err) {
+      alert('Print error: ' + (err.message || 'Could not print'));
+    } finally {
+      this.disabled = false;
+      this.textContent = '🖨️ Print';
     }
   });
   document.getElementById('btnClose').addEventListener('click', function() {

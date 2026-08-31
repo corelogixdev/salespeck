@@ -165,8 +165,8 @@
                                     Paper Size:
                                 </label>
                                 <select class="form-select" id="printer-paper" name="printer[paper]">
-                                    <option value="58mm" <%= (envSettings.printer.paper === '58mm' || !envSettings.printer.paper) ? 'selected' : '' %>>58mm POS Receipt Roll</option>
-                                    <option value="80mm" <%= envSettings.printer.paper === '80mm' ? 'selected' : '' %>>80mm POS Receipt Roll</option>
+                                    <option value="80mm" <%= (envSettings.printer.paper === '80mm' || !envSettings.printer.paper) ? 'selected' : '' %>>80mm POS Receipt Roll (Standard)</option>
+                                    <option value="58mm" <%= envSettings.printer.paper === '58mm' ? 'selected' : '' %>>58mm POS Receipt Roll</option>
                                     <option value="A4" <%= envSettings.printer.paper === 'A4' ? 'selected' : '' %>>A4 Standard</option>
                                     <option value="A5" <%= envSettings.printer.paper === 'A5' ? 'selected' : '' %>>A5 Half Sheet</option>
                                     <option value="Letter" <%= envSettings.printer.paper === 'Letter' ? 'selected' : '' %>>US Letter</option>
@@ -180,7 +180,7 @@
                                 <label class="form-label" for="printer-width">
                                     Width (mm):
                                 </label>
-                                <input type="number" class="form-control" id="printer-width" name="printer[width]" value="<%= envSettings.printer.width || 58 %>" placeholder="58">
+                                <input type="number" class="form-control" id="printer-width" name="printer[width]" value="<%= envSettings.printer.width !== undefined ? envSettings.printer.width : 80 %>" placeholder="80">
                             </div>
                         </div>
 
@@ -189,7 +189,7 @@
                                 <label class="form-label" for="printer-height">
                                     Height (mm):
                                 </label>
-                                <input type="number" class="form-control" id="printer-height" name="printer[height]" value="<%= envSettings.printer.height || 200 %>" placeholder="200 (0 for roll)">
+                                <input type="number" class="form-control" id="printer-height" name="printer[height]" value="<%= envSettings.printer.height !== undefined ? envSettings.printer.height : 0 %>" placeholder="0 (0 for roll)">
                             </div>
                         </div>
 
@@ -198,7 +198,7 @@
                                 <label class="form-label" for="printer-fontSize">
                                     Print Font Size (pt):
                                 </label>
-                                <input type="number" class="form-control" id="printer-fontSize" name="printer[fontSize]" value="<%= envSettings.printer.fontSize || 12 %>" min="8" max="24">
+                                <input type="number" class="form-control" id="printer-fontSize" name="printer[fontSize]" value="<%= envSettings.printer.fontSize || 11 %>" min="8" max="24">
                             </div>
                         </div>
 
@@ -469,5 +469,38 @@
         refreshBtn.addEventListener('click', loadPrinters);
     }
     loadPrinters();
+
+    // Auto-update width & printer type when paper selection changes
+    const paperSelect = document.getElementById('printer-paper');
+    const widthInput = document.getElementById('printer-width');
+    const heightInput = document.getElementById('printer-height');
+    const typeSelect = document.getElementById('printer-printerType');
+
+    if (paperSelect) {
+        paperSelect.addEventListener('change', function() {
+            const val = this.value;
+            if (val === '80mm') {
+                if (widthInput) widthInput.value = 80;
+                if (heightInput) heightInput.value = 0;
+                if (typeSelect) typeSelect.value = 'thermal';
+            } else if (val === '58mm') {
+                if (widthInput) widthInput.value = 58;
+                if (heightInput) heightInput.value = 0;
+                if (typeSelect) typeSelect.value = 'thermal';
+            } else if (val === 'A4') {
+                if (widthInput) widthInput.value = 210;
+                if (heightInput) heightInput.value = 297;
+                if (typeSelect) typeSelect.value = 'standard';
+            } else if (val === 'A5') {
+                if (widthInput) widthInput.value = 148;
+                if (heightInput) heightInput.value = 210;
+                if (typeSelect) typeSelect.value = 'standard';
+            } else if (val === 'Letter') {
+                if (widthInput) widthInput.value = 216;
+                if (heightInput) heightInput.value = 279;
+                if (typeSelect) typeSelect.value = 'standard';
+            }
+        });
+    }
 })();
 </script>

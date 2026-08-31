@@ -86,22 +86,22 @@ exports.index = async (req, res) => {
     envSettings.printer = {
       printer: envSettings.printer.printer || '',
       printerType: envSettings.printer.printerType || 'thermal',
-      paper: envSettings.printer.paper || '58mm',
-      width: envSettings.printer.width || 58,
-      height: envSettings.printer.height || 200,
-      fontSize: envSettings.printer.fontSize || 12,
-      silentPrinting: envSettings.printer.silentPrinting !== undefined ? envSettings.printer.silentPrinting : false,
-      numberOfPrints: envSettings.printer.numberOfPrints || 1
+      paper: envSettings.printer.paper || '80mm',
+      width: envSettings.printer.width !== undefined ? Number(envSettings.printer.width) : (envSettings.printer.paper === '58mm' ? 58 : 80),
+      height: envSettings.printer.height !== undefined ? Number(envSettings.printer.height) : 0,
+      fontSize: envSettings.printer.fontSize !== undefined ? Number(envSettings.printer.fontSize) : 11,
+      silentPrinting: envSettings.printer.silentPrinting !== undefined ? Boolean(envSettings.printer.silentPrinting) : false,
+      numberOfPrints: envSettings.printer.numberOfPrints ? Number(envSettings.printer.numberOfPrints) : 1
     };
   } else {
     // Default printer if not set
     envSettings.printer = {
       printer: '',
       printerType: 'thermal',
-      paper: '58mm',
-      width: 58,
-      height: 200,
-      fontSize: 12,
+      paper: '80mm',
+      width: 80,
+      height: 0,
+      fontSize: 11,
       silentPrinting: false,
       numberOfPrints: 1
     };
@@ -182,18 +182,25 @@ exports.save = async (req, res) => {
     // Build updated settings object - only include variables from DEFAULT_SETTINGS
     const updatedSettings = {};
     
-    // Handle printer settings (comes as printer[field] from form)
-    const printerSettings = {};
-    Object.keys(req.body).forEach(key => {
-      if (key.startsWith('printer[')) {
-        // Extract field name from printer[field] format
-        const fieldName = key.match(/printer\[(.+)\]/)[1];
-        printerSettings[fieldName] = req.body[key];
-      }
-    });
+    // Handle printer settings (may come as object req.body.printer or flat printer[field] keys)
+    let printerSettings = {};
+    if (req.body.printer && typeof req.body.printer === 'object' && !Array.isArray(req.body.printer)) {
+      printerSettings = req.body.printer;
+    } else {
+      Object.keys(req.body).forEach(key => {
+        if (key.startsWith('printer[')) {
+          const match = key.match(/printer\[(.+)\]/);
+          if (match) {
+            printerSettings[match[1]] = req.body[key];
+          }
+        }
+      });
+    }
     
-    // Update printer settings if any were provided
-    if (Object.keys(printerSettings).length > 0) {
+    // Check if any printer form field was submitted
+    const hasPrinterSubmission = Object.keys(printerSettings).length > 0 || req.body.hasOwnProperty('printer');
+    
+    if (hasPrinterSubmission) {
       // Get current printer settings
       let currentPrinter = {};
       if (currentSettings.printer) {
@@ -209,25 +216,31 @@ exports.save = async (req, res) => {
       // Merge with new values
       const mergedSettings = { ...currentPrinter, ...printerSettings };
       
-      // Handle silentPrinting checkbox (if not checked, it won't be in req.body)
+      // Handle silentPrinting checkbox (if unchecked, it won't be in form body)
       if (printerSettings.silentPrinting === undefined) {
-        // Checkbox not in form data - keep current value or default to false
-        mergedSettings.silentPrinting = currentPrinter.silentPrinting !== undefined ? currentPrinter.silentPrinting : false;
+        mergedSettings.silentPrinting = false;
       } else {
-        mergedSettings.silentPrinting = printerSettings.silentPrinting === 'true' || printerSettings.silentPrinting === true;
+        mergedSettings.silentPrinting = printerSettings.silentPrinting === 'true' || printerSettings.silentPrinting === true || printerSettings.silentPrinting === 'on';
       }
       
-      // Ensure numberOfPrints is a number
+      // Ensure numeric types
       if (printerSettings.numberOfPrints !== undefined) {
-        mergedSettings.numberOfPrints = parseInt(printerSettings.numberOfPrints) || 1;
+        mergedSettings.numberOfPrints = parseInt(printerSettings.numberOfPrints, 10) || 1;
       } else {
         mergedSettings.numberOfPrints = currentPrinter.numberOfPrints || 1;
       }
       
-      // Ensure width, height, fontSize are numbers
-      if (printerSettings.width !== undefined) mergedSettings.width = parseInt(printerSettings.width) || 58;
-      if (printerSettings.height !== undefined) mergedSettings.height = parseInt(printerSettings.height) || 200;
-      if (printerSettings.fontSize !== undefined) mergedSettings.fontSize = parseInt(printerSettings.fontSize) || 12;
+      if (printerSettings.width !== undefined) {
+        mergedSettings.width = parseInt(printerSettings.width, 10) || (mergedSettings.paper === '58mm' ? 58 : 80);
+      }
+      
+      if (printerSettings.height !== undefined) {
+        mergedSettings.height = isNaN(parseInt(printerSettings.height, 10)) ? 0 : parseInt(printerSettings.height, 10);
+      }
+      
+      if (printerSettings.fontSize !== undefined) {
+        mergedSettings.fontSize = parseInt(printerSettings.fontSize, 10) || 11;
+      }
       
       // Store printer as JSON string
       updatedSettings.printer = JSON.stringify(mergedSettings);

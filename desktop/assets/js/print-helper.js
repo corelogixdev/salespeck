@@ -12,10 +12,10 @@
         return {
             printer: 'Default',
             printerType: 'thermal',
-            paper: '58mm',
-            width: 58,
-            height: 200,
-            fontSize: 12,
+            paper: '80mm',
+            width: 80,
+            height: 0,
+            fontSize: 11,
             silentPrinting: false,
             numberOfPrints: 1
         };
@@ -31,30 +31,48 @@
 
         const cfg = config || getPrinterConfig();
         const printerType = cfg.printerType || 'thermal';
-        const paper = cfg.paper || '58mm';
-        const fontSize = parseInt(cfg.fontSize) || 12;
-        const widthMm = parseInt(cfg.width) || (paper === '80mm' ? 80 : 58);
+        const paper = cfg.paper || '80mm';
+        const fontSize = parseInt(cfg.fontSize) || 11;
+        const widthMm = parseInt(cfg.width) || (paper === '58mm' ? 58 : 80);
+        const heightMm = parseInt(cfg.height) || 0;
 
         let css = '';
         if (printerType === 'thermal' || paper === '58mm' || paper === '80mm') {
+            const pageHeightCss = heightMm > 0 ? `${heightMm}mm` : 'auto';
             css = `
                 @media print {
                     @page {
-                        size: ${widthMm}mm auto;
+                        size: ${widthMm}mm ${pageHeightCss};
                         margin: 0;
                     }
-                    html, body {
-                        width: ${widthMm}mm !important;
+                    /* Hide outer app navigation, topbars, footers, buttons & breadcrumbs */
+                    #page-topbar, #scrollbar, .navbar-header, .vertical-overlay,
+                    .breadcrumb, .page-title-box, .no-print, .no-print *,
+                    .btn, button, nav, header, footer {
+                        display: none !important;
+                    }
+                    /* Reset Bootstrap grid containers & margins for thermal roll paper */
+                    html, body, #layout-wrapper, .main-content, .page-content, .cstm-row, .container-fluid, .row, .col-lg-12, .col-12 {
                         margin: 0 !important;
-                        padding: 2mm !important;
+                        padding: 0 !important;
+                        width: 100% !important;
+                        max-width: ${widthMm}mm !important;
+                        float: none !important;
+                        position: static !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                    }
+                    body {
+                        width: ${widthMm}mm !important;
+                        margin: 0 auto !important;
+                        padding: 1mm 2mm !important;
                         font-size: ${fontSize}px !important;
+                        line-height: 1.25 !important;
+                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
                         background: #fff !important;
                         color: #000 !important;
                         -webkit-print-color-adjust: exact !important;
                         print-color-adjust: exact !important;
-                    }
-                    .no-print, .no-print * {
-                        display: none !important;
                     }
                     .card {
                         border: none !important;
@@ -62,20 +80,86 @@
                         padding: 0 !important;
                         margin: 0 !important;
                         width: 100% !important;
+                        background: transparent !important;
                     }
+                    .card-header, .card-body, .card-footer {
+                        padding: 2px 0 !important;
+                        border: none !important;
+                    }
+                    /* Stack Company Details & Customer Details vertically for thermal roll */
+                    .card-header .d-flex {
+                        flex-direction: column !important;
+                        align-items: center !important;
+                        text-align: center !important;
+                    }
+                    .card-header .flex-grow-1, .card-header .flex-shrink-0 {
+                        width: 100% !important;
+                        text-align: center !important;
+                        margin-bottom: 4px !important;
+                    }
+                    /* Clean metadata section (Invoice No, Date, Total Amount) */
+                    .card-body .row.g-3 {
+                        display: flex !important;
+                        flex-wrap: wrap !important;
+                        justify-content: space-between !important;
+                        margin: 4px 0 !important;
+                        border-top: 1px dashed #000 !important;
+                        border-bottom: 1px dashed #000 !important;
+                        padding: 4px 0 !important;
+                    }
+                    .card-body .row.g-3 > div {
+                        width: 32% !important;
+                        text-align: center !important;
+                        padding: 0 !important;
+                    }
+                    .card-body .row.g-3 p {
+                        margin-bottom: 2px !important;
+                        font-size: ${Math.max(9, fontSize - 2)}px !important;
+                    }
+                    .card-body .row.g-3 h5 {
+                        font-size: ${Math.max(10, fontSize - 1)}px !important;
+                    }
+                    /* Compact table styles */
                     .table {
                         font-size: ${Math.max(10, fontSize - 1)}px !important;
                         width: 100% !important;
                         margin-bottom: 4px !important;
+                        border-collapse: collapse !important;
+                        color: #000 !important;
                     }
                     .table th, .table td {
-                        padding: 2px 4px !important;
+                        padding: 2px 1px !important;
+                        border-bottom: 1px dotted #888 !important;
+                        max-width: none !important;
                     }
-                    .card-header, .card-body, .card-footer {
-                        padding: 4px !important;
+                    .table-active {
+                        background-color: transparent !important;
+                        border-bottom: 1px solid #000 !important;
+                    }
+                    .footer-table {
+                        width: 100% !important;
+                        min-width: 0 !important;
+                        margin-left: 0 !important;
+                    }
+                    .footer-table td, .footer-table th {
+                        padding: 2px 0 !important;
                     }
                     img.card-logo {
                         max-height: 40px !important;
+                        margin: 0 auto 4px auto !important;
+                    }
+                    .duplicate-watermark {
+                        position: relative !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        right: 0 !important;
+                        transform: none !important;
+                        font-size: 1.1rem !important;
+                        border: 2px dashed #000 !important;
+                        color: #000 !important;
+                        padding: 4px !important;
+                        margin: 4px 0 !important;
+                        text-align: center !important;
                     }
                 }
             `;
@@ -94,7 +178,8 @@
                         -webkit-print-color-adjust: exact !important;
                         print-color-adjust: exact !important;
                     }
-                    .no-print, .no-print * {
+                    #page-topbar, #scrollbar, .navbar-header, .vertical-overlay,
+                    .breadcrumb, .page-title-box, .no-print, .no-print * {
                         display: none !important;
                     }
                     .card {

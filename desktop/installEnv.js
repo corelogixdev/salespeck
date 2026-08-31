@@ -19,10 +19,10 @@ const DEFAULT_SETTINGS = [
   { key: 'printer', value: JSON.stringify({
     printer: 'Default',
     printerType: 'thermal',
-    paper: '58mm',
-    width: 58,
-    height: 200,
-    fontSize: 12,
+    paper: '80mm',
+    width: 80,
+    height: 0,
+    fontSize: 11,
     silentPrinting: false,
     numberOfPrints: 1
   })}
@@ -180,21 +180,21 @@ const config = {
         return {
           printer: parsed.printer || '',
           printerType: parsed.printerType || 'thermal',
-          paper: parsed.paper || '58mm',
-          width: parsed.width || 58,
-          height: parsed.height || 200,
-          fontSize: parsed.fontSize || 12,
-          silentPrinting: parsed.silentPrinting !== undefined ? parsed.silentPrinting : false,
-          numberOfPrints: parsed.numberOfPrints || 1
+          paper: parsed.paper || '80mm',
+          width: parsed.width !== undefined ? Number(parsed.width) : (parsed.paper === '58mm' ? 58 : 80),
+          height: parsed.height !== undefined ? Number(parsed.height) : 0,
+          fontSize: parsed.fontSize !== undefined ? Number(parsed.fontSize) : 11,
+          silentPrinting: parsed.silentPrinting !== undefined ? Boolean(parsed.silentPrinting) : false,
+          numberOfPrints: parsed.numberOfPrints ? Number(parsed.numberOfPrints) : 1
         };
       } catch (e) {
         return {
           printer: '',
           printerType: 'thermal',
-          paper: '58mm',
-          width: 58,
-          height: 200,
-          fontSize: 12,
+          paper: '80mm',
+          width: 80,
+          height: 0,
+          fontSize: 11,
           silentPrinting: false,
           numberOfPrints: 1
         };
@@ -203,10 +203,10 @@ const config = {
     return {
       printer: '',
       printerType: 'thermal',
-      paper: '58mm',
-      width: 58,
-      height: 200,
-      fontSize: 12,
+      paper: '80mm',
+      width: 80,
+      height: 0,
+      fontSize: 11,
       silentPrinting: false,
       numberOfPrints: 1
     };
