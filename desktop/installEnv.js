@@ -18,6 +18,7 @@ const DEFAULT_SETTINGS = [
   { key: 'backup_path', value: '' }, // filled with default on first load
   { key: 'printer', value: JSON.stringify({
     printer: 'Default',
+    printerType: 'thermal',
     paper: '58mm',
     width: 58,
     height: 200,
@@ -178,6 +179,7 @@ const config = {
         const parsed = typeof printerValue === 'string' ? JSON.parse(printerValue) : printerValue;
         return {
           printer: parsed.printer || '',
+          printerType: parsed.printerType || 'thermal',
           paper: parsed.paper || '58mm',
           width: parsed.width || 58,
           height: parsed.height || 200,
@@ -188,6 +190,7 @@ const config = {
       } catch (e) {
         return {
           printer: '',
+          printerType: 'thermal',
           paper: '58mm',
           width: 58,
           height: 200,
@@ -199,6 +202,7 @@ const config = {
     }
     return {
       printer: '',
+      printerType: 'thermal',
       paper: '58mm',
       width: 58,
       height: 200,

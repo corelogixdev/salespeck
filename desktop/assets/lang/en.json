@@ -41,11 +41,12 @@
         "env": "Environment",
         "backup_path": "Database Backup Folder",
         "printer": {
-            "printer": "Printer",
-            "paper": "Paper",
-            "width": "Width",
-            "height": "Height",
-            "fontSize": "Font Size",
+            "printer": "Printer Device",
+            "printerType": "Printer Type",
+            "paper": "Paper Size",
+            "width": "Width (mm)",
+            "height": "Height (mm)",
+            "fontSize": "Font Size (pt)",
             "silentPrinting": "Silent Printing",
             "numberOfPrints": "Number of Prints"
         }

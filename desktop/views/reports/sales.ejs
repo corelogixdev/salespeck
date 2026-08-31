@@ -2,8 +2,13 @@
   <!-- Header Row -->
   <div class="bi-header-row">
     <h2 class="bi-page-title">Sales Report</h2>
-    <div class="bi-conceptual-date">
-      <i class="ri-time-line fs-16"></i> Current Conceptual Date at <%= moment().format('h:mm A') %>
+    <div class="d-flex align-items-center gap-2">
+      <button type="button" class="bi-conceptual-date privacy-toggle-btn border-0" style="cursor: pointer;">
+        <i class="ri-eye-line fs-16 me-1"></i> <span class="privacy-label">Show Amounts</span>
+      </button>
+      <div class="bi-conceptual-date">
+        <i class="ri-time-line fs-16"></i> Current Conceptual Date at <%= moment().format('h:mm A') %>
+      </div>
     </div>
   </div>
 
@@ -64,7 +69,7 @@
               <h6 class="bi-kpi-title">Total Revenue (Rs.)</h6>
             </div>
             <div class="bi-kpi-body">
-              <div class="bi-kpi-value">
+              <div class="bi-kpi-value mask-amount">
                 <%= reportData.totals.totalAmount ? reportData.totals.totalAmount.toFixed(2) : '7524543.00' %>
               </div>
               <div class="bi-kpi-icon-circle bi-kpi-icon-blue">Rs.</div>
@@ -79,7 +84,7 @@
               <h6 class="bi-kpi-title">Total Received (Rs.)</h6>
             </div>
             <div class="bi-kpi-body">
-              <div class="bi-kpi-value">
+              <div class="bi-kpi-value mask-amount">
                 <%= reportData.totals.totalPayment ? reportData.totals.totalPayment.toFixed(2) : '1520413.00' %>
               </div>
               <div class="bi-kpi-icon-circle bi-kpi-icon-indigo">Rs.</div>
@@ -95,7 +100,7 @@
             </div>
             <div class="bi-kpi-body">
               <div>
-                <div class="bi-kpi-value">
+                <div class="bi-kpi-value mask-amount">
                   <%= reportData.totals.totalDiscount ? reportData.totals.totalDiscount.toFixed(2) : '6004130.00' %>
                 </div>
                 <div class="bi-kpi-subtext">Concept: Discount Rate %</div>
@@ -197,9 +202,9 @@
                     : 'Walk in' %>
                 </td>
                 <td><%= sale.SoldPoducts ? sale.SoldPoducts.length : 1 %></td>
-                <td class="text-end fw-semibold"><%= price.toFixed(2) %></td>
-                <td class="text-end"><%= payment.toFixed(2) %></td>
-                <td class="text-end"><%= discount.toFixed(2) %></td>
+                <td class="text-end fw-semibold mask-amount"><%= price.toFixed(2) %></td>
+                <td class="text-end mask-amount"><%= payment.toFixed(2) %></td>
+                <td class="text-end mask-amount"><%= discount.toFixed(2) %></td>
                 <td class="text-center">
                   <span class="bi-badge-status <%= statusClass %>"><%= statusText %></span>
                 </td>
@@ -213,9 +218,9 @@
               <td>2028-08-20 19:40</td>
               <td>Sarah Khan</td>
               <td>1</td>
-              <td class="text-end fw-semibold">70.00</td>
-              <td class="text-end">70.00</td>
-              <td class="text-end">0.00</td>
+              <td class="text-end fw-semibold mask-amount">70.00</td>
+              <td class="text-end mask-amount">70.00</td>
+              <td class="text-end mask-amount">0.00</td>
               <td class="text-center"><span class="bi-badge-status paid">Paid</span></td>
             </tr>
             <tr>
@@ -224,9 +229,9 @@
               <td>2026-08-20 19:40</td>
               <td>Bilal Hassan</td>
               <td>2</td>
-              <td class="text-end fw-semibold">85.00</td>
-              <td class="text-end">85.00</td>
-              <td class="text-end">0.00</td>
+              <td class="text-end fw-semibold mask-amount">85.00</td>
+              <td class="text-end mask-amount">85.00</td>
+              <td class="text-end mask-amount">0.00</td>
               <td class="text-center"><span class="bi-badge-status paid">Paid</span></td>
             </tr>
             <tr>
@@ -235,9 +240,9 @@
               <td>2026-08-20 18:02</td>
               <td>Ram Collection</td>
               <td>4</td>
-              <td class="text-end fw-semibold">5900.00</td>
-              <td class="text-end">4000.00</td>
-              <td class="text-end">1900.00</td>
+              <td class="text-end fw-semibold mask-amount">5900.00</td>
+              <td class="text-end mask-amount">4000.00</td>
+              <td class="text-end mask-amount">1900.00</td>
               <td class="text-center"><span class="bi-badge-status pending">Pending</span></td>
             </tr>
             <tr>
@@ -246,9 +251,9 @@
               <td>2026-08-20 17:57</td>
               <td>Walk in</td>
               <td>4</td>
-              <td class="text-end fw-semibold">5900.00</td>
-              <td class="text-end">5310.00</td>
-              <td class="text-end">590.00</td>
+              <td class="text-end fw-semibold mask-amount">5900.00</td>
+              <td class="text-end mask-amount">5310.00</td>
+              <td class="text-end mask-amount">590.00</td>
               <td class="text-center"><span class="bi-badge-status paid">Paid</span></td>
             </tr>
             <tr>
@@ -257,7 +262,7 @@
               <td>2026-08-20 17:55</td>
               <td>Ayesha Malk</td>
               <td>3</td>
-              <td class="text-end fw-semibold">220.00</td>
+              <td class="text-end fw-semibold mask-amount">220.00</td>
               <td class="text-end">220.00</td>
               <td class="text-end">0.00</td>
               <td class="text-center"><span class="bi-badge-status pending">Pending</span></td>
@@ -299,7 +304,17 @@ document.addEventListener("DOMContentLoaded", function() {
     gradient.addColorStop(0, 'rgba(37, 99, 235, 0.35)');
     gradient.addColorStop(1, 'rgba(37, 99, 235, 0.01)');
 
-    new Chart(ctx, {
+    function getChartColors() {
+      const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark' || document.documentElement.getAttribute('data-layout-mode') === 'dark';
+      return {
+        grid: isDark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9',
+        tick: isDark ? '#94a3b8' : '#64748b',
+        pointBorder: isDark ? '#1e293b' : '#ffffff'
+      };
+    }
+
+    const colors = getChartColors();
+    const salesChart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: chartLabels,
@@ -312,7 +327,7 @@ document.addEventListener("DOMContentLoaded", function() {
           fill: true,
           backgroundColor: gradient,
           pointBackgroundColor: '#2563eb',
-          pointBorderColor: '#ffffff',
+          pointBorderColor: colors.pointBorder,
           pointBorderWidth: 2,
           pointRadius: 4,
           pointHoverRadius: 6
@@ -332,18 +347,29 @@ document.addEventListener("DOMContentLoaded", function() {
         scales: {
           x: {
             grid: { display: false },
-            ticks: { color: '#64748b', font: { size: 11, weight: '500' } }
+            ticks: { color: colors.tick, font: { size: 11, weight: '500' } }
           },
           y: {
-            grid: { color: '#f1f5f9' },
+            grid: { color: colors.grid },
             ticks: {
-              color: '#64748b',
+              color: colors.tick,
               font: { size: 11 },
               callback: function() { return 'Rs.'; }
             }
           }
         }
       }
+    });
+
+    window.addEventListener('themeChanged', function() {
+      const c = getChartColors();
+      salesChart.options.scales.x.ticks.color = c.tick;
+      salesChart.options.scales.y.ticks.color = c.tick;
+      salesChart.options.scales.y.grid.color = c.grid;
+      if (salesChart.data.datasets[0]) {
+        salesChart.data.datasets[0].pointBorderColor = c.pointBorder;
+      }
+      salesChart.update();
     });
   }
 

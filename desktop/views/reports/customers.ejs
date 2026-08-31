@@ -2,8 +2,13 @@
   <!-- Header Row -->
   <div class="bi-header-row">
     <h2 class="bi-page-title">Customer Report</h2>
-    <div class="bi-conceptual-date">
-      <i class="ri-time-line fs-16"></i> Current Conceptual Date at <%= moment().format('h:mm A') %>
+    <div class="d-flex align-items-center gap-2">
+      <button type="button" class="bi-conceptual-date privacy-toggle-btn border-0" style="cursor: pointer;">
+        <i class="ri-eye-line fs-16 me-1"></i> <span class="privacy-label">Show Amounts</span>
+      </button>
+      <div class="bi-conceptual-date">
+        <i class="ri-time-line fs-16"></i> Current Conceptual Date at <%= moment().format('h:mm A') %>
+      </div>
     </div>
   </div>
 
@@ -62,7 +67,7 @@
               <h6 class="bi-kpi-title">Total Revenue (Rs.)</h6>
             </div>
             <div class="bi-kpi-body">
-              <div class="bi-kpi-value">
+              <div class="bi-kpi-value mask-amount">
                 <%= reportData.totals.totalRevenue ? reportData.totals.totalRevenue.toFixed(2) : '8520400.00' %>
               </div>
               <div class="bi-kpi-icon-circle bi-kpi-icon-blue">Rs.</div>
@@ -77,7 +82,7 @@
             </div>
             <div class="bi-kpi-body">
               <div>
-                <div class="bi-kpi-value">
+                <div class="bi-kpi-value mask-amount">
                   <%= ((reportData.totals.totalRevenue || 8520400) / Math.max(1, reportData.totals.totalCustomers || 156)).toFixed(2) %>
                 </div>
                 <div class="bi-kpi-subtext">Per Customer</div>
@@ -162,7 +167,7 @@
                 <td><%= c.phone || 'N/A' %></td>
                 <td><%= c.email || 'N/A' %></td>
                 <td class="text-end fw-semibold"><%= c.totalPurchases || 0 %></td>
-                <td class="text-end fw-semibold"><%= spent.toFixed(2) %></td>
+                <td class="text-end fw-semibold mask-amount"><%= spent.toFixed(2) %></td>
                 <td>
                   <%= c.lastPurchaseDate 
                     ? moment(c.lastPurchaseDate).format('YYYY-MM-DD') 
@@ -182,7 +187,7 @@
               <td>+92 300 1234567</td>
               <td>sarah.khan@example.com</td>
               <td class="text-end fw-semibold">18</td>
-              <td class="text-end fw-semibold">7524543.00</td>
+              <td class="text-end fw-semibold mask-amount">7524543.00</td>
               <td>2026-08-20</td>
               <td class="text-center"><span class="bi-badge-status paid">VIP Customer</span></td>
             </tr>
@@ -192,7 +197,7 @@
               <td>+92 321 9876543</td>
               <td>bilal.hassan@example.com</td>
               <td class="text-end fw-semibold">6</td>
-              <td class="text-end fw-semibold">45000.00</td>
+              <td class="text-end fw-semibold mask-amount">45000.00</td>
               <td>2026-08-20</td>
               <td class="text-center"><span class="bi-badge-status pending">Active</span></td>
             </tr>
@@ -233,7 +238,17 @@ document.addEventListener("DOMContentLoaded", function() {
     gradient.addColorStop(0, 'rgba(67, 56, 202, 0.35)');
     gradient.addColorStop(1, 'rgba(67, 56, 202, 0.01)');
 
-    new Chart(ctx, {
+    function getChartColors() {
+      const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark' || document.documentElement.getAttribute('data-layout-mode') === 'dark';
+      return {
+        grid: isDark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9',
+        tick: isDark ? '#94a3b8' : '#64748b',
+        pointBorder: isDark ? '#1e293b' : '#ffffff'
+      };
+    }
+
+    const colors = getChartColors();
+    const customerChart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: chartLabels,
@@ -246,7 +261,7 @@ document.addEventListener("DOMContentLoaded", function() {
           fill: true,
           backgroundColor: gradient,
           pointBackgroundColor: '#4338ca',
-          pointBorderColor: '#ffffff',
+          pointBorderColor: colors.pointBorder,
           pointBorderWidth: 2,
           pointRadius: 4
         }]
@@ -256,10 +271,21 @@ document.addEventListener("DOMContentLoaded", function() {
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 11 } } },
-          y: { grid: { color: '#f1f5f9' }, ticks: { color: '#64748b' } }
+          x: { grid: { display: false }, ticks: { color: colors.tick, font: { size: 11 } } },
+          y: { grid: { color: colors.grid }, ticks: { color: colors.tick } }
         }
       }
+    });
+
+    window.addEventListener('themeChanged', function() {
+      const c = getChartColors();
+      customerChart.options.scales.x.ticks.color = c.tick;
+      customerChart.options.scales.y.ticks.color = c.tick;
+      customerChart.options.scales.y.grid.color = c.grid;
+      if (customerChart.data.datasets[0]) {
+        customerChart.data.datasets[0].pointBorderColor = c.pointBorder;
+      }
+      customerChart.update();
     });
   }
 

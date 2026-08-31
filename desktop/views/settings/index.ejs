@@ -120,35 +120,111 @@
                         </div>
                     </div>
 
-                    <% if (translations.printer) { %>
-                        <hr class="my-4">
-                        <h6 class="mb-3">Printer Settings</h6>
-                        <div class="row">
-                            <% Object.keys(translations.printer).forEach(key => { %>
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <label class="form-label" for="printer-<%= key %>">
-                                            <%= translations.printer[key] %>:
-                                        </label>
-                                        <% if (key === 'silentPrinting') { %>
-                                            <div class="form-check">
-                                                <input type="checkbox" class="form-check-input" id="printer-<%= key %>" name="printer[<%= key %>]" value="true" <%= envSettings.printer[key] === true || envSettings.printer[key] === 'true' ? 'checked' : '' %>>
-                                                <label class="form-check-label" for="printer-<%= key %>">
-                                                    Enable Silent Printing
-                                                </label>
-                                            </div>
-                                        <% } else if (key === 'numberOfPrints') { %>
-                                            <input type="number" class="form-control" id="printer-<%= key %>" name="printer[<%= key %>]" value="<%= envSettings.printer[key] || 1 %>" min="1" max="10">
-                                        <% } else if (key === 'width' || key === 'height' || key === 'fontSize') { %>
-                                            <input type="number" class="form-control" id="printer-<%= key %>" name="printer[<%= key %>]" value="<%= envSettings.printer[key] %>">
-                                        <% } else { %>
-                                            <input type="text" class="form-control" id="printer-<%= key %>" name="printer[<%= key %>]" value="<%= envSettings.printer[key] || '' %>">
+                    <hr class="my-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h6 class="mb-0">Printer Settings</h6>
+                        <small id="printer-detect-status" class="text-muted fs-12"></small>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-label" for="printer-printer">
+                                    Target Printer Device:
+                                </label>
+                                <div class="input-group">
+                                    <select class="form-select" id="printer-printer" name="printer[printer]" data-current-value="<%= envSettings.printer.printer || 'Default' %>">
+                                        <option value="Default" <%= (!envSettings.printer.printer || envSettings.printer.printer === 'Default') ? 'selected' : '' %>>Default (System Default)</option>
+                                        <% if (envSettings.printer.printer && envSettings.printer.printer !== 'Default') { %>
+                                            <option value="<%= envSettings.printer.printer %>" selected><%= envSettings.printer.printer %></option>
                                         <% } %>
-                                    </div>
+                                    </select>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-refresh-printers" title="Refresh Installed Printers">
+                                        <i class="ri-refresh-line"></i> Refresh
+                                    </button>
                                 </div>
-                            <% }) %>
+                                <small class="text-muted">Select installed system printer or default.</small>
+                            </div>
                         </div>
-                    <% } %>
+
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-label" for="printer-printerType">
+                                    Printer Type / Mode:
+                                </label>
+                                <select class="form-select" id="printer-printerType" name="printer[printerType]">
+                                    <option value="thermal" <%= (envSettings.printer.printerType === 'thermal' || !envSettings.printer.printerType) ? 'selected' : '' %>>Thermal POS Receipt Printer (58mm / 80mm Roll)</option>
+                                    <option value="standard" <%= envSettings.printer.printerType === 'standard' ? 'selected' : '' %>>Standard / Document Printer (A4 / A5 / Letter)</option>
+                                </select>
+                                <small class="text-muted">Thermal printers render compact roll receipts.</small>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-label" for="printer-paper">
+                                    Paper Size:
+                                </label>
+                                <select class="form-select" id="printer-paper" name="printer[paper]">
+                                    <option value="58mm" <%= (envSettings.printer.paper === '58mm' || !envSettings.printer.paper) ? 'selected' : '' %>>58mm POS Receipt Roll</option>
+                                    <option value="80mm" <%= envSettings.printer.paper === '80mm' ? 'selected' : '' %>>80mm POS Receipt Roll</option>
+                                    <option value="A4" <%= envSettings.printer.paper === 'A4' ? 'selected' : '' %>>A4 Standard</option>
+                                    <option value="A5" <%= envSettings.printer.paper === 'A5' ? 'selected' : '' %>>A5 Half Sheet</option>
+                                    <option value="Letter" <%= envSettings.printer.paper === 'Letter' ? 'selected' : '' %>>US Letter</option>
+                                    <option value="Legal" <%= envSettings.printer.paper === 'Legal' ? 'selected' : '' %>>US Legal</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-label" for="printer-width">
+                                    Width (mm):
+                                </label>
+                                <input type="number" class="form-control" id="printer-width" name="printer[width]" value="<%= envSettings.printer.width || 58 %>" placeholder="58">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-label" for="printer-height">
+                                    Height (mm):
+                                </label>
+                                <input type="number" class="form-control" id="printer-height" name="printer[height]" value="<%= envSettings.printer.height || 200 %>" placeholder="200 (0 for roll)">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-label" for="printer-fontSize">
+                                    Print Font Size (pt):
+                                </label>
+                                <input type="number" class="form-control" id="printer-fontSize" name="printer[fontSize]" value="<%= envSettings.printer.fontSize || 12 %>" min="8" max="24">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-label" for="printer-numberOfPrints">
+                                    Number of Copies:
+                                </label>
+                                <input type="number" class="form-control" id="printer-numberOfPrints" name="printer[numberOfPrints]" value="<%= envSettings.printer.numberOfPrints || 1 %>" min="1" max="10">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-label" for="printer-silentPrinting">
+                                    Silent Direct Print:
+                                </label>
+                                <div class="form-check mt-2">
+                                    <input type="checkbox" class="form-check-input" id="printer-silentPrinting" name="printer[silentPrinting]" value="true" <%= (envSettings.printer.silentPrinting === true || envSettings.printer.silentPrinting === 'true') ? 'checked' : '' %>>
+                                    <label class="form-check-label" for="printer-silentPrinting">
+                                        Print directly without OS print dialog
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="text-end">
                         <button type="submit" class="btn btn-primary mt-3">Save Environment Settings</button>
@@ -316,29 +392,82 @@
     const input = document.getElementById('backup_path');
     const browseBtn = document.getElementById('backup-path-browse');
     const resetBtn = document.getElementById('backup-path-reset');
-    if (!input) return;
 
-    if (resetBtn) {
-        resetBtn.addEventListener('click', function () {
-            const def = input.getAttribute('data-default-path') || '';
-            input.value = def;
-        });
-    }
+    if (input) {
+        if (resetBtn) {
+            resetBtn.addEventListener('click', function () {
+                const def = input.getAttribute('data-default-path') || '';
+                input.value = def;
+            });
+        }
 
-    if (browseBtn) {
-        browseBtn.addEventListener('click', async function () {
-            try {
-                if (window.electron && typeof window.electron.selectDirectory === 'function') {
-                    const selected = await window.electron.selectDirectory(input.value || undefined);
-                    if (selected) input.value = selected;
-                } else {
-                    toastr.info('Folder browse is available in the desktop app. Type or paste a path instead.');
+        if (browseBtn) {
+            browseBtn.addEventListener('click', async function () {
+                try {
+                    if (window.electron && typeof window.electron.selectDirectory === 'function') {
+                        const selected = await window.electron.selectDirectory(input.value || undefined);
+                        if (selected) input.value = selected;
+                    } else {
+                        toastr.info('Folder browse is available in the desktop app. Type or paste a path instead.');
+                    }
+                } catch (e) {
+                    console.error(e);
+                    toastr.error('Could not open folder picker');
                 }
-            } catch (e) {
-                console.error(e);
-                toastr.error('Could not open folder picker');
-            }
-        });
+            });
+        }
     }
+
+    // Printer auto-detection logic
+    const printerSelect = document.getElementById('printer-printer');
+    const refreshBtn = document.getElementById('btn-refresh-printers');
+    const statusText = document.getElementById('printer-detect-status');
+
+    async function loadPrinters() {
+        if (!printerSelect) return;
+        const savedVal = printerSelect.getAttribute('data-current-value') || printerSelect.value || 'Default';
+
+        if (window.electron && typeof window.electron.getPrinters === 'function') {
+            if (statusText) statusText.textContent = 'Detecting printers...';
+            try {
+                const printers = await window.electron.getPrinters();
+                console.log('Detected system printers:', printers);
+                printerSelect.innerHTML = '<option value="Default">Default (System Default)</option>';
+
+                let matched = false;
+                if (Array.isArray(printers) && printers.length > 0) {
+                    printers.forEach(p => {
+                        const opt = document.createElement('option');
+                        opt.value = p.name;
+                        const suffix = p.isDefault ? ' (System Default)' : '';
+                        opt.textContent = (p.displayName || p.name) + suffix;
+                        if (p.name === savedVal) {
+                            opt.selected = true;
+                            matched = true;
+                        }
+                        printerSelect.appendChild(opt);
+                    });
+                }
+                if (savedVal && savedVal !== 'Default' && !matched) {
+                    const savedOpt = document.createElement('option');
+                    savedOpt.value = savedVal;
+                    savedOpt.textContent = savedVal + ' (Saved)';
+                    savedOpt.selected = true;
+                    printerSelect.appendChild(savedOpt);
+                }
+                if (statusText) statusText.textContent = `${printers.length || 0} printer(s) detected.`;
+            } catch (err) {
+                console.error('Error fetching printers:', err);
+                if (statusText) statusText.textContent = 'Could not load system printers.';
+            }
+        } else {
+            if (statusText) statusText.textContent = 'Printer detection available in Desktop App.';
+        }
+    }
+
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', loadPrinters);
+    }
+    loadPrinters();
 })();
 </script>

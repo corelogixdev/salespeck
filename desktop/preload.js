@@ -24,14 +24,18 @@ contextBridge.exposeInMainWorld('electron', {
         ipcRenderer.on('report-pdf-generated', (event, ...args) => func(...args));
     },
     /**
+     * Fetch list of system installed printers.
+     */
+    getPrinters: () => ipcRenderer.invoke('get-printers'),
+    /**
      * Generate a PDF preview of the current window.
      * Returns { success: true, previewUrl: 'app-print://token' }
      */
     generatePrintPreview: () => ipcRenderer.invoke('generate-print-preview'),
     /**
-     * Trigger the native OS print dialog for the current window.
+     * Trigger native OS print or direct print for the current window with optional settings.
      */
-    triggerPrint: () => ipcRenderer.invoke('trigger-print'),
+    triggerPrint: (options) => ipcRenderer.invoke('trigger-print', options),
     /**
      * One-shot: generate PDF preview AND open the dedicated preview window.
      */

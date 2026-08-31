@@ -388,25 +388,86 @@ ipcMain.handle('generate-print-preview', async (event) => {
 });
 
 /**
- * IPC: trigger-print
- * Opens the native OS print dialog for the sender window.
+ * IPC: get-printers
+ * Returns list of installed system printers available to Electron.
  */
-ipcMain.handle('trigger-print', async (event) => {
+ipcMain.handle('get-printers', async (event) => {
+  const senderWindow = BrowserWindow.fromWebContents(event.sender);
+  const targetContents = (senderWindow && !senderWindow.isDestroyed()) ? senderWindow.webContents : (mainWindow ? mainWindow.webContents : null);
+  if (!targetContents) return [];
+  try {
+    let printers = [];
+    if (typeof targetContents.getPrintersAsync === 'function') {
+      printers = await targetContents.getPrintersAsync();
+    } else if (typeof targetContents.getPrinters === 'function') {
+      printers = targetContents.getPrinters();
+    }
+    logi(`[Printers] Fetched ${printers ? printers.length : 0} printer(s)`);
+    return printers || [];
+  } catch (err) {
+    logi('[Printers] Failed to fetch installed printers:', err.message);
+    return [];
+  }
+});
+
+/**
+ * IPC: trigger-print
+ * Performs silent direct printing if enabled, or opens clean print preview window if non-silent.
+ */
+ipcMain.handle('trigger-print', async (event, customOptions = {}) => {
   const senderWindow = BrowserWindow.fromWebContents(event.sender);
   if (!senderWindow || senderWindow.isDestroyed()) {
     throw new Error('Sender window not available');
   }
-  try {
-    await senderWindow.webContents.print({
-      silent: false,
+  const printerSettings = config.printer || {};
+  const isSilent = customOptions.silent !== undefined 
+    ? Boolean(customOptions.silent) 
+    : (printerSettings.silentPrinting === true || printerSettings.silentPrinting === 'true');
+
+  const deviceName = customOptions.deviceName || printerSettings.printer;
+
+  if (isSilent) {
+    const printOptions = {
+      silent: true,
       printBackground: true,
       preferCSSPageSize: true,
-    });
-    return { success: true };
-  } catch (err) {
-    throw new Error(err.message || 'Print failed or was cancelled.');
+      copies: customOptions.copies || Number(printerSettings.numberOfPrints) || 1,
+    };
+
+    if (deviceName && deviceName !== 'Default' && deviceName !== '') {
+      printOptions.deviceName = deviceName;
+    }
+
+    try {
+      await senderWindow.webContents.print(printOptions);
+      logi('[Print] Silent direct print sent to device:', deviceName || 'Default');
+      return { success: true };
+    } catch (err) {
+      logi('[Print] Silent print failed:', err.message);
+      throw new Error(err.message || 'Silent print failed.');
+    }
+  } else {
+    // Non-silent mode: Open custom PDF preview window to avoid Chromium's "This app doesn't support print preview" dialog
+    try {
+      await generateAndShowPreview(senderWindow);
+      return { success: true };
+    } catch (err) {
+      logi('[Print] Custom preview failed, falling back to system print:', err.message);
+      const printOptions = {
+        silent: false,
+        printBackground: true,
+        preferCSSPageSize: true,
+        copies: customOptions.copies || Number(printerSettings.numberOfPrints) || 1,
+      };
+      if (deviceName && deviceName !== 'Default' && deviceName !== '') {
+        printOptions.deviceName = deviceName;
+      }
+      await senderWindow.webContents.print(printOptions);
+      return { success: true };
+    }
   }
 });
+
 
 /**
  * IPC: trigger-print-original

@@ -660,7 +660,7 @@ const canCreate = (role=='user' && permissions.usersCreate) || (role=='vendor' &
                                         <option value="100" ${pageSize === 100 ? 'selected' : ''}>100</option>
                                         <option value="all" ${pageSize === 'all' ? 'selected' : ''}>All</option>
                                     </select>
-                                    <button class="btn btn-soft-primary btn-sm" onclick="window.print()"><i class="ri-printer-line me-1"></i> Print</button>
+                                    <button class="btn btn-soft-primary btn-sm" onclick="doUserPrint()"><i class="ri-printer-line me-1"></i> Print</button>
                                 </div>
                             </div>
                             <div class="table-responsive">
@@ -1050,7 +1050,19 @@ const canCreate = (role=='user' && permissions.usersCreate) || (role=='vendor' &
         </div>
     </div>
 </div>
+<script src="/assets/js/print-helper.js"></script>
 <script>
+    const printerConfig = <%- JSON.stringify(typeof printerConfig !== 'undefined' ? printerConfig : { printer: 'Default', printerType: 'standard', paper: 'A4', width: 210, height: 297, fontSize: 12, silentPrinting: false, numberOfPrints: 1 }) %>;
+    window.printerConfig = printerConfig;
+
+async function doUserPrint() {
+    if (window.SalesPeckPrinter && typeof window.SalesPeckPrinter.print === 'function') {
+        await window.SalesPeckPrinter.print();
+    } else {
+        window.print();
+    }
+}
+
 function openIframeModal(url, title = 'Document View') {
     document.getElementById('iframeModalTitle').innerText = title;
     

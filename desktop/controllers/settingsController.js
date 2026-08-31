@@ -85,6 +85,7 @@ exports.index = async (req, res) => {
   if (envSettings.printer) {
     envSettings.printer = {
       printer: envSettings.printer.printer || '',
+      printerType: envSettings.printer.printerType || 'thermal',
       paper: envSettings.printer.paper || '58mm',
       width: envSettings.printer.width || 58,
       height: envSettings.printer.height || 200,
@@ -96,6 +97,7 @@ exports.index = async (req, res) => {
     // Default printer if not set
     envSettings.printer = {
       printer: '',
+      printerType: 'thermal',
       paper: '58mm',
       width: 58,
       height: 200,

@@ -40,11 +40,14 @@ function applyUserLocals(res, userData) {
     res.locals.permissions = permissionsForRole(userData.role);
 }
 
+const config = require('../installEnv');
+
 module.exports = async (req, res, next) => {
     try {
         res.locals.isAuthenticated = false;
         res.locals.user = null;
         res.locals.appVersion = appVersion;
+        res.locals.printerConfig = config.printer || {};
 
         try {
             const license = require('../utils/license');

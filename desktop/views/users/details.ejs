@@ -117,10 +117,14 @@
 </div>
 
 
+<script src="/assets/js/print-helper.js"></script>
 <script>
-function doPrint() {
-    if (window.electron && window.electron.printPreview) {
-        window.electron.printPreview();
+    const printerConfig = <%- JSON.stringify(typeof printerConfig !== 'undefined' ? printerConfig : { printer: 'Default', printerType: 'standard', paper: 'A4', width: 210, height: 297, fontSize: 12, silentPrinting: false, numberOfPrints: 1 }) %>;
+    window.printerConfig = printerConfig;
+
+async function doPrint() {
+    if (window.SalesPeckPrinter && typeof window.SalesPeckPrinter.print === 'function') {
+        await window.SalesPeckPrinter.print();
     } else {
         window.print();
     }

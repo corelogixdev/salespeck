@@ -266,9 +266,11 @@
 
 </body>
 <script src="/assets/js/vendor/moment.min.js"></script>
+<script src="/assets/js/print-helper.js"></script>
 <script>
     // Printer configuration from settings
-    const printerConfig = <%- JSON.stringify(typeof printerConfig !== 'undefined' ? printerConfig : { silentPrinting: false, numberOfPrints: 1 }) %>;
+    const printerConfig = <%- JSON.stringify(typeof printerConfig !== 'undefined' ? printerConfig : { printer: 'Default', printerType: 'thermal', paper: '58mm', width: 58, height: 200, fontSize: 12, silentPrinting: false, numberOfPrints: 1 }) %>;
+    window.printerConfig = printerConfig;
     
     function markInvoicePrinted() {
         try {
@@ -291,86 +293,12 @@
 
     window.addEventListener('beforeprint', markInvoicePrinted);
 
-    function printReceipt() {
+    async function printReceipt() {
         markInvoicePrinted();
-        const numberOfPrints = parseInt(printerConfig.numberOfPrints || 1);
-        const silentPrinting = printerConfig.silentPrinting === true || printerConfig.silentPrinting === 'true';
-        
-        function doPrint() {
-            if (silentPrinting) {
-                const iframe = document.createElement('iframe');
-                iframe.style.position = 'fixed';
-                iframe.style.right = '0';
-                iframe.style.bottom = '0';
-                iframe.style.width = '0';
-                iframe.style.height = '0';
-                iframe.style.border = '0';
-                document.body.appendChild(iframe);
-                
-                const printContent = document.getElementById('demo').innerHTML;
-                const printWindow = iframe.contentWindow;
-                printWindow.document.open();
-                let styles = '';
-                Array.from(document.querySelectorAll('style')).forEach(styleEl => {
-                    styles += styleEl.innerHTML + '\n';
-                });
-                
-                const isDuplicateActive = document.getElementById('demo').classList.contains('show-duplicate');
-                printWindow.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>Print Receipt</title>
-                        <style>
-                            ${styles}
-                            @media print {
-                                .no-print { display: none !important; }
-                                .duplicate-watermark {
-                                    color: #e57373 !important;
-                                    border-color: #e57373 !important;
-                                    -webkit-print-color-adjust: exact !important;
-                                    print-color-adjust: exact !important;
-                                    opacity: 0.65 !important;
-                                }
-                            }
-                        </style>
-                    </head>
-                    <body class="${isDuplicateActive ? 'show-duplicate' : ''}">
-                        <div id="demo" class="card position-relative ${isDuplicateActive ? 'show-duplicate' : ''}">
-                            ${printContent}
-                        </div>
-                    </body>
-                    </html>
-                `);
-                printWindow.document.close();
-                
-                printWindow.onload = function() {
-                    setTimeout(() => {
-                        printWindow.focus();
-                        printWindow.print();
-                        setTimeout(() => {
-                            if (document.body.contains(iframe)) {
-                                document.body.removeChild(iframe);
-                            }
-                        }, 1000);
-                    }, 100);
-                };
-            } else {
-                window.print();
-            }
-        }
-        
-        if (numberOfPrints > 1) {
-            let printCount = 0;
-            const printInterval = setInterval(() => {
-                doPrint();
-                printCount++;
-                if (printCount >= numberOfPrints) {
-                    clearInterval(printInterval);
-                }
-            }, silentPrinting ? 1500 : 500);
+        if (window.SalesPeckPrinter && typeof window.SalesPeckPrinter.print === 'function') {
+            await window.SalesPeckPrinter.print();
         } else {
-            doPrint();
+            window.print();
         }
     }
 

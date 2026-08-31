@@ -2,8 +2,13 @@
   <!-- Header Row -->
   <div class="bi-header-row">
     <h2 class="bi-page-title">Inventory Report</h2>
-    <div class="bi-conceptual-date">
-      <i class="ri-time-line fs-16"></i> Current Conceptual Date at <%= moment().format('h:mm A') %>
+    <div class="d-flex align-items-center gap-2">
+      <button type="button" class="bi-conceptual-date privacy-toggle-btn border-0" style="cursor: pointer;">
+        <i class="ri-eye-line fs-16 me-1"></i> <span class="privacy-label">Show Amounts</span>
+      </button>
+      <div class="bi-conceptual-date">
+        <i class="ri-time-line fs-16"></i> Current Conceptual Date at <%= moment().format('h:mm A') %>
+      </div>
     </div>
   </div>
 
@@ -64,7 +69,7 @@
               <h6 class="bi-kpi-title">Total Stock Value (Rs.)</h6>
             </div>
             <div class="bi-kpi-body">
-              <div class="bi-kpi-value">
+              <div class="bi-kpi-value mask-amount">
                 <%= reportData.totals.totalValue ? reportData.totals.totalValue.toFixed(2) : '9415800.00' %>
               </div>
               <div class="bi-kpi-icon-circle bi-kpi-icon-green">Rs.</div>
@@ -179,9 +184,9 @@
                 <td><%= p.Category ? p.Category.name : 'General' %></td>
                 <td><%= p.Brand ? p.Brand.name : 'N/A' %></td>
                 <td class="text-end fw-semibold"><%= qty %></td>
-                <td class="text-end"><%= pPrice.toFixed(2) %></td>
-                <td class="text-end"><%= sPrice.toFixed(2) %></td>
-                <td class="text-end fw-semibold"><%= stockVal.toFixed(2) %></td>
+                <td class="text-end mask-amount"><%= pPrice.toFixed(2) %></td>
+                <td class="text-end mask-amount"><%= sPrice.toFixed(2) %></td>
+                <td class="text-end fw-semibold mask-amount"><%= stockVal.toFixed(2) %></td>
                 <td class="text-center">
                   <span class="bi-badge-status <%= isLow ? 'pending' : 'paid' %>">
                     <%= isLow ? 'Low Stock' : 'In Stock' %>
@@ -197,9 +202,9 @@
               <td>Electronics</td>
               <td>Samsung</td>
               <td class="text-end fw-semibold">25</td>
-              <td class="text-end">210000.00</td>
-              <td class="text-end">245000.00</td>
-              <td class="text-end fw-semibold">5250000.00</td>
+              <td class="text-end mask-amount">210000.00</td>
+              <td class="text-end mask-amount">245000.00</td>
+              <td class="text-end fw-semibold mask-amount">5250000.00</td>
               <td class="text-center"><span class="bi-badge-status paid">In Stock</span></td>
             </tr>
             <tr>
@@ -209,9 +214,9 @@
               <td>Accessories</td>
               <td>Logitech</td>
               <td class="text-end fw-semibold">4</td>
-              <td class="text-end">1800.00</td>
-              <td class="text-end">2500.00</td>
-              <td class="text-end fw-semibold">7200.00</td>
+              <td class="text-end mask-amount">1800.00</td>
+              <td class="text-end mask-amount">2500.00</td>
+              <td class="text-end fw-semibold mask-amount">7200.00</td>
               <td class="text-center"><span class="bi-badge-status pending">Low Stock</span></td>
             </tr>
           <% } %>
@@ -251,7 +256,17 @@ document.addEventListener("DOMContentLoaded", function() {
     gradient.addColorStop(0, 'rgba(21, 128, 61, 0.35)');
     gradient.addColorStop(1, 'rgba(21, 128, 61, 0.01)');
 
-    new Chart(ctx, {
+    function getChartColors() {
+      const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark' || document.documentElement.getAttribute('data-layout-mode') === 'dark';
+      return {
+        grid: isDark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9',
+        tick: isDark ? '#94a3b8' : '#64748b',
+        pointBorder: isDark ? '#1e293b' : '#ffffff'
+      };
+    }
+
+    const colors = getChartColors();
+    const inventoryChart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: chartLabels,
@@ -264,7 +279,7 @@ document.addEventListener("DOMContentLoaded", function() {
           fill: true,
           backgroundColor: gradient,
           pointBackgroundColor: '#166534',
-          pointBorderColor: '#ffffff',
+          pointBorderColor: colors.pointBorder,
           pointBorderWidth: 2,
           pointRadius: 4
         }]
@@ -274,10 +289,21 @@ document.addEventListener("DOMContentLoaded", function() {
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 11 } } },
-          y: { grid: { color: '#f1f5f9' }, ticks: { color: '#64748b', callback: function() { return 'Rs.'; } } }
+          x: { grid: { display: false }, ticks: { color: colors.tick, font: { size: 11 } } },
+          y: { grid: { color: colors.grid }, ticks: { color: colors.tick, callback: function() { return 'Rs.'; } } }
         }
       }
+    });
+
+    window.addEventListener('themeChanged', function() {
+      const c = getChartColors();
+      inventoryChart.options.scales.x.ticks.color = c.tick;
+      inventoryChart.options.scales.y.ticks.color = c.tick;
+      inventoryChart.options.scales.y.grid.color = c.grid;
+      if (inventoryChart.data.datasets[0]) {
+        inventoryChart.data.datasets[0].pointBorderColor = c.pointBorder;
+      }
+      inventoryChart.update();
     });
   }
 

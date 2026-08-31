@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
         html.setAttribute('data-bs-theme', theme);
         localStorage.setItem('data-bs-theme', theme);
         updateThemeUI(theme);
+        window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: theme } }));
     }
 
     // Get preferred theme

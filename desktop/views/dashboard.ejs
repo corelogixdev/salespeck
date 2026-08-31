@@ -33,7 +33,7 @@
                 <% if (dashboardConfig.todays_sales==='partial' ) { %>
                   Rs. ****
                   <% } else { %>
-                    Rs.<span class="counter-value" data-target="<%= todaysSalesAmount %>">
+                    Rs.<span class="counter-value mask-amount" data-target="<%= todaysSalesAmount %>">
                       <%= todaysSalesAmount %>
                     </span>
                     <% } %>
@@ -85,7 +85,7 @@
                     <% if (dashboardConfig.todays_customers==='partial' ) { %>
                       ****
                       <% } else { %>
-                        <span class="counter-value" data-target="<%= todayCustomersCount %>">
+                        <span class="counter-value mask-amount" data-target="<%= todayCustomersCount %>">
                           <%= todayCustomersCount %>
                         </span>
                         <% } %>
@@ -121,7 +121,7 @@
                         <% if (dashboardConfig.last_30_days_sales==='partial' ) { %>
                           ****
                           <% } else { %>
-                            <span class="counter-value" data-target="<%= totalSalesCount %>">
+                            <span class="counter-value mask-amount" data-target="<%= totalSalesCount %>">
                               <%- totalSalesCount %>
                             </span>
                             <% } %>
@@ -168,6 +168,9 @@
                              <a href="/accounting/coa" class="btn btn-dark btn-sm px-3">
                                  <i class="ri-scales-3-line align-bottom me-1"></i> Accounts
                              </a>
+                             <button type="button" class="btn btn-outline-primary btn-sm px-3 privacy-toggle-btn" title="Toggle Amount Privacy">
+                                 <i class="ri-eye-line align-bottom me-1"></i> <span class="privacy-label">Show Amounts</span>
+                             </button>
                          </div>
                      </div>
                  </div>
@@ -188,7 +191,7 @@
               <tbody>
                 <tr>
                   <td class="text-muted">Total Orders:</td>
-                  <td class="fw-medium text-end">
+                  <td class="fw-medium text-end mask-amount">
                     <% if (dashboardConfig.weekly_summary==='partial' ) { %>
                       ****
                       <% } else { %>
@@ -198,7 +201,7 @@
                 </tr>
                 <tr>
                   <td class="text-muted">Total Revenue:</td>
-                  <td class="fw-medium text-end">
+                  <td class="fw-medium text-end mask-amount">
                     <% if (dashboardConfig.weekly_summary==='partial' ) { %>
                       Rs. ****
                       <% } else { %>
@@ -208,7 +211,7 @@
                 </tr>
                 <tr>
                   <td class="text-muted">Avg Order Value:</td>
-                  <td class="fw-medium text-end">
+                  <td class="fw-medium text-end mask-amount">
                     <% if (dashboardConfig.weekly_summary==='partial' ) { %>
                       Rs. ****
                       <% } else { %>
@@ -235,7 +238,7 @@
                   <tbody>
                     <tr>
                       <td class="text-muted">Total Orders:</td>
-                      <td class="fw-medium text-end">
+                      <td class="fw-medium text-end mask-amount">
                         <% if (dashboardConfig.monthly_summary==='partial' ) { %>
                           ****
                           <% } else { %>
@@ -245,7 +248,7 @@
                     </tr>
                     <tr>
                       <td class="text-muted">Total Revenue:</td>
-                      <td class="fw-medium text-end">
+                      <td class="fw-medium text-end mask-amount">
                         <% if (dashboardConfig.monthly_summary==='partial' ) { %>
                           Rs. ****
                           <% } else { %>
@@ -255,7 +258,7 @@
                     </tr>
                     <tr>
                       <td class="text-muted">Avg Order Value:</td>
-                      <td class="fw-medium text-end">
+                      <td class="fw-medium text-end mask-amount">
                         <% if (dashboardConfig.monthly_summary==='partial' ) { %>
                           Rs. ****
                           <% } else { %>
@@ -282,7 +285,7 @@
               <p class="text-muted">Chart hidden due to privacy settings</p>
             </div>
             <% } else { %>
-              <div style="height: 350px; position: relative;">
+              <div class="privacy-mask-chart" style="height: 350px; position: relative;">
                 <canvas id="salesTrendChart"></canvas>
               </div>
               <% } %>
@@ -299,7 +302,7 @@
                   <p class="text-muted">Chart hidden due to privacy settings</p>
                 </div>
                 <% } else { %>
-                   <div style="height: 350px; position: relative;">
+                   <div class="privacy-mask-chart" style="height: 350px; position: relative;">
                      <canvas id="topProductsChart"></canvas>
                    </div>
                   <% } %>
@@ -316,7 +319,7 @@
                 <h5 class="card-title mb-0">Sales by Hour (Today)</h5>
             </div>
             <div class="card-body">
-                 <div style="height: 350px; position: relative;">
+                 <div class="privacy-mask-chart" style="height: 350px; position: relative;">
                    <canvas id="hourlySalesChart"></canvas>
                  </div>
             </div>
@@ -328,7 +331,7 @@
                 <h5 class="card-title mb-0">Sales by Category (Last 30 Days)</h5>
             </div>
             <div class="card-body">
-                 <div style="height: 350px; position: relative;">
+                 <div class="privacy-mask-chart" style="height: 350px; position: relative;">
                    <canvas id="categorySalesChart"></canvas>
                  </div>
             </div>

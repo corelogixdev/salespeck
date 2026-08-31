@@ -140,7 +140,7 @@
                                 <% if (ret.sale) { %>
                                 <a href="/sales/<%= ret.sale %>" class="btn btn-soft-info">Original sale</a>
                                 <% } %>
-                                <button onclick="window.print()" class="btn btn-success">
+                                <button onclick="doReturnPrint()" class="btn btn-success">
                                     <i class="ri-printer-line align-bottom me-1"></i> Print
                                 </button>
                             </div>
@@ -152,10 +152,22 @@
     </div>
 </body>
 <script src="/assets/js/vendor/moment.min.js"></script>
+<script src="/assets/js/print-helper.js"></script>
 <script>
+    const printerConfig = <%- JSON.stringify(typeof printerConfig !== 'undefined' ? printerConfig : { printer: 'Default', printerType: 'thermal', paper: '58mm', width: 58, height: 200, fontSize: 12, silentPrinting: false, numberOfPrints: 1 }) %>;
+    window.printerConfig = printerConfig;
+
     document.querySelectorAll('.format-date').forEach((el) => {
         const d = el.textContent.trim();
         if (d && window.moment) el.textContent = moment(d).format('D MMM, YYYY HH:mm');
     });
+
+    async function doReturnPrint() {
+        if (window.SalesPeckPrinter && typeof window.SalesPeckPrinter.print === 'function') {
+            await window.SalesPeckPrinter.print();
+        } else {
+            window.print();
+        }
+    }
 </script>
 </html>

@@ -2,8 +2,13 @@
   <!-- Header Row -->
   <div class="bi-header-row">
     <h2 class="bi-page-title">Purchases Report</h2>
-    <div class="bi-conceptual-date">
-      <i class="ri-time-line fs-16"></i> Current Conceptual Date at <%= moment().format('h:mm A') %>
+    <div class="d-flex align-items-center gap-2">
+      <button type="button" class="bi-conceptual-date privacy-toggle-btn border-0" style="cursor: pointer;">
+        <i class="ri-eye-line fs-16 me-1"></i> <span class="privacy-label">Show Amounts</span>
+      </button>
+      <div class="bi-conceptual-date">
+        <i class="ri-time-line fs-16"></i> Current Conceptual Date at <%= moment().format('h:mm A') %>
+      </div>
     </div>
   </div>
 
@@ -61,7 +66,7 @@
               <h6 class="bi-kpi-title">Total Amount (Rs.)</h6>
             </div>
             <div class="bi-kpi-body">
-              <div class="bi-kpi-value">
+              <div class="bi-kpi-value mask-amount">
                 <%= reportData.totals.totalAmount ? reportData.totals.totalAmount.toFixed(2) : '4820150.00' %>
               </div>
               <div class="bi-kpi-icon-circle bi-kpi-icon-blue">Rs.</div>
@@ -75,7 +80,7 @@
               <h6 class="bi-kpi-title">Total Payment (Rs.)</h6>
             </div>
             <div class="bi-kpi-body">
-              <div class="bi-kpi-value">
+              <div class="bi-kpi-value mask-amount">
                 <%= reportData.totals.totalPayment ? reportData.totals.totalPayment.toFixed(2) : '3910200.00' %>
               </div>
               <div class="bi-kpi-icon-circle bi-kpi-icon-indigo">Rs.</div>
@@ -90,7 +95,7 @@
             </div>
             <div class="bi-kpi-body">
               <div>
-                <div class="bi-kpi-value">
+                <div class="bi-kpi-value mask-amount">
                   <%= ((reportData.totals.totalAmount || 4820150) - (reportData.totals.totalPayment || 3910200)).toFixed(2) %>
                 </div>
                 <div class="bi-kpi-subtext">Payables Summary</div>
@@ -187,8 +192,8 @@
                     : 'N/A' %>
                 </td>
                 <td><%= p.PurchasedItems ? p.PurchasedItems.length : 1 %></td>
-                <td class="text-end fw-semibold"><%= amount.toFixed(2) %></td>
-                <td class="text-end"><%= payment.toFixed(2) %></td>
+                <td class="text-end fw-semibold mask-amount"><%= amount.toFixed(2) %></td>
+                <td class="text-end mask-amount"><%= payment.toFixed(2) %></td>
                 <td class="text-center">
                   <span class="bi-badge-status <%= statusClass %>"><%= statusText %></span>
                 </td>
@@ -201,8 +206,8 @@
               <td>2026-08-20 16:30</td>
               <td>Tech Supplies Co</td>
               <td>5</td>
-              <td class="text-end fw-semibold">12500.00</td>
-              <td class="text-end">12500.00</td>
+              <td class="text-end fw-semibold mask-amount">12500.00</td>
+              <td class="text-end mask-amount">12500.00</td>
               <td class="text-center"><span class="bi-badge-status paid">Paid</span></td>
             </tr>
             <tr>
@@ -211,8 +216,8 @@
               <td>2026-08-19 14:15</td>
               <td>Global Traders</td>
               <td>12</td>
-              <td class="text-end fw-semibold">45000.00</td>
-              <td class="text-end">30000.00</td>
+              <td class="text-end fw-semibold mask-amount">45000.00</td>
+              <td class="text-end mask-amount">30000.00</td>
               <td class="text-center"><span class="bi-badge-status pending">Pending</span></td>
             </tr>
           <% } %>
@@ -252,7 +257,17 @@ document.addEventListener("DOMContentLoaded", function() {
     gradient.addColorStop(0, 'rgba(2, 132, 199, 0.35)');
     gradient.addColorStop(1, 'rgba(2, 132, 199, 0.01)');
 
-    new Chart(ctx, {
+    function getChartColors() {
+      const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark' || document.documentElement.getAttribute('data-layout-mode') === 'dark';
+      return {
+        grid: isDark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9',
+        tick: isDark ? '#94a3b8' : '#64748b',
+        pointBorder: isDark ? '#1e293b' : '#ffffff'
+      };
+    }
+
+    const colors = getChartColors();
+    const purchasesChart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: chartLabels,
@@ -265,7 +280,7 @@ document.addEventListener("DOMContentLoaded", function() {
           fill: true,
           backgroundColor: gradient,
           pointBackgroundColor: '#0284c7',
-          pointBorderColor: '#ffffff',
+          pointBorderColor: colors.pointBorder,
           pointBorderWidth: 2,
           pointRadius: 4
         }]
@@ -282,10 +297,21 @@ document.addEventListener("DOMContentLoaded", function() {
           }
         },
         scales: {
-          x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 11 } } },
-          y: { grid: { color: '#f1f5f9' }, ticks: { color: '#64748b', callback: function() { return 'Rs.'; } } }
+          x: { grid: { display: false }, ticks: { color: colors.tick, font: { size: 11 } } },
+          y: { grid: { color: colors.grid }, ticks: { color: colors.tick, callback: function() { return 'Rs.'; } } }
         }
       }
+    });
+
+    window.addEventListener('themeChanged', function() {
+      const c = getChartColors();
+      purchasesChart.options.scales.x.ticks.color = c.tick;
+      purchasesChart.options.scales.y.ticks.color = c.tick;
+      purchasesChart.options.scales.y.grid.color = c.grid;
+      if (purchasesChart.data.datasets[0]) {
+        purchasesChart.data.datasets[0].pointBorderColor = c.pointBorder;
+      }
+      purchasesChart.update();
     });
   }
 

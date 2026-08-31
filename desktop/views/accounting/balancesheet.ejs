@@ -22,7 +22,7 @@
                 <form class="d-flex gap-2" method="GET" action="/accounting/balance-sheet">
                     <input type="date" class="form-control form-control-sm" name="date" value="<%= asOfDate %>" max="<%= new Date().toISOString().split('T')[0] %>">
                     <button type="submit" class="btn btn-sm btn-primary">Filter</button>
-                    <button type="button" class="btn btn-sm btn-success" onclick="window.print()">
+                    <button type="button" class="btn btn-sm btn-success" onclick="doPrintBalanceSheet()">
                         <i class="ri-printer-line align-bottom me-1"></i> Print
                     </button>
                 </form>
@@ -135,6 +135,19 @@
     </div>
 </div>
 
+<script src="/assets/js/print-helper.js"></script>
+<script>
+    const printerConfig = <%- JSON.stringify(typeof printerConfig !== 'undefined' ? printerConfig : { printer: 'Default', printerType: 'standard', paper: 'A4', width: 210, height: 297, fontSize: 12, silentPrinting: false, numberOfPrints: 1 }) %>;
+    window.printerConfig = printerConfig;
+
+    async function doPrintBalanceSheet() {
+        if (window.SalesPeckPrinter && typeof window.SalesPeckPrinter.print === 'function') {
+            await window.SalesPeckPrinter.print();
+        } else {
+            window.print();
+        }
+    }
+</script>
 <style>
     @media print {
         body * {
