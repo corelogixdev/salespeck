@@ -1,0 +1,108 @@
+<div class="modal fade" id="<%= id %>" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered <%= typeof size !== 'undefined' ? size : 'modal-xl' %> modal-dialog-scrollable">
+    <div class="modal-content shadow-lg border-0">
+      <div class="modal-header bg-light border-bottom py-3">
+        <h5 class="modal-title d-flex align-items-center text-primary">
+          <span class="fw-bold"><%= typeof title !== 'undefined' ? title : 'Details' %></span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-0">
+        <!-- Profile Header Section (Optional) -->
+        <div id="<%= id %>HeaderSection" class="p-3 bg-light bg-gradient border-bottom d-none">
+          <!-- Populated via JS -->
+        </div>
+
+        <div id="<%= id %>TabContainer" class="d-none">
+          <div class="px-4 pt-4">
+            <ul class="nav nav-pills nav-custom nav-primary mb-3" role="tablist">
+              <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#<%= id %>DetailsTab" role="tab">
+                  <i class="ri-information-line me-1 align-bottom"></i> Profile Details
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#<%= id %>ExtraTab" role="tab" id="<%= id %>ExtraTabTitle">
+                  <i class="ri-file-list-3-line me-1 align-bottom"></i> Extra
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="tab-content p-4 pt-0">
+            <div class="tab-pane active" id="<%= id %>DetailsTab" role="tabpanel">
+               <div id="<%= id %>DetailsBody"></div>
+            </div>
+            <div class="tab-pane" id="<%= id %>ExtraTab" role="tabpanel">
+               <div id="<%= id %>ExtraBody"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="<%= id %>DefaultBody" class="p-4">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+      <div class="modal-footer bg-light border-top">
+        <button type="button" class="btn btn-ghost-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    if (window.renderViewModal) return;
+    
+    window.renderViewModal = function(modalId, fields, extraTab = null, headerHtml = null) {
+      const defaultBody = document.getElementById(modalId + 'DefaultBody');
+      const tabContainer = document.getElementById(modalId + 'TabContainer');
+      const detailsBody = document.getElementById(modalId + 'DetailsBody');
+      const extraBody = document.getElementById(modalId + 'ExtraBody');
+      const extraTabTitle = document.getElementById(modalId + 'ExtraTabTitle');
+      const headerSection = document.getElementById(modalId + 'HeaderSection');
+
+      // Handle Header Section
+      if (headerHtml) {
+        headerSection.innerHTML = headerHtml;
+        headerSection.classList.remove('d-none');
+      } else {
+        headerSection.classList.add('d-none');
+      }
+
+      let html = '';
+      if (Array.isArray(fields)) {
+        html = '<div class="row g-4">';
+        fields.forEach(function(field) {
+          html += '<div class="col-md-4">' +
+                  '<div class="p-3 border border-dashed rounded-3 h-100 bg-white">' +
+                  '<div class="d-flex align-items-center mb-2">' +
+                  (field.icon ? '<i class="' + field.icon + ' text-primary fs-18 me-2"></i>' : '') +
+                  '<small class="text-muted text-uppercase fw-bold ls-1 fs-11">' + (field.label || '') + '</small>' +
+                  '</div>' +
+                  '<div class="fs-15 fw-semibold text-dark">' + (field.value || '-') + '</div>' +
+                  '</div>' +
+                  '</div>';
+        });
+        html += '</div>';
+      } else if (typeof fields === 'string') {
+        html = fields;
+      }
+
+      if (extraTab) {
+        tabContainer.classList.remove('d-none');
+        defaultBody.classList.add('d-none');
+        detailsBody.innerHTML = html;
+        extraTabTitle.innerHTML = `<i class="${extraTab.icon || 'ri-file-list-3-line'} me-1 align-bottom"></i> ${extraTab.title}`;
+        extraBody.innerHTML = extraTab.content;
+        
+        // Switch to details tab by default
+        const firstTab = document.querySelector(`#${modalId}TabContainer .nav-link:first-child`);
+        if (firstTab) bootstrap.Tab.getOrCreateInstance(firstTab).show();
+      } else {
+        tabContainer.classList.add('d-none');
+        defaultBody.classList.remove('d-none');
+        defaultBody.innerHTML = html;
+      }
+    };
+  })();
+</script>

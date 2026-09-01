@@ -1,0 +1,168 @@
+<div class="card">
+  <div class="card-header align-items-center d-flex">
+    <h4 class="card-title mb-0 flex-grow-1">
+      <%= title %>
+    </h4>
+    <div class="d-flex gap-2 align-items-center">
+      <% if (permissions.salesSearch) { %>
+        <button class="btn btn-soft-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#salesFilters" aria-expanded="false" aria-controls="salesFilters">
+          <i class="ri-filter-3-line align-bottom me-1"></i> Filters
+        </button>
+      <% } %>
+      <button onclick="window.location.reload()" class="btn btn-soft-success btn-sm" title="Refresh">
+        <i class="ri-refresh-line align-middle"></i> Refresh
+      </button>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <% if (permissions.salesSearch) { %>
+      <div class="collapse mb-3" id="salesFilters">
+        <%- include('../components/partials/filter-section', {
+          filters: [
+            { name: 'daterange', label: 'Date Range', type: 'daterange', placeholder: 'Filter by date range...', icon: 'ri-calendar-2-line', colSize: 3 },
+            { name: 'customer', label: 'Customer', type: 'text', placeholder: 'Search by customer...', icon: 'ri-user-line', colSize: 3 },
+            { name: 'productId', label: 'Product ID', type: 'text', placeholder: 'Search by product ID...', icon: 'ri-shopping-basket-2-line', colSize: 3 }
+          ],
+          values: query,
+          action: '/sales'
+        }) %>
+      </div>
+    <% } %>
+
+    <%
+    const tableColumns = [
+      { 
+        key: 'SoldPoducts', 
+        label: 'Product', 
+        sortable: false,
+        render: (row) => {
+          const products = row.SoldPoducts ? row.SoldPoducts.map(({Product}) => Product.name).join(', ') : '';
+          const short = products.length > 40 ? products.substring(0, 40) + '...' : products;
+          return `<span class="limited-text" title="${products}">${short || '-'}</span>`;
+        }
+      },
+      { 
+        key: 'discountpercentage', 
+        label: 'Discount %', 
+        sortable: true,
+        render: (row) => `${row.discountpercentage || 0}%`
+      },
+      { 
+        key: 'totalprice', 
+        label: 'Total', 
+        sortable: true,
+        render: (row) => {
+          const total = row.netAmount !== undefined ? row.netAmount : (parseFloat(row.totalprice || 0) - (parseFloat(row.totalprice || 0) * ((row.discountpercentage || 0) / 100)));
+          return `Rs. ${total.toFixed(2)}`;
+        }
+      },
+      { 
+        key: 'createdAt', 
+        label: 'Created At', 
+        sortable: true,
+        render: (row) => moment(row.createdAt).format('D MMM, YYYY')
+      },
+      {
+        key: 'actions',
+        label: 'Actions',
+        sortable: false,
+        class: 'text-end',
+        render: (row) => {
+          return `<div class="btn-group btn-group-sm action-group" role="group">
+            <a href="/sales/${row.id}" target="_blank" class="btn btn-soft-info action-btn" title="Receipt"><i class="ri-file-text-line"></i></a>
+            <a href="/sales/returns?saleId=${row.id}" class="btn btn-soft-warning action-btn" title="Create Return"><i class="ri-arrow-go-back-line"></i></a>
+            <button type="button" class="btn btn-soft-primary action-btn" onclick="openViewModal('${row.id}')" title="Quick View"><i class="ri-eye-line"></i></button>
+          </div>`;
+        }
+      }
+    ];
+    %>
+
+    <%- include('../components/partials/data-table', {
+      columns: tableColumns,
+      data: sales,
+      sortBy: sortBy,
+      sortOrder: sortOrder,
+      baseUrl: '/sales',
+      query: query
+    }) %>
+
+    <%- include('../components/partials/pagination', {
+      pagination: pagination,
+      baseUrl: '/sales',
+      query: query
+    }) %>
+  </div>
+</div>
+
+<%- include('../components/partials/floating-action-btn', {
+  targetModal: null,
+  icon: 'ri-add-line',
+  tooltip: 'New Sale',
+  colorClass: 'btn-primary',
+  show: permissions.salesCreate
+}) %>
+
+<script>
+  (function() {
+    const fab = document.querySelector('.floating-action-btn');
+    if (fab && !fab.getAttribute('data-bs-target')) {
+      fab.addEventListener('click', function() {
+        window.location.href = '/sales/form';
+      });
+    }
+  })();
+</script>
+
+<!-- View Modal -->
+<%- include('../components/partials/view-modal', {
+  id: 'viewSaleModal',
+  title: 'Sale Details'
+}) %>
+
+
+
+<script>
+  function openViewModal(id) {
+    fetch('/sales/api/' + id)
+      .then(r => r.json())
+      .then(result => {
+        if (!result.success) return toastr.error('Failed to load details');
+        const s = result.sale;
+        const customer = s.Customer ? `${s.Customer.firstname} ${s.Customer.lastname}` : 'Walk-in';
+        const cashier = s.User ? `${s.User.firstname} ${s.User.lastname}` : 'Unknown';
+        const items = (s.SoldPoducts || []).map(item => {
+          const prod = item.Product ? item.Product.name : 'Unknown';
+          return `${prod} (Qty: ${item.quantity || 0})`;
+        }).join('<br>');
+        const total = parseFloat(s.totalprice || 0);
+        const discount = parseFloat(s.discountpercentage || 0);
+        const afterDiscount = total - (total * (discount / 100));
+
+        renderViewModal('viewSaleModal', [
+          { label: 'Invoice #', value: s.invoicenum || '-' },
+          { label: 'Date', value: s.createdAt ? moment(s.createdAt).format('D MMM, YYYY HH:mm') : '-' },
+          { label: 'Cashier', value: cashier },
+          { label: 'Customer', value: customer },
+          { label: 'Discount', value: discount + '%' },
+          { label: 'Total', value: 'Rs. ' + afterDiscount.toFixed(2) },
+          { label: 'Paid', value: 'Rs. ' + (parseFloat(s.totalpayment || 0)).toFixed(2) },
+          { label: 'Products', value: items || '-' }
+        ]);
+
+        const modal = new bootstrap.Modal(document.getElementById('viewSaleModal'));
+        modal.show();
+      })
+      .catch(e => { console.error(e); toastr.error('Error loading details'); });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    flatpickr(".flatpickr-range", {
+      mode: "range",
+      placeholder: "Filter by date range",
+      dateFormat: "Y-m-d",
+      defaultDate: "<%= query?.daterange?.split(' to ') || '' %>"
+    });
+  });
+</script>

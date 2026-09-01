@@ -1,0 +1,12 @@
+{
+  "development": {
+    "dialect": "sqlite",
+    "storage": "./db/stitch.sqlite",
+    "logging": false
+  },
+  "production": {
+    "dialect": "sqlite",
+    "storage": "./db/stitch.sqlite",
+    "logging": false
+  }
+}

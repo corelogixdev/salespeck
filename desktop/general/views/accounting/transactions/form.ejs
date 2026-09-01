@@ -1,0 +1,194 @@
+<%- contentFor('body') %>
+
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0"><%= title %></h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="/accounting/transactions">Transactions</a></li>
+                    <li class="breadcrumb-item active"><%= title %></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Record Manual Journal Entry</h5>
+            </div>
+            <div class="card-body">
+                <% const isEdit = typeof journal !== 'undefined' && journal !== null; %>
+                <form action="<%= isEdit ? '/accounting/transactions/update/' + journal.id : '/accounting/transactions/save' %>" method="POST" id="journalForm">
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label">Date <span class="text-danger">*</span></label>
+                            <%
+                                let dateVal = new Date().toISOString().split('T')[0];
+                                if (isEdit && journal.date) {
+                                    dateVal = new Date(journal.date).toISOString().split('T')[0];
+                                }
+                            %>
+                            <input type="date" class="form-control" name="date" value="<%= dateVal %>" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Reference</label>
+                            <input type="text" class="form-control" name="reference" placeholder="e.g. ADJ-001" value="<%= isEdit ? (journal.reference || '') : '' %>">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" name="description" rows="2" placeholder="Reason for this entry..." required><%= isEdit ? (journal.description || '') : '' %></textarea>
+                        </div>
+                    </div>
+
+                    <h5 class="fs-14 mb-3">Ledger Entries</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="entriesTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Account</th>
+                                    <th>Details</th>
+                                    <th style="width: 15%">Debit (Rs.)</th>
+                                    <th style="width: 15%">Credit (Rs.)</th>
+                                    <th style="width: 5%"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="entriesBody">
+                                <% if (isEdit && journal.ledger_entries && journal.ledger_entries.length > 0) { %>
+                                    <% journal.ledger_entries.forEach(function(entry, idx) { %>
+                                        <tr>
+                                            <td>
+                                                <select class="form-select" name="entries[<%= idx %>][account_id]" required>
+                                                    <option value="">Select Account...</option>
+                                                    <% accounts.forEach(function(acc) { %>
+                                                        <option value="<%= acc.id %>" <%= entry.account_id === acc.id ? 'selected' : '' %>><%= acc.code %> - <%= acc.name %></option>
+                                                    <% }); %>
+                                                </select>
+                                            </td>
+                                            <td><input type="text" class="form-control" name="entries[<%= idx %>][details]" value="<%= entry.details || '' %>"></td>
+                                            <td><input type="number" class="form-control debit-input" name="entries[<%= idx %>][debit]" step="0.01" min="0" onchange="calculateTotals()" value="<%= parseFloat(entry.debit) || '' %>"></td>
+                                            <td><input type="number" class="form-control credit-input" name="entries[<%= idx %>][credit]" step="0.01" min="0" onchange="calculateTotals()" value="<%= parseFloat(entry.credit) || '' %>"></td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove(); calculateTotals();"><i class="ri-delete-bin-line"></i></button>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <!-- Initial Two Rows -->
+                                    <tr>
+                                        <td>
+                                            <select class="form-select" name="entries[0][account_id]" required>
+                                                <option value="">Select Account...</option>
+                                                <% accounts.forEach(function(acc) { %>
+                                                    <option value="<%= acc.id %>"><%= acc.code %> - <%= acc.name %></option>
+                                                <% }); %>
+                                            </select>
+                                        </td>
+                                        <td><input type="text" class="form-control" name="entries[0][details]"></td>
+                                        <td><input type="number" class="form-control debit-input" name="entries[0][debit]" step="0.01" min="0" onchange="calculateTotals()"></td>
+                                        <td><input type="number" class="form-control credit-input" name="entries[0][credit]" step="0.01" min="0" onchange="calculateTotals()"></td>
+                                        <td><button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove(); calculateTotals();"><i class="ri-delete-bin-line"></i></button></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <select class="form-select" name="entries[1][account_id]" required>
+                                                <option value="">Select Account...</option>
+                                                <% accounts.forEach(function(acc) { %>
+                                                    <option value="<%= acc.id %>"><%= acc.code %> - <%= acc.name %></option>
+                                                <% }); %>
+                                            </select>
+                                        </td>
+                                        <td><input type="text" class="form-control" name="entries[1][details]"></td>
+                                        <td><input type="number" class="form-control debit-input" name="entries[1][debit]" step="0.01" min="0" onchange="calculateTotals()"></td>
+                                        <td><input type="number" class="form-control credit-input" name="entries[1][credit]" step="0.01" min="0" onchange="calculateTotals()"></td>
+                                        <td><button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove(); calculateTotals();"><i class="ri-delete-bin-line"></i></button></td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <td colspan="2"><button type="button" class="btn btn-sm btn-soft-primary" onclick="addRow()">+ Add Line</button></td>
+                                    <th class="text-end" id="totalDebit">0.00</th>
+                                    <th class="text-end" id="totalCredit">0.00</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="alert alert-danger d-none mt-3" id="balanceError">
+                        Total Debits must equal Total Credits to save this journal entry.
+                    </div>
+
+                    <div class="mt-4 text-end">
+                        <a href="/accounting/transactions" class="btn btn-light me-2">Cancel</a>
+                        <button type="submit" class="btn btn-success" id="saveBtn" disabled>Post Entry</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    <% if (typeof journal !== 'undefined' && journal !== null && journal.ledger_entries) { %>
+        let rowIdx = <%= journal.ledger_entries.length %>;
+    <% } else { %>
+        let rowIdx = 2;
+    <% } %>
+
+    function addRow() {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>
+                <select class="form-select" name="entries[${rowIdx}][account_id]" required>
+                    <option value="">Select Account...</option>
+                    <% accounts.forEach(function(acc) { %>
+                        <option value="<%= acc.id %>"><%= acc.code %> - <%= acc.name %></option>
+                    <% }); %>
+                </select>
+            </td>
+            <td><input type="text" class="form-control" name="entries[${rowIdx}][details]"></td>
+            <td><input type="number" class="form-control debit-input" name="entries[${rowIdx}][debit]" step="0.01" min="0" onchange="calculateTotals()"></td>
+            <td><input type="number" class="form-control credit-input" name="entries[${rowIdx}][credit]" step="0.01" min="0" onchange="calculateTotals()"></td>
+            <td><button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove(); calculateTotals();"><i class="ri-delete-bin-line"></i></button></td>
+        `;
+        document.getElementById('entriesBody').appendChild(tr);
+        rowIdx++;
+    }
+
+    function calculateTotals() {
+        let tDebit = 0;
+        let tCredit = 0;
+
+        document.querySelectorAll('.debit-input').forEach(el => {
+            tDebit += parseFloat(el.value) || 0;
+        });
+        document.querySelectorAll('.credit-input').forEach(el => {
+            tCredit += parseFloat(el.value) || 0;
+        });
+
+        document.getElementById('totalDebit').innerText = tDebit.toFixed(2);
+        document.getElementById('totalCredit').innerText = tCredit.toFixed(2);
+
+        const diff = Math.abs(tDebit - tCredit);
+        const saveBtn = document.getElementById('saveBtn');
+        const errorDiv = document.getElementById('balanceError');
+
+        if (tDebit > 0 && diff < 0.001) {
+            saveBtn.disabled = false;
+            errorDiv.classList.add('d-none');
+        } else {
+            saveBtn.disabled = true;
+            if (tDebit > 0 || tCredit > 0) {
+                errorDiv.classList.remove('d-none');
+            }
+        }
+    }
+
+    // Call once on load for edit mode
+    calculateTotals();
+</script>

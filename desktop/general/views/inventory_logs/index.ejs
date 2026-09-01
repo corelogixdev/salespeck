@@ -1,0 +1,192 @@
+<div class="card">
+    <div class="card-header align-items-center d-flex">
+        <h4 class="card-title mb-0 flex-grow-1">Stock Ledger</h4>
+        <div class="d-flex gap-2 align-items-center">
+            <button class="btn btn-soft-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#inventoryFilters" aria-expanded="false" aria-controls="inventoryFilters">
+                <i class="ri-filter-3-line align-bottom me-1"></i> Filters
+            </button>
+            <button onclick="window.location.reload()" class="btn btn-soft-success btn-sm" title="Refresh">
+                <i class="ri-refresh-line align-middle"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="collapse mb-3" id="inventoryFilters">
+            <%- include('../components/partials/filter-section', {
+                filters: [
+                    { name: 'dateRange', label: 'Date Range', type: 'daterange', placeholder: 'Filter by date range...', colSize: 3 },
+                    { name: 'product', label: 'Product', type: 'text', placeholder: 'Filter by product name or ID...', icon: 'ri-shopping-basket-2-line', colSize: 3 },
+                    { name: 'createdBy', label: 'Created By', type: 'text', placeholder: 'Filter by user...', icon: 'ri-user-line', colSize: 3 }
+                ],
+                values: query,
+                action: '/inventorylogs'
+            }) %>
+        </div>
+
+        <%
+        if (typeof currentProduct !== 'undefined' && currentProduct) {
+            // Calculate running balance for the current page (descending)
+            let currentBal = currentProduct.quantity;
+            inventoryLogs.forEach((log, index) => {
+                log.runningBalance = currentBal;
+                currentBal -= (log.quantity || 0);
+            });
+        }
+
+        const tableColumns = [
+            { 
+                key: 'createdAt', 
+                label: 'Date', 
+                sortable: true, 
+                render: (row) => moment(row.createdAt).format('D MMM, YYYY HH:mm')
+            },
+            { 
+                key: 'Product', 
+                label: 'Product', 
+                sortable: false, 
+                render: (row) => {
+                    const name = row.Product ? row.Product.name : 'Unknown Product';
+                    const short = name.length > 20 ? name.substring(0, 20) + '...' : name;
+                    return `<span class="limited-text" title="${name}">${short}</span>`;
+                }
+            },
+            { 
+                key: 'type', 
+                label: 'Type', 
+                sortable: true, 
+                render: (row) => {
+                    const type = row.type || 'Unknown';
+                    const badgeClass = type === 'sale' ? 'danger' : 'success';
+                    const label = type.charAt(0).toUpperCase() + type.slice(1);
+                    return `<span class="badge bg-${badgeClass}">${label}</span>`;
+                }
+            },
+            { 
+                key: 'quantity', 
+                label: 'Change', 
+                sortable: true, 
+                render: (row) => {
+                    const qty = row.quantity || 0;
+                    const color = parseInt(qty) < 0 ? 'text-danger' : 'text-success';
+                    return `<span class="${color} fw-medium">${qty > 0 ? '+' : ''}${qty}</span>`;
+                }
+            },
+            {
+                key: 'runningBalance',
+                label: 'Balance',
+                sortable: false,
+                render: (row) => {
+                    if (typeof row.runningBalance !== 'undefined' && row.runningBalance !== null) {
+                        return `<span class="fw-bold">${row.runningBalance}</span>`;
+                    }
+                    return '<span class="text-muted">-</span>';
+                }
+            },
+            { 
+                key: 'note', 
+                label: 'Note', 
+                sortable: false, 
+                render: (row) => {
+                    const note = row.note || '-';
+                    const short = note.length > 30 ? note.substring(0, 30) + '...' : note;
+                    return `<span class="limited-text" title="${note}">${short}</span>`;
+                }
+            },
+            { 
+                key: 'User', 
+                label: 'Created By', 
+                sortable: false, 
+                render: (row) => {
+                    const name = row.User ? `${row.User.firstname} ${row.User.lastname}` : 'Unknown User';
+                    const short = name.length > 15 ? name.substring(0, 15) + '...' : name;
+                    return `<span class="limited-text" title="${name}">${short}</span>`;
+                }
+            },
+            {
+                key: 'actions',
+                label: 'Actions',
+                sortable: false,
+                class: 'text-end',
+                render: (row) => {
+                    const productName = (row.Product ? row.Product.name : 'Unknown Product').replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+                    const note = (row.note || '-').replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+                    const userName = (row.User ? `${row.User.firstname} ${row.User.lastname}` : 'Unknown User').replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+                    const createdAt = row.createdAt || '';
+                    const type = row.type || '';
+                    const quantity = row.quantity || 0;
+                    return `<button type="button" class="btn btn-soft-info action-btn" 
+                        data-product="${productName}" 
+                        data-note="${note}" 
+                        data-createdat="${createdAt}" 
+                        data-type="${type}" 
+                        data-quantity="${quantity}" 
+                        data-user="${userName}"
+                        onclick="openViewModalFromBtn(this)" 
+                        title="View Details">
+                        <i class="ri-eye-line"></i>
+                    </button>`;
+                }
+            }
+        ];
+        %>
+
+        <%- include('../components/partials/data-table', {
+            columns: tableColumns,
+            data: inventoryLogs,
+            sortBy: sortBy,
+            sortOrder: sortOrder,
+            baseUrl: '/inventorylogs',
+            query: query
+        }) %>
+
+        <%- include('../components/partials/pagination', {
+            pagination: pagination,
+            baseUrl: '/inventorylogs',
+            query: query
+        }) %>
+    </div>
+</div>
+
+<!-- View Modal -->
+<%- include('../components/partials/view-modal', {
+    id: 'viewInventoryModal',
+    title: 'Inventory Log Details'
+}) %>
+
+
+
+<script>
+    function openViewModalFromBtn(btn) {
+        const product = btn.getAttribute('data-product');
+        const note = btn.getAttribute('data-note');
+        const createdAt = btn.getAttribute('data-createdat');
+        const type = btn.getAttribute('data-type');
+        const quantity = btn.getAttribute('data-quantity');
+        const user = btn.getAttribute('data-user');
+
+        const typeLabel = type ? (type.charAt(0).toUpperCase() + type.slice(1)) : 'Unknown';
+        const badgeHtml = `<span class="badge bg-${type === 'sale' ? 'danger' : 'success'}">${typeLabel}</span>`;
+        const qtyHtml = `<span class="${parseInt(quantity) < 0 ? 'text-danger' : 'text-success'}">${quantity}</span>`;
+
+        renderViewModal('viewInventoryModal', [
+            { label: 'Date & Time', value: createdAt ? moment(createdAt).format('D MMM, YYYY HH:mm') : '-' },
+            { label: 'Product Name', value: product },
+            { label: 'Operation Type', value: badgeHtml },
+            { label: 'Quantity Changed', value: qtyHtml },
+            { label: 'Created By', value: user },
+            { label: 'Note', value: note }
+        ]);
+
+        const modal = new bootstrap.Modal(document.getElementById('viewInventoryModal'));
+        modal.show();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        flatpickr(".flatpickr-range", {
+            mode: "range",
+            placeholder: "Filter by date range",
+            defaultDate: "<%= query?.dateRange?.split(' to ') || '' %>"
+        });
+    });
+</script>

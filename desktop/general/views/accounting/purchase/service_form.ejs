@@ -1,0 +1,960 @@
+<!-- Tab Bar -->
+<div class="tab-bar-container">
+    <div class="tab-bar-content">
+        <ul class="nav nav-tabs nav-tabs-custom mb-0 border-0" id="purchase-tabs" role="tablist">
+            <!-- Tabs will be dynamically added here -->
+        </ul>
+        <button class="btn btn-primary new-purchase-btn" id="new-purchase-tab-btn" title="New Purchase">
+            <i class="ri-add-line"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Tab Content Container -->
+<div id="purchase-tab-content-container" style="height: 85vh; margin-top: -7px;">
+    <!-- Tab content will be dynamically added here -->
+</div>
+
+
+
+<script>
+    // Tab Management System for Purchases
+    let purchaseTabs = [];
+    let currentTabId = null;
+    let tabCounter = 0;
+    let allProducts = [];
+
+    // Initialize first tab on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        createNewTab();
+
+        // New Purchase button handler
+        document.getElementById('new-purchase-tab-btn').addEventListener('click', () => {
+            createNewTab();
+        });
+
+        // Initialize clock updates
+        updateAllClocks();
+        setInterval(updateAllClocks, 1000);
+    });
+
+    // Update all visible clocks
+    function updateAllClocks() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', { hour12: false });
+        const dateString = now.toLocaleDateString('en-US', {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+
+        document.querySelectorAll('.digital-clock').forEach(clock => {
+            const timeEl = clock.querySelector('.clock-time');
+            const dateEl = clock.querySelector('.clock-date');
+            if (timeEl) timeEl.textContent = timeString;
+            if (dateEl) dateEl.textContent = dateString;
+        });
+    }
+
+    function createNewTab() {
+        tabCounter++;
+        const tabId = `purchase-tab-${tabCounter}`;
+        const tabData = {
+            id: tabId,
+            vendor: null,
+            products: [],
+            discountpercentage: 0,
+            totalPayment: 0,
+            ledger: false,
+            previousEntry: null,
+            selectedProduct: null
+        };
+
+        purchaseTabs.push(tabData);
+
+        // Create tab button
+        const tabButton = document.createElement('li');
+        tabButton.className = 'nav-item';
+        tabButton.innerHTML = `
+            <a class="nav-link" id="${tabId}-btn" data-bs-toggle="tab" href="#${tabId}" role="tab" aria-selected="false">
+                Purchase ${tabCounter}
+                <button class="tab-close-btn" onclick="closeTab('${tabId}', event)">&times;</button>
+            </a>
+        `;
+        document.getElementById('purchase-tabs').appendChild(tabButton);
+
+        // Create tab content panel
+        const tabContent = document.createElement('div');
+        tabContent.className = 'tab-content-panel';
+        tabContent.id = tabId;
+        tabContent.innerHTML = getTabContentHTML(tabId);
+        document.getElementById('purchase-tab-content-container').appendChild(tabContent);
+
+        // Fetch next invoice number
+        fetch('/accounting/purchase/next-service-invoice-num')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const display = document.getElementById(`invoice-num-display-${tabId}`);
+                    if (display) display.innerText = data.nextNum;
+                    tabData.invoicenum = data.nextNum;
+                }
+            });
+
+        // Fetch expense accounts
+        fetch('/accounting/purchase/expense-accounts')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const select = document.getElementById(`purchase-account-${tabId}`);
+                    if (select) {
+                        select.innerHTML = data.accounts.map(acc => `<option value="${acc.id}">${acc.code} - ${acc.name}</option>`).join('');
+                        const defaultAcc = localStorage.getItem('default_purchase_service_account');
+                        if(defaultAcc) select.value = defaultAcc;
+                    }
+                }
+            });
+
+        // Switch to new tab
+        switchToTab(tabId);
+
+        // Initialize Select2 for vendor dropdown in this tab
+        setTimeout(() => {
+            $(`#vendor-${tabId}`).select2({
+                theme: 'bootstrap-5',
+                dropdownParent: $(`#vendor-${tabId}`).parent(),
+                ajax: {
+                    url: '/accounting/purchase/search-vendors',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return { search: params.term };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.map(vendor => ({
+                                id: vendor.id,
+                                text: `${vendor.firstname} ${vendor.lastname} (${vendor.phone || 'No phone'})`
+                            }))
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 1,
+                placeholder: 'Search vendor...',
+                dropdownCssClass: 'select2-dropdown-custom',
+            });
+
+            // Store vendor selection
+            $(`#vendor-${tabId}`).on('select2:select', function (e) {
+                const tab = purchaseTabs.find(t => t.id === tabId);
+                const vendorId = e.params.data.id;
+                if (tab) tab.vendor = vendorId;
+
+                // Fetch and show balance
+                const balanceDisplay = document.getElementById(`vendor-balance-info-${tabId}`);
+                if (balanceDisplay) {
+                    balanceDisplay.innerHTML = '<i class="ri-loader-4-line rotate"></i> Loading...';
+                    balanceDisplay.classList.remove('d-none');
+                    
+                    fetch(`/users/${vendorId}/balance`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                const balance = data.balance;
+                                // For vendors, negative is credit (we owe them), positive is debit (they owe us - unlikely but possible)
+                                const balanceClass = balance < 0 ? 'text-danger' : (balance > 0 ? 'text-success' : 'text-muted');
+                                balanceDisplay.innerHTML = `Current Balance: <span class="${balanceClass} fw-bold">Rs.${Math.abs(balance).toFixed(2)} ${balance < 0 ? '(Payable)' : (balance > 0 ? '(Receivable)' : '')}</span>`;
+                            }
+                        })
+                        .catch(err => {
+                            balanceDisplay.innerHTML = '<span class="text-danger">Failed to load balance</span>';
+                        });
+                }
+            });
+        }, 100);
+    }
+
+    function getTabContentHTML(tabId) {
+        return `
+            <div class="row g-2 mt-0" style="height: 100%;">
+                <!-- Left Column: Product Search (25%) -->
+                <div class="col-lg-3">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column" style="height: 100%;">
+                            <div class="mb-3 p-3 bg-light rounded border-primary border" style="border-width: 2px !important;">
+                                <label class="form-label text-primary text-uppercase fw-bold mb-1" style="font-size: 13px;">Invoice Number</label>
+                                <div class="h3 mb-0 text-dark fw-bold" id="invoice-num-display-${tabId}">Loading...</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label for="purchase-account-${tabId}" class="form-label text-muted text-uppercase fw-semibold mb-0" style="font-size: 11px;">COGS Account (Manufacturing)</label>
+                                    <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none fs-11" onclick="setDefaultAccount('purchase_service_account', 'purchase-account-${tabId}')" title="Set selected account as default"><i class="ri-pushpin-line"></i> Set Default</button>
+                                </div>
+                                <select id="purchase-account-${tabId}" class="form-select form-select-sm border-primary">
+                                    <option value="">Loading accounts...</option>
+                                </select>
+                            </div>
+
+                            <div id="search-product-purchase-page-search-section-${tabId}" style="position: relative;">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label for="product-search-${tabId}" class="form-label text-muted text-uppercase fw-semibold mb-0">Search Service</label>
+                                </div>
+                                <input type="text" class="form-control mb-2 border-primary" id="product-search-${tabId}" placeholder="Enter service name">
+                                <div class="d-flex justify-content-between align-items-center mb-3 mt-1">
+                                    <button type="button" class="btn btn-soft-primary btn-sm px-2 py-0 fs-11 rounded-pill" id="quick-add-btn-${tabId}" onclick="quickAddServiceFromSearch('${tabId}')">
+                                        <i class="ri-add-line align-bottom"></i> Add Service
+                                    </button>
+                                    <button type="button" class="btn btn-soft-info btn-sm px-2 py-0 fs-11 rounded-pill ms-2" onclick="downloadBulkTemplate()">
+                                        <i class="ri-download-2-line align-bottom"></i> Download Template
+                                    </button>
+                                    <button type="button" class="btn btn-soft-success btn-sm px-2 py-0 fs-11 rounded-pill ms-2" onclick="triggerBulkImport('${tabId}')">
+                                        <i class="ri-file-excel-line align-bottom"></i> Import Excel
+                                    </button>
+                                </div>
+                                <div id="search-results-${tabId}" class="shadow-lg rounded p-3 d-none border search-results-dropdown" style="position: absolute; width: 100%; z-index: 9999; background: var(--pos-bg-surface); max-height: 300px; overflow-y: auto;"></div>
+                            </div>
+                            
+                            <!-- Spacer to push clock to bottom -->
+                            <div class="flex-grow-1"></div>
+                            
+                            <!-- Digital Clock -->
+                            <div class="digital-clock-container">
+                                <div class="digital-clock" id="digital-clock-${tabId}">
+                                    <span class="clock-time">00:00:00</span>
+                                    <span class="clock-date">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Middle Column: Selected Products (50%) -->
+                <div class="col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-header align-items-center d-flex">
+                            <h4 class="card-title mb-0 flex-grow-1">Selected Products</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive" style="height: calc(67vh);">
+                                <table class="table table-striped table-nowrap align-middle mb-0">
+                                    <thead class="table-primary" style="position: sticky; top: 0; z-index: 1;">
+                                        <tr>
+                                            <th scope="col" style="width: 50px;">#</th>
+                                            <th scope="col">Service Name</th>
+                                            <th scope="col" style="width: 100px;">Qty</th>
+                                            <th scope="col" style="width: 120px;">Rate (Rs.)</th>
+                                            <th scope="col" style="width: 120px;">Amount (Rs.)</th>
+                                            <th scope="col" style="width: 60px;">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="selected-products-${tabId}"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Billing Information (25%) -->
+                <div class="col-lg-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="mb-4 total-bill-section">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-label text-muted text-uppercase fw-semibold mb-0">Total Bill</label>
+                                    <h2 id="total-bill-amount-${tabId}" class="mb-0 glowing-bill">Rs.0.00</h2>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="transaction-date-${tabId}" class="form-label text-uppercase fw-bold text-primary" style="font-size: 11px;">Transaction Date & Time</label>
+                                <input type="datetime-local" id="transaction-date-${tabId}" class="form-control form-control-sm border-primary" 
+                                    value="${new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)}">
+                            </div>
+
+                             <div class="mb-3">
+                                <label for="vendor-${tabId}" class="form-label text-muted text-uppercase fw-semibold">Vendor</label>
+                                <select id="vendor-${tabId}" class="form-select select2" data-placeholder="Select Vendor">
+                                    <option value="">Select Vendor</option>
+                                </select>
+                                <div id="vendor-balance-info-${tabId}" class="mt-2 fs-12 d-none p-2 bg-light rounded border border-dashed"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label for="discountpercentage-${tabId}" class="form-label text-muted text-uppercase fw-semibold mb-0">Discount %</label>
+                                    <input type="number" class="form-control form-control-sm inline-input" id="discountpercentage-${tabId}" value="0" style="width: 100px;">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label for="total-payment-${tabId}" class="form-label text-muted text-uppercase fw-semibold mb-0">Payment</label>
+                                    <input type="number" class="form-control form-control-sm inline-input" id="total-payment-${tabId}" style="width: 120px;">
+                                </div>
+                                <div class="form-check mt-2 ms-2">
+                                    <input type="checkbox" class="form-check-input" id="ledger-${tabId}">
+                                    <label class="form-check-label text-muted" for="ledger-${tabId}">Ledger Posting</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-label text-muted text-uppercase fw-semibold mb-0">Change</label>
+                                    <h4 id="change-${tabId}" class="mb-0 text-success">Rs.0.00</h4>
+                                </div>
+                            </div>
+
+                            <!-- Complete Purchase Button -->
+                            <button class="btn btn-primary w-100 mt-3" onclick="completePurchase('${tabId}')" style="padding: 0.75rem;">
+                                <i class="ri-check-double-line me-2"></i>Complete Purchase
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function switchToTab(tabId) {
+        // Hide all tab panels
+        document.querySelectorAll('.tab-content-panel').forEach(panel => {
+            panel.classList.remove('active');
+        });
+
+        // Show selected tab panel
+        const tabPanel = document.getElementById(tabId);
+        if (tabPanel) {
+            tabPanel.classList.add('active');
+        }
+
+        // Update nav tabs
+        document.querySelectorAll('#purchase-tabs .nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        const tabBtn = document.getElementById(`${tabId}-btn`);
+        if (tabBtn) {
+            tabBtn.classList.add('active');
+        }
+
+        currentTabId = tabId;
+        initializeTabEventListeners(tabId);
+    }
+
+    function closeTab(tabId, event) {
+        event.stopPropagation();
+
+        if (purchaseTabs.length <= 1) {
+            toastr.warning('At least one purchase tab must remain open');
+            return;
+        }
+
+        // Remove tab from array
+        purchaseTabs = purchaseTabs.filter(t => t.id !== tabId);
+
+        // Remove tab button
+        const tabBtn = document.getElementById(`${tabId}-btn`).closest('li');
+        if (tabBtn) tabBtn.remove();
+
+        // Remove tab content
+        const tabPanel = document.getElementById(tabId);
+        if (tabPanel) tabPanel.remove();
+
+        // Switch to first remaining tab
+        if (purchaseTabs.length > 0) {
+            switchToTab(purchaseTabs[0].id);
+        }
+    }
+
+    function initializeTabEventListeners(tabId) {
+        const productSearch = document.getElementById(`product-search-${tabId}`);
+        const totalPayment = document.getElementById(`total-payment-${tabId}`);
+        const discountpercentage = document.getElementById(`discountpercentage-${tabId}`);
+        const searchResults = document.getElementById(`search-results-${tabId}`);
+
+        if (totalPayment && !totalPayment.dataset.listenersAttached) {
+            totalPayment.dataset.listenersAttached = 'true';
+            totalPayment.addEventListener('input', () => UpdateChangePrice(tabId));
+            discountpercentage.addEventListener('input', () => updateTotalBill(tabId));
+
+            if (productSearch) {
+                // Show all on focus
+                productSearch.addEventListener('focus', () => {
+                    if (productSearch.value.length === 0) productSearch.dispatchEvent(new Event('input'));
+                });
+
+                productSearch.addEventListener('input', () => {
+                    const query = productSearch.value.trim();
+                    const tab = purchaseTabs.find(t => t.id === tabId);
+
+                    fetch('/accounting/purchase/service-productsget', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: query })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.length === 0) {
+                            searchResults.classList.add('d-none');
+                            return;
+                        }
+                        
+                        searchResults.classList.remove('d-none');
+                        searchResults.innerHTML = '';
+                        
+                        data.forEach((product, index) => {
+                            const productElement = document.createElement('div');
+                            productElement.className = 'search-result-product p-2 d-flex justify-content-between align-items-center border-bottom';
+                            if (index === 0) productElement.classList.add('selected');
+                            
+                            productElement.style.cursor = 'pointer';
+                            productElement.innerHTML = `
+                                <div>
+                                    <div class="product-name-cell fw-bold" title="${product.name}">${product.name}</div>
+                                    <small class="d-block text-muted">Service</small>
+                                </div>
+                                <span>Rs. ${parseFloat(product.purchaseprice || 0).toFixed(2)}</span>
+                            `;
+                            
+                            productElement.addEventListener('mouseenter', () => {
+                                searchResults.querySelectorAll('.search-result-product').forEach(el => el.classList.remove('selected'));
+                                productElement.classList.add('selected');
+                            });
+
+                            productElement.addEventListener('mousedown', (e) => {
+                                e.preventDefault();
+                                productSearch.value = '';
+                                searchResults.classList.add('d-none');
+                                addServiceLine(product, tabId);
+                            });
+                            
+                            searchResults.appendChild(productElement);
+                        });
+                    })
+                    .catch(console.error);
+                });
+
+                // Keyboard navigation for dropdown
+                productSearch.addEventListener('keydown', (e) => {
+                    if (searchResults.classList.contains('d-none')) return;
+                    
+                    const items = Array.from(searchResults.querySelectorAll('.search-result-product'));
+                    let currentIndex = items.findIndex(item => item.classList.contains('selected'));
+                    
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        if (currentIndex < items.length - 1) {
+                            items.forEach(item => item.classList.remove('selected'));
+                            items[currentIndex + 1].classList.add('selected');
+                            items[currentIndex + 1].scrollIntoView({ block: 'nearest' });
+                        }
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        if (currentIndex > 0) {
+                            items.forEach(item => item.classList.remove('selected'));
+                            items[currentIndex - 1].classList.add('selected');
+                            items[currentIndex - 1].scrollIntoView({ block: 'nearest' });
+                        }
+                    } else if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (currentIndex >= 0 && currentIndex < items.length) {
+                            items[currentIndex].dispatchEvent(new Event('mousedown'));
+                        }
+                    }
+                });
+
+                document.addEventListener('click', (event) => {
+                    if (!event.target.closest(`#search-product-purchase-page-search-section-${tabId}`)) {
+                        searchResults.classList.add('d-none');
+                    }
+                });
+            }
+        }
+    }
+
+    // Tab button click handlers
+    document.addEventListener('click', (event) => {
+        if (event.target.closest('.nav-link') && event.target.closest('.nav-link').id) {
+            const tabBtn = event.target.closest('.nav-link');
+            const tabId = tabBtn.id.replace('-btn', '');
+            if (purchaseTabs.find(t => t.id === tabId)) {
+                switchToTab(tabId);
+            }
+        }
+    });
+
+    let rowCounter = 0;
+
+    function addServiceLine(product, tabId) {
+        rowCounter++;
+        const tbody = document.getElementById(`selected-products-${tabId}`);
+        const rowId = `row-${rowCounter}-${tabId}`;
+        const row = document.createElement('tr');
+        row.id = rowId;
+        
+        row.innerHTML = `
+            <td class="product-serial text-center fw-medium bg-light"></td>
+            <td>
+                <input type="text" class="form-control border-0 bg-transparent fw-medium design-number-input px-0" value="${product.name}" readonly>
+                <input type="hidden" class="product-id-hidden" value="${product.id}">
+            </td>
+            <td>
+                <input type="number" class="form-control text-center quantity-input fw-bold text-primary" value="1" min="1" oninput="calculateRowTotal('${rowId}', '${tabId}')" onfocus="this.select()">
+            </td>
+            <td>
+                <input type="number" class="form-control text-end rate-input fw-bold" value="${product.purchaseprice || 0}" oninput="calculateRowTotal('${rowId}', '${tabId}')" onfocus="this.select()">
+            </td>
+            <td>
+                <input type="text" class="form-control text-end amount-input fw-bold border-0 bg-transparent px-0" value="${product.purchaseprice || 0}" readonly>
+            </td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-soft-danger rounded-circle p-2" onclick="removeRow('${rowId}', '${tabId}')">
+                    <i class="ri-delete-bin-line"></i>
+                </button>
+            </td>
+        `;
+        
+        if (tbody.firstChild) {
+            tbody.insertBefore(row, tbody.firstChild);
+        } else {
+            tbody.appendChild(row);
+        }
+        
+        updateSerialNumbers(tabId);
+        updateTotalBill(tabId);
+    }
+
+    function calculateRowTotal(rowId, tabId) {
+        const row = document.getElementById(rowId);
+        if (!row) return;
+        
+        const qty = parseFloat(row.querySelector('.quantity-input').value) || 0;
+        const rate = parseFloat(row.querySelector('.rate-input').value) || 0;
+        const amountEl = row.querySelector('.amount-input');
+        
+        const amount = qty * rate;
+        amountEl.value = amount.toFixed(2);
+        
+        updateTotalBill(tabId);
+    }
+
+    function removeRow(rowId, tabId) {
+        const row = document.getElementById(rowId);
+        if (row) {
+            row.remove();
+            updateTotalBill(tabId);
+            updateSerialNumbers(tabId);
+        }
+    }
+
+    function updateTotalBill(tabId) {
+        const tbody = document.getElementById(`selected-products-${tabId}`);
+        if (!tbody) return;
+
+        let total = 0;
+        const rows = tbody.querySelectorAll('tr');
+        rows.forEach(row => {
+            const amount = parseFloat(row.querySelector('.amount-input').value) || 0;
+            total += amount;
+        });
+        
+        let discountpercentage = parseFloat(document.getElementById(`discountpercentage-${tabId}`).value || 0);
+        total = total - (total * discountpercentage / 100);
+        
+        const totalBillAmount = document.getElementById(`total-bill-amount-${tabId}`);
+        if (totalBillAmount) {
+            totalBillAmount.textContent = `Rs. ${total.toFixed(2)}`;
+        }
+
+        const totalPayment = document.getElementById(`total-payment-${tabId}`);
+        if (totalPayment) {
+            totalPayment.value = total.toFixed(2);
+        }
+
+        UpdateChangePrice(tabId);
+    }
+
+    function updateSerialNumbers(tabId) {
+        const tbody = document.getElementById(`selected-products-${tabId}`);
+        if (!tbody) return;
+        const rows = tbody.querySelectorAll('tr');
+        rows.forEach((row, index) => {
+            row.querySelector('.product-serial').textContent = index + 1;
+        });
+    }
+
+    function UpdateChangePrice(tabId) {
+        const totalBillAmount = document.getElementById(`total-bill-amount-${tabId}`);
+        const totalPayment = document.getElementById(`total-payment-${tabId}`);
+        const changeEl = document.getElementById(`change-${tabId}`);
+        if (!totalBillAmount || !totalPayment || !changeEl) return;
+
+        const totalBill = parseFloat(totalBillAmount.textContent.replace('Rs. ', ''));
+        const payment = parseFloat(totalPayment.value) || 0;
+        const change = payment - totalBill;
+        
+        if (change < 0 || isNaN(change)) {
+            changeEl.textContent = 'Rs. 0.00';
+            return;
+        }
+        changeEl.textContent = `Rs. ${change.toFixed(2)}`;
+    }
+
+    function completePurchase(tabId) {
+        const tab = purchaseTabs.find(t => t.id === tabId);
+        if (!tab) return;
+
+        const vendor = document.getElementById(`vendor-${tabId}`).value || null;
+        const discountpercentage = parseFloat(document.getElementById(`discountpercentage-${tabId}`).value);
+        const ledger = document.getElementById(`ledger-${tabId}`).checked;
+        const transactionDate = document.getElementById(`transaction-date-${tabId}`).value;
+        const totalPaymentVal = parseFloat(document.getElementById(`total-payment-${tabId}`).value) || 0;
+        const purchaseAccountId = document.getElementById(`purchase-account-${tabId}`).value;
+        const totalBillText = document.getElementById(`total-bill-amount-${tabId}`).textContent;
+        const totalPriceGross = parseFloat(totalBillText.replace('Rs. ', '')) / (1 - (discountpercentage / 100)); // Reverse engineer gross total
+
+        const products = [];
+        const rows = document.querySelectorAll(`#selected-products-${tabId} tr`);
+        
+        let valid = true;
+        rows.forEach(row => {
+            const name = row.querySelector('.design-number-input').value.trim();
+            const productId = row.querySelector('.product-id-hidden').value;
+            const quantity = parseFloat(row.querySelector('.quantity-input').value) || 0;
+            const price = parseFloat(row.querySelector('.rate-input').value) || 0;
+            
+            if (name && quantity > 0) {
+                products.push({
+                    name: name,
+                    productId: productId || null,
+                    quantity: quantity,
+                    price: price
+                });
+            } else if (name && quantity <= 0) {
+                valid = false;
+                toastr.error('Quantity must be greater than 0 for design: ' + name);
+            }
+        });
+
+        if (!valid) return;
+
+        if (products.length === 0) {
+            toastr.warning('Please select products');
+            return;
+        }
+
+        const totalPrice = totalPriceGross;
+        const priceWithDiscount = totalPrice - (totalPrice * discountpercentage / 100);
+
+        if (discountpercentage < 0 || discountpercentage > 100) {
+            toastr.warning('Please enter valid discount percentage');
+            return;
+        }
+
+        if (totalPaymentVal < priceWithDiscount && !ledger) {
+            toastr.warning('Please check the ledger option or pay the full amount');
+            return;
+        }
+        
+        // Show confirmation modal
+        $.confirm({
+            title: '<i class="ri-information-line me-2 text-primary"></i>Confirm Transaction Accounts',
+            theme: 'material',
+            closeIcon: true,
+            boxWidth: '400px',
+            useBootstrap: false,
+            content: `
+                <div class="p-2">
+                    <p class="text-muted mb-3" style="font-size: 13px;">Please verify the accounts for this transaction before proceeding.</p>
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-uppercase fw-bold text-muted" style="font-size: 11px;">COGS Account (Manufacturing)</label>
+                        <select id="modal-purchase-account" class="form-select form-select-sm border-primary">
+                            ${document.getElementById(`purchase-account-${tabId}`).innerHTML}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-uppercase fw-bold text-muted" style="font-size: 11px;">Vendor / Party</label>
+                        <select id="modal-vendor" class="form-select form-select-sm border-primary">
+                            ${document.getElementById(`vendor-${tabId}`).innerHTML}
+                        </select>
+                    </div>
+                </div>
+            `,
+            onContentReady: function () {
+                const modalAcc = this.$content.find('#modal-purchase-account');
+                const modalVen = this.$content.find('#modal-vendor');
+                modalAcc.val(purchaseAccountId);
+                modalVen.val(vendor);
+            },
+            buttons: {
+                confirm: {
+                    text: 'Finish Purchase',
+                    btnClass: 'btn-primary',
+                    action: function () {
+                        const finalPurchaseAccountId = this.$content.find('#modal-purchase-account').val();
+                        const finalVendor = this.$content.find('#modal-vendor').val();
+
+                        if (totalPaymentVal < priceWithDiscount && !finalVendor) {
+                            toastr.warning('Please select a vendor for ledger posting');
+                            return false;
+                        }
+
+                        fetch('/accounting/purchase/service-save', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                vendor: finalVendor, 
+                                discountpercentage, 
+                                totalPrice, 
+                                ledger, 
+                                products, 
+                                totalPayment: totalPaymentVal, 
+                                transactionDate, 
+                                purchaseAccountId: finalPurchaseAccountId 
+                            }),
+                        }).then(async response => {
+                            let data = await response.json();
+                            if (response.ok) {
+                                $.alert({
+                                    title: 'Success!',
+                                    content: data.message,
+                                    theme: 'material',
+                                    useBootstrap: false,
+                                    boxWidth: '30%',
+                                    type: 'green',
+                                    buttons: {
+                                        confirm: {
+                                            text: 'Ok',
+                                            btnClass: 'btn-success',
+                                            action: function () {
+                                                window.location.href = '/accounting/purchase/view/' + data.purchaseId;
+                                            }
+                                        }
+                                    }
+                                });
+                            } else {
+                                $.alert({
+                                    title: 'Error!',
+                                    content: data.message,
+                                    theme: 'material',
+                                    useBootstrap: false,
+                                    boxWidth: '30%',
+                                    type: 'red',
+                                    buttons: {
+                                        confirm: {
+                                            text: 'Ok',
+                                            btnClass: 'btn-danger',
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                },
+                cancel: {
+                    text: 'Back',
+                    btnClass: 'btn-light'
+                }
+            }
+        });
+    }
+
+    async function quickAddServiceFromSearch(tabId) {
+        const searchInput = document.getElementById(`product-search-${tabId}`);
+        const name = searchInput ? searchInput.value.trim() : '';
+        const btn = document.getElementById(`quick-add-btn-${tabId}`);
+
+        if (!name) {
+            toastr.warning('Please type a Service Name in the search box first');
+            if (searchInput) searchInput.focus();
+            return;
+        }
+
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="ri-loader-4-line rotate align-bottom"></i> Saving...';
+        btn.disabled = true;
+
+        try {
+            const res = await fetch('/products/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: name,
+                    saleprice: 0,
+                    is_service: 'on',
+                    saleactive: 'off',
+                    purchaseactive: 'on',
+                    quantity: 0,
+                    purchaseprice: 0,
+                    discount: 0,
+                    carrycost: 0,
+                    barcode: ''
+                })
+            });
+            const result = await res.json();
+            
+            if (result.success) {
+                toastr.success('Service created successfully');
+                if (searchInput) {
+                    searchInput.dispatchEvent(new Event('input'));
+                }
+            } else {
+                toastr.error(result.message || 'Failed to save service');
+            }
+        } catch (error) {
+            console.error(error);
+            toastr.error('Network error');
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+
+// Make functions globally accessible
+    window.removeProduct = removeProduct;
+    window.completePurchase = completePurchase;
+    window.closeTab = closeTab;
+    window.createNewTab = createNewTab;
+    window.downloadBulkTemplate = downloadBulkTemplate;
+    window.triggerBulkImport = triggerBulkImport;
+
+    // Bulk Import Logic (Inline)
+    function downloadBulkTemplate() {
+        try {
+            const ws_data = [
+                ["Service Name", "Qty", "Rate"],
+                ["Example Service 1", 1, 500],
+                ["Example Service 2", 5, 200]
+            ];
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            const wscols = [ {wch: 30}, {wch: 10}, {wch: 15} ];
+            ws['!cols'] = wscols;
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Services");
+            XLSX.writeFile(wb, "bulk_purchase_services_template.xlsx");
+        } catch (e) {
+            console.error("Error generating template:", e);
+            toastr.error("Could not generate Excel template.");
+        }
+    }
+
+    function triggerBulkImport(tabId) {
+        currentTabId = tabId;
+        const fileInput = document.getElementById('hiddenBulkImportInput');
+        fileInput.value = '';
+        fileInput.click();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('hiddenBulkImportInput');
+        if (!fileInput) return;
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            toastr.info('Processing Excel file...', 'Please wait', { timeOut: 0, extendedTimeOut: 0, id: "import-toast" });
+
+            reader.onload = function(evt) {
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, {raw: false});
+
+                    if (jsonData.length === 0) throw new Error("The Excel file is empty.");
+
+                    const parsedServices = jsonData.map(row => {
+                        const name = row["Service Name"] || row["service name"] || row["Service name"] || row["Name"];
+                        const qty = row["Qty"] || row["qty"] || row["Quantity"] || row["quantity"] || 1;
+                        const rate = row["Rate"] || row["rate"] || row["Price"] || row["price"] || '';
+                        if (!name) return null;
+                        return { name: name.toString().trim(), qty: parseFloat(qty) || 1, rate: rate === '' ? '' : parseFloat(rate) };
+                    }).filter(Boolean);
+
+                    if (parsedServices.length === 0) throw new Error("No valid services found.");
+
+                    fetch('/accounting/purchase/bulk-resolve-services', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ services: parsedServices })
+                    })
+                    .then(res => res.json())
+                    .then(async result => {
+                        if (result.success) {
+                            if (!currentTabId) return;
+
+                            toastr.info('Preparing items... this might take a moment if many are new.');
+
+                            for (let i = 0; i < result.products.length; i++) {
+                                let product = result.products[i];
+
+                                if (product.isNew) {
+                                    try {
+                                        const createRes = await fetch('/accounting/purchase/create-single-service', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ name: product.name, rate: product.rate })
+                                        });
+                                        const createData = await createRes.json();
+                                        if (createData.success && createData.product) {
+                                            product.id = createData.product.id;
+                                            product.purchaseprice = createData.product.purchaseprice;
+                                            product.saleprice = createData.product.saleprice;
+                                        }
+                                    } catch (err) {
+                                        console.error('Failed to create new product:', product.name, err);
+                                    }
+                                }
+
+                                if (!product.id) continue;
+
+                                product.purchaseprice = product.rate !== '' && product.rate !== undefined
+                                    ? product.rate
+                                    : (product.purchaseprice || 0);
+
+                                addServiceLine(product, currentTabId);
+                                const rowId = `row-${rowCounter}-${currentTabId}`;
+                                const row = document.getElementById(rowId);
+                                if (row) {
+                                    const qtyInput = row.querySelector('.quantity-input');
+                                    const rateInput = row.querySelector('.rate-input');
+                                    if (qtyInput) qtyInput.value = product.qty;
+                                    if (rateInput) rateInput.value = product.rate !== '' ? product.rate : (product.purchaseprice || 0);
+                                    calculateRowTotal(rowId, currentTabId);
+                                }
+                            }
+                            toastr.clear();
+                            toastr.success(`Added ${result.products.length} services to the invoice.`);
+                        } else {
+                            toastr.clear();
+                            throw new Error(result.message || "Failed to resolve services.");
+                        }
+                    })
+                    .catch(err => {
+                        toastr.clear();
+                        toastr.error(err.message);
+                    });
+                } catch (error) {
+                    toastr.clear();
+                    toastr.error(error.message);
+                }
+            };
+
+            reader.onerror = function() {
+                toastr.clear();
+                toastr.error("Error reading file.");
+            };
+
+            reader.readAsArrayBuffer(file);
+        });
+    });
+</script>
+
+<input type="file" id="hiddenBulkImportInput" accept=".xlsx, .xls, .csv" style="display: none;">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>

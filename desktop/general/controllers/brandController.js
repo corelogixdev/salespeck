@@ -1,0 +1,184 @@
+const queries = require('../prisma/queries');
+const { getPaginationMeta, buildSortClause, buildFilterClause, sanitizeFilters } = require('../utils/paginationHelper');
+
+exports.listBrands = async (req, res) => {
+    try {
+        const query = req.query;
+
+        // Pagination parameters
+        const page = parseInt(query.page) || 1;
+        const pageSize = parseInt(query.pageSize) || 10;
+
+        // Filter parameters
+        // Sort parameters
+        const sortBy = query.sortBy || 'name';
+        const sortOrder = query.sortOrder || 'asc';
+
+        // Get total count and paginated data
+        const { count, rows } = await queries.brands.list({
+            page,
+            pageSize,
+            sortBy,
+            sortOrder,
+            search: query.name_like,
+            status: query.status
+        });
+
+        // Generate pagination metadata
+        const pagination = getPaginationMeta(page, pageSize, count);
+
+        if (query.partial) {
+            return res.render('products/brand/_table_rows', {
+                layout: false,
+                brands: rows
+            });
+        }
+
+        res.render('products/brand/list', {
+            title: "Brands",
+            brands: rows,
+            pagination,
+            query,
+            sortBy,
+            sortOrder
+        });
+    } catch (error) {
+        console.error('Error fetching brands:', error);
+        req.session.message = {
+            type: "error",
+            text: "An error occurred while fetching brands."
+        };
+        res.redirect("/dashboard");
+    }
+};
+
+exports.getBrand = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const brand = await queries.brands.findById(id);
+        
+        if (!brand) {
+            return res.status(404).json({
+                success: false,
+                message: 'Brand not found'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            brand: brand
+        });
+    } catch (error) {
+        console.error('Error fetching brand:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal Server Error'
+        });
+    }
+};
+
+exports.saveBrand = async (req, res) => {
+    try {
+        const { id, name, description, status } = req.body;
+
+        if (id) {
+            // UPDATE
+            const brand = await queries.brands.findById(id);
+            if (!brand) {
+                return res.status(404).json({ success: false, message: 'Brand not found' });
+            }
+
+            const existingBrand = await queries.brands.findByNameExceptId(name, id);
+            if (existingBrand) {
+                return res.status(400).json({ success: false, message: 'Brand name already exists' });
+            }
+
+            const parsedStatus = status === '1' || status === 'true' || status === 'on' || status === true;
+
+            await queries.brands.update(id, {
+                name,
+                description,
+                status: parsedStatus,
+                updatedby: req.session.user.id
+            });
+
+            return res.status(200).json({ success: true, message: 'Brand updated successfully' });
+        } else {
+            // CREATE
+            const existingBrand = await queries.brands.findByName(name);
+            if (existingBrand) {
+                return res.status(400).json({ success: false, message: 'Brand already exists' });
+            }
+
+            const newBrand = await queries.brands.create({
+                name,
+                description,
+                status: true,
+                createdby: req.session.user.id
+            });
+
+            return res.status(200).json({ success: true, message: 'Brand created successfully', brand: newBrand });
+        }
+    } catch (error) {
+        console.error('Error saving brand:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+};
+
+exports.deleteBrand = async (req, res) => {
+    try {
+        const { id } = req.body;
+
+        // Check if brand is being used by any products
+        const productsUsingBrand = await queries.products.list({
+            page: 1,
+            pageSize: 1,
+            where: { brand: id }
+        });
+
+        if (productsUsingBrand.count > 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Cannot delete brand as it is being used by products'
+            });
+        }
+
+        await queries.brands.update(id, {
+            status: false,
+            updatedby: req.session.user.id
+        });
+
+        res.status(200).json({
+            success: true,
+            message: 'Brand deleted successfully'
+        });
+    } catch (error) {
+        console.error('Error deleting brand:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal Server Error'
+        });
+    }
+};
+
+exports.searchBrands = async (req, res) => {
+    try {
+        const { search } = req.body;
+        if (!search) {
+            return res.json({ success: false, data: [] });
+        }
+
+        const brands = await queries.brands.search(search, 20);
+
+        res.status(200).json({
+            success: true,
+            data: brands
+        });
+    } catch (error) {
+        console.error('Error searching brands:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal Server Error'
+        });
+    }
+};

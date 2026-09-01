@@ -1,0 +1,167 @@
+
+<div class="auth-bg">
+    <div class="auth-page-wrapper">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-10 col-lg-8 col-xl-7">
+                    <div class="card card-bg-fill" style="margin-top: 13px;">
+                        <div class="card-body p-4">
+                            <div class="row align-items-center mt-0">
+                                <div class="col-7 text-start">
+                                    <h3 class="text-primary mb-2">Create Account</h3>
+                                    <p class="text-muted mb-0">Sign up to start using SalesPeck.</p>
+                                </div>
+                                <div class="col-5 text-end">
+                                    <img src="/assets/img/icon.png" alt="" height="80">
+                                </div>
+                            </div>
+                            <div class="p-1 mt-2">
+                                <form action="/register" method="post" enctype="multipart/form-data">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="firstName" class="form-label">First Name</label>
+                                            <input type="text"
+                                                class="form-control <%= locals.errors?.firstName ? 'is-invalid' : '' %>"
+                                                id="firstName" name="firstName" placeholder="Enter first name">
+                                            <% if (locals.errors?.firstName) { %>
+                                                <div class="invalid-feedback">
+                                                    <%= errors.firstName %>
+                                                </div>
+                                                <% } %>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="lastName" class="form-label">Last Name</label>
+                                            <input type="text"
+                                                class="form-control <%= locals.errors?.lastName ? 'is-invalid' : '' %>"
+                                                id="lastName" name="lastName" placeholder="Enter last name">
+                                            <% if (locals.errors?.lastName) { %>
+                                                <div class="invalid-feedback">
+                                                    <%= errors.lastName %>
+                                                </div>
+                                                <% } %>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="username" class="form-label">Username</label>
+                                            <input type="text"
+                                                class="form-control <%= locals.errors?.username ? 'is-invalid' : '' %>"
+                                                id="username" name="username" placeholder="Enter username" required>
+                                            <% if (locals.errors?.username) { %>
+                                                <div class="invalid-feedback">
+                                                    <%= errors.username %>
+                                                </div>
+                                                <% } %>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="email" class="form-label">Email</label>
+                                            <input type="email"
+                                                class="form-control <%= locals.errors?.email ? 'is-invalid' : '' %>"
+                                                id="email" name="email" placeholder="Enter email">
+                                            <% if (locals.errors?.email) { %>
+                                                <div class="invalid-feedback">
+                                                    <%= errors.email %>
+                                                </div>
+                                                <% } %>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label" for="password">Password</label>
+                                            <div class="position-relative auth-pass-inputgroup">
+                                                <input type="password"
+                                                    class="form-control pe-5 <%= locals.errors?.password ? 'is-invalid' : '' %>"
+                                                    id="password" name="password" placeholder="Enter password"
+                                                    autocomplete="new-password" required>
+                                                <button
+                                                    class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted"
+                                                    type="button" onclick="togglePassword(this)">
+                                                    <i class="ri-eye-fill align-middle"></i>
+                                                </button>
+                                                <% if (locals.errors?.password) { %>
+                                                    <div class="invalid-feedback">
+                                                        <%= errors.password %>
+                                                    </div>
+                                                    <% } %>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="phone" class="form-label">Phone Number</label>
+                                            <input type="tel"
+                                                class="form-control <%= locals.errors?.phone ? 'is-invalid' : '' %>"
+                                                id="phone" name="phone" placeholder="Enter phone number">
+                                            <% if (locals.errors?.phone) { %>
+                                                <div class="invalid-feedback">
+                                                    <%= errors.phone %>
+                                                </div>
+                                                <% } %>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label for="address" class="form-label">Address</label>
+                                            <textarea
+                                                class="form-control <%= locals.errors?.address ? 'is-invalid' : '' %>"
+                                                id="address" name="address" rows="1"
+                                                placeholder="Enter address"></textarea>
+                                            <% if (locals.errors?.address) { %>
+                                                <div class="invalid-feedback">
+                                                    <%= errors.address %>
+                                                </div>
+                                                <% } %>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="mt-4">
+                                        <button class="btn btn-primary w-100" type="submit">
+                                            <i class="ri-user-add-line align-middle me-1"></i> Sign Up
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="text-center mt-3">
+                                <div class="row">
+                                    <div class="col-6 text-start">
+                                        <p class="mb-0 text-muted small">
+                                            Powered by <a href="javascript:void(0);" class="fw-semibold">SalesPeck</a>
+                                        </p>
+                                    </div>
+                                    <div class="col-6 text-end">
+                                        <p class="mb-0 text-muted">
+                                            Already have an account? <a href="/login"
+                                                class="fw-semibold text-primary text-decoration-underline">Login</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
+    <script src="/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function togglePassword(button) {
+            const input = button.parentElement.querySelector('input');
+            const icon = button.querySelector('i');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('ri-eye-fill');
+                icon.classList.add('ri-eye-off-fill');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('ri-eye-off-fill');
+                icon.classList.add('ri-eye-fill');
+            }
+        }
+
+    </script>
+</div>

@@ -1,0 +1,113 @@
+<div class="card">
+  <div class="card-header align-items-center d-flex">
+    <h4 class="card-title mb-0 flex-grow-1">Categories</h4>
+    <div class="d-flex gap-2 align-items-center">
+
+      <button onclick="InlineEditor.addNewRow()" class="btn btn-primary btn-sm" title="Add New Category">
+        <i class="ri-add-line align-middle me-1"></i> Add Category
+      </button>
+      <button onclick="window.location.reload()" class="btn btn-soft-success btn-sm" title="Refresh">
+        <i class="ri-refresh-line align-middle"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <div class="mb-3">
+      <%- include('../../components/partials/filter-section', {
+        filters: [
+          { name: 'name_like', label: 'Category Name', type: 'text', placeholder: 'Search by category name...', icon: 'ri-search-line', colSize: 4 },
+          { name: 'status', label: 'Status', type: 'toggle', options: [{ value: '1', label: 'Active' }, { value: '0', label: 'Inactive' }], colSize: 3 }
+        ],
+        values: query,
+        action: '/categories',
+        buttonColSize: 2,
+        autoSubmit: true,
+        hideClear: true
+      }) %>
+    </div>
+
+    <%
+      const statusOptions = [
+        { label: 'Active', value: '1' },
+        { label: 'Inactive', value: '0' }
+      ];
+    %>
+
+    <div class="table-responsive">
+      <table class="table table-nowrap align-middle mb-0" id="category-table">
+        <thead class="table-light">
+          <tr>
+            <th scope="col" style="width: 300px;">Name</th>
+            <th scope="col">Description</th>
+            <th scope="col" style="width: 150px;">Status</th>
+            <th scope="col" class="text-end" style="width: 120px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% categories.forEach(category => { %>
+            <tr data-id="<%= category.id %>">
+              <td data-field="name" data-field-value="<%= category.name %>">
+                <h6 class="fs-14 mb-0"><%= category.name %></h6>
+              </td>
+              <td data-field="description" data-field-value="<%= category.description %>">
+                <%= category.description || '-' %>
+              </td>
+              <td data-field="status" data-field-type="select" data-field-value="<%= category.status ? '1' : '0' %>" data-field-options='<%- JSON.stringify(statusOptions) %>'>
+                <%- category.status ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>' %>
+              </td>
+              <td class="text-end">
+                <div class="display-actions">
+                  <button class="btn btn-soft-warning btn-sm edit-row-btn" title="Edit">
+                    <i class="ri-pencil-fill"></i>
+                  </button>
+                  <button class="btn btn-soft-danger btn-sm delete-row-btn" title="Delete">
+                    <i class="ri-delete-bin-fill"></i>
+                  </button>
+                </div>
+                <div class="edit-actions d-none">
+                  <button class="btn btn-success btn-sm save-row-btn" title="Save"><i class="ri-check-line"></i></button>
+                  <button class="btn btn-danger btn-sm cancel-edit-btn" title="Cancel"><i class="ri-close-line"></i></button>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <%- include('../../components/partials/pagination', {
+      pagination: pagination,
+      baseUrl: '/categories',
+      query: query
+    }) %>
+  </div>
+</div>
+
+<!-- Template for New Row -->
+<div class="d-none">
+  <table>
+    <tr class="row-template">
+      <td data-field="name"></td>
+      <td data-field="description"></td>
+      <td data-field="status" data-field-type="select" data-field-options='<%- JSON.stringify(statusOptions) %>'></td>
+      <td class="text-end">
+        <div class="edit-actions">
+          <button class="btn btn-success btn-sm save-row-btn" title="Save"><i class="ri-check-line"></i></button>
+          <button class="btn btn-danger btn-sm cancel-edit-btn" title="Cancel"><i class="ri-close-line"></i></button>
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<script src="/assets/js/inline-editor.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    InlineEditor.init('category-table', {
+      saveUrl: '/categories/save',
+      deleteUrl: '/categories/delete',
+      onSaveSuccess: () => location.reload()
+    });
+  });
+</script>

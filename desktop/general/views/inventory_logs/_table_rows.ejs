@@ -1,0 +1,73 @@
+                                    <% if (!inventoryLogs || inventoryLogs.length===0) { %>
+                                        <tr>
+                                            <td colspan="8" class="text-center">No stock records found.</td>
+                                        </tr>
+                                        <% } else { %>
+                                            <% 
+                                                if (typeof currentProduct !== 'undefined' && currentProduct) {
+                                                    let currentBal = currentProduct.quantity;
+                                                    inventoryLogs.forEach(log => {
+                                                        log.runningBalance = currentBal;
+                                                        currentBal -= (log.quantity || 0);
+                                                    });
+                                                }
+                                            %>
+                                            <% inventoryLogs.forEach(log=> { %>
+                                                <tr>
+                                                    <td>
+                                                        <%= log.createdAt ? moment(log.createdAt).format('D MMM, YYYY HH:mm') : 'Unknown' %>
+                                                    </td>
+                                                    <td>
+                                                        <% const productName=log.Product ? log.Product.name : 'Unknown Product' %>
+                                                        <span class="limited-text" title="<%= productName %>">
+                                                            <%= productName.length> 20 ? productName.substring(0, 20) + '...' : productName %>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <% 
+                                                            let typeBadge = 'success';
+                                                            if (log.type === 'sale') typeBadge = 'danger';
+                                                            else if (log.type === 'return') typeBadge = 'info';
+                                                        %>
+                                                        <span class="badge bg-<%= typeBadge %>">
+                                                            <%= log.type ? (log.type.charAt(0).toUpperCase() + log.type.slice(1)) : 'Unknown' %>
+                                                        </span>
+                                                    </td>
+                                                    <td class="<%= parseInt(log.quantity) < 0 ? 'text-danger' : 'text-success' %> fw-medium">
+                                                        <%= log.quantity > 0 ? '+' : '' %><%= log.quantity || 0 %>
+                                                    </td>
+                                                    <td>
+                                                        <% if (typeof log.runningBalance !== 'undefined' && log.runningBalance !== null) { %>
+                                                            <span class="fw-bold"><%= log.runningBalance %></span>
+                                                        <% } else { %>
+                                                            <span class="text-muted">-</span>
+                                                        <% } %>
+                                                    </td>
+                                                    <td>
+                                                        <% const note=log.note || '-' %>
+                                                        <span class="limited-note" title="<%= note %>">
+                                                            <%= note.length> 30 ? note.substring(0, 30) + '...' : note %>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <% const userName=log.User ? log.User.firstname+ ' ' + log.User.lastname : 'Unknown User' %>
+                                                        <span class="limited-text" title="<%= userName %>">
+                                                            <%= userName.length> 15 ? userName.substring(0, 15) + '...' : userName %>
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <button class="btn btn-soft-info btn-sm"
+                                                            onclick="openViewModalFromBtn(this)"
+                                                            data-product="<%= productName %>"
+                                                            data-note="<%= note %>"
+                                                            data-createdat="<%= log.createdAt %>"
+                                                            data-type="<%= log.type %>"
+                                                            data-quantity="<%= log.quantity %>"
+                                                            data-user="<%= userName %>"
+                                                            title="View Details">
+                                                            <i class="ri-eye-line align-middle"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <% }); %>
+                                                    <% } %>

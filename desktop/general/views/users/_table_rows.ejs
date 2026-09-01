@@ -1,0 +1,59 @@
+<% if (!data || data.length===0) { %>
+    <tr>
+        <td colspan="<%= role === 'user' ? 7 : 6 %>" class="text-center">
+            <i class="ri-error-warning-line align-middle me-1"></i> No data found
+        </td>
+    </tr>
+<% } else { %>
+    <% data.forEach(obj=> { %>
+        <tr>
+            <td class="fw-medium">
+                <%= obj.id %>
+            </td>
+            <td>
+                <%= obj.firstname %>
+                    <%= obj.lastname %>
+            </td>
+            <td>
+                <%= obj.phone %>
+            </td>
+            <td>
+                <%= obj.email %>
+            </td>
+            <% if (role !== 'user') { %>
+                <td>
+                    <span class="badge bg-soft-secondary text-secondary">
+                        <%= obj.fk_financeaccount_id ? 'Linked' : 'Not Linked' %>
+                    </span>
+                </td>
+            <% } %>
+            <% if (role==='user' ) { %>
+                <td>
+                    <%= obj.username %>
+                </td>
+                <td><span class="badge bg-primary">
+                        <%= obj.role %>
+                    </span></td>
+            <% } %>
+            <% if ((role=='user' && (permissions.usersUpdate || permissions.usersDelete)) || (role=='vendor' && (permissions.vendorsUpdate || permissions.vendorsDelete)) || (role=='customer' && (permissions.customersUpdate || permissions.customersDelete))) { %>
+                <td style="text-align: end;">
+                    <% if ((role=='user' && permissions.usersUpdate) || (role=='vendor' && permissions.vendorsUpdate) || (role=='customer' && permissions.customersUpdate)) { %>
+                        <a href="/users/form?id=<%= obj.id %>&role=<%= obj.role %>"
+                            class="btn btn-soft-warning btn-sm <%= obj.role == 'branchmanager' ? 'custom_disabled' : '' %>">
+                            <i class="ri-pencil-fill align-middle"></i> Edit
+                        </a>
+                    <% } %>
+                    <% if ((role=='user' && permissions.usersDelete) || (role=='vendor' && permissions.vendorsDelete) || (role=='customer' && permissions.customersDelete)) { %>
+                        <button type="button"
+                            onclick="deleteRecord('<%= obj.id %>')"
+                            class="btn btn-soft-danger btn-sm"
+                            <%=obj.role=='branchmanager' ? 'disabled' : '' %>>
+                            <i class="ri-delete-bin-fill align-middle"></i>
+                            Delete
+                        </button>
+                    <% } %>
+                </td>
+            <% } %>
+        </tr>
+    <% }) %>
+<% } %>

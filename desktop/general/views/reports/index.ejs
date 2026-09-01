@@ -1,0 +1,76 @@
+<%- contentFor('body') %>
+<div class="bi-report-container">
+  <div class="bi-header-row">
+    <h2 class="bi-page-title">SalesPeck BI Reports Hub</h2>
+    <div class="d-flex align-items-center gap-2">
+      <button type="button" class="bi-conceptual-date privacy-toggle-btn border-0" style="cursor: pointer;">
+        <i class="ri-eye-line fs-16 me-1"></i> <span class="privacy-label">Show Amounts</span>
+      </button>
+      <div class="bi-conceptual-date">
+        <i class="ri-time-line fs-16"></i> Comprehensive Financial Insights
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mt-1">
+    <!-- Sales Report -->
+    <div class="col-xl-3 col-md-6">
+      <div class="bi-kpi-card text-center p-4">
+        <div class="bi-kpi-icon-circle bi-kpi-icon-blue mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.5rem;">
+          <i class="ri-shopping-cart-line"></i>
+        </div>
+        <h5 class="fw-bold bi-kpi-title mb-2">Sales Report</h5>
+        <p class="text-muted fs-13 mb-4">Analyze revenue, invoice details, payment statuses, and monthly sales trends.</p>
+        <a href="/reports/sales" class="bi-filter-btn-apply w-100 text-decoration-none">
+          <i class="ri-bar-chart-2-line me-1"></i> Open Sales BI
+        </a>
+      </div>
+    </div>
+
+    <!-- Purchases Report -->
+    <div class="col-xl-3 col-md-6">
+      <div class="bi-kpi-card text-center p-4">
+        <div class="bi-kpi-icon-circle bi-kpi-icon-indigo mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.5rem;">
+          <i class="ri-shopping-bag-line"></i>
+        </div>
+        <h5 class="fw-bold bi-kpi-title mb-2">Purchases Report</h5>
+        <p class="text-muted fs-13 mb-4">Track vendor payables, procurement totals, and monthly purchase trends.</p>
+        <a href="/reports/purchases" class="bi-filter-btn-apply w-100 text-decoration-none" style="background-color: #4338ca;">
+          <i class="ri-bar-chart-2-line me-1"></i> Open Purchases BI
+        </a>
+      </div>
+    </div>
+
+    <!-- Inventory Report -->
+    <div class="col-xl-3 col-md-6">
+      <div class="bi-kpi-card text-center p-4">
+        <div class="bi-kpi-icon-circle bi-kpi-icon-green mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.5rem;">
+          <i class="ri-stack-line"></i>
+        </div>
+        <h5 class="fw-bold bi-kpi-title mb-2">Inventory Report</h5>
+        <p class="text-muted fs-13 mb-4">Monitor stock valuations, low stock alerts, and category distributions.</p>
+        <a href="/reports/inventory" class="bi-filter-btn-apply w-100 text-decoration-none" style="background-color: #15803d;">
+          <i class="ri-bar-chart-2-line me-1"></i> Open Inventory BI
+        </a>
+      </div>
+    </div>
+
+    <!-- Customer Report -->
+    <div class="col-xl-3 col-md-6">
+      <div class="bi-kpi-card text-center p-4">
+        <div class="bi-kpi-icon-circle bi-kpi-icon-amber mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.5rem;">
+          <i class="ri-user-line"></i>
+        </div>
+        <h5 class="fw-bold bi-kpi-title mb-2">Customer Report</h5>
+        <p class="text-muted fs-13 mb-4">Review customer purchase history, top spenders, and acquisition metrics.</p>
+        <a href="/reports/customers" class="bi-filter-btn-apply w-100 text-decoration-none" style="background-color: #d97706;">
+          <i class="ri-bar-chart-2-line me-1"></i> Open Customer BI
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="bi-footer-banner mt-5">
+    Powered by SalesPeck BI: Comprehensive Financial Insights
+  </div>
+</div>

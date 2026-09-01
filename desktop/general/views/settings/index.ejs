@@ -1,0 +1,506 @@
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Settings</h5>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button
+                    class="nav-link <%= (typeof currenttab !== 'undefined' && currenttab === 'env') || (typeof currenttab === 'undefined') ? 'active' : '' %>"
+                    id="env-tab" data-bs-toggle="tab" data-bs-target="#env" type="button"
+                    role="tab" aria-controls="env"
+                    aria-selected="<%= (typeof currenttab !== 'undefined' && currenttab === 'env') || (typeof currenttab === 'undefined') ? 'true' : 'false' %>">
+                    Environment Settings (.settings)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button
+                    class="nav-link <%= (typeof currenttab !== 'undefined' && currenttab === 'db') ? 'active' : '' %>"
+                    id="db-tab" data-bs-toggle="tab" data-bs-target="#db" type="button"
+                    role="tab" aria-controls="db"
+                    aria-selected="<%= (typeof currenttab !== 'undefined' && currenttab === 'db') ? 'true' : 'false' %>">
+                    Application Settings (Database)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button
+                    class="nav-link <%= (typeof currenttab !== 'undefined' && currenttab === 'dashboard') ? 'active' : '' %>"
+                    id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard" type="button"
+                    role="tab" aria-controls="dashboard"
+                    aria-selected="<%= (typeof currenttab !== 'undefined' && currenttab === 'dashboard') ? 'true' : 'false' %>">
+                    Dashboard Customization
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button
+                    class="nav-link <%= (typeof currenttab !== 'undefined' && currenttab === 'license') ? 'active' : '' %>"
+                    id="license-tab" data-bs-toggle="tab" data-bs-target="#license" type="button"
+                    role="tab" aria-controls="license"
+                    aria-selected="<%= (typeof currenttab !== 'undefined' && currenttab === 'license') ? 'true' : 'false' %>">
+                    License
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <!-- Environment Settings Tab (.settings file) -->
+            <div class="tab-pane fade <%= (typeof currenttab !== 'undefined' && currenttab === 'env') || (typeof currenttab === 'undefined') ? 'show active' : '' %>"
+                id="env" role="tabpanel" aria-labelledby="env-tab">
+                <form action="/settings/save?type=env" method="POST" class="p-2 card mt-3">
+                    <div class="row">
+                        <% 
+                        // Loop through variables from envSettings (which comes from DEFAULT_SETTINGS)
+                        // installEnv.js is the single source of truth - only show variables defined there
+                        Object.keys(envSettings).forEach(key => { 
+                            if (key === 'printer') {
+                                // Handle printer settings separately
+                                return;
+                            }
+                            if (key === 'backup_path') {
+                                return; // rendered below with Browse / Reset
+                            }
+                            
+                            // Get label from translations if available, otherwise use key name
+                            const label = translations[key] || key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
+                            const value = envSettings[key];
+                            const fieldType = typeof value;
+                        %>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-label" for="<%= key %>">
+                                        <%= label %>:
+                                        <% if (typeof envOnlyVars !== 'undefined' && envOnlyVars[key]) { %>
+                                            <span class="badge bg-info ms-2" title="This value comes from .env file and is read-only">From .env</span>
+                                        <% } %>
+                                    </label>
+                                    <% 
+                                    const isReadOnly = (typeof envOnlyVars !== 'undefined' && envOnlyVars[key]) || key === 'install_date';
+                                    %>
+                                    <% if (key === 'env') { %>
+                                        <select class="form-control" id="<%= key %>" name="<%= key %>" <%= isReadOnly ? 'disabled' : '' %>>
+                                            <option value="development" <%= value === 'development' ? 'selected' : '' %>>Development</option>
+                                            <option value="production" <%= value === 'production' ? 'selected' : '' %>>Production</option>
+                                        </select>
+                                    <% } else if (key === 'logging') { %>
+                                        <input type="checkbox" class="form-check-input" id="<%= key %>" name="<%= key %>" <%= value ? 'checked' : '' %> <%= isReadOnly ? 'disabled' : '' %>>
+                                    <% } else if (fieldType === 'number' || key === 'CI_PROJECT_ID' || key === 'port') { %>
+                                        <input type="number" class="form-control" id="<%= key %>" name="<%= key %>" value="<%= value %>" <%= isReadOnly ? 'readonly' : '' %>>
+                                    <% } else { %>
+                                        <input type="text" class="form-control" id="<%= key %>" name="<%= key %>" value="<%= value || '' %>" <%= isReadOnly ? 'readonly' : '' %>>
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+
+                    <hr class="my-4">
+                    <h6 class="mb-2">Database Backup</h6>
+                    <p class="text-muted fs-13 mb-3">
+                        Folder where Export DB and automatic update backups are saved.
+                        Leave as default or choose another drive/folder (e.g. external disk).
+                    </p>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label" for="backup_path">
+                                    <%= translations.backup_path || 'Database Backup Folder' %>:
+                                </label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="backup_path" name="backup_path"
+                                        value="<%= envSettings.backup_path || '' %>"
+                                        placeholder="<%= typeof defaultBackupPath !== 'undefined' ? defaultBackupPath : '' %>"
+                                        data-default-path="<%= typeof defaultBackupPath !== 'undefined' ? defaultBackupPath : '' %>">
+                                    <button type="button" class="btn btn-outline-secondary" id="backup-path-browse" title="Browse folder">
+                                        Browse
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" id="backup-path-reset" title="Reset to default">
+                                        Default
+                                    </button>
+                                </div>
+                                <small class="text-muted">Default: <code id="backup-path-default-label"><%= typeof defaultBackupPath !== 'undefined' ? defaultBackupPath : '' %></code></small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h6 class="mb-0">Printer Settings</h6>
+                        <small id="printer-detect-status" class="text-muted fs-12"></small>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-label" for="printer-printer">
+                                    Target Printer Device:
+                                </label>
+                                <div class="input-group">
+                                    <select class="form-select" id="printer-printer" name="printer[printer]" data-current-value="<%= envSettings.printer.printer || 'Default' %>">
+                                        <option value="Default" <%= (!envSettings.printer.printer || envSettings.printer.printer === 'Default') ? 'selected' : '' %>>Default (System Default)</option>
+                                        <% if (envSettings.printer.printer && envSettings.printer.printer !== 'Default') { %>
+                                            <option value="<%= envSettings.printer.printer %>" selected><%= envSettings.printer.printer %></option>
+                                        <% } %>
+                                    </select>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-refresh-printers" title="Refresh Installed Printers">
+                                        <i class="ri-refresh-line"></i> Refresh
+                                    </button>
+                                </div>
+                                <small class="text-muted">Select installed system printer or default.</small>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-label" for="printer-printerType">
+                                    Printer Type / Mode:
+                                </label>
+                                <select class="form-select" id="printer-printerType" name="printer[printerType]">
+                                    <option value="thermal" <%= (envSettings.printer.printerType === 'thermal' || !envSettings.printer.printerType) ? 'selected' : '' %>>Thermal POS Receipt Printer (58mm / 80mm Roll)</option>
+                                    <option value="standard" <%= envSettings.printer.printerType === 'standard' ? 'selected' : '' %>>Standard / Document Printer (A4 / A5 / Letter)</option>
+                                </select>
+                                <small class="text-muted">Thermal printers render compact roll receipts.</small>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-label" for="printer-paper">
+                                    Paper Size:
+                                </label>
+                                <select class="form-select" id="printer-paper" name="printer[paper]">
+                                    <option value="80mm" <%= (envSettings.printer.paper === '80mm' || !envSettings.printer.paper) ? 'selected' : '' %>>80mm POS Receipt Roll (Standard)</option>
+                                    <option value="58mm" <%= envSettings.printer.paper === '58mm' ? 'selected' : '' %>>58mm POS Receipt Roll</option>
+                                    <option value="A4" <%= envSettings.printer.paper === 'A4' ? 'selected' : '' %>>A4 Standard</option>
+                                    <option value="A5" <%= envSettings.printer.paper === 'A5' ? 'selected' : '' %>>A5 Half Sheet</option>
+                                    <option value="Letter" <%= envSettings.printer.paper === 'Letter' ? 'selected' : '' %>>US Letter</option>
+                                    <option value="Legal" <%= envSettings.printer.paper === 'Legal' ? 'selected' : '' %>>US Legal</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-label" for="printer-width">
+                                    Width (mm):
+                                </label>
+                                <input type="number" class="form-control" id="printer-width" name="printer[width]" value="<%= envSettings.printer.width !== undefined ? envSettings.printer.width : 80 %>" placeholder="80">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-label" for="printer-height">
+                                    Height (mm):
+                                </label>
+                                <input type="number" class="form-control" id="printer-height" name="printer[height]" value="<%= envSettings.printer.height !== undefined ? envSettings.printer.height : 0 %>" placeholder="0 (0 for roll)">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-label" for="printer-fontSize">
+                                    Print Font Size (pt):
+                                </label>
+                                <input type="number" class="form-control" id="printer-fontSize" name="printer[fontSize]" value="<%= envSettings.printer.fontSize || 11 %>" min="8" max="24">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-label" for="printer-numberOfPrints">
+                                    Number of Copies:
+                                </label>
+                                <input type="number" class="form-control" id="printer-numberOfPrints" name="printer[numberOfPrints]" value="<%= envSettings.printer.numberOfPrints || 1 %>" min="1" max="10">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-label" for="printer-silentPrinting">
+                                    Silent Direct Print:
+                                </label>
+                                <div class="form-check mt-2">
+                                    <input type="checkbox" class="form-check-input" id="printer-silentPrinting" name="printer[silentPrinting]" value="true" <%= (envSettings.printer.silentPrinting === true || envSettings.printer.silentPrinting === 'true') ? 'checked' : '' %>>
+                                    <label class="form-check-label" for="printer-silentPrinting">
+                                        Print directly without OS print dialog
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary mt-3">Save Environment Settings</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Database Settings Tab -->
+            <div class="tab-pane fade <%= (typeof currenttab !== 'undefined' && currenttab === 'db') ? 'show active' : '' %>"
+                id="db" role="tabpanel" aria-labelledby="db-tab">
+                <% if (Object.keys(dbSettings).length === 0) { %>
+                    <div class="alert alert-info mt-3">
+                        No database settings found.
+                    </div>
+                <% } else { %>
+                    <% Object.keys(dbSettings).forEach((setting, index) => { %>
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h6 class="mb-0"><%= setting.charAt(0).toUpperCase() + setting.slice(1) %></h6>
+                            </div>
+                            <div class="card-body">
+                                <form action="/settings/save?type=db&name=<%= setting %>" method="POST">
+                                    <div class="row">
+                                        <% Object.keys(dbSettings[setting]).forEach(key => { %>
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="<%= setting %>-<%= key %>">
+                                                        <%= key.charAt(0).toUpperCase() + key.slice(1) %>:
+                                                    </label>
+                                                    <% if (typeof dbSettings[setting][key] === 'boolean') { %>
+                                                        <input type="checkbox" class="form-check-input" id="<%= setting %>-<%= key %>" name="<%= key %>" <%= dbSettings[setting][key] ? 'checked' : '' %>>
+                                                    <% } else { %>
+                                                        <input type="text" class="form-control" id="<%= setting %>-<%= key %>" name="<%= key %>" value="<%= (dbSettings[setting][key] != null ? String(dbSettings[setting][key]) : '').replace(/"/g, '&quot;') %>">
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        <% }) %>
+                                    </div>
+                                    <div class="text-end">
+                                        <button type="submit" class="btn btn-primary mt-3">Save <%= setting.charAt(0).toUpperCase() + setting.slice(1) %></button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } %>
+            </div>
+            <!-- Dashboard Customization Tab -->
+            <div class="tab-pane fade <%= (typeof currenttab !== 'undefined' && currenttab === 'dashboard') ? 'show active' : '' %>"
+                id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">Customize Dashboard Visibility</h6>
+                    </div>
+                    <div class="card-body">
+                        <form action="/settings/save?type=dashboard" method="POST">
+                            <div class="row">
+                                <% 
+                                const dashboardItems = [
+                                    { key: 'todays_sales', label: "Today's Sales Card" },
+                                    { key: 'todays_customers', label: "Today's Customers Card" },
+                                    { key: 'last_30_days_sales', label: "Last 30 Days Sales Card" },
+                                    { key: 'weekly_summary', label: "Weekly Summary Table" },
+                                    { key: 'monthly_summary', label: "Monthly Summary Table" },
+                                    { key: 'sales_trend_chart', label: "Sales Trend Chart" },
+                                    { key: 'top_products_chart', label: "Top Products Chart" },
+                                    { key: 'low_stock_alert', label: "Low Stock Alert" }
+                                ];
+                                %>
+                                <% dashboardItems.forEach(item => { %>
+                                    <div class="col-lg-6 mb-3">
+                                        <div class="form-group border p-3 rounded">
+                                            <h6 class="mb-2"><%= item.label %></h6>
+                                            <div class="d-flex gap-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="<%= item.key %>" id="<%= item.key %>_visible" value="visible" 
+                                                        <%= (!dashboardConfig[item.key] || dashboardConfig[item.key] === 'visible') ? 'checked' : '' %>>
+                                                    <label class="form-check-label" for="<%= item.key %>_visible">
+                                                        Visible
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="<%= item.key %>" id="<%= item.key %>_partial" value="partial"
+                                                        <%= (dashboardConfig[item.key] === 'partial') ? 'checked' : '' %>>
+                                                    <label class="form-check-label" for="<%= item.key %>_partial">
+                                                        Partial (Hide Figures)
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="<%= item.key %>" id="<%= item.key %>_hidden" value="hidden"
+                                                        <%= (dashboardConfig[item.key] === 'hidden') ? 'checked' : '' %>>
+                                                    <label class="form-check-label" for="<%= item.key %>_hidden">
+                                                        Hidden
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            </div>
+                            <div class="text-end">
+                                <button type="submit" class="btn btn-primary mt-3">Save Dashboard Preferences</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade <%= (typeof currenttab !== 'undefined' && currenttab === 'license') ? 'show active' : '' %>"
+                id="license" role="tabpanel" aria-labelledby="license-tab">
+                <div class="p-3 card mt-3">
+                    <% const ls = typeof licenseStatus !== 'undefined' && licenseStatus ? licenseStatus : null; %>
+                    <% if (!ls) { %>
+                        <p class="text-muted mb-0">License status unavailable.</p>
+                    <% } else { %>
+                        <div class="alert alert-<%= (ls.state === 'valid') ? 'success' : ((ls.state === 'grace') ? 'warning' : 'danger') %> mb-3">
+                            <strong class="text-uppercase"><%= ls.state %></strong>
+                            <div class="mt-1"><%= ls.message %></div>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <div class="text-muted text-uppercase fs-11">Client</div>
+                                <div class="fw-semibold"><%= ls.clientName || '—' %></div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-muted text-uppercase fs-11">Plan</div>
+                                <div class="fw-semibold text-capitalize"><%= ls.plan || '—' %></div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-muted text-uppercase fs-11">Expires</div>
+                                <div class="fw-semibold"><%= ls.expiresAt ? ls.expiresAt.slice(0, 10) : '—' %></div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-muted text-uppercase fs-11">Staff seats</div>
+                                <div class="fw-semibold"><%= ls.seatsUsed || 0 %> / <%= ls.seatsMax || 0 %></div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-muted text-uppercase fs-11">Days remaining</div>
+                                <div class="fw-semibold"><%= typeof ls.daysRemaining === 'number' ? ls.daysRemaining : '—' %></div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-muted text-uppercase fs-11">Machine bind</div>
+                                <div class="fw-semibold"><%= ls.bindMode || '—' %></div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-muted text-uppercase fs-11">Clock check</div>
+                                <div class="fw-semibold"><%= ls.clockState || 'ok' %></div>
+                            </div>
+                            <div class="col-12">
+                                <div class="text-muted text-uppercase fs-11">This PC fingerprint</div>
+                                <code class="user-select-all"><%= ls.fingerprint || '—' %></code>
+                            </div>
+                        </div>
+                        <a href="/license/activate" class="btn btn-soft-primary btn-sm">
+                            <i class="ri-key-2-line align-bottom me-1"></i> Activate / renew license
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+(function () {
+    const input = document.getElementById('backup_path');
+    const browseBtn = document.getElementById('backup-path-browse');
+    const resetBtn = document.getElementById('backup-path-reset');
+
+    if (input) {
+        if (resetBtn) {
+            resetBtn.addEventListener('click', function () {
+                const def = input.getAttribute('data-default-path') || '';
+                input.value = def;
+            });
+        }
+
+        if (browseBtn) {
+            browseBtn.addEventListener('click', async function () {
+                try {
+                    if (window.electron && typeof window.electron.selectDirectory === 'function') {
+                        const selected = await window.electron.selectDirectory(input.value || undefined);
+                        if (selected) input.value = selected;
+                    } else {
+                        toastr.info('Folder browse is available in the desktop app. Type or paste a path instead.');
+                    }
+                } catch (e) {
+                    console.error(e);
+                    toastr.error('Could not open folder picker');
+                }
+            });
+        }
+    }
+
+    // Printer auto-detection logic
+    const printerSelect = document.getElementById('printer-printer');
+    const refreshBtn = document.getElementById('btn-refresh-printers');
+    const statusText = document.getElementById('printer-detect-status');
+
+    async function loadPrinters() {
+        if (!printerSelect) return;
+        const savedVal = printerSelect.getAttribute('data-current-value') || printerSelect.value || 'Default';
+
+        if (window.electron && typeof window.electron.getPrinters === 'function') {
+            if (statusText) statusText.textContent = 'Detecting printers...';
+            try {
+                const printers = await window.electron.getPrinters();
+                console.log('Detected system printers:', printers);
+                printerSelect.innerHTML = '<option value="Default">Default (System Default)</option>';
+
+                let matched = false;
+                if (Array.isArray(printers) && printers.length > 0) {
+                    printers.forEach(p => {
+                        const opt = document.createElement('option');
+                        opt.value = p.name;
+                        const suffix = p.isDefault ? ' (System Default)' : '';
+                        opt.textContent = (p.displayName || p.name) + suffix;
+                        if (p.name === savedVal) {
+                            opt.selected = true;
+                            matched = true;
+                        }
+                        printerSelect.appendChild(opt);
+                    });
+                }
+                if (savedVal && savedVal !== 'Default' && !matched) {
+                    const savedOpt = document.createElement('option');
+                    savedOpt.value = savedVal;
+                    savedOpt.textContent = savedVal + ' (Saved)';
+                    savedOpt.selected = true;
+                    printerSelect.appendChild(savedOpt);
+                }
+                if (statusText) statusText.textContent = `${printers.length || 0} printer(s) detected.`;
+            } catch (err) {
+                console.error('Error fetching printers:', err);
+                if (statusText) statusText.textContent = 'Could not load system printers.';
+            }
+        } else {
+            if (statusText) statusText.textContent = 'Printer detection available in Desktop App.';
+        }
+    }
+
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', loadPrinters);
+    }
+    loadPrinters();
+
+    // Auto-update width & printer type when paper selection changes
+    const paperSelect = document.getElementById('printer-paper');
+    const widthInput = document.getElementById('printer-width');
+    const heightInput = document.getElementById('printer-height');
+    const typeSelect = document.getElementById('printer-printerType');
+
+    if (paperSelect) {
+        paperSelect.addEventListener('change', function() {
+            const val = this.value;
+            if (val === '80mm') {
+                if (widthInput) widthInput.value = 80;
+                if (heightInput) heightInput.value = 0;
+                if (typeSelect) typeSelect.value = 'thermal';
+            } else if (val === '58mm') {
+                if (widthInput) widthInput.value = 58;
+                if (heightInput) heightInput.value = 0;
+                if (typeSelect) typeSelect.value = 'thermal';
+            } else if (val === 'A4') {
+                if (widthInput) widthInput.value = 210;
+                if (heightInput) heightInput.value = 297;
+                if (typeSelect) typeSelect.value = 'standard';
+            } else if (val === 'A5') {
+                if (widthInput) widthInput.value = 148;
+                if (heightInput) heightInput.value = 210;
+                if (typeSelect) typeSelect.value = 'standard';
+            } else if (val === 'Letter') {
+                if (widthInput) widthInput.value = 216;
+                if (heightInput) heightInput.value = 279;
+                if (typeSelect) typeSelect.value = 'standard';
+            }
+        });
+    }
+})();
+</script>

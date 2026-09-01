@@ -1,0 +1,173 @@
+<!doctype html>
+<html data-layout="horizontal" data-topbar="light" data-sidebar="light" data-sidebar-size="sm-hover"
+    data-sidebar-image="none" data-preloader="disable">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Return <%= ret.invoicenum || '' %> — SalesPeck</title>
+    <link rel="icon" href="/assets/img/icon.png" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="/assets/css/vendor/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/vendor/icons.min.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/vendor/app.min.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/custom.min.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/pos-theme.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/pos-pages.css" rel="stylesheet" type="text/css" />
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="row mx-auto cstm-row mt-3 px-4">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0">Sales Return</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="/sales/returns">Returns</a></li>
+                        <li class="breadcrumb-item active">Receipt</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row px-4 pb-4">
+        <div class="col-lg-12">
+            <div class="card" id="demo">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card-header border-bottom-dashed px-4">
+                            <img src="/assets/img/icon.png" class="card-logo mx-auto mb-3 d-block" alt="logo" height="50">
+                            <div class="d-flex justify-content-between">
+                                <div class="flex-grow-1">
+                                    <div class="mt-1">
+                                        <h6 class="text-uppercase fw-bold">Company Details</h6>
+                                        <p class="mb-1"><%= companySettings.name %></p>
+                                        <p class="mb-0"><%= companySettings.address %></p>
+                                        <p class="mb-0">Contact: <%= companySettings.phone %></p>
+                                    </div>
+                                </div>
+                                <% if (ret.Customer) { %>
+                                <div class="flex-shrink-0">
+                                    <h6 class="text-uppercase fw-bold mt-1">Customer</h6>
+                                    <p class="mb-2">
+                                        <%= ret.Customer.firstname %> <%= ret.Customer.lastname %>
+                                    </p>
+                                    <p class="mb-1"><%= ret.Customer.address %></p>
+                                    <p class="mb-1">Phone: <%= ret.Customer.phone %></p>
+                                </div>
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <div class="card-body pt-4 pb-0 px-4">
+                            <div class="row g-3">
+                                <div class="col-3">
+                                    <p class="mb-2 text-uppercase fw-bold">Return No</p>
+                                    <h5 class="fs-14 mb-0"><%= ret.invoicenum %></h5>
+                                </div>
+                                <div class="col-3">
+                                    <p class="mb-2 text-uppercase fw-bold">Original</p>
+                                    <h5 class="fs-14 mb-0">
+                                        <%= ret.OriginalSale ? ret.OriginalSale.invoicenum : '—' %>
+                                    </h5>
+                                </div>
+                                <div class="col-3">
+                                    <p class="mb-2 text-uppercase fw-bold">Date</p>
+                                    <h5 class="fs-14 mb-0 format-date"><%= ret.createdAt %></h5>
+                                </div>
+                                <div class="col-3">
+                                    <p class="mb-2 text-uppercase fw-bold">Refund</p>
+                                    <h5 class="fs-14 mb-0 text-capitalize"><%= ret.refundmode || '—' %></h5>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body py-4 px-3 fs-6">
+                            <div class="table-responsive">
+                                <table class="table table-borderless text-center table-nowrap align-middle mb-0">
+                                    <thead>
+                                        <tr class="table-active">
+                                            <th scope="col" style="width: 50px;">#</th>
+                                            <th scope="col">Product</th>
+                                            <th scope="col">Rate</th>
+                                            <th scope="col">Qty</th>
+                                            <th scope="col" class="text-end">Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% (ret.Items || []).forEach((item, index) => { %>
+                                        <tr>
+                                            <th scope="row"><%= index + 1 %></th>
+                                            <td class="text-center">
+                                                <span class="fw-medium"><%= item.Product ? item.Product.name : '—' %></span>
+                                            </td>
+                                            <td>Rs.<%= item.price %></td>
+                                            <td><%= item.quantity %></td>
+                                            <td class="text-end">Rs.<%= ((item.quantity || 0) * (item.price || 0)).toFixed(2) %></td>
+                                        </tr>
+                                        <% }); %>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="border-top border-top-dashed mt-2 fs-7">
+                                <table class="table table-borderless table-nowrap align-middle mb-0 ms-auto footer-table" style="width: auto; min-width: 280px;">
+                                    <tbody>
+                                        <tr class="border-top border-top-dashed fs-15">
+                                            <th scope="row" class="p-1 text-end">Return Total</th>
+                                            <th class="text-end code p-1">Rs.<%= Number(ret.totalamount || 0).toFixed(2) %></th>
+                                        </tr>
+                                        <% if (ret.note) { %>
+                                        <tr>
+                                            <td class="p-1 text-end text-muted">Note</td>
+                                            <td class="text-end p-1"><%= ret.note %></td>
+                                        </tr>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                                <p class="text-end border-top pt-2">
+                                    <small class="text-muted">Powered by <strong>SalesPeck</strong></small>
+                                </p>
+                            </div>
+
+                            <div class="d-flex justify-content-end align-items-center mt-4 no-print gap-2">
+                                <a href="/sales/returns" class="btn btn-light">New return</a>
+                                <% if (ret.sale) { %>
+                                <a href="/sales/<%= ret.sale %>" class="btn btn-soft-info">Original sale</a>
+                                <% } %>
+                                <button onclick="doReturnPrint()" class="btn btn-success">
+                                    <i class="ri-printer-line align-bottom me-1"></i> Print
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="/assets/js/vendor/moment.min.js"></script>
+<script src="/assets/js/print-helper.js"></script>
+<script>
+    const printerConfig = <%- JSON.stringify(typeof printerConfig !== 'undefined' ? printerConfig : { printer: 'Default', printerType: 'thermal', paper: '80mm', width: 80, height: 0, fontSize: 11, silentPrinting: false, numberOfPrints: 1 }) %>;
+    window.printerConfig = printerConfig;
+
+    document.querySelectorAll('.format-date').forEach((el) => {
+        const d = el.textContent.trim();
+        if (d && window.moment) el.textContent = moment(d).format('D MMM, YYYY HH:mm');
+    });
+
+    async function doReturnPrint() {
+        if (window.SalesPeckPrinter && typeof window.SalesPeckPrinter.print === 'function') {
+            await window.SalesPeckPrinter.print();
+        } else {
+            window.print();
+        }
+    }
+</script>
+</html>

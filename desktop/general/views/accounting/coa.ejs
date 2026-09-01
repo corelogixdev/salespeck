@@ -1,0 +1,277 @@
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Chart of Accounts</h4>
+            <div class="page-title-right">
+                <button type="button" class="btn btn-soft-danger me-2" onclick="resetCOA()">
+                    <i class="ri-refresh-line align-bottom me-1"></i> Reset Chart of Accounts
+                </button>
+                <button type="button" class="btn btn-soft-success me-2" onclick="exportCOA()">
+                    <i class="ri-file-excel-line align-bottom me-1"></i> Export to Excel
+                </button>
+                <button type="button" class="btn btn-primary" onclick="InlineEditor.addNewRow()">
+                    <i class="ri-add-line align-bottom me-1"></i> Add Root Account
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-nowrap align-middle mb-0" id="coa-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col" style="width: 150px;">Code</th>
+                                <th scope="col">Account Name</th>
+                                <th scope="col" style="width: 150px;">Category</th>
+                                <th scope="col" style="width: 150px;">Balance Type</th>
+                                <th class="text-end" style="width: 150px;">Opening Balance</th>
+                                <th class="text-center" style="width: 120px;">OB Date</th>
+                                <th class="text-end" style="width: 150px;">Current Balance</th>
+                                <th scope="col" class="text-end" style="width: 150px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% 
+                            const categories = [
+                                { label: 'ASSET', value: 'ASSET' },
+                                { label: 'LIABILITY', value: 'LIABILITY' },
+                                { label: 'EQUITY', value: 'EQUITY' },
+                                { label: 'REVENUE', value: 'REVENUE' },
+                                { label: 'EXPENSE', value: 'EXPENSE' }
+                            ];
+                            const balanceTypes = [
+                                { label: 'DEBIT', value: 'DEBIT' },
+                                { label: 'CREDIT', value: 'CREDIT' }
+                            ];
+
+                            function renderAccountRow(account, level = 0) { 
+                            %>
+                                <tr class="hierarchy-row level-<%= level %> <%= level > 0 ? 'child-row d-none' : '' %>" 
+                                    data-id="<%= account.id %>" 
+                                    data-level="<%= level %>" 
+                                    data-parent-id="<%= account.fk_parent_in_financeaccount %>">
+                                    
+                                    <td data-field="code" data-field-value="<%= account.code %>">
+                                        <%= account.code %>
+                                    </td>
+                                    
+                                    <td data-field="name" data-field-value="<%= account.name %>" style="padding-left: <%= level * 20 %>px;">
+                                        <% if (account.children && account.children.length > 0) { %>
+                                            <span class="toggle-icon ri-arrow-right-s-line" onclick="toggleRow(this)"></span>
+                                            <i class="ri-folder-fill text-warning me-1"></i>
+                                        <% } else { %>
+                                            <span class="toggle-icon ms-3"></span>
+                                            <i class="ri-file-list-2-line text-primary me-1"></i>
+                                        <% } %>
+                                        <span class="account-name"><%= account.name %></span>
+                                    </td>
+                                    
+                                    <td data-field="category" 
+                                        data-field-type="select" 
+                                        data-field-value="<%= account.category %>"
+                                        data-field-options='<%- JSON.stringify(categories) %>'>
+                                        <span class="badge bg-soft-info text-info"><%= account.category %></span>
+                                    </td>
+                                    
+                                    <td data-field="balance_type" 
+                                        data-field-type="select" 
+                                        data-field-value="<%= account.balance_type %>"
+                                        data-field-options='<%- JSON.stringify(balanceTypes) %>'>
+                                        <%= account.balance_type %>
+                                    </td>
+                                    
+                                    <td data-field="opening_balance" data-field-type="number" class="text-end">
+                                        <%= (account.opening_balance || 0).toLocaleString() %>
+                                    </td>
+                                    <td data-field="opening_balance_date" data-field-type="date" data-field-value="<%= account.opening_balance_date ? new Date(account.opening_balance_date).toISOString().split('T')[0] : '' %>" class="text-center">
+                                        <%= account.opening_balance_date ? new Date(account.opening_balance_date).toLocaleDateString() : '-' %>
+                                    </td>
+                                    
+                                    <td class="text-end fw-bold">
+                                        <% 
+                                        const displayBalance = Math.abs(account.currentBalance);
+                                        const suffix = account.currentBalance >= 0 ? ' (Dr)' : ' (Cr)';
+                                        %>
+                                        <%= displayBalance.toLocaleString() %> <span class="text-muted fs-10"><%= suffix %></span>
+                                    </td>
+                                    
+                                    <td class="text-end">
+                                        <div class="display-actions">
+                                            <button class="btn btn-soft-primary btn-sm add-child-btn" title="Add Child">
+                                                <i class="ri-add-line"></i>
+                                            </button>
+                                            <button class="btn btn-soft-warning btn-sm edit-row-btn" title="Edit">
+                                                <i class="ri-pencil-fill"></i>
+                                            </button>
+                                            <button class="btn btn-soft-danger btn-sm delete-row-btn" title="Delete">
+                                                <i class="ri-delete-bin-fill"></i>
+                                            </button>
+                                        </div>
+                                        <div class="edit-actions d-none">
+                                            <button class="btn btn-success btn-sm save-row-btn" title="Save">
+                                                <i class="ri-check-line"></i>
+                                            </button>
+                                            <button class="btn btn-danger btn-sm cancel-edit-btn" title="Cancel">
+                                                <i class="ri-close-line"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <% if (account.children && account.children.length > 0) { %>
+                                    <% account.children.sort((a,b) => (a.code || '').localeCompare(b.code || '')).forEach(child => { %>
+                                        <% renderAccountRow(child, level + 1) %>
+                                    <% }) %>
+                                <% } %>
+                            <% } %>
+
+                            <% accounts.forEach(account => { %>
+                                <% renderAccountRow(account) %>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden Template for New Rows -->
+<div class="d-none">
+    <table>
+        <tr class="row-template hierarchy-row">
+            <td data-field="code"></td>
+            <td data-field="name">
+                <span class="toggle-icon ms-3"></span>
+                <i class="ri-file-list-2-line text-primary me-1"></i>
+            </td>
+            <td data-field="category" data-field-type="select" data-field-options='<%- JSON.stringify(categories) %>'></td>
+            <td data-field="balance_type" data-field-type="select" data-field-options='<%- JSON.stringify(balanceTypes) %>'></td>
+            <td data-field="opening_balance" data-field-type="number" data-field-value="0" class="text-end"></td>
+            <td data-field="opening_balance_date" data-field-type="date" class="text-center"></td>
+            <td class="text-end">
+                <div class="edit-actions">
+                    <button class="btn btn-success btn-sm save-row-btn" title="Save"><i class="ri-check-line"></i></button>
+                    <button class="btn btn-danger btn-sm cancel-edit-btn" title="Cancel"><i class="ri-close-line"></i></button>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        InlineEditor.init('coa-table', {
+            saveUrl: '/accounting/coa/save',
+            onSaveSuccess: (result, row) => {
+                location.reload(); // Simple reload for now to maintain hierarchy order
+            }
+        });
+    });
+
+    function toggleRow(icon) {
+        const row = icon.closest('tr');
+        const id = row.dataset.id;
+        const isExpanded = icon.classList.contains('expanded');
+        
+        icon.classList.toggle('expanded');
+        icon.classList.toggle('ri-arrow-right-s-line');
+        icon.classList.toggle('ri-arrow-down-s-line');
+
+        const children = document.querySelectorAll(`[data-parent-id="${id}"]`);
+        children.forEach(child => {
+            if (isExpanded) {
+                // Collapse recursively
+                hideChildren(child);
+            } else {
+                child.classList.remove('d-none');
+            }
+        });
+    }
+
+    function hideChildren(row) {
+        row.classList.add('d-none');
+        const icon = row.querySelector('.toggle-icon');
+        if (icon && icon.classList.contains('expanded')) {
+            icon.classList.remove('expanded');
+            icon.classList.add('ri-arrow-right-s-line');
+            icon.classList.remove('ri-arrow-down-s-line');
+        }
+        const children = document.querySelectorAll(`[data-parent-id="${row.dataset.id}"]`);
+        children.forEach(hideChildren);
+    }
+
+    async function resetCOA() {
+        if (!confirm('WARNING: This will delete ALL sub-accounts and ALL financial transaction history. Main account types (Assets, Liabilities, etc.) will be kept. This action cannot be undone. Are you absolutely sure?')) {
+            return;
+        }
+
+        const btn = event.currentTarget;
+        const originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Resetting...';
+
+        try {
+            const response = await fetch('/accounting/coa/reset', { method: 'POST' });
+            const result = await response.json();
+            if (result.success) {
+                toastr.success(result.message);
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                toastr.error(result.message);
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        } catch (error) {
+            toastr.error('Failed to reset COA');
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+    }
+    function exportCOA() {
+        const rows = document.querySelectorAll('#coa-table tbody tr.hierarchy-row');
+        let csvContent = "\uFEFF"; // BOM for Excel UTF-8 support
+        csvContent += "Code,Account Name,Category,Balance Type,Opening Balance,OB Date,Current Balance\n";
+
+        rows.forEach(row => {
+            const code = row.querySelector('[data-field="code"]').textContent.trim();
+            const name = row.querySelector('.account-name').textContent.trim();
+            const level = parseInt(row.dataset.level) || 0;
+            const category = row.querySelector('[data-field="category"]').textContent.trim();
+            const balanceType = row.querySelector('[data-field="balance_type"]').textContent.trim();
+            const opening = row.querySelector('[data-field="opening_balance"]').textContent.trim().replace(/,/g, '');
+            const obDate = row.querySelector('[data-field="opening_balance_date"]').textContent.trim();
+            const currentCell = row.cells[6]; // Current Balance column is index 6
+            const current = currentCell.textContent.trim().replace(/,/g, '');
+
+            // Indent name for better hierarchy view in Excel
+            const indentedName = "    ".repeat(level) + name;
+
+            const line = [
+                `"${code}"`,
+                `"${indentedName}"`,
+                `"${category}"`,
+                `"${balanceType}"`,
+                `"${opening}"`,
+                `"${obDate}"`,
+                `"${current}"`
+            ].join(",");
+
+            csvContent += line + "\n";
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", "Chart_of_Accounts.csv");
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>

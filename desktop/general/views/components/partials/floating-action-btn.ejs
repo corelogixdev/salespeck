@@ -1,0 +1,11 @@
+<% if (typeof show === 'undefined' || show) { %>
+<button type="button"
+  class="btn <%= typeof colorClass !== 'undefined' ? colorClass : 'btn-primary' %> floating-action-btn shadow-lg"
+  data-bs-toggle="modal"
+  data-bs-target="<%= typeof targetModal !== 'undefined' ? targetModal : '#' %>"
+  title="<%= typeof tooltip !== 'undefined' ? tooltip : 'Add' %>">
+  <i class="<%= typeof icon !== 'undefined' ? icon : 'ri-add-line' %>"></i>
+</button>
+
+
+<% } %>

@@ -1,0 +1,67 @@
+<%- contentFor('body') %>
+
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0"><%= title %></h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="/accounting/coa">Accounting</a></li>
+                    <li class="breadcrumb-item active"><%= title %></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Expense List</h5>
+                <a href="/accounting/expenses/form" class="btn btn-primary btn-sm">
+                    <i class="ri-add-line align-bottom me-1"></i> New Expense
+                </a>
+            </div>
+            <div class="card-body">
+                <form class="d-flex gap-2 mb-4" method="GET" action="/accounting/expenses">
+                    <input type="date" class="form-control form-control-sm w-auto" name="startDate" placeholder="Start Date">
+                    <input type="date" class="form-control form-control-sm w-auto" name="endDate" placeholder="End Date">
+                    <button type="submit" class="btn btn-sm btn-secondary">Filter</button>
+                    <a href="/accounting/expenses" class="btn btn-sm btn-light">Clear</a>
+                </form>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Expense Account</th>
+                                <th>Payment Account</th>
+                                <th>Description</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (expenses && expenses.length > 0) { %>
+                                <% expenses.forEach(function(expense) { %>
+                                    <tr>
+                                        <td><%= new Date(expense.date).toLocaleDateString() %></td>
+                                        <td><span class="badge bg-danger-subtle text-danger fs-12"><%= expense.expenseAccount %></span></td>
+                                        <td><span class="badge bg-success-subtle text-success fs-12"><%= expense.paymentAccount %></span></td>
+                                        <td><%= expense.description || '-' %></td>
+                                        <td class="text-end fw-bold">Rs.<%= expense.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) %></td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="5" class="text-center">No expenses recorded yet.</td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

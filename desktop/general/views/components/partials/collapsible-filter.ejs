@@ -1,0 +1,9 @@
+<div class="collapsible-filter-wrapper mb-3">
+  <button class="btn btn-soft-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#<%= filterId %>" aria-expanded="false" aria-controls="<%= filterId %>">
+    <i class="ri-filter-3-line align-bottom me-1"></i> Filters
+  </button>
+
+  <div class="collapse mt-3" id="<%= filterId %>">
+    <%- include('./filter-section', { filters, values, action }) %>
+  </div>
+</div>

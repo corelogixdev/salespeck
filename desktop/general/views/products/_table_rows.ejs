@@ -1,0 +1,60 @@
+              <% if (!data || data.length === 0) { %>
+                <tr>
+                  <td colspan="10" class="text-center">
+                    <i class="ri-error-warning-line align-middle me-1"></i> No data found
+                  </td>
+                </tr>
+              <% } else { %>
+                <% data.forEach(item => { %>
+                  <tr>
+                    <td><%= item.barcode %></td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                          <h6 class="fs-14 mb-1"><%= item.name %></h6>
+                        </div>
+                      </div>
+                    </td>
+                    <td><%= categories.find(c => c.id === item.category_id)?.name || '-' %></td>
+                    <td><%= item.discount %>%</td>
+                    <td><%= typeof item.purchaseprice === 'number' ? item.purchaseprice.toFixed(2) : item.purchaseprice %></td>
+                    <td>
+                      <% if (item.purchaseactive) { %>
+                        <span class="badge badge-soft-success text-uppercase">Active</span>
+                      <% } else { %>
+                        <span class="badge badge-soft-danger text-uppercase">Inactive</span>
+                      <% } %>
+                    </td>
+                    <td>
+                      <% if (item.quantity === 0) { %>
+                        <span class="badge badge-soft-danger text-uppercase">Out of Stock</span>
+                      <% } else if (item.quantity < 10) { %>
+                        <span class="badge badge-soft-warning text-uppercase"><%= item.quantity %> (Low)</span>
+                      <% } else { %>
+                        <span class="badge badge-soft-success text-uppercase"><%= item.quantity %></span>
+                      <% } %>
+                      <button type="button" class="btn btn-sm btn-ghost-primary waves-effect waves-light p-0 ms-1"
+                        onclick="updateQuantity('<%= item.id %>', '<%= item.name %>', '<%= item.quantity %>')"
+                        title="Add Quantity">
+                        <i class="ri-add-circle-line fs-16 align-middle"></i>
+                      </button>
+                    </td>
+                    <td><%= typeof item.saleprice === 'number' ? item.saleprice.toFixed(2) : item.saleprice %></td>
+                    <td>
+                      <% if (item.saleactive) { %>
+                        <span class="badge badge-soft-success text-uppercase">Active</span>
+                      <% } else { %>
+                        <span class="badge badge-soft-danger text-uppercase">Inactive</span>
+                      <% } %>
+                    </td>
+                    <td style="text-align: end;">
+                      <a href="/products/form?id=<%= item.id %>" class="btn btn-sm btn-soft-info">
+                        <i class="ri-pencil-fill align-bottom me-1"></i> Edit
+                      </a>
+                      <button type="button" class="btn btn-sm btn-soft-danger" onclick="deleteRecord('<%= item.id %>')">
+                        <i class="ri-delete-bin-fill align-bottom me-1"></i> Delete
+                      </button>
+                    </td>
+                  </tr>
+                <% }); %>
+              <% } %>

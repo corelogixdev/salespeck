@@ -1,0 +1,344 @@
+<%- contentFor('body') %>
+
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0"><%= title %></h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="/accounting/coa">Accounting</a></li>
+                    <li class="breadcrumb-item active"><%= title %></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">End of Shift / Daily Cash Closing</h5>
+            </div>
+            <div class="card-body">
+                <form action="/accounting/cash-closing/save" method="POST">
+                    
+                    <div class="alert alert-info mb-4">
+                        <p class="mb-1"><strong>Today's Cash Ledger Summary</strong></p>
+                        <ul class="mb-0 ps-3">
+                            <li>Total Cash Received (Sales, etc): <span class="fw-bold text-success">+Rs.<%= todayCashIn %></span></li>
+                            <li>Total Cash Paid (Expenses, etc): <span class="fw-bold text-danger">-Rs.<%= todayCashOut %></span></li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">System Expected Cash Balance</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rs.</span>
+                            <input type="text" class="form-control fw-bold" name="expectedCash" id="expectedCash" value="<%= expectedCash %>" readonly>
+                        </div>
+                        <div class="form-text">This is calculated automatically from the Cash ledger.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Actual Cash Counted in Drawer <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rs.</span>
+                            <input type="number" class="form-control fw-bold fs-15 text-primary" name="actualCash" id="actualCash" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-text">Type the total directly, or expand the note/coin counter below.</div>
+                    </div>
+
+                    <div class="cash-denom-panel mb-3 is-collapsed" id="cashDenomPanel">
+                        <button type="button" class="cash-denom-panel-toggle" id="cashDenomToggle" aria-expanded="false" aria-controls="cashDenomBody">
+                            <div class="cash-denom-panel-toggle-text">
+                                <span class="cash-denom-panel-title">Cash notes &amp; coins</span>
+                                <span class="cash-denom-panel-sub">Optional — quantities fill Actual Cash automatically</span>
+                            </div>
+                            <i class="ri-arrow-down-s-line cash-denom-chevron" aria-hidden="true"></i>
+                        </button>
+                        <div class="cash-denom-body" id="cashDenomBody" hidden>
+                            <div class="cash-denom-groups">
+                                <div class="cash-denom-group">
+                                    <div class="cash-denom-group-title">Notes</div>
+                                    <div class="cash-denom-rows" id="cashDenomNotes"></div>
+                                </div>
+                                <div class="cash-denom-group">
+                                    <div class="cash-denom-group-title">Coins</div>
+                                    <div class="cash-denom-rows" id="cashDenomCoins"></div>
+                                </div>
+                            </div>
+                            <div class="cash-denom-footer">
+                                <div class="cash-denom-total">
+                                    <span class="cash-denom-total-label">Counted total</span>
+                                    <span class="cash-denom-total-value">Rs. <strong id="cashDenomGrandTotal">0.00</strong></span>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-light" id="cashDenomClear">Clear counts</button>
+                            </div>
+                            <div class="cash-denom-mismatch" id="cashDenomMismatch" hidden>
+                                <span id="cashDenomMismatchText"></span>
+                                <button type="button" class="btn btn-sm btn-soft-primary ms-2" id="cashDenomApply">Use counted total</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Difference (Short/Over)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rs.</span>
+                            <input type="text" class="form-control" id="difference" value="0.00" readonly>
+                        </div>
+                        <div class="form-text" id="diffMessage">If there is a difference, a journal entry will be automatically posted to adjust the Cash ledger.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Notes / Remarks</label>
+                        <textarea class="form-control" name="note" rows="2" placeholder="Optional explanation for shortages or overages..."></textarea>
+                    </div>
+
+                    <div class="mt-4 text-end">
+                        <a href="/accounting/cash-closing-report" class="btn btn-light me-2">Cancel</a>
+                        <button type="submit" class="btn btn-success">Save Closing & Adjust Ledger</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    function initCashDenom() {
+        var DENOMS = [
+            { value: 5000, type: 'note' },
+            { value: 1000, type: 'note' },
+            { value: 500, type: 'note' },
+            { value: 100, type: 'note' },
+            { value: 50, type: 'note' },
+            { value: 10, type: 'note' },
+            { value: 5, type: 'coin' },
+            { value: 2, type: 'coin' },
+            { value: 1, type: 'coin' }
+        ];
+
+        var actualCashEl = document.getElementById('actualCash');
+        var expectedCashEl = document.getElementById('expectedCash');
+        var diffEl = document.getElementById('difference');
+        var diffMsg = document.getElementById('diffMessage');
+        var panel = document.getElementById('cashDenomPanel');
+        var toggleBtn = document.getElementById('cashDenomToggle');
+        var denomBody = document.getElementById('cashDenomBody');
+        var notesContainer = document.getElementById('cashDenomNotes');
+        var coinsContainer = document.getElementById('cashDenomCoins');
+        var grandTotalEl = document.getElementById('cashDenomGrandTotal');
+        var clearBtn = document.getElementById('cashDenomClear');
+        var mismatchEl = document.getElementById('cashDenomMismatch');
+        var mismatchText = document.getElementById('cashDenomMismatchText');
+        var applyBtn = document.getElementById('cashDenomApply');
+
+        if (!actualCashEl || !panel || !notesContainer || !coinsContainer) {
+            return;
+        }
+
+        var syncingFromDenoms = false;
+        var lastDenomTotal = 0;
+
+        if (toggleBtn && denomBody) {
+            toggleBtn.addEventListener('click', function () {
+                var open = denomBody.hidden;
+                denomBody.hidden = !open;
+                panel.classList.toggle('is-collapsed', !open);
+                panel.classList.toggle('is-open', open);
+                toggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            });
+        }
+
+        function calculateDifference() {
+            var expected = parseFloat(expectedCashEl.value) || 0;
+            var actual = parseFloat(actualCashEl.value) || 0;
+            var diff = actual - expected;
+
+            diffEl.value = diff.toFixed(2);
+
+            if (diff < -0.001) {
+                diffEl.classList.add('text-danger');
+                diffEl.classList.remove('text-success');
+                diffMsg.innerHTML = '<span class="text-danger fw-bold"><i class="ri-error-warning-line"></i> Cash Shortage detected!</span> An expense adjustment entry will be created.';
+            } else if (diff > 0.001) {
+                diffEl.classList.add('text-success');
+                diffEl.classList.remove('text-danger');
+                diffMsg.innerHTML = '<span class="text-success fw-bold"><i class="ri-information-line"></i> Cash Overage detected!</span> A revenue adjustment entry will be created.';
+            } else {
+                diffEl.classList.remove('text-danger', 'text-success');
+                diffMsg.innerHTML = '<span class="text-muted"><i class="ri-check-line"></i> Cash perfectly balanced. No adjusting entry needed.</span>';
+            }
+        }
+
+        function formatMoney(n) {
+            return (Math.round(n * 100) / 100).toFixed(2);
+        }
+
+        function getQtyInputs() {
+            return panel.querySelectorAll('.cash-denom-qty');
+        }
+
+        function getDenomTotal() {
+            var total = 0;
+            getQtyInputs().forEach(function (input) {
+                var qty = parseInt(input.value, 10) || 0;
+                var value = parseFloat(input.dataset.value) || 0;
+                total += qty * value;
+            });
+            return total;
+        }
+
+        function updateLineTotals() {
+            getQtyInputs().forEach(function (input) {
+                var qty = parseInt(input.value, 10) || 0;
+                var value = parseFloat(input.dataset.value) || 0;
+                var lineEl = input.closest('.cash-denom-row').querySelector('.cash-denom-line-total');
+                if (lineEl) {
+                    lineEl.textContent = 'Rs. ' + formatMoney(qty * value);
+                }
+            });
+        }
+
+        function updateMismatchHint() {
+            var denomTotal = lastDenomTotal;
+            var actual = parseFloat(actualCashEl.value) || 0;
+            var hasCounts = Array.prototype.some.call(getQtyInputs(), function (input) {
+                return (parseInt(input.value, 10) || 0) > 0;
+            });
+
+            if (hasCounts && Math.abs(actual - denomTotal) > 0.001) {
+                mismatchText.textContent = 'Denomination total is Rs. ' + formatMoney(denomTotal) + ' — differs from typed amount.';
+                mismatchEl.hidden = false;
+            } else {
+                mismatchEl.hidden = true;
+            }
+        }
+
+        function applyDenomTotalToActual() {
+            var total = getDenomTotal();
+            lastDenomTotal = total;
+            grandTotalEl.textContent = formatMoney(total);
+            updateLineTotals();
+
+            syncingFromDenoms = true;
+            actualCashEl.value = formatMoney(total);
+            syncingFromDenoms = false;
+
+            calculateDifference();
+            mismatchEl.hidden = true;
+        }
+
+        function onDenomChange() {
+            lastDenomTotal = getDenomTotal();
+            grandTotalEl.textContent = formatMoney(lastDenomTotal);
+            updateLineTotals();
+            applyDenomTotalToActual();
+        }
+
+        function buildRow(denom) {
+            var row = document.createElement('div');
+            row.className = 'cash-denom-row cash-denom-' + denom.type;
+
+            row.innerHTML =
+                '<span class="cash-denom-badge" title="Rs. ' + denom.value + '">' + denom.value + '</span>' +
+                '<div class="cash-denom-stepper">' +
+                    '<button type="button" class="cash-denom-btn cash-denom-minus" aria-label="Decrease">−</button>' +
+                    '<input type="number" class="cash-denom-qty" data-value="' + denom.value + '" min="0" step="1" value="0" inputmode="numeric">' +
+                    '<button type="button" class="cash-denom-btn cash-denom-plus" aria-label="Increase">+</button>' +
+                '</div>' +
+                '<span class="cash-denom-line-total">Rs. 0.00</span>';
+
+            var qtyInput = row.querySelector('.cash-denom-qty');
+            var minusBtn = row.querySelector('.cash-denom-minus');
+            var plusBtn = row.querySelector('.cash-denom-plus');
+
+            function clampQty() {
+                var qty = parseInt(qtyInput.value, 10);
+                if (isNaN(qty) || qty < 0) qty = 0;
+                qtyInput.value = String(qty);
+            }
+
+            minusBtn.addEventListener('click', function () {
+                var qty = Math.max(0, (parseInt(qtyInput.value, 10) || 0) - 1);
+                qtyInput.value = String(qty);
+                onDenomChange();
+            });
+
+            plusBtn.addEventListener('click', function () {
+                var qty = (parseInt(qtyInput.value, 10) || 0) + 1;
+                qtyInput.value = String(qty);
+                onDenomChange();
+            });
+
+            qtyInput.addEventListener('input', function () {
+                clampQty();
+                onDenomChange();
+            });
+
+            qtyInput.addEventListener('blur', function () {
+                clampQty();
+                onDenomChange();
+            });
+
+            return row;
+        }
+
+        notesContainer.innerHTML = '';
+        coinsContainer.innerHTML = '';
+        DENOMS.forEach(function (denom) {
+            var row = buildRow(denom);
+            if (denom.type === 'note') {
+                notesContainer.appendChild(row);
+            } else {
+                coinsContainer.appendChild(row);
+            }
+        });
+
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function () {
+                var previousTotal = lastDenomTotal;
+                var currentActual = parseFloat(actualCashEl.value) || 0;
+
+                getQtyInputs().forEach(function (input) {
+                    input.value = '0';
+                });
+                lastDenomTotal = 0;
+                grandTotalEl.textContent = '0.00';
+                updateLineTotals();
+                mismatchEl.hidden = true;
+
+                if (Math.abs(currentActual - previousTotal) < 0.001) {
+                    syncingFromDenoms = true;
+                    actualCashEl.value = '';
+                    syncingFromDenoms = false;
+                    calculateDifference();
+                }
+            });
+        }
+
+        if (applyBtn) {
+            applyBtn.addEventListener('click', function () {
+                applyDenomTotalToActual();
+            });
+        }
+
+        actualCashEl.addEventListener('input', function () {
+            if (syncingFromDenoms) return;
+            calculateDifference();
+            updateMismatchHint();
+        });
+
+        calculateDifference();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initCashDenom);
+    } else {
+        initCashDenom();
+    }
+})();
+</script>

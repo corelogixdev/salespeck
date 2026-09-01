@@ -1,0 +1,1079 @@
+<div class="card">
+    <div class="card-header align-items-center d-flex">
+        <div class="flex-grow-1">
+            <h4 class="card-title mb-1">
+                <%= role==='user' ? 'Users' : (role==='vendor' ? 'Vendors' : 'Customers' ) %> List
+            </h4>
+            <p class="text-muted mb-0 fs-12">Manage and view details of your <%= role %>s</p>
+        </div>
+        <% if (typeof totalBalance !== 'undefined' && role !== 'user') { %>
+            <div class="text-end me-4">
+                <small class="text-muted text-uppercase fw-bold fs-10 d-block mb-1">Total Net Balance</small>
+                <h4 class="mb-0 fw-bold <%= totalBalance >= 0 ? 'text-success' : 'text-danger' %>">
+                    <%= Math.abs(totalBalance).toLocaleString(undefined, { minimumFractionDigits: 2 }) %>
+                    <small class="fs-12 fw-normal text-muted"><%= totalBalance >= 0 ? 'Dr' : 'Cr' %></small>
+                </h4>
+            </div>
+        <% } %>
+        <div class="d-flex gap-2 align-items-center">
+            <% if ((role=='user' && permissions.usersSearch) || (role=='vendor' && permissions.vendorsSearch) ||
+                (role=='customer' && permissions.customersSearch)) { %>
+                <form action="/users" method="GET" class="d-flex mb-0">
+                    <input type="hidden" name="role" value="<%= role %>">
+                    <div class="input-group input-group-sm" style="width: 250px;">
+                        <input type="text" name="search" class="form-control" placeholder="Search by name or phone..." value="<%= query.search || '' %>">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="ri-search-line"></i>
+                        </button>
+                    </div>
+                </form>
+            <% } %>
+            <% if ((role=='user' && permissions.usersSearch) || (role=='vendor' && permissions.vendorsSearch) ||
+                (role=='customer' && permissions.customersSearch)) { %>
+                <button class="btn btn-soft-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#partyFilters" aria-expanded="false" aria-controls="partyFilters">
+                    <i class="ri-filter-3-line align-bottom me-1"></i> Filters
+                </button>
+            <% } %>
+            <button onclick="window.location.reload()" class="btn btn-soft-success btn-sm" title="Refresh">
+                <i class="ri-refresh-line align-middle"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <% if ((role=='user' && permissions.usersSearch) || (role=='vendor' && permissions.vendorsSearch) ||
+            (role=='customer' && permissions.customersSearch)) { %>
+            <div class="collapse mb-3" id="partyFilters">
+                <%- include('../components/partials/filter-section', {
+                    filters: [
+                        { name: 'role', type: 'hidden' },
+                        { name: 'search', label: 'Search', type: 'text', placeholder: 'Search by name, username or phone', icon: 'ri-search-line', colSize: 4 },
+                        { name: 'daterange', label: 'Date Range', type: 'daterange', placeholder: 'Filter by date range...', colSize: 4 }
+                    ],
+                    values: query,
+                    action: '/users'
+                }) %>
+            </div>
+        <% } %>
+
+        <% 
+        let tableColumns = [
+            { key: 'firstname', label: 'Name', sortable: true, render: (row) => `${row.firstname} ${row.lastname}` },
+            { key: 'phone', label: 'Phone', sortable: true },
+            { key: 'email', label: 'Email', sortable: true }
+        ];
+        
+        if (role !== 'user') {
+            tableColumns.push({ 
+                key: 'balance', 
+                label: 'Balance',
+                class: 'text-end',
+                render: (row) => {
+                    const bal = row.balance || 0;
+                    const suffix = bal >= 0 ? ' (Dr)' : ' (Cr)';
+                    return `<span class="fw-bold">${Math.abs(bal).toLocaleString()}</span> <small class="text-muted">${suffix}</small>`;
+                }
+            });
+            tableColumns.push({ 
+                key: 'fk_financeaccount_id', 
+                label: 'Account Head', 
+                render: (row) => row.fk_financeaccount_id ? '<span class="badge bg-soft-info text-info">Linked</span>' : '<span class="badge bg-soft-secondary text-muted">Not Linked</span>'
+            });
+        }
+
+        if (role === 'user') {
+            tableColumns.push({ key: 'username', label: 'Username', sortable: true });
+            tableColumns.push({ key: 'role', label: 'Role', sortable: true, type: 'badge', badgeMap: { branchmanager: 'warning', user: 'primary', admin: 'danger', superadmin: 'dark' } });
+        }
+
+        const canUpdateAny = (role=='user' && permissions.usersUpdate) || (role=='vendor' && permissions.vendorsUpdate) || (role=='customer' && permissions.customersUpdate);
+        const canDeleteAny = (role=='user' && permissions.usersDelete) || (role=='vendor' && permissions.vendorsDelete) || (role=='customer' && permissions.customersDelete);
+
+        if (canUpdateAny || canDeleteAny) {
+            tableColumns.push({
+                key: 'actions',
+                label: 'Actions',
+                sortable: false,
+                class: 'text-end',
+                render: (row) => {
+                    const isBranchManager = row.role == 'branchmanager';
+                    let html = '<div class="btn-group btn-group-sm action-group" role="group">';
+                    html += `<button type="button" class="btn btn-soft-info action-btn" onclick="window.location.href='/users/details/${row.id}?role=${role}'" title="View"><i class="ri-eye-line"></i></button>`;
+                    if (canUpdateAny) {
+                        html += `<button type="button" class="btn btn-soft-warning action-btn ${isBranchManager ? 'custom_disabled' : ''}" onclick="openEditModal('${row.id}')" title="Edit"><i class="ri-pencil-fill"></i></button>`;
+                    }
+                    if (canDeleteAny) {
+                        html += `<button type="button" class="btn btn-soft-danger action-btn" onclick="deleteRecord('${row.id}')" ${isBranchManager ? 'disabled' : ''} title="Delete"><i class="ri-delete-bin-fill"></i></button>`;
+                    }
+                    html += '</div>';
+                    return html;
+                }
+            });
+        }
+        %>
+
+        <%- include('../components/partials/data-table', {
+            columns: tableColumns,
+            data: data,
+            sortBy: sortBy,
+            sortOrder: sortOrder,
+            baseUrl: '/users',
+            query: query
+        }) %>
+
+        <%- include('../components/partials/pagination', {
+            pagination: pagination,
+            baseUrl: '/users',
+            query: query
+        }) %>
+    </div>
+</div>
+
+<% 
+const canCreate = (role=='user' && permissions.usersCreate) || (role=='vendor' && permissions.vendorsCreate) || (role=='customer' && permissions.customersCreate);
+%>
+
+<%- include('../components/partials/floating-action-btn', {
+    targetModal: '#addUserModal',
+    icon: 'ri-add-line',
+    tooltip: 'Create New ' + (role==='user' ? 'User' : (role==='vendor' ? 'Vendor' : 'Customer')),
+    colorClass: 'btn-primary',
+    show: canCreate
+}) %>
+
+<!-- Create Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-primary text-white">
+                <h5 class="modal-title">Create <%= role==='user' ? 'User' : (role==='vendor' ? 'Vendor' : 'Customer') %></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addUserForm" class="needs-validation" novalidate>
+                    <div class="row gy-3">
+                        <div class="col-md-6">
+                            <label for="addFirstName" class="form-label">First Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="addFirstName" name="firstname" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="addLastName" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="addLastName" name="lastname">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="addEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="addEmail" name="email">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="addUsername" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="addUsername" name="username">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="addPhone" class="form-label">Phone</label>
+                            <input type="text" class="form-control" id="addPhone" name="phone">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="addAddress" class="form-label">Address</label>
+                            <textarea class="form-control" id="addAddress" name="address" rows="1"></textarea>
+                        </div>
+                        <% if (role === 'vendor' || role === 'customer') { %>
+                        <div class="col-md-6">
+                            <label for="addPartyType" class="form-label"><%= role === 'vendor' ? 'Vendor Type' : 'Client Type' %></label>
+                            <div class="input-group">
+                                <select class="form-select" id="addPartyType" name="fk_partytype_id">
+                                    <option value="">Select Type...</option>
+                                </select>
+                                <button type="button" class="btn btn-outline-secondary" onclick="managePartyTypes('<%= role %>')" title="Manage Types">
+                                    <i class="ri-add-line"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <% } %>
+                        <% if (role !== 'customer' && role !== 'vendor') { %>
+                        <div class="col-md-6 position-relative">
+                            <label for="addPassword" class="form-label">Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="addPassword" name="password" autocomplete="on">
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('addPassword', this)">
+                                    <i class="ri-eye-line"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <% } else { %>
+                        <div class="col-12">
+                            <div class="card border border-dashed shadow-none mb-0 bg-light">
+                                <div class="card-header py-2 d-flex align-items-center">
+                                    <h6 class="card-title mb-0 fs-13 flex-grow-1"><i class="ri-scales-3-line me-1 align-bottom"></i> Opening Balance Setup (Double Entry)</h6>
+                                    <span class="badge bg-soft-success text-success fs-10" id="obBalanceBadge">Balanced</span>
+                                </div>
+                                <div class="card-body p-2">
+                                    <div class="row mb-2 gy-2">
+                                        <div class="col-md-12">
+                                            <label class="form-label fs-11 mb-1">As of Date <span class="text-danger">*</span></label>
+                                            <input type="date" class="form-control form-control-sm" name="ob_date" value="<%= new Date().toISOString().split('T')[0] %>" required>
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-nowrap align-middle mb-0">
+                                            <thead class="table-light fs-11">
+                                                <tr>
+                                                    <th>Account Head</th>
+                                                    <th class="text-end" style="width: 120px;">Debit</th>
+                                                    <th class="text-end" style="width: 120px;">Credit</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="fs-12">
+                                                <!-- Primary Account (Party) -->
+                                                <tr>
+                                                    <td>
+                                                        <div class="fw-medium text-primary">New <%= role.charAt(0).toUpperCase() + role.slice(1) %> Account</div>
+                                                        <small class="text-muted">Sub-ledger under <%= role === 'customer' ? 'Receivables' : 'Payables' %></small>
+                                                    </td>
+                                                    <td><input type="number" class="form-control form-control-sm text-end ob-input" name="ob_primary_debit" value="0" step="any" oninput="balanceOB(this, 'primary', 'debit')"></td>
+                                                    <td><input type="number" class="form-control form-control-sm text-end ob-input" name="ob_primary_credit" value="0" step="any" oninput="balanceOB(this, 'primary', 'credit')"></td>
+                                                </tr>
+                                                <!-- Contra Account -->
+                                                <tr>
+                                                    <td>
+                                                        <select class="form-select form-select-sm border-0 bg-transparent fw-medium" name="ob_contra_account">
+                                                            <% accounts.forEach(acc => { %>
+                                                                <option value="<%= acc.id %>" <%= acc.code === '3200' ? 'selected' : '' %>><%= acc.code %> - <%= acc.name %></option>
+                                                            <% }) %>
+                                                        </select>
+                                                        <small class="text-muted ms-1">Offsetting account</small>
+                                                    </td>
+                                                    <td><input type="number" class="form-control form-control-sm text-end ob-input" name="ob_contra_debit" value="0" step="any" oninput="balanceOB(this, 'contra', 'debit')"></td>
+                                                    <td><input type="number" class="form-control form-control-sm text-end ob-input" name="ob_contra_credit" value="0" step="any" oninput="balanceOB(this, 'contra', 'credit')"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <% } %>
+                        <input type="hidden" name="role" value="<%= role %>">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveUser()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-warning text-white">
+                <h5 class="modal-title">Edit <%= role==='user' ? 'User' : (role==='vendor' ? 'Vendor' : 'Customer') %></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editUserForm" class="needs-validation" novalidate>
+                    <input type="hidden" id="editUserId" name="id">
+                    <div class="row gy-3">
+                        <div class="col-md-6">
+                            <label for="editFirstName" class="form-label">First Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editFirstName" name="firstname" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editLastName" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="editLastName" name="lastname">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editEmail" name="email">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editUsername" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="editUsername" name="username">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editPhone" class="form-label">Phone</label>
+                            <input type="text" class="form-control" id="editPhone" name="phone">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editAddress" class="form-label">Address</label>
+                            <textarea class="form-control" id="editAddress" name="address" rows="1"></textarea>
+                        </div>
+                        <% if (role === 'vendor' || role === 'customer') { %>
+                        <div class="col-md-6">
+                            <label for="editPartyType" class="form-label"><%= role === 'vendor' ? 'Vendor Type' : 'Client Type' %></label>
+                            <div class="input-group">
+                                <select class="form-select" id="editPartyType" name="fk_partytype_id">
+                                    <option value="">Select Type...</option>
+                                </select>
+                                <button type="button" class="btn btn-outline-secondary" onclick="managePartyTypes('<%= role %>')" title="Manage Types">
+                                    <i class="ri-add-line"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <% } %>
+                        <% if (role !== 'customer' && role !== 'vendor') { %>
+                        <div class="col-md-6 position-relative">
+                            <label for="editPassword" class="form-label">Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="editPassword" name="password" autocomplete="on">
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('editPassword', this)">
+                                    <i class="ri-eye-line"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <% } else { %>
+                        <div class="col-12">
+                            <div class="card border border-dashed shadow-none mb-0 bg-light">
+                                <div class="card-header py-2 d-flex align-items-center">
+                                    <h6 class="card-title mb-0 fs-13 flex-grow-1"><i class="ri-scales-3-line me-1 align-bottom"></i> Edit Opening Balance</h6>
+                                    <span class="badge bg-soft-success text-success fs-10" id="editObBalanceBadge">Balanced</span>
+                                </div>
+                                <div class="card-body p-2">
+                                    <div class="row mb-2 gy-2">
+                                        <div class="col-md-12">
+                                            <label class="form-label fs-11 mb-1">As of Date <span class="text-danger">*</span></label>
+                                            <input type="date" class="form-control form-control-sm" name="ob_date" id="editObDate" value="<%= new Date().toISOString().split('T')[0] %>" required>
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-nowrap align-middle mb-0">
+                                            <thead class="table-light fs-11">
+                                                <tr>
+                                                    <th>Account Head</th>
+                                                    <th class="text-end" style="width: 120px;">Debit</th>
+                                                    <th class="text-end" style="width: 120px;">Credit</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="fs-12">
+                                                <!-- Primary Account (Party) -->
+                                                <tr>
+                                                    <td>
+                                                        <div class="fw-medium text-primary"><%= role.charAt(0).toUpperCase() + role.slice(1) %> Account</div>
+                                                        <small class="text-muted">Sub-ledger under <%= role === 'customer' ? 'Receivables' : 'Payables' %></small>
+                                                    </td>
+                                                    <td><input type="number" class="form-control form-control-sm text-end ob-input" id="editObPrimaryDebit" name="ob_primary_debit" value="0" step="any" oninput="balanceOB(this, 'primary', 'debit', 'edit')"></td>
+                                                    <td><input type="number" class="form-control form-control-sm text-end ob-input" id="editObPrimaryCredit" name="ob_primary_credit" value="0" step="any" oninput="balanceOB(this, 'primary', 'credit', 'edit')"></td>
+                                                </tr>
+                                                <!-- Contra Account -->
+                                                <tr>
+                                                    <td>
+                                                        <select class="form-select form-select-sm border-0 bg-transparent fw-medium" id="editObContraAccount" name="ob_contra_account">
+                                                            <% accounts.forEach(acc => { %>
+                                                                <option value="<%= acc.id %>" <%= acc.code === '3200' ? 'selected' : '' %>><%= acc.code %> - <%= acc.name %></option>
+                                                            <% }) %>
+                                                        </select>
+                                                        <small class="text-muted ms-1">Offsetting account</small>
+                                                    </td>
+                                                    <td><input type="number" class="form-control form-control-sm text-end ob-input" id="editObContraDebit" name="ob_contra_debit" value="0" step="any" oninput="balanceOB(this, 'contra', 'debit', 'edit')"></td>
+                                                    <td><input type="number" class="form-control form-control-sm text-end ob-input" id="editObContraCredit" name="ob_contra_credit" value="0" step="any" oninput="balanceOB(this, 'contra', 'credit', 'edit')"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <% } %>
+                        <input type="hidden" name="role" value="<%= role %>">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-warning" onclick="updateUser()">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View Modal -->
+<%- include('../components/partials/view-modal', {
+    id: 'viewUserModal',
+    title: (role==='user' ? 'User' : (role==='vendor' ? 'Vendor' : 'Customer')) + ' Details',
+    size: 'modal-xl'
+}) %>
+
+
+
+<script>
+    function balanceOB(input, rowType, fieldType, prefix = '') {
+        const form = input.closest('form');
+        const val = parseFloat(input.value) || 0;
+        
+        // Disable other field in same row
+        const otherFieldInRow = fieldType === 'debit' ? 'credit' : 'debit';
+        form.querySelector(`[name="ob_${rowType}_${otherFieldInRow}"]`).value = val > 0 ? 0 : form.querySelector(`[name="ob_${rowType}_${otherFieldInRow}"]`).value;
+
+        // Balance logic
+        const otherRowType = rowType === 'primary' ? 'contra' : 'primary';
+        const otherRowField = fieldType === 'debit' ? 'credit' : 'debit';
+        const sameFieldInOtherRow = fieldType;
+
+        if (val > 0) {
+            // If I debit primary, I should credit contra
+            form.querySelector(`[name="ob_${otherRowType}_${otherRowField}"]`).value = val;
+            form.querySelector(`[name="ob_${otherRowType}_${sameFieldInOtherRow}"]`).value = 0;
+        }
+
+        // Check balance badge
+        const pDebit = parseFloat(form.querySelector('[name="ob_primary_debit"]').value) || 0;
+        const pCredit = parseFloat(form.querySelector('[name="ob_primary_credit"]').value) || 0;
+        const cDebit = parseFloat(form.querySelector('[name="ob_contra_debit"]').value) || 0;
+        const cCredit = parseFloat(form.querySelector('[name="ob_contra_credit"]').value) || 0;
+        
+        const totalDebit = pDebit + cDebit;
+        const totalCredit = pCredit + cCredit;
+        
+        const badge = prefix === 'edit' ? document.getElementById('editObBalanceBadge') : document.getElementById('obBalanceBadge');
+        if (totalDebit === totalCredit && totalDebit > 0) {
+            badge.innerText = 'Balanced';
+            badge.className = 'badge bg-soft-success text-success fs-10';
+        } else if (totalDebit !== totalCredit) {
+            badge.innerText = 'Imbalanced';
+            badge.className = 'badge bg-soft-danger text-danger fs-10';
+        } else {
+            badge.innerText = 'No Entry';
+            badge.className = 'badge bg-soft-secondary text-muted fs-10';
+        }
+    }
+
+    function togglePassword(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('ri-eye-line');
+            icon.classList.add('ri-eye-off-line');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('ri-eye-off-line');
+            icon.classList.add('ri-eye-line');
+        }
+    }
+
+    async function openViewModal(id) {
+        try {
+            const userResponse = await fetch('/users/' + id);
+            const userResult = await userResponse.json();
+            if (!userResult.success) return toastr.error('Failed to load details');
+            
+            const u = userResult.user;
+            const role = '<%= role %>';
+            const fields = [
+                { label: 'First Name', value: u.firstname, icon: 'ri-user-line' },
+                { label: 'Last Name', value: u.lastname || '-', icon: 'ri-user-line' },
+                { label: 'Email', value: u.email || '-', icon: 'ri-mail-line' },
+                { label: 'Phone', value: u.phone || '-', icon: 'ri-phone-line' },
+                { label: 'Address', value: u.address || '-', icon: 'ri-map-pin-line' }
+            ];
+
+            // Build Profile Header
+            const initials = (u.firstname.charAt(0) + (u.lastname ? u.lastname.charAt(0) : '')).toUpperCase();
+            let headerHtml = `
+                <div class="d-flex align-items-start">
+                    <div class="flex-shrink-0">
+                        <div class="avatar-md">
+                            <span class="avatar-title bg-soft-primary text-primary rounded-circle fs-20 fw-bold" style="width: 48px; height: 48px;">
+                                ${initials}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <h4 class="mb-0 fw-bold text-dark">${u.firstname} ${u.lastname || ''}</h4>
+                            <span class="badge bg-soft-info text-info ms-3 fs-10 text-uppercase ls-1">${role}</span>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center">
+                                    <i class="ri-phone-line text-primary me-2"></i>
+                                    <div>
+                                        <small class="text-muted text-uppercase fw-bold fs-9 d-block ls-1">Phone</small>
+                                        <h6 class="mb-0 fs-12 fw-semibold">${u.phone || '-'}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center">
+                                    <i class="ri-mail-line text-primary me-2"></i>
+                                    <div>
+                                        <small class="text-muted text-uppercase fw-bold fs-9 d-block ls-1">Email</small>
+                                        <h6 class="mb-0 fs-12 fw-semibold text-truncate" style="max-width: 150px;">${u.email || '-'}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center">
+                                    <i class="ri-map-pin-line text-primary me-2"></i>
+                                    <div>
+                                        <small class="text-muted text-uppercase fw-bold fs-9 d-block ls-1">Address</small>
+                                        <h6 class="mb-0 fs-12 fw-semibold text-truncate" style="max-width: 200px;">${u.address || 'No address'}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    ${role !== 'user' ? `
+                    <div class="flex-shrink-0 text-end p-2 px-3 bg-white rounded border border-dashed ms-4" style="min-width: 140px;">
+                        <small class="text-muted text-uppercase fw-bold fs-9 d-block mb-0">Current Balance</small>
+                        <h4 class="mb-0 fw-bold ${u.balance >= 0 ? 'text-success' : 'text-danger'}">
+                            ${Math.abs(u.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                            <small class="fs-11 fw-normal text-muted">${u.balance >= 0 ? 'Dr' : 'Cr'}</small>
+                        </h4>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            if (role === 'user') {
+                fields.push({ label: 'Username', value: u.username || '-', icon: 'ri-user-settings-line' });
+                fields.push({ label: 'Role', value: u.role || '-', icon: 'ri-shield-user-line' });
+                renderViewModal('viewUserModal', fields, null, headerHtml);
+            } else {
+                // Fetch Ledger for Customers/Vendors
+                const ledgerResponse = await fetch('/accounting/ledger/party/' + id);
+                const ledgerResult = await ledgerResponse.json();
+
+                // Sort newest first
+                const allEntries = (ledgerResult.success && ledgerResult.ledger.length > 0)
+                    ? [...ledgerResult.ledger].sort((a, b) => new Date(b.journal.date) - new Date(a.journal.date))
+                    : [];
+
+                // Build cumulative balances (oldest→newest direction)
+                const oldestFirst = [...allEntries].reverse();
+                const cumulativeBalances = [];
+                let bal = 0;
+                for (const entry of oldestFirst) {
+                    if (role === 'customer') bal += (entry.debit - entry.credit);
+                    else bal += (entry.credit - entry.debit);
+                    cumulativeBalances.push(bal);
+                }
+                const total = allEntries.length;
+
+                function buildModalSOAHtml(pageSize, currentPage) {
+                    let startIdx = 0, endIdx = total;
+                    let pageEntries = allEntries;
+                    if (pageSize !== 'all') {
+                        startIdx = (currentPage - 1) * pageSize;
+                        endIdx   = Math.min(startIdx + pageSize, total);
+                        pageEntries = allEntries.slice(startIdx, endIdx);
+                    }
+
+                    let rowsHtml = '';
+                    for (let j = 0; j < pageEntries.length; j++) {
+                        const entry = pageEntries[j];
+                        const globalIdx = startIdx + j;
+                        const balance = cumulativeBalances[total - 1 - globalIdx];
+
+                        let viewButton = '';
+                        if (entry.journal.reference) {
+                            let docTitle = entry.journal.description || (entry.journal.voucher_no ? 'Invoice ' + entry.journal.voucher_no : 'Document');
+                            const desc = (entry.journal.description || '').toLowerCase();
+                            if (desc.includes('sale')) {
+                                viewButton = `<button type="button" onclick="openIframeModal('/sales/${entry.journal.reference}', '${docTitle}')" class="btn btn-soft-primary btn-sm px-2 py-0 fs-11"><i class="ri-eye-line me-1"></i>View</button>`;
+                            } else if (desc.includes('purchase')) {
+                                viewButton = `<button type="button" onclick="openIframeModal('/accounting/purchase/view/${entry.journal.reference}', '${docTitle}')" class="btn btn-soft-primary btn-sm px-2 py-0 fs-11"><i class="ri-eye-line me-1"></i>View</button>`;
+                            }
+                        }
+
+                        const debitVal  = (entry.debit > 0 || entry.credit < 0) ? Math.abs(entry.debit || entry.credit).toLocaleString(undefined, { minimumFractionDigits: 2 }) : '-';
+                        const creditVal = (entry.credit > 0 || entry.debit < 0) ? Math.abs(entry.credit || entry.debit).toLocaleString(undefined, { minimumFractionDigits: 2 }) : '-';
+                        const debitClass  = (entry.debit > 0 || entry.credit < 0) ? 'text-success' : 'text-muted';
+                        const creditClass = (entry.credit > 0 || entry.debit < 0) ? 'text-danger' : 'text-muted';
+                        const balLabel = role === 'customer' ? (balance >= 0 ? 'Dr' : 'Cr') : (balance >= 0 ? 'Cr' : 'Dr');
+
+                        rowsHtml += `
+                            <tr>
+                                <td class="text-muted">${new Date(entry.journal.date).toLocaleDateString()}</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <div class="fw-semibold text-dark">${entry.journal.description || '-'}</div>
+                                        ${entry.journal.voucher_no ? `<span class="badge bg-soft-info text-info fs-10">${entry.journal.voucher_no}</span>` : ''}
+                                        ${viewButton}
+                                    </div>
+                                    <div class="text-muted fs-12">${entry.details || ''}</div>
+                                </td>
+                                <td class="text-end fw-medium ${debitClass}">${debitVal}</td>
+                                <td class="text-end fw-medium ${creditClass}">${creditVal}</td>
+                                <td class="text-end fw-bold text-dark bg-light-subtle">
+                                    ${Math.abs(balance).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                    <small class="text-muted fw-normal">${balLabel}</small>
+                                </td>
+                            </tr>
+                        `;
+                    }
+
+                    // Page totals
+                    let pageTotalDebit = 0, pageTotalCredit = 0;
+                    for (const entry of pageEntries) {
+                        if (entry.debit > 0 || entry.credit < 0) pageTotalDebit  += Math.abs(entry.debit || entry.credit);
+                        if (entry.credit > 0 || entry.debit < 0) pageTotalCredit += Math.abs(entry.credit || entry.debit);
+                    }
+                    let grandTotalDebit = 0, grandTotalCredit = 0;
+                    for (const entry of allEntries) {
+                        if (entry.debit > 0 || entry.credit < 0) grandTotalDebit  += Math.abs(entry.debit || entry.credit);
+                        if (entry.credit > 0 || entry.debit < 0) grandTotalCredit += Math.abs(entry.credit || entry.debit);
+                    }
+                    const grandBalance = cumulativeBalances.length > 0 ? cumulativeBalances[cumulativeBalances.length - 1] : 0;
+                    const grandBalLabel = role === 'customer' ? (grandBalance >= 0 ? 'Dr' : 'Cr') : (grandBalance >= 0 ? 'Cr' : 'Dr');
+
+                    // Pagination controls
+                    let paginationHtml = '';
+                    if (pageSize !== 'all' && total > 0) {
+                        const totalPages = Math.ceil(total / pageSize);
+                        const from = startIdx + 1, to = endIdx;
+                        let btns = '';
+                        btns += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}"><a class="page-link soa-modal-page" href="#" data-page="${currentPage - 1}">‹</a></li>`;
+                        const delta = 2;
+                        let pages2 = [], prev2 = null;
+                        for (let i = 1; i <= totalPages; i++) {
+                            if (i === 1 || i === totalPages || (i >= currentPage - delta && i <= currentPage + delta)) pages2.push(i);
+                        }
+                        for (const p of pages2) {
+                            if (prev2 !== null && p - prev2 > 1) btns += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
+                            btns += `<li class="page-item ${p === currentPage ? 'active' : ''}"><a class="page-link soa-modal-page" href="#" data-page="${p}">${p}</a></li>`;
+                            prev2 = p;
+                        }
+                        btns += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}"><a class="page-link soa-modal-page" href="#" data-page="${currentPage + 1}">›</a></li>`;
+
+                        paginationHtml = `
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 px-2 pt-2 border-top">
+                                <div class="text-muted fs-12">Showing ${from} to ${to} of ${total} records</div>
+                                <nav><ul class="pagination pagination-sm mb-0">${btns}</ul></nav>
+                            </div>
+                        `;
+                    }
+
+                    return `
+                        <div class="card border-0 shadow-none mb-0">
+                            <div class="card-header p-0 pb-3 bg-transparent border-0 d-flex align-items-center flex-wrap gap-2">
+                                <h6 class="card-title mb-0 flex-grow-1"><i class="ri-file-list-3-line me-1 align-bottom text-primary"></i> Statement of Account</h6>
+                                <div class="d-flex align-items-center gap-2">
+                                    <label class="text-muted fs-12 mb-0">Show</label>
+                                    <select id="soaModalPageSize" class="form-select form-select-sm" style="min-width: 75px;">
+                                        <option value="10" ${pageSize === 10 ? 'selected' : ''}>10</option>
+                                        <option value="25" ${pageSize === 25 ? 'selected' : ''}>25</option>
+                                        <option value="50" ${pageSize === 50 ? 'selected' : ''}>50</option>
+                                        <option value="100" ${pageSize === 100 ? 'selected' : ''}>100</option>
+                                        <option value="all" ${pageSize === 'all' ? 'selected' : ''}>All</option>
+                                    </select>
+                                    <button class="btn btn-soft-primary btn-sm" onclick="doUserPrint()"><i class="ri-printer-line me-1"></i> Print</button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-nowrap align-middle mb-0">
+                                    <thead class="table-light fs-11 text-uppercase">
+                                        <tr>
+                                            <th style="width: 100px;">Date</th>
+                                            <th>Description</th>
+                                            <th class="text-end" style="width: 120px;">Debit</th>
+                                            <th class="text-end" style="width: 120px;">Credit</th>
+                                            <th class="text-end" style="width: 140px;">Balance</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="fs-13">
+                                        ${rowsHtml || '<tr><td colspan="5" class="text-center py-5 text-muted"><i class="ri-file-history-line fs-24 d-block mb-2"></i>No transactions found for this period</td></tr>'}
+                                    </tbody>
+                                    ${pageEntries.length > 0 ? `
+                                    <tfoot class="table-light fs-12 fw-bold">
+                                        <tr>
+                                            <td colspan="2" class="text-end text-muted text-uppercase fs-11">${pageSize !== 'all' ? `Page ${currentPage} Totals` : 'Grand Totals'}</td>
+                                            <td class="text-end text-success">${pageTotalDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                            <td class="text-end text-danger">${pageTotalCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                            <td class="text-end"></td>
+                                        </tr>
+                                        ${pageSize !== 'all' ? `
+                                        <tr class="border-top">
+                                            <td colspan="2" class="text-end text-muted text-uppercase fs-11">Grand Totals</td>
+                                            <td class="text-end text-success">${grandTotalDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                            <td class="text-end text-danger">${grandTotalCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                            <td class="text-end fw-bold text-dark">
+                                                ${Math.abs(grandBalance).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                <small class="text-muted fw-normal ms-1">${grandBalLabel}</small>
+                                            </td>
+                                        </tr>
+                                        ` : ''}
+                                    </tfoot>
+                                    ` : ''}
+                                </table>
+                            </div>
+                            ${paginationHtml}
+                        </div>
+                    `;
+                }
+
+                // Initial render
+                let soaModalPageSize = 10;
+                let soaModalCurrentPage = 1;
+
+                const ledgerHtml = buildModalSOAHtml(soaModalPageSize, soaModalCurrentPage);
+                renderViewModal('viewUserModal', ledgerHtml, null, headerHtml);
+
+                const modal = new bootstrap.Modal(document.getElementById('viewUserModal'));
+                modal.show();
+
+                // Attach page-size and pagination handlers after modal is shown
+                setTimeout(() => {
+                    attachModalPaginationHandlers();
+
+                    function attachModalPaginationHandlers() {
+                        // Re-attach page-size select (re-rendered on each page/size change)
+                        const psSel = document.getElementById('soaModalPageSize');
+                        if (psSel) {
+                            psSel.addEventListener('change', function() {
+                                soaModalPageSize = this.value === 'all' ? 'all' : parseInt(this.value);
+                                soaModalCurrentPage = 1;
+                                const newHtml = buildModalSOAHtml(soaModalPageSize, soaModalCurrentPage);
+                                renderViewModal('viewUserModal', newHtml, null, headerHtml);
+                                attachModalPaginationHandlers();
+                            });
+                        }
+                        // Re-attach page number links
+                        document.querySelectorAll('.soa-modal-page').forEach(a => {
+                            a.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                const p = parseInt(this.dataset.page);
+                                const totalPages = Math.ceil(total / soaModalPageSize);
+                                if (p >= 1 && p <= totalPages) {
+                                    soaModalCurrentPage = p;
+                                    const newHtml = buildModalSOAHtml(soaModalPageSize, soaModalCurrentPage);
+                                    renderViewModal('viewUserModal', newHtml, null, headerHtml);
+                                    attachModalPaginationHandlers();
+                                }
+                            });
+                        });
+                    }
+                }, 300);
+
+
+                return; // modal.show() already called above
+            }
+            const modal = new bootstrap.Modal(document.getElementById('viewUserModal'));
+            modal.show();
+        } catch (e) {
+            console.error(e);
+            toastr.error('Error loading details');
+        }
+    }
+
+    function openEditModal(id) {
+        fetch('/users/' + id)
+            .then(r => r.json())
+            .then(result => {
+                if (!result.success) return toastr.error('Failed to load record');
+                const u = result.user;
+                document.getElementById('editUserId').value = u.id;
+                document.getElementById('editFirstName').value = u.firstname || '';
+                document.getElementById('editLastName').value = u.lastname || '';
+                document.getElementById('editEmail').value = u.email || '';
+                document.getElementById('editUsername').value = u.username || '';
+                document.getElementById('editPhone').value = u.phone || '';
+                document.getElementById('editAddress').value = u.address || '';
+                if (document.getElementById('editPartyType') && u.fk_partytype_id) {
+                    document.getElementById('editPartyType').value = u.fk_partytype_id;
+                }
+                const currentRole = '<%= role %>';
+                if (currentRole !== 'customer' && currentRole !== 'vendor') {
+                    const pw = document.getElementById('editPassword');
+                    pw.value = '';
+                    pw.placeholder = 'Leave blank to keep current';
+                    const btn = pw.nextElementSibling;
+                    if (btn) {
+                        btn.querySelector('i').classList.remove('ri-eye-off-line');
+                        btn.querySelector('i').classList.add('ri-eye-line');
+                    }
+                } else {
+                    if (u.ob_date) document.getElementById('editObDate').value = u.ob_date;
+                    if (u.ob_primary_debit !== undefined) document.getElementById('editObPrimaryDebit').value = u.ob_primary_debit;
+                    if (u.ob_primary_credit !== undefined) document.getElementById('editObPrimaryCredit').value = u.ob_primary_credit;
+                    if (u.ob_contra_account) document.getElementById('editObContraAccount').value = u.ob_contra_account;
+                    if (u.ob_contra_debit !== undefined) document.getElementById('editObContraDebit').value = u.ob_contra_debit;
+                    if (u.ob_contra_credit !== undefined) document.getElementById('editObContraCredit').value = u.ob_contra_credit;
+                    // Re-evaluate badge
+                    balanceOB(document.getElementById('editObPrimaryDebit'), 'primary', 'debit', 'edit');
+                }
+                const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+                modal.show();
+            })
+            .catch(e => { console.error(e); toastr.error('Error loading record'); });
+    }
+
+    function validateForm(formId) {
+        const form = document.getElementById(formId);
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return null;
+        }
+        const phone = form.querySelector('input[name="phone"]').value;
+        if (phone && phone.length < 8) {
+            toastr.error('Phone number must be at least 8 characters');
+            form.querySelector('input[name="phone"]').focus();
+            return null;
+        }
+        const data = {};
+        new FormData(form).forEach((value, key) => { data[key] = value; });
+        return data;
+    }
+
+    function saveUser() {
+        const data = validateForm('addUserForm');
+        if (!data) return;
+        fetch('/users/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(r => r.json())
+        .then(result => {
+            if (result.success) {
+                toastr.success(result.message);
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
+                if (modal) modal.hide();
+                setTimeout(() => window.location.reload(), 800);
+            } else {
+                toastr.error(result.message || 'Error saving record');
+            }
+        })
+        .catch(e => { console.error(e); toastr.error('Failed to save record'); });
+    }
+
+    function updateUser() {
+        const data = validateForm('editUserForm');
+        if (!data) return;
+        fetch('/users/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(r => r.json())
+        .then(result => {
+            if (result.success) {
+                toastr.success(result.message);
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
+                if (modal) modal.hide();
+                setTimeout(() => window.location.reload(), 800);
+            } else {
+                toastr.error(result.message || 'Error updating record');
+            }
+        })
+        .catch(e => { console.error(e); toastr.error('Failed to update record'); });
+    }
+
+    function deleteRecord(id) {
+        $.confirm({
+            title: 'Confirm Delete',
+            content: 'Are you sure you want to delete this record?',
+            theme: 'material',
+            useBootstrap: false,
+            boxWidth: '30%',
+            type: 'red',
+            buttons: {
+                confirm: {
+                    text: 'Yes, Delete',
+                    btnClass: 'btn-danger',
+                    action: function () {
+                        fetch('/users/' + id + '/delete', { method: 'POST' })
+                            .then(r => r.json())
+                            .then(result => {
+                                if (result.success) {
+                                    toastr.success(result.message);
+                                    setTimeout(() => window.location.reload(), 800);
+                                } else {
+                                    toastr.error(result.message || 'Error deleting record');
+                                }
+                            })
+                            .catch(e => { console.error(e); toastr.error('Failed to delete record'); });
+                    }
+                },
+                cancel: {
+                    text: 'No',
+                    btnClass: 'btn-primary'
+                }
+            }
+        });
+    }
+</script>
+
+<!-- Party Types Management Modal -->
+<div class="modal fade" id="managePartyTypesModal" tabindex="-1" aria-hidden="true" style="z-index: 1070;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-light border-bottom py-2">
+                <h5 class="modal-title" id="managePartyTypesModalTitle">Manage Types</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addPartyTypeForm" class="d-flex mb-3">
+                    <input type="text" class="form-control form-control-sm me-2" id="newPartyTypeName" placeholder="New Type Name" required>
+                    <button type="submit" class="btn btn-primary btn-sm"><i class="ri-add-line"></i></button>
+                </form>
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table class="table table-sm table-nowrap align-middle">
+                        <tbody id="partyTypesList">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentPartyRole = '';
+    
+    function loadPartyTypes(role, selectedId = null, targetSelectId = null) {
+        if (role !== 'vendor' && role !== 'customer') return;
+        
+        fetch(`/partytypes?type=${role}`)
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    const options = '<option value="">Select Type...</option>' + 
+                        res.data.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+                    
+                    if (targetSelectId) {
+                        const select = document.getElementById(targetSelectId);
+                        if (select) {
+                            select.innerHTML = options;
+                            if (selectedId) select.value = selectedId;
+                        }
+                    } else {
+                        const addSelect = document.getElementById('addPartyType');
+                        const editSelect = document.getElementById('editPartyType');
+                        if (addSelect) {
+                            const prevVal = addSelect.value;
+                            addSelect.innerHTML = options;
+                            if (prevVal) addSelect.value = prevVal;
+                        }
+                        if (editSelect) {
+                            const prevVal = editSelect.value;
+                            editSelect.innerHTML = options;
+                            if (prevVal) editSelect.value = prevVal;
+                        }
+                    }
+                    
+                    // Populate modal list if open
+                    const listEl = document.getElementById('partyTypesList');
+                    if (listEl && currentPartyRole === role) {
+                        listEl.innerHTML = res.data.map(t => `
+                            <tr>
+                                <td>
+                                    <input type="text" class="form-control form-control-sm border-0 bg-light" id="pt_name_${t.id}" value="${t.name}">
+                                </td>
+                                <td class="text-end" style="width: 80px;">
+                                    <button class="btn btn-sm btn-link text-primary p-0 me-2" onclick="updatePartyType('${t.id}')"><i class="ri-save-line fs-16"></i></button>
+                                    <button class="btn btn-sm btn-link text-danger p-0" onclick="deletePartyType('${t.id}')"><i class="ri-delete-bin-line fs-16"></i></button>
+                                </td>
+                            </tr>
+                        `).join('');
+                    }
+                }
+            });
+    }
+
+    function managePartyTypes(role) {
+        currentPartyRole = role;
+        document.getElementById('managePartyTypesModalTitle').innerText = role === 'vendor' ? 'Manage Vendor Types' : 'Manage Client Types';
+        loadPartyTypes(role);
+        new bootstrap.Modal(document.getElementById('managePartyTypesModal')).show();
+    }
+
+    document.getElementById('addPartyTypeForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = document.getElementById('newPartyTypeName').value;
+        if (!name) return;
+        
+        fetch('/partytypes/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, type: currentPartyRole })
+        }).then(r => r.json()).then(res => {
+            if (res.success) {
+                document.getElementById('newPartyTypeName').value = '';
+                loadPartyTypes(currentPartyRole);
+            } else {
+                toastr.error(res.message);
+            }
+        });
+    });
+
+    function updatePartyType(id) {
+        const name = document.getElementById(`pt_name_${id}`).value;
+        fetch('/partytypes/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, name, type: currentPartyRole })
+        }).then(r => r.json()).then(res => {
+            if (res.success) {
+                toastr.success('Updated successfully');
+                loadPartyTypes(currentPartyRole);
+            } else {
+                toastr.error(res.message);
+            }
+        });
+    }
+
+    function deletePartyType(id) {
+        if (!confirm('Are you sure?')) return;
+        fetch(`/partytypes/${id}/delete`, { method: 'POST' })
+            .then(r => r.json()).then(res => {
+                if (res.success) {
+                    loadPartyTypes(currentPartyRole);
+                } else {
+                    toastr.error(res.message);
+                }
+            });
+    }
+    
+    // Initial load
+    document.addEventListener('DOMContentLoaded', () => {
+        loadPartyTypes('<%= role %>');
+    });
+</script><!-- Iframe Modal for Document Viewing -->
+<div class="modal fade" id="iframeModal" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" style="max-width: 90vw; height: 90vh;">
+        <div class="modal-content shadow-lg border-0 h-100">
+            <div class="modal-header bg-light border-bottom py-2">
+                <h5 class="modal-title d-flex align-items-center text-primary">
+                    <i class="ri-file-text-line me-2"></i>
+                    <span class="fw-bold" id="iframeModalTitle">Document View</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0" style="overflow: hidden; background: #eef1f5;">
+                <iframe id="iframeModalContent" style="width: 100%; height: 100%; border: none;" src=""></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/assets/js/print-helper.js"></script>
+<script>
+    const printerConfig = <%- JSON.stringify(typeof printerConfig !== 'undefined' ? printerConfig : { printer: 'Default', printerType: 'standard', paper: 'A4', width: 210, height: 297, fontSize: 12, silentPrinting: false, numberOfPrints: 1 }) %>;
+    window.printerConfig = printerConfig;
+
+async function doUserPrint() {
+    if (window.SalesPeckPrinter && typeof window.SalesPeckPrinter.print === 'function') {
+        await window.SalesPeckPrinter.print();
+    } else {
+        window.print();
+    }
+}
+
+function openIframeModal(url, title = 'Document View') {
+    document.getElementById('iframeModalTitle').innerText = title;
+    
+    const iframe = document.getElementById('iframeModalContent');
+    iframe.src = url;
+    
+    const modal = new bootstrap.Modal(document.getElementById('iframeModal'));
+    modal.show();
+    
+    document.getElementById('iframeModal').addEventListener('hidden.bs.modal', function () {
+        iframe.src = '';
+    }, { once: true });
+}
+</script>

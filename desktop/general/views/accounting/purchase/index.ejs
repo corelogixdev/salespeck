@@ -1,0 +1,164 @@
+<div class="card">
+    <div class="card-header align-items-center d-flex">
+        <h4 class="card-title mb-0 flex-grow-1">Purchase List</h4>
+        <div class="d-flex gap-2 align-items-center">
+            <button class="btn btn-soft-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#purchaseFilters" aria-expanded="false" aria-controls="purchaseFilters">
+                <i class="ri-filter-3-line align-bottom me-1"></i> Filters
+            </button>
+            <button onclick="window.location.reload()" class="btn btn-soft-success btn-sm" title="Refresh">
+                <i class="ri-refresh-line align-middle"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="collapse mb-3" id="purchaseFilters">
+            <%- include('../../components/partials/filter-section', {
+                filters: [
+                    { name: 'daterange', label: 'Date Range', type: 'daterange', placeholder: 'Filter by date range...', icon: 'ri-calendar-2-line', colSize: 3 },
+                    { name: 'vendor', label: 'Vendor', type: 'text', placeholder: 'Search by vendor name...', icon: 'ri-user-line', colSize: 3 },
+                    { name: 'invoicenum', label: 'Invoice #', type: 'text', placeholder: 'Search by invoice number...', icon: 'ri-file-list-line', colSize: 3 }
+                ],
+                values: query,
+                action: '/accounting/purchase'
+            }) %>
+        </div>
+
+        <%
+        const tableColumns = [
+            { 
+                key: 'createdAt', 
+                label: 'Date', 
+                sortable: true, 
+                render: (row) => moment(row.createdAt).format('D MMM, YYYY')
+            },
+            { 
+                key: 'Creator', 
+                label: 'Creator', 
+                sortable: false, 
+                render: (row) => {
+                    const name = row.Creator ? `${row.Creator.firstname} ${row.Creator.lastname}` : 'Unknown';
+                    return name;
+                }
+            },
+            { 
+                key: 'Vendor', 
+                label: 'Vendor', 
+                sortable: false, 
+                render: (row) => {
+                    const name = row.Vendor ? `${row.Vendor.firstname} ${row.Vendor.lastname}` : 'None';
+                    return name;
+                }
+            },
+            { 
+                key: 'totalAmount', 
+                label: 'Amount', 
+                sortable: true, 
+                render: (row) => `Rs. ${formatNumber(row.netAmount || row.totalAmount || 0)}`
+            },
+            { 
+                key: 'invoicenum', 
+                label: 'Invoice ID', 
+                sortable: true,
+                render: (row) => row.invoicenum || '-'
+            },
+            {
+                key: 'actions',
+                label: 'Actions',
+                sortable: false,
+                class: 'text-end',
+                render: (row) => {
+                    return `<div class="btn-group btn-group-sm action-group" role="group">
+                        <button type="button" class="btn btn-soft-info action-btn" onclick="viewPurchase('${row.id}')" title="Invoice"><i class="ri-file-text-line"></i></button>
+                        <button type="button" class="btn btn-soft-primary action-btn" onclick="openViewModal('${row.id}')" title="Quick View"><i class="ri-eye-line"></i></button>
+                    </div>`;
+                }
+            }
+        ];
+        %>
+
+        <%- include('../../components/partials/data-table', {
+            columns: tableColumns,
+            data: purchases,
+            sortBy: sortBy,
+            sortOrder: sortOrder,
+            baseUrl: '/accounting/purchase',
+            query: query
+        }) %>
+
+        <%- include('../../components/partials/pagination', {
+            pagination: pagination,
+            baseUrl: '/accounting/purchase',
+            query: query
+        }) %>
+    </div>
+</div>
+
+<%- include('../../components/partials/floating-action-btn', {
+    targetModal: null,
+    icon: 'ri-add-line',
+    tooltip: 'New Purchase',
+    colorClass: 'btn-primary',
+    show: true
+}) %>
+
+<script>
+    (function() {
+        const fab = document.querySelector('.floating-action-btn');
+        if (fab && !fab.getAttribute('data-bs-target')) {
+            fab.addEventListener('click', function() {
+                window.location.href = '/accounting/purchase/form';
+            });
+        }
+    })();
+</script>
+
+<!-- View Modal -->
+<%- include('../../components/partials/view-modal', {
+    id: 'viewPurchaseModal',
+    title: 'Purchase Details'
+}) %>
+
+<script>
+    function viewPurchase(id) {
+        window.open('/accounting/purchase/view/' + id, '_blank');
+    }
+
+    function openViewModal(id) {
+        fetch('/accounting/purchase/api/' + id)
+            .then(r => r.json())
+            .then(result => {
+                if (!result.success) return toastr.error('Failed to load details');
+                const p = result.purchase;
+                const vendor = p.Vendor ? `${p.Vendor.firstname} ${p.Vendor.lastname}` : 'None';
+                const creator = p.Creator ? `${p.Creator.firstname} ${p.Creator.lastname}` : 'Unknown';
+                const items = (p.PurchasedItems || []).map(item => {
+                    const prod = item.Product ? item.Product.name : 'Unknown Product';
+                    return `${prod} (Qty: ${item.quantity || 0})`;
+                }).join('<br>');
+
+                renderViewModal('viewPurchaseModal', [
+                    { label: 'Invoice ID', value: p.invoicenum || '-' },
+                    { label: 'Date', value: p.createdAt ? moment(p.createdAt).format('D MMM, YYYY HH:mm') : '-' },
+                    { label: 'Creator', value: creator },
+                    { label: 'Vendor', value: vendor },
+                    { label: 'Total Amount', value: `Rs. ${(p.totalAmount || 0).toLocaleString()}` },
+                    { label: 'Total Payment', value: `Rs. ${(p.totalPayment || 0).toLocaleString()}` },
+                    { label: 'Products', value: items || '-' }
+                ]);
+
+                const modal = new bootstrap.Modal(document.getElementById('viewPurchaseModal'));
+                modal.show();
+            })
+            .catch(e => { console.error(e); toastr.error('Error loading details'); });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        flatpickr(".flatpickr-range", {
+            mode: "range",
+            dateFormat: "Y-m-d",
+            placeholder: "Filter by date range...",
+            defaultDate: "<%= query?.daterange?.split(' to ') || '' %>"
+        });
+    });
+</script>

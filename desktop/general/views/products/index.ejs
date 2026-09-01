@@ -1,0 +1,614 @@
+<div class="card">
+  <div class="card-header align-items-center d-flex">
+    <h4 class="card-title mb-0 flex-grow-1">
+      <%= title %>
+    </h4>
+    <div class="d-flex gap-2 align-items-center">
+      <% if (permissions.productsCreate) { %>
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addProductModal">
+          <i class="ri-add-line align-middle me-1"></i> Add New Product
+        </button>
+      <% } %>
+      <button onclick="window.location.reload()" class="btn btn-soft-success btn-sm" title="Refresh">
+        <i class="ri-refresh-line align-middle"></i> Refresh
+      </button>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <div class="mb-3" id="productFilters">
+      <%
+        const categoryOptions = categories.map(c => ({ value: c.id, label: c.name }));
+        const brandOptions = brands.map(b => ({ value: b.id, label: b.name }));
+      %>
+      <%- include('../components/partials/filter-section', {
+        filters: [
+          { name: 'name', label: 'Product Name', type: 'text', placeholder: 'Name...', icon: 'ri-search-line', colSize: 2 },
+          { name: 'category', label: 'Category', type: 'select', options: categoryOptions, colSize: 2 },
+          { name: 'brand', label: 'Brand', type: 'select', options: brandOptions, colSize: 1 },
+          { name: 'stock_status', label: 'Stock', type: 'select', options: [
+            { value: 'in_stock', label: 'In Stock' },
+            { value: 'low_stock', label: 'Low Stock' },
+            { value: 'out_of_stock', label: 'Out of Stock' }
+          ], colSize: 2 },
+          { label: 'Price Range', type: 'range', names: ['price_min', 'price_max'], placeholders: ['Min', 'Max'], colSize: 2 },
+          { name: 'sale_active', label: 'Sale', type: 'select', options: [{ value: '1', label: 'Active' }, { value: '0', label: 'Inactive' }], colSize: 1 },
+          { name: 'purchase_active', label: 'Purchase', type: 'select', options: [{ value: '1', label: 'Active' }, { value: '0', label: 'Inactive' }], colSize: 1 }
+        ],
+        values: query,
+        action: '/products',
+        buttonColSize: 1,
+        autoSubmit: true,
+        hideClear: true,
+        ajaxContainer: '#table-wrapper'
+      }) %>
+    </div>
+
+    <div id="table-wrapper">
+      <%- include('./_table_content') %>
+    </div>
+  </div>
+</div>
+
+<script>
+  // AJAX handling for sorting and pagination
+  document.addEventListener('click', function(e) {
+    const link = e.target.closest('.sort-link, .pagination a');
+    if (!link) return;
+    
+    e.preventDefault();
+    const url = new URL(link.href);
+    url.searchParams.set('partial', '1');
+    
+    // Ensure active filters are included in the sort/pagination link
+    const currentParams = new URLSearchParams(window.location.search);
+    for (const [key, value] of currentParams) {
+        if (!url.searchParams.has(key)) {
+            url.searchParams.set(key, value);
+        }
+    }
+    
+    // Update browser URL
+    const displayUrl = new URL(url.toString());
+    displayUrl.searchParams.delete('partial');
+    window.history.pushState({}, '', displayUrl.toString());
+    
+    fetch(url.toString(), {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(response => response.text())
+    .then(html => {
+        const wrapper = document.getElementById('table-wrapper');
+        if (wrapper) wrapper.innerHTML = html;
+    })
+    .catch(error => {
+        console.error('AJAX Error:', error);
+        window.location.href = displayUrl.toString(); // Fallback
+    });
+  });
+</script>
+
+
+
+<!-- Add Product Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-gradient-primary text-white">
+        <h5 class="modal-title">Create Product</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addProductForm" class="needs-validation" novalidate>
+          <div class="row gy-3">
+            <div class="col-md-6">
+              <label for="addName" class="form-label">Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="addName" name="name" required>
+            </div>
+            <div class="col-md-6">
+              <label for="addBarcode" class="form-label">Barcode</label>
+              <div class="input-group">
+                <input type="text" class="form-control" id="addBarcode" name="barcode" placeholder="Scan or enter barcode">
+                <button class="btn btn-outline-secondary" type="button" id="addBarcodeManual">Manual</button>
+                <button class="btn btn-outline-primary active" type="button" id="addBarcodeScan">Barcode</button>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="addTaxid" class="form-label">Tax Type</label>
+              <select class="form-select" id="addTaxid" name="taxid">
+                <option value="">Select Tax Type</option>
+                <% taxes.forEach(tax => { %>
+                  <option value="<%= tax.id %>"><%= tax.name.toUpperCase() %> (<%= tax.percentage %>%)</option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="addCategory" class="form-label">Category</label>
+              <select class="form-select" id="addCategory" name="category">
+                <option value="">Select Category</option>
+                <% categories.forEach(cat => { %>
+                  <option value="<%= cat.id %>"><%= cat.name %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="addBrand" class="form-label">Brand</label>
+              <select class="form-select" id="addBrand" name="brand">
+                <option value="">Select Brand</option>
+                <% brands.forEach(brand => { %>
+                  <option value="<%= brand.id %>"><%= brand.name %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="addCarrycost" class="form-label">Carry Cost</label>
+              <input type="number" step="0.01" class="form-control" id="addCarrycost" name="carrycost">
+            </div>
+            <div class="col-md-6">
+              <label for="addDiscount" class="form-label">Discount</label>
+              <input type="number" step="0.01" class="form-control" id="addDiscount" name="discount">
+            </div>
+            <div class="col-md-6">
+              <label for="addPurchaseprice" class="form-label">Purchase Price</label>
+              <input type="number" step="0.01" class="form-control" id="addPurchaseprice" name="purchaseprice">
+            </div>
+            <div class="col-md-6">
+              <label for="addQuantity" class="form-label">Quantity</label>
+              <input type="number" step="0.01" class="form-control" id="addQuantity" name="quantity">
+            </div>
+            <div class="col-md-6">
+              <label for="addSaleprice" class="form-label">Sale Price</label>
+              <input type="number" step="0.01" class="form-control" id="addSaleprice" name="saleprice">
+            </div>
+            <div class="col-md-12">
+              <div class="d-flex gap-4 align-items-center mt-2">
+                <div class="form-check form-switch">
+                  <input type="checkbox" class="form-check-input" id="addSaleactive" name="saleactive" checked>
+                  <label class="form-check-label" for="addSaleactive">Sale Active</label>
+                </div>
+                <div class="form-check form-switch">
+                  <input type="checkbox" class="form-check-input" id="addPurchaseactive" name="purchaseactive" checked>
+                  <label class="form-check-label" for="addPurchaseactive">Purchase Active</label>
+                </div>
+                <div class="form-check form-switch">
+                  <input type="checkbox" class="form-check-input" id="addIsService" name="is_service">
+                  <label class="form-check-label text-primary fw-bold" for="addIsService">Is Service Design?</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="saveProduct()">Save Product</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Product Modal -->
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-gradient-warning text-white">
+        <h5 class="modal-title">Edit Product</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editProductForm" class="needs-validation" novalidate>
+          <input type="hidden" id="editProductId" name="id">
+          <div class="row gy-3">
+            <div class="col-md-6">
+              <label for="editName" class="form-label">Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="editName" name="name" required>
+            </div>
+            <div class="col-md-6">
+              <label for="editBarcode" class="form-label">Barcode</label>
+              <div class="input-group">
+                <input type="text" class="form-control" id="editBarcode" name="barcode" placeholder="Scan or enter barcode">
+                <button class="btn btn-outline-secondary" type="button" id="editBarcodeManual">Manual</button>
+                <button class="btn btn-outline-primary active" type="button" id="editBarcodeScan">Barcode</button>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="editTaxid" class="form-label">Tax Type</label>
+              <select class="form-select" id="editTaxid" name="taxid">
+                <option value="">Select Tax Type</option>
+                <% taxes.forEach(tax => { %>
+                  <option value="<%= tax.id %>"><%= tax.name.toUpperCase() %> (<%= tax.percentage %>%)</option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="editCategory" class="form-label">Category</label>
+              <select class="form-select" id="editCategory" name="category">
+                <option value="">Select Category</option>
+                <% categories.forEach(cat => { %>
+                  <option value="<%= cat.id %>"><%= cat.name %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="editBrand" class="form-label">Brand</label>
+              <select class="form-select" id="editBrand" name="brand">
+                <option value="">Select Brand</option>
+                <% brands.forEach(brand => { %>
+                  <option value="<%= brand.id %>"><%= brand.name %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="editCarrycost" class="form-label">Carry Cost</label>
+              <input type="number" step="0.01" class="form-control" id="editCarrycost" name="carrycost">
+            </div>
+            <div class="col-md-6">
+              <label for="editDiscount" class="form-label">Discount</label>
+              <input type="number" step="0.01" class="form-control" id="editDiscount" name="discount">
+            </div>
+            <div class="col-md-6">
+              <label for="editPurchaseprice" class="form-label">Purchase Price</label>
+              <input type="number" step="0.01" class="form-control" id="editPurchaseprice" name="purchaseprice">
+            </div>
+            <div class="col-md-6">
+              <label for="editQuantity" class="form-label">Quantity</label>
+              <input type="number" step="0.01" class="form-control" id="editQuantity" name="quantity">
+            </div>
+            <div class="col-md-6">
+              <label for="editSaleprice" class="form-label">Sale Price</label>
+              <input type="number" step="0.01" class="form-control" id="editSaleprice" name="saleprice">
+            </div>
+            <div class="col-md-12">
+              <div class="d-flex gap-4 align-items-center mt-2">
+                <div class="form-check form-switch">
+                  <input type="checkbox" class="form-check-input" id="editSaleactive" name="saleactive">
+                  <label class="form-check-label" for="editSaleactive">Sale Active</label>
+                </div>
+                <div class="form-check form-switch">
+                  <input type="checkbox" class="form-check-input" id="editPurchaseactive" name="purchaseactive">
+                  <label class="form-check-label" for="editPurchaseactive">Purchase Active</label>
+                </div>
+                <div class="form-check form-switch">
+                  <input type="checkbox" class="form-check-input" id="editIsService" name="is_service">
+                  <label class="form-check-label text-primary fw-bold" for="editIsService">Is Service Design?</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-warning" onclick="updateProduct()">Update Product</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View Modal -->
+<%- include('../components/partials/view-modal', {
+  id: 'viewProductModal',
+  title: 'Product Details'
+}) %>
+
+<!-- Quantity Update Modal -->
+<div class="modal fade" id="quantityModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-gradient-info text-white">
+        <h5 class="modal-title">Update Product Quantity</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="quantityForm" class="needs-validation" novalidate>
+          <input type="hidden" id="quantityProductId" name="id">
+          <div class="row gy-3">
+            <div class="col-md-6">
+              <label for="quantityProductName" class="form-label">Product Name</label>
+              <input type="text" class="form-control" id="quantityProductName" name="name" readonly>
+            </div>
+            <div class="col-md-6">
+              <label for="quantityCurrent" class="form-label">Current Quantity</label>
+              <input type="number" step="0.01" class="form-control" id="quantityCurrent" name="currentQuantity">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Adjustment Type</label>
+              <div class="btn-group w-100" role="group" id="quantityTypeGroup">
+                <button type="button" class="btn btn-sm btn-primary active" data-value="increase" id="qtyTypeIncrease">Increase</button>
+                <button type="button" class="btn btn-sm btn-light" data-value="decrease" id="qtyTypeDecrease">Decrease</button>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="quantityAdjust" class="form-label">Quantity to Adjust <span class="text-danger">*</span></label>
+              <input type="number" step="0.01" class="form-control" id="quantityAdjust" name="quantity" min="0" required>
+              <div class="invalid-feedback">Please enter a valid quantity.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="quantityExpiry" class="form-label">Expiry Date</label>
+              <input type="date" class="form-control" id="quantityExpiry" name="expirydate" min="<%= new Date().toISOString().split('T')[0] %>">
+            </div>
+            <div class="col-md-12">
+              <label for="quantityNote" class="form-label">Note <span class="text-danger">*</span></label>
+              <textarea class="form-control" id="quantityNote" name="note" rows="3" required placeholder="Enter a note for this quantity change"></textarea>
+              <div class="invalid-feedback">Please enter a note.</div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="saveQuantity()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+  function setupBarcodeToggle(prefix) {
+    const manualBtn = document.getElementById(prefix + 'BarcodeManual');
+    const scanBtn = document.getElementById(prefix + 'BarcodeScan');
+    const input = document.getElementById(prefix + 'Barcode');
+
+    manualBtn.addEventListener('click', () => {
+      manualBtn.classList.add('active');
+      scanBtn.classList.remove('active');
+      input.placeholder = 'Enter barcode manually';
+    });
+    scanBtn.addEventListener('click', () => {
+      scanBtn.classList.add('active');
+      manualBtn.classList.remove('active');
+      input.placeholder = 'Scan or enter barcode';
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setupBarcodeToggle('add');
+    setupBarcodeToggle('edit');
+
+    // Stock color coding
+    document.querySelectorAll('.data-table tbody tr').forEach(row => {
+      const qtyCell = row.querySelector('td:nth-child(7)');
+      if (qtyCell) {
+        const text = qtyCell.textContent.trim();
+        const qty = parseFloat(text);
+        if (!isNaN(qty)) {
+          if (qty === 0) row.style.backgroundColor = 'var(--vz-danger-bg-subtle)';
+          else if (qty < 10) row.style.backgroundColor = 'var(--vz-warning-bg-subtle)';
+        }
+      }
+    });
+  });
+
+  function updateQuantity(id, name, quantity) {
+    document.getElementById('quantityProductId').value = id;
+    document.getElementById('quantityProductName').value = name;
+    document.getElementById('quantityCurrent').value = quantity;
+    document.getElementById('quantityAdjust').value = '';
+    document.getElementById('quantityExpiry').value = '';
+    document.getElementById('quantityNote').value = '';
+    // Default to increase
+    document.getElementById('qtyTypeIncrease').classList.add('btn-primary', 'active');
+    document.getElementById('qtyTypeIncrease').classList.remove('btn-light');
+    document.getElementById('qtyTypeDecrease').classList.remove('btn-primary', 'active');
+    document.getElementById('qtyTypeDecrease').classList.add('btn-light');
+
+    const modal = new bootstrap.Modal(document.getElementById('quantityModal'));
+    modal.show();
+  }
+
+  document.getElementById('qtyTypeIncrease').addEventListener('click', function () {
+    this.classList.add('btn-primary', 'active');
+    this.classList.remove('btn-light');
+    document.getElementById('qtyTypeDecrease').classList.remove('btn-primary', 'active');
+    document.getElementById('qtyTypeDecrease').classList.add('btn-light');
+  });
+  document.getElementById('qtyTypeDecrease').addEventListener('click', function () {
+    this.classList.add('btn-primary', 'active');
+    this.classList.remove('btn-light');
+    document.getElementById('qtyTypeIncrease').classList.remove('btn-primary', 'active');
+    document.getElementById('qtyTypeIncrease').classList.add('btn-light');
+  });
+
+  function saveQuantity() {
+    const form = document.getElementById('quantityForm');
+    if (!form.checkValidity()) {
+      form.classList.add('was-validated');
+      return;
+    }
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    data.quantity = parseFloat(data.quantity) || 0;
+    const isDecrease = document.getElementById('qtyTypeDecrease').classList.contains('active');
+    if (isDecrease && data.quantity > 0) {
+      data.quantity = data.quantity * -1;
+    }
+    data.currentQuantity = parseFloat(data.currentQuantity) || 0;
+
+    fetch('/products/quantity/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(result => {
+      if (result.success) {
+        toastr.success(result.message || 'Quantity updated successfully');
+        const modal = bootstrap.Modal.getInstance(document.getElementById('quantityModal'));
+        if (modal) modal.hide();
+        setTimeout(() => window.location.reload(), 800);
+      } else {
+        toastr.error(result.message || 'Error updating quantity');
+      }
+    })
+    .catch(e => { console.error(e); toastr.error('Failed to update quantity'); });
+  }
+
+  function validateForm(formId) {
+    const form = document.getElementById(formId);
+    if (!form.checkValidity()) {
+      form.classList.add('was-validated');
+      return null;
+    }
+    const name = form.querySelector('[name="name"]').value;
+    if (name.length < 2) {
+      toastr.error('Product name must be at least 2 characters');
+      return null;
+    }
+    const data = {};
+    new FormData(form).forEach((value, key) => {
+      data[key] = value;
+    });
+    data.saleactive = form.querySelector('[name="saleactive"]').checked ? 'on' : 'off';
+    data.purchaseactive = form.querySelector('[name="purchaseactive"]').checked ? 'on' : 'off';
+    const isServiceCheckbox = form.querySelector('[name="is_service"]');
+    if (isServiceCheckbox) {
+      data.is_service = isServiceCheckbox.checked ? 'on' : 'off';
+    }
+    // Ensure numeric fields are sent as numbers when possible
+    ['carrycost', 'discount', 'purchaseprice', 'quantity', 'saleprice'].forEach(k => {
+      if (data[k] !== undefined && data[k] !== '') data[k] = parseFloat(data[k]);
+    });
+    return data;
+  }
+
+  function saveProduct() {
+    const data = validateForm('addProductForm');
+    if (!data) return;
+    fetch('/products/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(result => {
+      if (result.success) {
+        toastr.success(result.message);
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
+        if (modal) modal.hide();
+        setTimeout(() => window.location.reload(), 800);
+      } else {
+        toastr.error(result.message || 'Error saving product');
+      }
+    })
+    .catch(e => { console.error(e); toastr.error('Failed to save product'); });
+  }
+
+  function openEditModal(id) {
+    fetch('/products/api/' + id)
+      .then(r => r.json())
+      .then(result => {
+        if (!result.success) return toastr.error('Failed to load product');
+        const p = result.product;
+        document.getElementById('editProductId').value = p.id;
+        document.getElementById('editName').value = p.name || '';
+        document.getElementById('editBarcode').value = p.barcode || '';
+        document.getElementById('editTaxid').value = p.taxid || '';
+        document.getElementById('editCategory').value = p.category || '';
+        document.getElementById('editBrand').value = p.brand || '';
+        document.getElementById('editCarrycost').value = p.carrycost || '';
+        document.getElementById('editDiscount').value = p.discount || '';
+        document.getElementById('editPurchaseprice').value = p.purchaseprice || '';
+        document.getElementById('editQuantity').value = p.quantity || '';
+        document.getElementById('editSaleprice').value = p.saleprice || '';
+        document.getElementById('editSaleactive').checked = p.saleactive;
+        document.getElementById('editPurchaseactive').checked = p.purchaseactive;
+        if (document.getElementById('editIsService')) {
+          document.getElementById('editIsService').checked = p.is_service;
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('editProductModal'));
+        modal.show();
+      })
+      .catch(e => { console.error(e); toastr.error('Error loading product'); });
+  }
+
+  function updateProduct() {
+    const data = validateForm('editProductForm');
+    if (!data) return;
+    fetch('/products/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(result => {
+      if (result.success) {
+        toastr.success(result.message);
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editProductModal'));
+        if (modal) modal.hide();
+        setTimeout(() => window.location.reload(), 800);
+      } else {
+        toastr.error(result.message || 'Error updating product');
+      }
+    })
+    .catch(e => { console.error(e); toastr.error('Failed to update product'); });
+  }
+
+  function openViewModal(id) {
+    fetch('/products/api/' + id)
+      .then(r => r.json())
+      .then(result => {
+        if (!result.success) return toastr.error('Failed to load details');
+        const p = result.product;
+        renderViewModal('viewProductModal', [
+          { label: 'Name', value: p.name },
+          { label: 'Barcode', value: p.barcode || '-' },
+          { label: 'Category', value: p.Category ? p.Category.name : '-' },
+          { label: 'Brand', value: p.Brand ? p.Brand.name : '-' },
+          { label: 'Purchase Price', value: typeof p.purchaseprice === 'number' ? p.purchaseprice.toFixed(2) : p.purchaseprice },
+          { label: 'Sale Price', value: typeof p.saleprice === 'number' ? p.saleprice.toFixed(2) : p.saleprice },
+          { label: 'Quantity', value: p.quantity || 0 },
+          { label: 'Discount', value: (p.discount || 0) + '%' },
+          { label: 'Carry Cost', value: p.carrycost || 0 },
+          { label: 'Sale Active', value: p.saleactive ? 'Yes' : 'No' },
+          { label: 'Purchase Active', value: p.purchaseactive ? 'Yes' : 'No' },
+          { label: 'Is Service', value: p.is_service ? 'Yes' : 'No' }
+        ]);
+        const modal = new bootstrap.Modal(document.getElementById('viewProductModal'));
+        modal.show();
+      })
+      .catch(e => { console.error(e); toastr.error('Error loading details'); });
+  }
+
+  function deleteRecord(id) {
+    $.confirm({
+      title: 'Confirm!',
+      content: 'Are you sure you want to delete this product?',
+      theme: 'material',
+      useBootstrap: false,
+      boxWidth: '30%',
+      buttons: {
+        confirm: {
+          text: 'Yes',
+          btnClass: 'btn-danger',
+          action: async function () {
+            const response = await fetch(`/products/${id}/delete`, { method: 'POST' });
+            let result = await response.json();
+            if (result.success === true) {
+              toastr.success(result.message);
+              setTimeout(() => window.location.reload(), 800);
+            } else {
+              toastr.error(result.message || 'Error deleting product');
+            }
+          }
+        },
+        cancel: {
+          text: 'No',
+          btnClass: 'btn-primary',
+        }
+      }
+    });
+  }
+</script>
+
+<% if (permissions.productsCreate) { %>
+  <%- include('../components/partials/floating-action-btn', {
+    targetModal: '#addProductModal',
+    icon: 'ri-add-line',
+    tooltip: 'Add New Product',
+    colorClass: 'btn-primary',
+    show: true
+  }) %>
+<% } %>

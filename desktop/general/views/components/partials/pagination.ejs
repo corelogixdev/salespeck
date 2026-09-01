@@ -1,0 +1,141 @@
+<%
+function buildPaginationUrl(page, pageSize) {
+    const params = new URLSearchParams(query || {});
+    params.set('page', page);
+    if (pageSize) params.set('pageSize', pageSize);
+    return `${baseUrl}?${params.toString()}`;
+}
+
+const pageSizeOptions = [
+    { value: 10, label: '10' },
+    { value: 25, label: '25' },
+    { value: 50, label: '50' },
+    { value: 100, label: '100' },
+    { value: 200, label: '200' },
+    { value: 500, label: '500' },
+    { value: 1000, label: '1000' },
+    { value: 9999, label: 'All' }
+];
+const currentPageSize = pagination.pageSize || 10;
+%>
+
+    <% if (pagination && pagination.totalCount > 0) { %>
+        <div class="pagination-wrapper">
+            <div class="pagination-container">
+                <!-- Records Info -->
+                <div class="pagination-info">
+                    <span class="text-muted">
+                        Showing <strong>
+                            <%= pagination.startRecord %>
+                        </strong> to
+                        <strong>
+                            <%= pagination.endRecord %>
+                        </strong> of
+                        <strong>
+                            <%= pagination.totalCount %>
+                        </strong> records
+                    </span>
+                </div>
+
+                <!-- Page Size Selector -->
+                <div class="page-size-selector">
+                    <label for="pageSize" class="me-2 text-muted">Show:</label>
+                    <select id="pageSize" class="form-select form-select-sm"
+                        onchange="(function() { const params = new URLSearchParams(window.location.search); params.set('page', 1); params.set('pageSize', this.value); window.location.href = '<%= baseUrl %>' + '?' + params.toString(); }).call(this)">
+                        <% pageSizeOptions.forEach(option => { %>
+                            <option value="<%= option.value %>" <%= currentPageSize == option.value ? 'selected' : '' %>><%= option.label %></option>
+                        <% }) %>
+                    </select>
+                </div>
+
+                <!-- Pagination Controls -->
+                <% if (pagination.totalPages > 1) { %>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination pagination-sm mb-0">
+                            <!-- First Page -->
+                            <li class="page-item <%= !pagination.hasPrevious ? 'disabled' : '' %>">
+                                <a class="page-link"
+                                    href="<%= pagination.hasPrevious ? buildPaginationUrl(1, currentPageSize) : '#' %>"
+                                    title="First">
+                                    <i class="ri-arrow-left-double-line"></i>
+                                </a>
+                            </li>
+
+                            <!-- Previous Page -->
+                            <li class="page-item <%= !pagination.hasPrevious ? 'disabled' : '' %>">
+                                <a class="page-link"
+                                    href="<%= pagination.hasPrevious ? buildPaginationUrl(pagination.currentPage - 1, currentPageSize) : '#' %>"
+                                    title="Previous">
+                                    <i class="ri-arrow-left-s-line"></i>
+                                </a>
+                            </li>
+
+                            <!-- Page Numbers -->
+                            <%
+                                const currentPage = pagination.currentPage;
+                                const totalPages = pagination.totalPages;
+                                let startPage = Math.max(1, currentPage - 2);
+                                let endPage = Math.min(totalPages, currentPage + 2);
+                                if (currentPage <= 3) {
+                                    endPage = Math.min(5, totalPages);
+                                } else if (currentPage >= totalPages - 2) {
+                                    startPage = Math.max(1, totalPages - 4);
+                                }
+                            %>
+
+                            <% if (startPage > 1) { %>
+                                <li class="page-item">
+                                    <a class="page-link" href="<%- buildPaginationUrl(1, currentPageSize) %>">1</a>
+                                </li>
+                                <% if (startPage > 2) { %>
+                                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                                <% } %>
+                            <% } %>
+
+                            <% for (let i = startPage; i <= endPage; i++) { %>
+                                <% if (i > 0 && i <= totalPages) { %>
+                                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                        <a class="page-link" href="<%- buildPaginationUrl(i, currentPageSize) %>">
+                                            <%= i %>
+                                        </a>
+                                    </li>
+                                <% } %>
+                            <% } %>
+
+                            <% if (endPage < totalPages) { %>
+                                <% if (endPage < totalPages - 1) { %>
+                                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                                <% } %>
+                                <li class="page-item">
+                                    <a class="page-link" href="<%- buildPaginationUrl(totalPages, currentPageSize) %>">
+                                        <%= totalPages %>
+                                    </a>
+                                </li>
+                            <% } %>
+
+                            <!-- Next Page -->
+                            <li class="page-item <%= !pagination.hasNext ? 'disabled' : '' %>">
+                                <a class="page-link"
+                                    href="<%= pagination.hasNext ? buildPaginationUrl(pagination.currentPage + 1, currentPageSize) : '#' %>"
+                                    title="Next">
+                                    <i class="ri-arrow-right-s-line"></i>
+                                </a>
+                            </li>
+
+                            <!-- Last Page -->
+                            <li class="page-item <%= !pagination.hasNext ? 'disabled' : '' %>">
+                                <a class="page-link"
+                                    href="<%= pagination.hasNext ? buildPaginationUrl(pagination.totalPages, currentPageSize) : '#' %>"
+                                    title="Last">
+                                    <i class="ri-arrow-right-double-line"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                <% } %>
+            </div>
+        </div>
+
+
+    <% } %>
+

@@ -1,0 +1,56 @@
+<%
+  const brandMap = {};
+  brands.forEach(b => brandMap[b.id] = b.name);
+  const categoryMap = {};
+  categories.forEach(c => categoryMap[c.id] = c.name);
+
+  const tableColumns = [
+    { key: 'name', label: 'Name', sortable: true, render: (row) => `<h6 class="fs-14 mb-0">${row.name}</h6>` },
+    { key: 'category', label: 'Category', sortable: true, render: (row) => categoryMap[row.category] || '-' },
+    { key: 'discount', label: 'Discount', sortable: true, render: (row) => `${row.discount || 0}%` },
+    { key: 'purchaseprice', label: 'Purchase Price', sortable: true, render: (row) => typeof row.purchaseprice === 'number' ? row.purchaseprice.toFixed(2) : row.purchaseprice },
+    { key: 'purchaseactive', label: 'Purchase Active', sortable: true, render: (row) => row.purchaseactive ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>' },
+    { 
+      key: 'quantity', 
+      label: 'Quantity', 
+      sortable: true, 
+      render: (row) => {
+        let badge = '';
+        if (row.quantity === 0) badge = '<span class="badge bg-danger">Out of Stock</span>';
+        else if (row.quantity < 10) badge = `<span class="badge bg-warning">${row.quantity} (Low)</span>`;
+        else badge = `<span class="badge bg-success">${row.quantity}</span>`;
+        return badge + ` <button type="button" class="btn btn-sm btn-ghost-primary waves-effect waves-light p-0 ms-1" onclick="updateQuantity('${row.id}', '${row.name.replace(/'/g, "\\'")}', '${row.quantity}')" title="Add Quantity"><i class="ri-add-circle-line fs-16 align-middle"></i></button>`;
+      }
+    },
+    { key: 'saleprice', label: 'Sale Price', sortable: true, render: (row) => typeof row.saleprice === 'number' ? row.saleprice.toFixed(2) : row.saleprice },
+    { key: 'saleactive', label: 'Sale Active', sortable: true, render: (row) => row.saleactive ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>' },
+    {
+      key: 'actions',
+      label: 'Actions',
+      sortable: false,
+      class: 'text-end',
+      render: (row) => {
+        return `<div class="btn-group btn-group-sm action-group" role="group">
+          <button type="button" class="btn btn-soft-info action-btn" onclick="openViewModal('${row.id}')" title="View"><i class="ri-eye-line"></i></button>
+          <button type="button" class="btn btn-soft-warning action-btn" onclick="openEditModal('${row.id}')" title="Edit"><i class="ri-pencil-fill"></i></button>
+          <button type="button" class="btn btn-soft-danger action-btn" onclick="deleteRecord('${row.id}')" title="Delete"><i class="ri-delete-bin-fill"></i></button>
+        </div>`;
+      }
+    }
+  ];
+%>
+
+<%- include('../components/partials/data-table', {
+  columns: tableColumns,
+  data: data,
+  sortBy: sortBy,
+  sortOrder: sortOrder,
+  baseUrl: '/products',
+  query: query
+}) %>
+
+<%- include('../components/partials/pagination', {
+  pagination: pagination,
+  baseUrl: '/products',
+  query: query
+}) %>

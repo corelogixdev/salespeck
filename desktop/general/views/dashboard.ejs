@@ -1,0 +1,662 @@
+<div class="row my-3">
+  <% if ((!dashboardConfig.todays_sales || dashboardConfig.todays_sales !=='hidden' )) { %>
+    <div class="col-lg-4">
+      <div class="card card-animate">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-grow-1 overflow-hidden">
+              <p class="text-uppercase fw-medium text-muted text-truncate mb-0">
+                Today's Sales
+              </p>
+            </div>
+            <div class="flex-shrink-0">
+              <% if (dashboardConfig.todays_sales==='partial' ) { %>
+                <h5 class="text-muted fs-14 mb-0">****</h5>
+                <% } else { %>
+                  <% if (salesArrowDirection==='up' ) { %>
+                    <h5 class="text-success fs-14 mb-0">
+                      <i class="ri-arrow-right-up-line fs-13 align-middle"></i>
+                      +<%= salesPercentageChange %> %
+                    </h5>
+                    <% } else { %>
+                      <h5 class="text-danger fs-14 mb-0">
+                        <i class="ri-arrow-right-down-line fs-13 align-middle"></i>
+                        <%= salesPercentageChange %> %
+                      </h5>
+                      <% } %>
+                        <% } %>
+            </div>
+          </div>
+          <div class="d-flex align-items-end justify-content-between mt-4">
+            <div>
+              <h4 class="fs-22 fw-semibold ff-secondary mb-4">
+                <% if (dashboardConfig.todays_sales==='partial' ) { %>
+                  Rs. ****
+                  <% } else { %>
+                    Rs.<span class="counter-value mask-amount" data-target="<%= todaysSalesAmount %>">
+                      <%= todaysSalesAmount %>
+                    </span>
+                    <% } %>
+              </h4>
+              <a href="/sales?filter=today" class="text-decoration-underline text-muted">View Sales</a>
+            </div>
+            <div class="avatar-sm flex-shrink-0">
+              <span class="avatar-title bg-success-subtle rounded fs-3">
+                <span class="text-success fs-5">PKR</span>
+              </span>
+            </div>
+          </div>
+        </div><!-- end card body -->
+      </div><!-- end card -->
+    </div>
+    <% } %>
+
+      <% if ((!dashboardConfig.todays_customers || dashboardConfig.todays_customers !=='hidden' )) { %>
+        <div class="col-lg-4">
+          <div class="card card-animate">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="flex-grow-1 overflow-hidden">
+                  <p class="text-uppercase fw-medium text-muted text-truncate mb-0">
+                    Today's Customers
+                  </p>
+                </div>
+                <div class="flex-shrink-0">
+                  <% if (dashboardConfig.todays_customers==='partial' ) { %>
+                    <h5 class="text-muted fs-14 mb-0">****</h5>
+                    <% } else { %>
+                      <% if (customerArrowDirection==='up' ) { %>
+                        <h5 class="text-success fs-14 mb-0">
+                          <i class="ri-arrow-right-up-line fs-13 align-middle"></i>
+                          +<%= customerPercentageChange %> %
+                        </h5>
+                        <% } else { %>
+                          <h5 class="text-danger fs-14 mb-0">
+                            <i class="ri-arrow-right-down-line fs-13 align-middle"></i>
+                            <%= customerPercentageChange %> %
+                          </h5>
+                          <% } %>
+                            <% } %>
+                </div>
+              </div>
+              <div class="d-flex align-items-end justify-content-between mt-4">
+                <div>
+                  <h4 class="fs-22 fw-semibold ff-secondary mb-4">
+                    <% if (dashboardConfig.todays_customers==='partial' ) { %>
+                      ****
+                      <% } else { %>
+                        <span class="counter-value mask-amount" data-target="<%= todayCustomersCount %>">
+                          <%= todayCustomersCount %>
+                        </span>
+                        <% } %>
+                  </h4>
+                  <a href="/users?role=customer&filter=today" class="text-decoration-underline text-muted">View
+                    Customers</a>
+                </div>
+                <div class="avatar-sm flex-shrink-0">
+                  <span class="avatar-title bg-success-subtle rounded fs-1">
+                    <i class="bx bx-user-plus fs-3 text-success"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% } %>
+
+          <% if ((!dashboardConfig.last_30_days_sales || dashboardConfig.last_30_days_sales !=='hidden' )) { %>
+            <div class="col-lg-4">
+              <div class="card card-animate">
+                <div class="card-body">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-grow-1 overflow-hidden">
+                      <p class="text-uppercase fw-medium text-muted text-truncate mb-0">
+                        Last 30 Days Sales
+                      </p>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-end justify-content-between mt-4">
+                    <div>
+                      <h4 class="fs-22 fw-semibold ff-secondary mb-4">
+                        <% if (dashboardConfig.last_30_days_sales==='partial' ) { %>
+                          ****
+                          <% } else { %>
+                            <span class="counter-value mask-amount" data-target="<%= totalSalesCount %>">
+                              <%- totalSalesCount %>
+                            </span>
+                            <% } %>
+                      </h4>
+                      <a href="/sales?filter=last30" class="text-decoration-underline text-muted">View Sales</a>
+                    </div>
+                    <div class="avatar-sm flex-shrink-0">
+                      <span class="avatar-title bg-success-subtle rounded fs-3">
+                        <i class="bx bx-cart fs-2 text-success"></i>
+                      </span>
+                    </div>
+                  </div>
+                </div><!-- end card body -->
+              </div><!-- end card -->
+            </div>
+            <% } %>
+
+</div>
+
+<!-- Weekly & Monthly Summary Cards -->
+ <div class="row mb-4">
+     <div class="col-12">
+         <div class="card shadow-none bg-primary-subtle border-0">
+             <div class="card-body p-3">
+                 <div class="row align-items-center">
+                     <div class="col-md-3">
+                         <h5 class="mb-0 fw-bold"><i class="ri-flashlight-line me-1 text-primary"></i> Quick Access</h5>
+                         <p class="text-muted mb-0 fs-12">Common tasks and shortcuts</p>
+                     </div>
+                     <div class="col-md-9">
+                         <div class="d-flex gap-2 flex-wrap justify-content-md-end">
+                             <a href="/accounting/purchase/form" class="btn btn-primary btn-sm px-3">
+                                 <i class="ri-add-box-line align-bottom me-1"></i> New Purchase
+                             </a>
+                             <a href="/sales/form" class="btn btn-success btn-sm px-3">
+                                 <i class="ri-shopping-cart-2-line align-bottom me-1"></i> New Sale
+                             </a>
+                             <a href="/products" class="btn btn-info btn-sm px-3">
+                                 <i class="ri-box-3-line align-bottom me-1"></i> Add/Manage Products
+                             </a>
+                             <a href="/users?role=customer" class="btn btn-warning btn-sm px-3 text-white">
+                                 <i class="ri-user-heart-line align-bottom me-1"></i> New Customer
+                             </a>
+                             <a href="/accounting/coa" class="btn btn-dark btn-sm px-3">
+                                 <i class="ri-scales-3-line align-bottom me-1"></i> Accounts
+                             </a>
+                             <button type="button" class="btn btn-outline-primary btn-sm px-3 privacy-toggle-btn" title="Toggle Amount Privacy">
+                                 <i class="ri-eye-line align-bottom me-1"></i> <span class="privacy-label">Show Amounts</span>
+                             </button>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     </div>
+ </div>
+<div class="row my-3">
+  <% if ((!dashboardConfig.weekly_summary || dashboardConfig.weekly_summary !=='hidden' )) { %>
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Weekly Summary (Last 7 Days)</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-borderless mb-0">
+              <tbody>
+                <tr>
+                  <td class="text-muted">Total Orders:</td>
+                  <td class="fw-medium text-end mask-amount">
+                    <% if (dashboardConfig.weekly_summary==='partial' ) { %>
+                      ****
+                      <% } else { %>
+                        <%= weeklySalesSummary.total_orders || 0 %>
+                          <% } %>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="text-muted">Total Revenue:</td>
+                  <td class="fw-medium text-end mask-amount">
+                    <% if (dashboardConfig.weekly_summary==='partial' ) { %>
+                      Rs. ****
+                      <% } else { %>
+                        Rs. <%= (weeklySalesSummary.total_revenue || 0).toFixed(2) %>
+                          <% } %>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="text-muted">Avg Order Value:</td>
+                  <td class="fw-medium text-end mask-amount">
+                    <% if (dashboardConfig.weekly_summary==='partial' ) { %>
+                      Rs. ****
+                      <% } else { %>
+                        Rs. <%= (weeklySalesSummary.avg_order_value || 0).toFixed(2) %>
+                          <% } %>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% } %>
+      <% if ((!dashboardConfig.monthly_summary || dashboardConfig.monthly_summary !=='hidden' )) { %>
+        <div class="col-lg-6">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">Monthly Summary (Last 30 Days)</h5>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-borderless mb-0">
+                  <tbody>
+                    <tr>
+                      <td class="text-muted">Total Orders:</td>
+                      <td class="fw-medium text-end mask-amount">
+                        <% if (dashboardConfig.monthly_summary==='partial' ) { %>
+                          ****
+                          <% } else { %>
+                            <%= monthlySalesSummary.total_orders || 0 %>
+                              <% } %>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="text-muted">Total Revenue:</td>
+                      <td class="fw-medium text-end mask-amount">
+                        <% if (dashboardConfig.monthly_summary==='partial' ) { %>
+                          Rs. ****
+                          <% } else { %>
+                            Rs. <%= (monthlySalesSummary.total_revenue || 0).toFixed(2) %>
+                              <% } %>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="text-muted">Avg Order Value:</td>
+                      <td class="fw-medium text-end mask-amount">
+                        <% if (dashboardConfig.monthly_summary==='partial' ) { %>
+                          Rs. ****
+                          <% } else { %>
+                            Rs. <%= (monthlySalesSummary.avg_order_value || 0).toFixed(2) %>
+                              <% } %>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% } %>
+</div>
+<!-- Charts Row -->
+<div class="row">
+  <% if ((!dashboardConfig.sales_trend_chart || dashboardConfig.sales_trend_chart !=='hidden' )) { %>
+    <div class="col-lg-8">
+      <div class="card h-100">
+        <div class="card-body">
+          <% if (dashboardConfig.sales_trend_chart==='partial' ) { %>
+            <div class="d-flex align-items-center justify-content-center" style="height: 350px;">
+              <p class="text-muted">Chart hidden due to privacy settings</p>
+            </div>
+            <% } else { %>
+              <div class="privacy-mask-chart" style="height: 350px; position: relative;">
+                <canvas id="salesTrendChart"></canvas>
+              </div>
+              <% } %>
+        </div>
+      </div>
+    </div>
+    <% } %>
+      <% if ((!dashboardConfig.top_products_chart || dashboardConfig.top_products_chart !=='hidden' )) { %>
+        <div class="col-lg-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <% if (dashboardConfig.top_products_chart==='partial' ) { %>
+                <div class="d-flex align-items-center justify-content-center" style="height: 350px;">
+                  <p class="text-muted">Chart hidden due to privacy settings</p>
+                </div>
+                <% } else { %>
+                   <div class="privacy-mask-chart" style="height: 350px; position: relative;">
+                     <canvas id="topProductsChart"></canvas>
+                   </div>
+                  <% } %>
+            </div>
+          </div>
+        </div>
+        <% } %>
+</div>
+<!-- Advanced Analytics Row -->
+<div class="row my-3">
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Sales by Hour (Today)</h5>
+            </div>
+            <div class="card-body">
+                 <div class="privacy-mask-chart" style="height: 350px; position: relative;">
+                   <canvas id="hourlySalesChart"></canvas>
+                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Sales by Category (Last 30 Days)</h5>
+            </div>
+            <div class="card-body">
+                 <div class="privacy-mask-chart" style="height: 350px; position: relative;">
+                   <canvas id="categorySalesChart"></canvas>
+                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Low Stock Products Table -->
+<div class="row">
+  <% if ((!dashboardConfig.low_stock_alert || dashboardConfig.low_stock_alert !=='hidden' )) { %>
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="bx bx-error-circle text-warning"></i> Low Stock Alert
+          </h5>
+        </div>
+        <div class="card-body">
+          <% if (dashboardConfig.low_stock_alert==='partial' && lowStockProducts && lowStockProducts.length> 0) { %>
+            <!-- Show generic alert or limited info -->
+            <div class="text-center text-muted py-3">
+              <i class="bx bx-error-circle fs-1 text-warning"></i>
+              <p class="mb-0">There are <%= lowStockProducts.length %> items with low stock.</p>
+            </div>
+            <% } else if (lowStockProducts && lowStockProducts.length> 0) { %>
+              <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Product Name</th>
+                      <th class="text-center">Current Stock</th>
+                      <th class="text-end">Sale Price</th>
+                      <th class="text-center">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% lowStockProducts.forEach(product=> { %>
+                      <tr>
+                        <td><a href="/product/<%= product.id %>" class="text-decoration-none">
+                            <%= product.name %>
+                          </a></td>
+                        <td class="text-center">
+                          <span class="badge <%= product.quantity <= 5 ? 'bg-danger' : 'bg-warning' %>">
+                            <%= product.quantity %>
+                          </span>
+                        </td>
+                        <td class="text-end">Rs. <%= product.saleprice.toFixed(2) %>
+                        </td>
+                        <td class="text-center">
+                          <% if (product.quantity <=5) { %>
+                            <span class="badge bg-danger">Critical</span>
+                            <% } else { %>
+                              <span class="badge bg-warning">Low</span>
+                              <% } %>
+                        </td>
+                      </tr>
+                      <% }); %>
+                  </tbody>
+                </table>
+              </div>
+              <% } else { %>
+                <div class="text-center text-muted py-3">
+                  <i class="bx bx-check-circle fs-1 text-success"></i>
+                  <p class="mb-0">All products are well stocked!</p>
+                </div>
+                <% } %>
+        </div>
+      </div>
+    </div>
+    <% } %>
+</div>
+
+<!-- Hidden data containers -->
+<% 
+  function jsonForAttr(value) {
+    return JSON.stringify(value, (_key, v) => typeof v === 'bigint' ? Number(v) : v).replace(/'/g, '&#39;');
+  }
+%>
+<div id="products-data" data-products='<%- jsonForAttr(topFiveSoldProductsWithSoldQuantity) %>' style="display: none;"></div>
+<div id="sales-data" data-sales='<%- jsonForAttr(salesCountByDay) %>' style="display: none;"></div>
+<div id="hourly-sales-data" data-hourly='<%- jsonForAttr(hourlySales) %>' style="display: none;"></div>
+<div id="category-sales-data" data-category='<%- jsonForAttr(categorySales) %>' style="display: none;"></div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Parse data from data attributes
+    const productsData = document.getElementById('products-data');
+    const salesData = document.getElementById('sales-data');
+
+    let topProducts = JSON.parse(productsData.getAttribute('data-products'));
+    let salesByDay = JSON.parse(salesData.getAttribute('data-sales'));
+
+    // Prepare top products chart data
+    let topProducts_labels = [];
+    let topProducts_data = [];
+    topProducts.forEach((product, index) => {
+      if (index < 5) {
+        topProducts_labels.push(product?.product_name || 'N/A');
+        topProducts_data.push(parseInt(product?.total_quantity) || 0);
+      }
+    });
+
+    // Prepare sales trend chart data (last 30 days)
+    let salesTrend_dates = [];
+    let salesTrend_totals = [];
+    let salesTrend_revenues = [];
+    salesByDay.forEach(sale => {
+      // Format date as MM-DD
+      const date = new Date(sale.date);
+      const formattedDate = (date.getMonth() + 1).toString().padStart(2, '0') + '-' +
+        date.getDate().toString().padStart(2, '0');
+      
+      salesTrend_dates.push(formattedDate);
+      salesTrend_totals.push(parseInt(sale.total) || 0);
+      salesTrend_revenues.push(parseFloat(sale.revenue) || 0);
+    });
+
+    // Top Products Chart (Doughnut Chart)
+    const ctxTop = document.getElementById('topProductsChart').getContext('2d');
+    
+    // Custom plugin to draw text in the middle of a doughnut chart
+    const centerTextPlugin = {
+      id: 'centerText',
+      afterDraw: (chart) => {
+        if (chart.config.type !== 'doughnut') return;
+        const { ctx, canvas } = chart;
+        ctx.save();
+        const x = chart.getDatasetMeta(0).data[0]?.x;
+        const y = chart.getDatasetMeta(0).data[0]?.y;
+        if (!x || !y) return;
+
+        const total = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+        
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        // Draw "Total" label
+        ctx.font = '12px Inter, sans-serif';
+        ctx.fillStyle = '#999';
+        ctx.fillText('Total Sold', x, y - 10);
+        
+        // Draw the number
+        ctx.font = 'bold 24px Inter, sans-serif';
+        ctx.fillStyle = '#333';
+        ctx.fillText(total, x, y + 15);
+        ctx.restore();
+      }
+    };
+
+    new Chart(ctxTop, {
+      type: 'doughnut',
+      plugins: [centerTextPlugin],
+      data: {
+        labels: topProducts_labels.length > 0 ? topProducts_labels : ['No Data'],
+        datasets: [{
+          data: topProducts_data.length > 0 ? topProducts_data : [0],
+          backgroundColor: ['#405189', '#0ab39c', '#f7b84b', '#f06548', '#299cdb'],
+          hoverOffset: 12,
+          borderRadius: 8,
+          spacing: 4,
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '82%',
+        plugins: {
+          title: {
+            display: true,
+            text: 'Top 5 Products (Last 30 Days)',
+            font: { size: 14, weight: '600' },
+            padding: { bottom: 20 }
+          },
+          legend: { 
+            position: 'bottom',
+            labels: {
+              usePointStyle: true,
+              padding: 20,
+              font: { size: 11 }
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            padding: 12,
+            cornerRadius: 8
+          }
+        }
+      }
+    });
+
+    // Sales Trend Chart (Combined Bar and Line Chart)
+    const ctxTrend = document.getElementById('salesTrendChart').getContext('2d');
+    new Chart(ctxTrend, {
+      type: 'bar',
+      data: {
+        labels: salesTrend_dates,
+        datasets: [
+          {
+            label: 'Orders',
+            data: salesTrend_totals,
+            backgroundColor: '#A9B5E1',
+            borderRadius: 4,
+            yAxisID: 'y'
+          },
+          {
+            label: 'Revenue (Rs.)',
+            data: salesTrend_revenues,
+            type: 'line',
+            borderColor: '#4CAF50',
+            backgroundColor: 'rgba(76, 175, 80, 0.2)',
+            fill: true,
+            tension: 0.4,
+            yAxisID: 'y1'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Sales Trend (Last 30 Days)',
+            font: { size: 14, weight: '600' }
+          },
+          legend: { position: 'top' }
+        },
+        scales: {
+          y: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            title: { display: true, text: 'Orders' },
+            beginAtZero: true,
+            ticks: { stepSize: 1 }
+          },
+          y1: {
+            type: 'linear',
+            display: true,
+            position: 'right',
+            title: { display: true, text: 'Revenue (Rs.)' },
+            beginAtZero: true,
+            grid: { drawOnChartArea: false }
+          }
+        }
+      }
+    });
+
+    // Hourly Sales Chart
+    const hourlyData = JSON.parse(document.getElementById('hourly-sales-data').getAttribute('data-hourly'));
+    const hourlyLabels = Array.from({length: 24}, (_, i) => i.toString().padStart(2, '0') + ':00');
+    const hourlyValues = new Array(24).fill(0);
+    
+    hourlyData.forEach(item => {
+        const h = parseInt(item.hour);
+        if (h >= 0 && h < 24) hourlyValues[h] = parseFloat(item.revenue);
+    });
+
+    const ctxHourly = document.getElementById('hourlySalesChart').getContext('2d');
+    new Chart(ctxHourly, {
+      type: 'bar',
+      data: {
+        labels: hourlyLabels,
+        datasets: [{
+          label: 'Revenue',
+          data: hourlyValues,
+          backgroundColor: '#667eea',
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Today\'s Hourly Performance',
+            font: { size: 14 }
+          },
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+
+    // Category Sales Chart
+    const categoryData = JSON.parse(document.getElementById('category-sales-data').getAttribute('data-category'));
+    const categoryLabels = categoryData.map(item => item.category || 'Uncategorized');
+    const categoryValues = categoryData.map(item => parseFloat(item.total_revenue));
+
+    const ctxCategory = document.getElementById('categorySalesChart').getContext('2d');
+    new Chart(ctxCategory, {
+      type: 'doughnut',
+      data: {
+        labels: categoryLabels.length > 0 ? categoryLabels : ['No Data'],
+        datasets: [{
+          data: categoryValues.length > 0 ? categoryValues : [0],
+          backgroundColor: ['#405189', '#0ab39c', '#f7b84b', '#f06548', '#299cdb'],
+          borderRadius: 6,
+          spacing: 3,
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '75%',
+        plugins: {
+          title: {
+            display: true,
+            text: 'Revenue by Category',
+            font: { size: 14, weight: '600' }
+          },
+          legend: { 
+            position: 'bottom',
+            labels: {
+              usePointStyle: true,
+              padding: 15
+            }
+          }
+        }
+      }
+    });
+  });
+</script>

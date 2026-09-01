@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/assets/css/icons.min.css" rel="stylesheet">
+  <link href="/assets/css/pos-theme.css" rel="stylesheet">
+  <link href="/assets/css/pos-pages.css" rel="stylesheet">
+
+</head>
+<body>
+  <div class="pdf-header">
+    <h5><i class="ri-file-pdf-line"></i> Report PDF Viewer</h5>
+    <div class="pdf-actions">
+      <% if (pdfUrl) { %>
+        <a href="<%= pdfUrl %>" download class="btn"><i class="ri-download-line me-1"></i> Download</a>
+      <% } %>
+      <button class="btn" onclick="history.back()"><i class="ri-arrow-left-line me-1"></i> Back</button>
+    </div>
+  </div>
+
+  <div class="pdf-container">
+    <% if (pdfUrl) { %>
+      <iframe id="pdfFrame" class="pdf-frame" src="<%= pdfUrl %>"></iframe>
+    <% } else { %>
+      <div class="empty-state">
+        <i class="ri-file-forbid-line"></i>
+        <h5>No PDF to display</h5>
+        <p>Generate a report PDF to view it here.</p>
+      </div>
+    <% } %>
+  </div>
+
+  <script src="/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

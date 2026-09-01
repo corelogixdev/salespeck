@@ -1,0 +1,122 @@
+<div class="auth-bg">
+    <div class="auth-page-wrapper">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-5">
+                    <div class="card mt-4 card-bg-fill">
+                        <div class="card-body p-4">
+                            <div class="text-center">
+                                <img src="/assets/img/icon.png" alt="" height="100" class="mb-1">
+                                <h3 class="text-primary mb-3">Welcome Back!</h3>
+                                <p class="text-muted">Sign in to continue to SalesPeck.</p>
+                            </div>
+                            <div class="p-2">
+                                <form action="/login" method="post">
+                                    <div class="mb-3">
+                                        <label for="username" class="form-label">Username</label>
+                                        <div class="position-relative auth-pass-inputgroup">
+                                            <input type="text"
+                                                class="form-control pe-5 <%= locals.errors?.username ? 'is-invalid' : '' %>"
+                                                id="username" name="username" placeholder="Enter username" required>
+                                            <% if (locals.errors?.username) { %>
+                                                <div class="invalid-feedback">
+                                                    <%= errors.username %>
+                                                </div>
+                                                <% } %>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label" for="password">Password</label>
+                                        <div class="position-relative auth-pass-inputgroup">
+                                            <input type="password"
+                                                class="form-control pe-5 <%= locals.errors?.password ? 'is-invalid' : '' %>"
+                                                id="password" name="password" placeholder="Enter password"
+                                                autocomplete="on" required>
+                                            <button
+                                                class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted"
+                                                type="button" onclick="togglePassword(this)">
+                                                <i class="ri-eye-fill align-middle"></i>
+                                            </button>
+                                            <% if (locals.errors?.password) { %>
+                                                <div class="invalid-feedback">
+                                                    <%= errors.password %>
+                                                </div>
+                                                <% } %>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <button class="btn btn-primary w-100" type="submit" id="loginBtn">
+                                            <span class="spinner-border spinner-border-sm me-1 d-none" role="status"
+                                                aria-hidden="true"></span>
+                                            <span class="btn-text"><i class="ri-login-box-line align-middle me-1"></i>
+                                                Sign In</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="mt-3">
+                                <div class="row">
+                                    <div class="col-6 text-start">
+                                        <p class="mb-0 text-muted">
+                                            Powered by <a href="javascript:void(0);"
+                                                class="fw-semibold text-primary text-decoration-underline">SalesPeck</a>
+                                        </p>
+                                    </div>
+                                    <div class="col-6 text-end">
+                                        <p class="mb-0 text-muted">
+                                            Don't have an account? <a href="/register"
+                                                class="fw-semibold text-primary text-decoration-underline">Register</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
+    <script src="/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function togglePassword(button) {
+            const input = button.parentElement.querySelector('input');
+            const icon = button.querySelector('i');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('ri-eye-fill');
+                icon.classList.add('ri-eye-off-fill');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('ri-eye-off-fill');
+                icon.classList.add('ri-eye-fill');
+            }
+        }
+
+        document.querySelector('form').addEventListener('submit', function (e) {
+            const btn = document.getElementById('loginBtn');
+            const spinner = btn.querySelector('.spinner-border');
+            const text = btn.querySelector('.btn-text');
+
+            // Only disable if validity check passes
+            if (this.checkValidity()) {
+                btn.classList.add('disabled'); // Use class instead of disabled attribute so form still submits
+                btn.style.pointerEvents = 'none';
+                spinner.classList.remove('d-none');
+                text.textContent = 'Signing In...';
+
+                // Safety timeout - re-enable after 5 seconds if no response
+                setTimeout(() => {
+                    btn.classList.remove('disabled');
+                    btn.style.pointerEvents = 'auto';
+                    spinner.classList.add('d-none');
+                    text.textContent = 'Sign In';
+                }, 5000);
+            }
+        });
+    </script>
+</div>

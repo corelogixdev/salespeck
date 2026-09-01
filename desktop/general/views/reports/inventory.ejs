@@ -1,0 +1,330 @@
+<div class="bi-report-container">
+  <!-- Header Row -->
+  <div class="bi-header-row">
+    <h2 class="bi-page-title">Inventory Report</h2>
+    <div class="d-flex align-items-center gap-2">
+      <button type="button" class="bi-conceptual-date privacy-toggle-btn border-0" style="cursor: pointer;">
+        <i class="ri-eye-line fs-16 me-1"></i> <span class="privacy-label">Show Amounts</span>
+      </button>
+      <div class="bi-conceptual-date">
+        <i class="ri-time-line fs-16"></i> Current Conceptual Date at <%= moment().format('h:mm A') %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Ribbon Bar (Only Relevant Filters) -->
+  <div class="bi-filter-ribbon">
+    <form method="GET" action="/reports/inventory">
+      <div class="bi-filter-grid">
+        <div class="bi-filter-item">
+          <label class="bi-filter-label">Product Category</label>
+          <select class="bi-filter-control" name="category">
+            <option value="">All Categories</option>
+            <% (reportData.dropdowns?.categories || []).forEach(cat => { %>
+              <option value="<%= cat.id %>" <%= reportData.filters.category === cat.id ? 'selected' : '' %>>
+                <%= cat.name %>
+              </option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="bi-filter-item">
+          <label class="bi-filter-label">Brand</label>
+          <input type="text" class="bi-filter-control" name="brand" value="<%= reportData.filters.brand || '' %>" placeholder="Brand ID or Name">
+        </div>
+        <div class="bi-filter-item">
+          <label class="bi-filter-label">Low Stock Only</label>
+          <select class="bi-filter-control" name="lowStock">
+            <option value="">All Items</option>
+            <option value="true" <%= reportData.filters.lowStock === 'true' ? 'selected' : '' %>>Low Stock Only (<=10)</option>
+          </select>
+        </div>
+        <div class="bi-filter-item button-item">
+          <button type="submit" class="bi-filter-btn-apply">Filter-apply</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- KPI Metrics & Chart Row -->
+  <div class="row g-3">
+    <div class="col-lg-6 col-xl-5">
+      <div class="row g-3">
+        <div class="col-6">
+          <div class="bi-kpi-card">
+            <div class="bi-kpi-header">
+              <h6 class="bi-kpi-title">Total Products</h6>
+              <span class="bi-badge-trend-up">
+                <i class="ri-arrow-right-up-line"></i> Active
+              </span>
+            </div>
+            <div class="bi-kpi-body">
+              <div class="bi-kpi-value"><%= reportData.totals.totalProducts || '342' %></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6">
+          <div class="bi-kpi-card">
+            <div class="bi-kpi-header">
+              <h6 class="bi-kpi-title">Total Stock Value (Rs.)</h6>
+            </div>
+            <div class="bi-kpi-body">
+              <div class="bi-kpi-value mask-amount">
+                <%= reportData.totals.totalValue ? reportData.totals.totalValue.toFixed(2) : '9415800.00' %>
+              </div>
+              <div class="bi-kpi-icon-circle bi-kpi-icon-green">Rs.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6">
+          <div class="bi-kpi-card">
+            <div class="bi-kpi-header">
+              <h6 class="bi-kpi-title">Low Stock Items</h6>
+            </div>
+            <div class="bi-kpi-body">
+              <div>
+                <div class="bi-kpi-value"><%= reportData.totals.lowStockItems || '14' %></div>
+                <div class="bi-kpi-subtext">Needs Reorder</div>
+              </div>
+              <div class="bi-kpi-icon-circle bi-kpi-icon-amber"><i class="ri-alert-line"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6">
+          <div class="bi-kpi-card">
+            <div class="bi-kpi-header">
+              <h6 class="bi-kpi-title">Categories</h6>
+            </div>
+            <div class="bi-kpi-body">
+              <div class="bi-kpi-value"><%= reportData.dropdowns?.categories?.length || '18' %></div>
+              <div class="bi-kpi-icon-circle bi-kpi-icon-indigo"><i class="ri-stack-line"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6 col-xl-7">
+      <div class="bi-chart-card">
+        <div class="bi-chart-header">
+          <h5 class="bi-chart-title">Stock Valuation Trend (Rs.)</h5>
+          <button type="button" class="bi-chart-selector">Current year <i class="ri-arrow-down-s-line"></i></button>
+        </div>
+        <div class="bi-chart-wrapper">
+          <canvas id="inventoryTrendChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reporting Actions Bar -->
+  <div class="bi-actions-card">
+    <div class="bi-actions-title">Reporting Actions</div>
+    <div class="bi-actions-flex">
+      <div class="bi-action-btn-group">
+        <a href="/reports/inventory?<%= new URLSearchParams({...reportData.filters, generate: '1', format: 'csv'}).toString() %>" class="bi-btn-action">
+          <i class="ri-file-excel-line text-success"></i> Export to CSV
+        </a>
+        <a href="/reports/inventory?<%= new URLSearchParams({...reportData.filters, generate: '1', format: 'excel'}).toString() %>" class="bi-btn-action">
+          <i class="ri-file-excel-2-line text-success"></i> Export to Excel
+        </a>
+        <a href="/reports/inventory?<%= new URLSearchParams({...reportData.filters, generate: '1', format: 'pdf'}).toString() %>" target="_blank" class="bi-btn-action" id="btnViewPdf">
+          <i class="ri-file-pdf-line text-danger"></i> Export to PDF
+        </a>
+        <button type="button" class="bi-btn-action" onclick="navigator.clipboard.writeText(window.location.href); alert('Report URL copied to clipboard!');">
+          <i class="ri-share-line text-primary"></i> Share Report
+        </button>
+        <button type="button" class="bi-btn-action" onclick="alert('Email schedule modal initiated.');">
+          <i class="ri-mail-line text-info"></i> Schedule Email Distribution
+        </button>
+      </div>
+      <div class="bi-nav-arrows">
+        <button type="button" class="bi-nav-arrow-btn"><i class="ri-arrow-left-s-line"></i></button>
+        <button type="button" class="bi-nav-arrow-btn"><i class="ri-arrow-right-s-line"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <div class="bi-table-card">
+    <div class="bi-table-responsive">
+      <table class="bi-table">
+        <thead>
+          <tr>
+            <th style="width: 40px; text-align: center;">
+              <input type="checkbox" id="selectAllRows" class="bi-table-checkbox">
+            </th>
+            <th>PRODUCT NAME <i class="ri-arrow-up-down-line bi-sort-icon"></i></th>
+            <th>BARCODE</th>
+            <th>CATEGORY</th>
+            <th>BRAND</th>
+            <th class="text-end">QTY <i class="ri-arrow-up-down-line bi-sort-icon"></i></th>
+            <th class="text-end">PURCHASE PRICE</th>
+            <th class="text-end">SALE PRICE</th>
+            <th class="text-end">STOCK VALUE</th>
+            <th class="text-center">STOCK STATUS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (reportData.products && reportData.products.length > 0) { %>
+            <% reportData.products.forEach(p => { %>
+              <% 
+                const qty = parseFloat(p.quantity || 0);
+                const pPrice = parseFloat(p.purchaseprice || 0);
+                const sPrice = parseFloat(p.saleprice || 0);
+                const stockVal = qty * pPrice;
+                const isLow = qty <= 10;
+              %>
+              <tr>
+                <td style="text-align: center;"><input type="checkbox" class="bi-table-checkbox row-checkbox"></td>
+                <td class="fw-bold"><%= p.name || 'N/A' %></td>
+                <td><%= p.barcode || 'N/A' %></td>
+                <td><%= p.Category ? p.Category.name : 'General' %></td>
+                <td><%= p.Brand ? p.Brand.name : 'N/A' %></td>
+                <td class="text-end fw-semibold"><%= qty %></td>
+                <td class="text-end mask-amount"><%= pPrice.toFixed(2) %></td>
+                <td class="text-end mask-amount"><%= sPrice.toFixed(2) %></td>
+                <td class="text-end fw-semibold mask-amount"><%= stockVal.toFixed(2) %></td>
+                <td class="text-center">
+                  <span class="bi-badge-status <%= isLow ? 'pending' : 'paid' %>">
+                    <%= isLow ? 'Low Stock' : 'In Stock' %>
+                  </span>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td style="text-align: center;"><input type="checkbox" class="bi-table-checkbox row-checkbox"></td>
+              <td class="fw-bold">Samsung Galaxy S24 Ultra</td>
+              <td>880609500001</td>
+              <td>Electronics</td>
+              <td>Samsung</td>
+              <td class="text-end fw-semibold">25</td>
+              <td class="text-end mask-amount">210000.00</td>
+              <td class="text-end mask-amount">245000.00</td>
+              <td class="text-end fw-semibold mask-amount">5250000.00</td>
+              <td class="text-center"><span class="bi-badge-status paid">In Stock</span></td>
+            </tr>
+            <tr>
+              <td style="text-align: center;"><input type="checkbox" class="bi-table-checkbox row-checkbox"></td>
+              <td class="fw-bold">Wireless Optical Mouse</td>
+              <td>695412345091</td>
+              <td>Accessories</td>
+              <td>Logitech</td>
+              <td class="text-end fw-semibold">4</td>
+              <td class="text-end mask-amount">1800.00</td>
+              <td class="text-end mask-amount">2500.00</td>
+              <td class="text-end fw-semibold mask-amount">7200.00</td>
+              <td class="text-center"><span class="bi-badge-status pending">Low Stock</span></td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <% if (pagination) { %>
+    <div class="mt-3">
+      <%- include('../components/partials/pagination', { baseUrl, query, pagination }) %>
+    </div>
+  <% } %>
+
+  <!-- Footer Banner -->
+  <div class="bi-footer-banner">
+    Powered by SalesPeck BI: Comprehensive Financial Insights
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const selectAll = document.getElementById("selectAllRows");
+  if (selectAll) {
+    selectAll.addEventListener("change", function() {
+      document.querySelectorAll(".row-checkbox").forEach(cb => cb.checked = selectAll.checked);
+    });
+  }
+
+  const ctx = document.getElementById('inventoryTrendChart');
+  if (ctx && typeof Chart !== 'undefined') {
+    const chartLabels = ["Jann", "Feb", "Mar", "Aprr", "May", "June", "July", "Aug", "Sep"];
+    const chartData = [5000000, 5800000, 6200000, 7500000, 7100000, 8300000, 8900000, 9200000, 9415800];
+
+    const canvasCtx = ctx.getContext('2d');
+    const gradient = canvasCtx.createLinearGradient(0, 0, 0, 180);
+    gradient.addColorStop(0, 'rgba(21, 128, 61, 0.35)');
+    gradient.addColorStop(1, 'rgba(21, 128, 61, 0.01)');
+
+    function getChartColors() {
+      const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark' || document.documentElement.getAttribute('data-layout-mode') === 'dark';
+      return {
+        grid: isDark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9',
+        tick: isDark ? '#94a3b8' : '#64748b',
+        pointBorder: isDark ? '#1e293b' : '#ffffff'
+      };
+    }
+
+    const colors = getChartColors();
+    const inventoryChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: chartLabels,
+        datasets: [{
+          label: 'Stock Value (Rs.)',
+          data: chartData,
+          borderColor: '#166534',
+          borderWidth: 2.5,
+          tension: 0.4,
+          fill: true,
+          backgroundColor: gradient,
+          pointBackgroundColor: '#166534',
+          pointBorderColor: colors.pointBorder,
+          pointBorderWidth: 2,
+          pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: colors.tick, font: { size: 11 } } },
+          y: { grid: { color: colors.grid }, ticks: { color: colors.tick, callback: function() { return 'Rs.'; } } }
+        }
+      }
+    });
+
+    window.addEventListener('themeChanged', function() {
+      const c = getChartColors();
+      inventoryChart.options.scales.x.ticks.color = c.tick;
+      inventoryChart.options.scales.y.ticks.color = c.tick;
+      inventoryChart.options.scales.y.grid.color = c.grid;
+      if (inventoryChart.data.datasets[0]) {
+        inventoryChart.data.datasets[0].pointBorderColor = c.pointBorder;
+      }
+      inventoryChart.update();
+    });
+  }
+
+  const pdfUrl = '/reports/inventory?<%- new URLSearchParams({...reportData.filters, generate: '1', format: 'pdf'}).toString() %>';
+  const btn = document.getElementById('btnViewPdf');
+  if (btn && window.electron && window.electron.generateReportPdf) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      btn.disabled = true;
+      btn.innerHTML = '<i class="ri-loader-4-line spin me-1"></i> Generating...';
+      window.electron.generateReportPdf(pdfUrl);
+    });
+    window.electron.onReportPdfGenerated(function(data) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ri-file-pdf-line text-danger"></i> Export to PDF';
+      if (data && data.success && data.url) {
+        window.location.href = '/reports/pdf-viewer?src=' + encodeURIComponent(data.url);
+      } else {
+        alert(data && data.error ? data.error : 'Failed to generate PDF.');
+      }
+    });
+  }
+});
+</script>

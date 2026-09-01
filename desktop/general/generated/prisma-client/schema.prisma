@@ -1,0 +1,331 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma-client"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model SequelizeMeta {
+  name String @id
+}
+
+model brand {
+  id          String   @id
+  name        String
+  description String?
+  status      Boolean? @default(true)
+  createdby   String?
+  updatedby   String?
+  source      String?  @default("desktop")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+}
+
+model cashclosing {
+  id                     String    @id
+  closingbalance         Float?
+  date                   DateTime?
+  expence                Float?
+  note                   String?
+  sale                   Float?
+  fk_user_in_cashclosing String?
+  source                 String?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @default(now())
+}
+
+model category {
+  id          String   @id
+  name        String
+  description String?
+  status      Boolean? @default(true)
+  createdby   String?
+  updatedby   String?
+  source      String?  @default("desktop")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+}
+
+model financeaccount {
+  id                          String           @id
+  name                        String?
+  code                        String?
+  type                        String? // asset, liability, equity, revenue, expense
+  category                    String? // asset, liability, equity, revenue, expense
+  opening_balance             Float?           @default(0)
+  balance_type                String?          @default("DEBIT") // DEBIT or CREDIT
+  fk_parent_in_financeaccount String?
+  createdby                   String?
+  updatedby                   String?
+  source                      String?
+  value                       Decimal?
+  opening_balance_date        DateTime?
+  isDefault                   Boolean?
+  createdAt                   DateTime         @default(now())
+  updatedAt                   DateTime         @default(now())
+  ledger_entries              account_ledger[]
+}
+
+model account_journal {
+  id             String           @id
+  date           DateTime         @default(now())
+  description    String?
+  reference      String?
+  source         String?
+  createdby      String?
+  updatedby      String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @default(now())
+  ledger_entries account_ledger[]
+}
+
+model account_ledger {
+  id         String          @id
+  journal_id String
+  account_id String
+  debit      Float           @default(0)
+  credit     Float           @default(0)
+  details    String?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @default(now())
+  journal    account_journal @relation(fields: [journal_id], references: [id])
+  account    financeaccount  @relation(fields: [account_id], references: [id])
+
+  @@index([journal_id])
+  @@index([account_id])
+}
+
+model financetransaction {
+  id                                      String    @id
+  name                                    String?
+  amount                                  Float?
+  status                                  String?
+  date                                    DateTime? @default(now())
+  details                                 String?
+  source                                  String?
+  fk_user_targetto_in_financetransaction  String?
+  fk_financeaccount_in_financetransaction String?
+  createdby                               String?
+  updatedby                               String?
+  createdAt                               DateTime  @default(now())
+  updatedAt                               DateTime  @default(now())
+}
+
+model inventorylogs {
+  id         String   @id
+  product_id String
+  quantity   Int
+  note       String?
+  createdby  String
+  type       String
+  vendor     String?
+  source     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+
+  @@index([product_id])
+  @@index([createdAt])
+}
+
+model product {
+  id             String   @id
+  barcode        String?
+  brand          String?
+  carrycost      Float?
+  category       String?
+  discount       Float?
+  ispurchaseable Boolean?
+  issaleable     Boolean?
+  name           String?
+  purchaseactive Boolean?
+  purchaseprice  Float?
+  quantity       Float?
+  saleactive     Boolean?
+  saleprice      Float?
+  is_service     Boolean? @default(false)
+  taxid          String?
+  createdby      String?
+  updatedby      String?
+  source         String?  @default("desktop")
+
+  @@index([barcode])
+  @@index([name])
+  @@index([category])
+}
+
+model productbatches {
+  id         String    @id
+  product    String?
+  expirydate DateTime?
+  quantity   Float?
+  source     String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @default(now())
+}
+
+model productsalepurchase {
+  id                                           String   @id
+  price                                        Float?
+  quantity                                     Float?
+  total                                        Float?
+  fk_product_in_productsalepurchase            String?
+  fk_financetransaction_in_productsalepurchase String?
+  source                                       String?
+  createdAt                                    DateTime @default(now())
+  updatedAt                                    DateTime @default(now())
+}
+
+model productsub {
+  id                            String   @id
+  fk_product_main_in_productsub String?
+  fk_product_sub_in_productsub  String?
+  quantity                      Float?
+  source                        String?
+  createdAt                     DateTime @default(now())
+  updatedAt                     DateTime @default(now())
+}
+
+model purchase {
+  id                 String   @id
+  createdby          String?
+  updatedby          String?
+  vendor             String?
+  discountpercentage String?
+  totalAmount        Float?
+  totalPayment       Float?
+  ledger             Boolean? @default(false)
+  invoicenum         String?
+  source             String?
+  printCount         Int?     @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now())
+}
+
+model purchasedproducts {
+  id          String   @id
+  purchase    String?
+  product     String?
+  quantity    Int?
+  price       Float?
+  totalAmount Float?
+  source      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+}
+
+model sale {
+  id                 String   @id
+  user               String?
+  customer           String?
+  invoicenum         String?
+  discountpercentage String?
+  totalprice         String?
+  totalpayment       String?
+  createdby          String?
+  updatedby          String?
+  source             String?
+  printCount         Int?     @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now())
+
+  @@index([invoicenum])
+  @@index([createdAt])
+}
+
+model softwaresetting {
+  id     String  @id
+  name   String?
+  value  String?
+  source String?
+}
+
+model soldproducts {
+  id        String   @id
+  sale      String?
+  product   String?
+  quantity  Int?
+  price     Float?
+  source    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model salereturn {
+  id          String   @id
+  sale        String
+  invoicenum  String?
+  customer    String?
+  user        String?
+  totalamount Float?
+  refundmode  String?
+  note        String?
+  createdby   String?
+  source      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+
+  @@index([sale])
+  @@index([invoicenum])
+  @@index([createdAt])
+}
+
+model salereturnitems {
+  id          String   @id
+  salereturn  String?
+  soldproduct String?
+  product     String?
+  quantity    Int?
+  price       Float?
+  source      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+
+  @@index([salereturn])
+  @@index([soldproduct])
+}
+
+model taxes {
+  id         String   @id
+  name       String?
+  percentage Float?
+  source     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+}
+
+model user {
+  id                   String   @id
+  address              String?
+  account_key          String?
+  email                String?
+  firstname            String?
+  lastname             String?
+  password             String?
+  username             String?
+  phone                String?
+  phone2               String?
+  role                 String?  @default("user")
+  createdby            String?
+  updatedby            String?
+  source               String?  @default("desktop")
+  profile_image_url    String?
+  dashboard_config     String?  @default("{}")
+  fk_financeaccount_id String?
+  fk_partytype_id      String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @default(now())
+}
+
+model partytype {
+  id          String   @id
+  name        String
+  type        String
+  description String?
+  createdby   String?
+  updatedby   String?
+  source      String?  @default("desktop")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+}
