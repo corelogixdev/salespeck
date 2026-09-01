@@ -1,0 +1,261 @@
+<div class="row mb-4">
+    <div class="col-12 d-flex align-items-center justify-content-between">
+        <div>
+            <h3 class="fw-bold mb-1 page-heading-title">
+                <i class="ri-file-text-line text-primary me-2"></i>Sales Order: <span class="text-primary"><%= order.ordernum %></span>
+            </h3>
+            <p class="text-muted mb-0">Booked on <%= new Date(order.bookingDate).toLocaleDateString() %></p>
+        </div>
+        <div class="btn-group">
+            <a href="/sales-orders" class="btn btn-outline-secondary">
+                <i class="ri-arrow-left-line me-1"></i> Dashboard
+            </a>
+            <a href="/sales-orders/receipt/<%= order.id %>" target="_blank" class="btn btn-primary fw-bold">
+                <i class="ri-receipt-line me-1"></i> Print Customer Receipt
+            </a>
+            <a href="/sales-orders/job-ticket/<%= order.id %>" target="_blank" class="btn btn-dark">
+                <i class="ri-scissors-line me-1"></i> Print Workshop Slip
+            </a>
+            <% if (order.status !== 'FULFILLED' && order.status !== 'CANCELLED') { %>
+                <a href="/sales/form?salesorder_id=<%= order.id %>" class="btn btn-success fw-bold">
+                    <i class="ri-shopping-bag-line me-1"></i> Fulfill & Invoice Order
+                </a>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<!-- Order Status Progress Bar -->
+<div class="card border-0 shadow-sm mb-4 theme-card">
+    <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold mb-0">Current Order Status Pipeline</h6>
+            <div>
+                <% if (order.status === 'BOOKED') { %>
+                    <span class="badge bg-info fs-14 px-3 py-2"><i class="ri-bookmark-line me-1"></i>BOOKED</span>
+                <% } else if (order.status === 'IN_EMBROIDERY') { %>
+                    <span class="badge bg-warning text-dark fs-14 px-3 py-2"><i class="ri-magic-line me-1"></i>IN EMBROIDERY</span>
+                <% } else if (order.status === 'IN_STITCHING') { %>
+                    <span class="badge bg-primary fs-14 px-3 py-2"><i class="ri-scissors-line me-1"></i>IN STITCHING</span>
+                <% } else if (order.status === 'READY') { %>
+                    <span class="badge bg-success fs-14 px-3 py-2"><i class="ri-checkbox-circle-line me-1"></i>READY FOR PICKUP</span>
+                <% } else if (order.status === 'FULFILLED') { %>
+                    <span class="badge bg-secondary fs-14 px-3 py-2"><i class="ri-check-double-line me-1"></i>FULFILLED & INVOICED</span>
+                <% } else { %>
+                    <span class="badge bg-danger fs-14 px-3 py-2"><%= order.status %></span>
+                <% } %>
+            </div>
+        </div>
+
+        <% if (order.status !== 'FULFILLED' && order.status !== 'CANCELLED') { %>
+        <div class="d-flex gap-2 flex-wrap">
+            <button type="button" class="btn btn-sm <%= order.status === 'BOOKED' ? 'btn-info' : 'btn-outline-info' %>" onclick="updateOrderStatus('BOOKED')">
+                <i class="ri-bookmark-line me-1"></i> Set Booked
+            </button>
+            <button type="button" class="btn btn-sm <%= order.status === 'IN_EMBROIDERY' ? 'btn-warning' : 'btn-outline-warning' %>" onclick="updateOrderStatus('IN_EMBROIDERY')">
+                <i class="ri-magic-line me-1"></i> In Embroidery
+            </button>
+            <button type="button" class="btn btn-sm <%= order.status === 'IN_STITCHING' ? 'btn-primary' : 'btn-outline-primary' %>" onclick="updateOrderStatus('IN_STITCHING')">
+                <i class="ri-scissors-line me-1"></i> In Stitching
+            </button>
+            <button type="button" class="btn btn-sm <%= order.status === 'READY' ? 'btn-success' : 'btn-outline-success' %>" onclick="updateOrderStatus('READY')">
+                <i class="ri-checkbox-circle-line me-1"></i> Mark Ready for Pickup
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger ms-auto" onclick="updateOrderStatus('CANCELLED')">
+                Cancel Order
+            </button>
+        </div>
+        <% } %>
+    </div>
+</div>
+
+<div class="row g-3">
+    <!-- Left Column: Order Items + Per-Item Specs -->
+    <div class="col-lg-8">
+        
+        <!-- 1. Customer & Logistics Info -->
+        <div class="card border-0 shadow-sm mb-3 theme-card">
+            <div class="card-header theme-card-header-dark py-3">
+                <h5 class="card-title mb-0 fw-bold"><i class="ri-user-heart-line me-2"></i>Customer & Logistics Info</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <span class="text-muted d-block fs-12">Customer Name</span>
+                        <h6 class="fw-bold mb-0">
+                            <%= customerDetails ? `${customerDetails.firstname || ''} ${customerDetails.lastname || ''}`.trim() : (order.customer || 'Walk-in Customer') %>
+                        </h6>
+                        <% if (customerDetails && customerDetails.phone) { %>
+                            <span class="text-muted fs-13"><i class="ri-phone-line me-1"></i><%= customerDetails.phone %></span>
+                        <% } %>
+                    </div>
+                    <div class="col-md-3">
+                        <span class="text-muted d-block fs-12">Promised Delivery</span>
+                        <h6 class="fw-bold mb-0 text-warning">
+                            <%= order.deliveryDate ? new Date(order.deliveryDate).toLocaleDateString() : 'Not Set' %>
+                        </h6>
+                    </div>
+                    <div class="col-md-3">
+                        <span class="text-muted d-block fs-12">Fabric Source</span>
+                        <h6 class="fw-bold mb-0">
+                            <%= order.fabricSource === 'BOUTIQUE_STOCK' ? 'Boutique In-Stock' : 'Client Provided' %>
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Ordered Items & Inventory Products List (PRIMARY FOCUS - FIRST) -->
+        <div class="card border-0 shadow-sm mb-3 theme-card">
+            <div class="card-header theme-card-header-accent py-3">
+                <h5 class="card-title mb-0 fw-bold"><i class="ri-list-check me-2"></i>Ordered Items & Tailoring Measurements</h5>
+            </div>
+            <div class="card-body p-0">
+                <% (order.items || []).forEach((item, index) => { 
+                    let itemMeas = {};
+                    try {
+                        if (item.notes && item.notes.startsWith('{')) {
+                            itemMeas = JSON.parse(item.notes);
+                        } else if (measurements.itemsMeasurements && measurements.itemsMeasurements[index]) {
+                            itemMeas = measurements.itemsMeasurements[index];
+                        }
+                    } catch (e) {}
+                %>
+                <div class="border-bottom p-3 item-row-card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <span class="badge bg-warning-subtle text-warning border border-warning me-2">Item #<%= index + 1 %></span>
+                            <strong class="fs-16"><%= item.item_name %></strong>
+                            <span class="badge bg-secondary-subtle text-secondary border ms-2"><%= item.item_type %></span>
+                        </div>
+                        <div class="text-end">
+                            <span class="text-muted fs-13"><%= item.quantity %> x Rs. <%= (item.price || 0).toLocaleString() %> = </span>
+                            <strong class="fs-16 text-primary">Rs. <%= (item.subtotal || 0).toLocaleString() %></strong>
+                        </div>
+                    </div>
+
+                    <!-- Associated Tailoring Measurements Card per Item -->
+                    <div class="p-3 item-meas-panel mt-2">
+                        <h6 class="fw-bold mb-2"><i class="ri-ruler-2-line text-warning me-1"></i>Tailoring Specs for <%= item.item_name %></h6>
+                        <div class="row g-3 fs-13">
+                            <div class="col-md-6 border-end">
+                                <span class="fw-bold text-primary d-block mb-1">Shirt Specs (Inches):</span>
+                                <div class="row g-1">
+                                    <div class="col-6 text-muted">Lambai:</div><div class="col-6 fw-bold"><%= itemMeas.lambai || '-' %></div>
+                                    <div class="col-6 text-muted">Gheera:</div><div class="col-6 fw-bold"><%= itemMeas.gheera || '-' %></div>
+                                    <div class="col-6 text-muted">Bazu:</div><div class="col-6 fw-bold"><%= itemMeas.bazu || '-' %></div>
+                                    <div class="col-6 text-muted">Bazu Mori:</div><div class="col-6 fw-bold"><%= itemMeas.bazu_mori || '-' %></div>
+                                    <div class="col-6 text-muted">Teera:</div><div class="col-6 fw-bold"><%= itemMeas.teera || '-' %></div>
+                                    <div class="col-6 text-muted">Chest:</div><div class="col-6 fw-bold"><%= itemMeas.chest || '-' %></div>
+                                    <div class="col-6 text-muted">Kamar:</div><div class="col-6 fw-bold"><%= itemMeas.kamar || '-' %></div>
+                                    <div class="col-6 text-muted">Hip:</div><div class="col-6 fw-bold"><%= itemMeas.hip || '-' %></div>
+                                    <div class="col-6 text-muted">Chaak:</div><div class="col-6 fw-bold"><%= itemMeas.chaak || '-' %></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <span class="fw-bold text-success d-block mb-1">Trouser & Work Specs:</span>
+                                <div class="row g-1 mb-2">
+                                    <div class="col-6 text-muted">Lower Style:</div><div class="col-6 fw-bold text-success"><%= itemMeas.lower_style || 'Trouser' %></div>
+                                    <div class="col-6 text-muted">Shalwar Lambai:</div><div class="col-6 fw-bold"><%= itemMeas.shalwar_lambai || '-' %></div>
+                                    <div class="col-6 text-muted">Paincha:</div><div class="col-6 fw-bold"><%= itemMeas.paincha || '-' %></div>
+                                    <div class="col-6 text-muted">Thigh:</div><div class="col-6 fw-bold"><%= itemMeas.thigh || '-' %></div>
+                                </div>
+                                <span class="fw-bold text-warning d-block mb-1">Embroidery Notes:</span>
+                                <div class="fs-12">
+                                    Pattern Code: <strong><%= itemMeas.pattern_code || 'Standard' %></strong> |
+                                    Dupatta: <strong><%= itemMeas.dupatta_specs || 'N/A' %></strong> |
+                                    Thread: <strong><%= itemMeas.thread_details || 'N/A' %></strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% }) %>
+            </div>
+        </div>
+
+        <% if (order.embroidererNotes || order.tailorNotes || order.designNotes) { %>
+        <div class="card border-0 shadow-sm mb-3 theme-card">
+            <div class="card-body">
+                <h6 class="fw-bold mb-2">Production Notes</h6>
+                <% if (order.embroidererNotes) { %><p class="mb-1 fs-13"><strong class="text-warning">Embroiderer Notes:</strong> <%= order.embroidererNotes %></p><% } %>
+                <% if (order.tailorNotes) { %><p class="mb-1 fs-13"><strong class="text-primary">Tailor Notes:</strong> <%= order.tailorNotes %></p><% } %>
+                <% if (order.designNotes) { %><p class="mb-0 fs-13"><strong>General Notes:</strong> <%= order.designNotes %></p><% } %>
+            </div>
+        </div>
+        <% } %>
+    </div>
+
+    <!-- Right Column: Financial Summary -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm sticky-top theme-card" style="top: 20px;">
+            <div class="card-header theme-card-header-dark py-3">
+                <h5 class="card-title mb-0 fw-bold"><i class="ri-coins-line me-2"></i>Financial Summary</h5>
+            </div>
+            <div class="card-body">
+                <% 
+                    const orderDiscount = measurements.discount || 0;
+                    const grossSubtotal = (order.totalAmount || 0) + orderDiscount;
+                %>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted fs-14">Gross Subtotal:</span>
+                    <span class="fs-15 fw-bold">Rs. <%= grossSubtotal.toLocaleString() %></span>
+                </div>
+                <% if (orderDiscount > 0) { %>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-danger fs-14"><i class="ri-price-tag-3-line me-1"></i>Discount Allowed:</span>
+                    <span class="fs-15 fw-bold text-danger">- Rs. <%= orderDiscount.toLocaleString() %></span>
+                </div>
+                <% } %>
+                <div class="d-flex justify-content-between align-items-center mb-3 pt-2 border-top">
+                    <span class="fs-15 fw-bold">Net Total Amount:</span>
+                    <span class="fs-18 fw-bold">Rs. <%= (order.totalAmount || 0).toLocaleString() %></span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-success fs-15 fw-semibold"><i class="ri-checkbox-circle-fill me-1"></i>Advance Paid:</span>
+                    <span class="fs-18 fw-bold text-success">Rs. <%= (order.advancePayment || 0).toLocaleString() %></span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="fs-16 fw-bold text-danger">Balance Due at Delivery:</span>
+                    <span class="fs-22 fw-bold text-danger">Rs. <%= (order.balanceAmount || 0).toLocaleString() %></span>
+                </div>
+
+                <% if (order.status !== 'FULFILLED' && order.status !== 'CANCELLED') { %>
+                    <a href="/sales/form?salesorder_id=<%= order.id %>" class="btn btn-success btn-lg w-100 py-3 fw-bold shadow-sm mb-2">
+                        <i class="ri-shopping-bag-line me-2"></i> Fulfill & Complete Sale
+                    </a>
+                <% } else if (order.status === 'FULFILLED') { %>
+                    <div class="alert alert-secondary text-center fw-bold mb-0">
+                        <i class="ri-check-double-line me-1"></i> Order Fulfilled & Invoiced
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function updateOrderStatus(newStatus) {
+    if (!confirm(`Are you sure you want to update order status to ${newStatus}?`)) return;
+
+    try {
+        const response = await fetch('/sales-orders/status-update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: '<%= order.id %>', status: newStatus })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            toastr.success(result.message);
+            setTimeout(() => window.location.reload(), 600);
+        } else {
+            toastr.error(result.message || 'Failed to update status');
+        }
+    } catch (err) {
+        console.error(err);
+        toastr.error('Server error');
+    }
+}
+</script>

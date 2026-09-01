@@ -99,8 +99,7 @@
                     <label class="form-label text-muted fs-12 fw-semibold">Invoice Type</label>
                     <select name="type" class="form-select form-select-sm">
                         <option value="all" <%= type === 'all' ? 'selected' : '' %>>All Types</option>
-                        <option value="sale" <%= type === 'sale' ? 'selected' : '' %>>Product Sale</option>
-                        <option value="service" <%= type === 'service' ? 'selected' : '' %>>Service Sale</option>
+                        <option value="sale" <%= type === 'sale' ? 'selected' : '' %>>Boutique / POS Sale</option>
                         <option value="purchase" <%= type === 'purchase' ? 'selected' : '' %>>Purchase Order</option>
                     </select>
                 </div>
@@ -144,10 +143,8 @@
                 label: 'Type', 
                 sortable: false,
                 render: (row) => {
-                    if (row.type === 'service') {
-                        return `<span class="badge bg-soft-secondary text-secondary px-2 py-1"><i class="ri-customer-service-2-line me-1"></i>Service Sale</span>`;
-                    } else if (row.type === 'sale') {
-                        return `<span class="badge bg-soft-info text-info px-2 py-1"><i class="ri-shopping-cart-2-line me-1"></i>Product Sale</span>`;
+                    if (row.type === 'sale') {
+                        return `<span class="badge bg-soft-info text-info px-2 py-1"><i class="ri-shopping-cart-2-line me-1"></i>Sale Invoice</span>`;
                     } else {
                         return `<span class="badge bg-soft-warning text-warning px-2 py-1"><i class="ri-truck-line me-1"></i>Purchase</span>`;
                     }

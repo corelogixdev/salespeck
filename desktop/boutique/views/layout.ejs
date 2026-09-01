@@ -79,11 +79,20 @@
                                         <li><a href="/products" class="dropdown-item">Products</a></li>
                                         <% if (typeof permissions !== 'undefined' && permissions.purchasesCreate) { %>
                                         <li><a href="/accounting/purchase/form" class="dropdown-item">New Purchase</a></li>
-                                        <li><a href="/accounting/purchase/service-form" class="dropdown-item">Purchase Services</a></li>
                                         <% } %>
                                         <li><a href="/inventorylogs" class="dropdown-item">Stock Ledger</a></li>
                                         <li><a href="/brands" class="dropdown-item">Brands</a></li>
                                         <li><a href="/categories" class="dropdown-item">Categories</a></li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link menu-link dropdown-toggle" href="#"
+                                        role="button" aria-expanded="false" aria-haspopup="true">
+                                        <i class="las la-cut"></i> <span class="fw-bold text-warning">Boutique Orders</span>
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/sales-orders" class="dropdown-item fw-semibold"><i class="ri-dashboard-line me-1"></i> Order Dashboard</a></li>
+                                        <li><a href="/sales-orders/book" class="dropdown-item text-success"><i class="ri-add-circle-line me-1"></i> Book New Order</a></li>
                                     </ul>
                                 </li>
                                 <li class="nav-item dropdown">
@@ -107,8 +116,7 @@
                                     <ul class="dropdown-menu">
                                         <li><a href="/invoices" class="dropdown-item fw-semibold text-primary">Invoices Hub</a></li>
                                         <li><a href="/sales" class="dropdown-item">POS Sales</a></li>
-                                        <li><a href="/sales/form" class="dropdown-item" id="new-sale-menu-link">New Sale</a></li>
-                                        <li><a href="/sales/service-form" class="dropdown-item">Service Sales</a></li>
+                                        <li><a href="/sales/form" class="dropdown-item" id="new-sale-menu-link">New Sale / Fulfill Order</a></li>
                                         <li><a href="/sales/returns" class="dropdown-item">Returns</a></li>
                                     </ul>
                                 </li>

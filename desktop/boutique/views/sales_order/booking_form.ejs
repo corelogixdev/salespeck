@@ -1,0 +1,439 @@
+<div class="row mb-3">
+    <div class="col-12 d-flex align-items-center justify-content-between">
+        <div>
+            <h3 class="fw-bold mb-1 page-heading-title"><i class="ri-ruler-2-line text-warning me-2"></i>Book Boutique Sales Order</h3>
+            <p class="text-muted mb-0">Add order items first, then configure tailoring measurements & extra charges associated to each garment.</p>
+        </div>
+        <div>
+            <a href="/sales-orders" class="btn btn-outline-secondary">
+                <i class="ri-arrow-left-line me-1"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<form id="bookingOrderForm" onsubmit="saveSalesOrderBooking(event)">
+    <div class="row g-3">
+        <!-- Left Column: Order Header + Products & Measurements -->
+        <div class="col-lg-8">
+            
+            <!-- 1. Customer & Order Header Card -->
+            <div class="card border-0 shadow-sm mb-3 theme-card">
+                <div class="card-header theme-card-header-dark py-3">
+                    <h5 class="card-title mb-0 fw-bold"><i class="ri-file-user-line me-2"></i>1. Customer & Order Logistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Order Number</label>
+                            <input type="text" class="form-control fw-bold text-primary" name="ordernum" value="<%= nextOrderNum %>" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Booking / Order Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="bookingDate" value="<%= new Date().toISOString().split('T')[0] %>" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Promised Delivery Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control border-warning fw-bold" name="deliveryDate" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Select Customer <span class="text-danger">*</span></label>
+                            <select class="form-select select2" name="customer" id="customerSelect" onchange="onCustomerChange(this)" required>
+                                <option value="">-- Choose Existing Customer or Enter Name --</option>
+                                <% customers.forEach(c => { %>
+                                    <option value="<%= c.id %>" data-name="<%= c.firstname %> <%= c.lastname %>" data-phone="<%= c.phone %>">
+                                        <%= c.firstname %> <%= c.lastname %> (<%= c.phone || 'No Phone' %>)
+                                    </option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Or Enter Walk-in Customer Name</label>
+                            <input type="text" class="form-control" name="customer_name" id="customerNameInput" placeholder="Customer Name">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Fabric Source</label>
+                            <select class="form-select" name="fabricSource">
+                                <option value="CLIENT_PROVIDED">Client Provided Fabric</option>
+                                <option value="BOUTIQUE_STOCK">Boutique In-Stock Fabric</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Order Items & Inventory Products List (PRIMARY FOCUS - FIRST) -->
+            <div class="card border-0 shadow-sm mb-3 theme-card">
+                <div class="card-header theme-card-header-accent py-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-0 fw-bold"><i class="ri-shopping-basket-line me-2"></i>2. Order Items & Products List</h5>
+                        <small class="opacity-75">Add outfits, fabrics, or stitching items. Configure measurements & additional charges per item below.</small>
+                    </div>
+                    <button type="button" class="btn btn-light btn-sm fw-bold text-primary" onclick="addOrderItemRow()">
+                        <i class="ri-add-line me-1"></i> Add Line Item
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div id="orderItemsContainer">
+                        <!-- Items rendered dynamically -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Summary & Payment -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm sticky-top theme-card" style="top: 20px;">
+                <div class="card-header theme-card-header-dark py-3">
+                    <h5 class="card-title mb-0 fw-bold"><i class="ri-calculator-line me-2"></i>Financial Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-muted">Gross Order Subtotal</label>
+                        <div class="input-group">
+                            <span class="input-group-text theme-input-text">Rs.</span>
+                            <input type="number" class="form-control text-end fw-bold fs-16" id="subtotalAmountInput" value="0" readonly>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-danger">Discount (Rs.)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-danger text-white">Rs.</span>
+                            <input type="number" class="form-control fs-18 fw-bold text-end text-danger border-danger" id="discountInput" name="discount" value="0" min="0" oninput="calculateOrderTotals()">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Net Total Estimated Amount</label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text theme-input-text">Rs.</span>
+                            <input type="number" class="form-control fs-20 fw-bold text-end" id="totalAmountInput" name="totalAmount" value="0" readonly>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-success">Advance Payment Paid <span class="text-danger">*</span></label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-success text-white">Rs.</span>
+                            <input type="number" class="form-control fs-20 fw-bold text-end text-success border-success" id="advancePaymentInput" name="advancePayment" value="1000" oninput="calculateOrderTotals()">
+                        </div>
+                        <small class="text-muted">Security deposit paid at booking.</small>
+                    </div>
+
+                    <hr class="my-3">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="fs-16 fw-bold">Remaining Balance:</span>
+                        <span class="fs-22 fw-bold text-danger" id="balanceDisplay">Rs. 0</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">General Design Notes</label>
+                        <textarea class="form-control" name="designNotes" rows="3" placeholder="Additional overall notes or customer requirements..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-lg w-100 py-3 fw-bold shadow-sm">
+                        <i class="ri-checkbox-circle-fill me-2 fs-18"></i> Book Sales Order
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+const availableProducts = <%- JSON.stringify(products || []) %>;
+let itemRowCounter = 0;
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Add default initial row
+    addOrderItemRow('Suit Stitching & Tailoring Charge', 'Stitching', 1, 2500, 0);
+});
+
+function onCustomerChange(select) {
+    const selectedOption = select.options[select.selectedIndex];
+    if (selectedOption && selectedOption.dataset.name) {
+        document.getElementById('customerNameInput').value = selectedOption.dataset.name;
+    }
+}
+
+function addOrderItemRow(defaultName = '', defaultType = 'Stitching', defaultQty = 1, defaultPrice = 0, defaultExtra = 0) {
+    itemRowCounter++;
+    const rowIndex = itemRowCounter;
+    const container = document.getElementById('orderItemsContainer');
+
+    let productOptions = '<option value="">-- Custom Outfit / Work Charge --</option>';
+    availableProducts.forEach(p => {
+        productOptions += `<option value="${p.id}" data-name="${p.name}" data-price="${p.saleprice}">${p.name} (Stock: ${p.quantity}) - Rs. ${p.saleprice}</option>`;
+    });
+
+    const itemCard = document.createElement('div');
+    itemCard.className = 'border-bottom p-3 item-row-card';
+    itemCard.id = `item-card-${rowIndex}`;
+    itemCard.innerHTML = `
+        <div class="row g-2 align-items-center">
+            <div class="col-md-3">
+                <label class="form-label fs-12 text-muted fw-bold mb-1">Select Product / Outfit</label>
+                <select class="form-select form-select-sm item-product-select" onchange="onItemProductChange(this, ${rowIndex})">
+                    ${productOptions}
+                </select>
+                <input type="hidden" class="item-product-id" value="">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fs-12 text-muted fw-bold mb-1">Description / Name</label>
+                <input type="text" class="form-control form-control-sm item-name fw-bold" value="${defaultName}" placeholder="Garment / Work Name" required>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fs-12 text-muted fw-bold mb-1">Type</label>
+                <select class="form-select form-select-sm item-type">
+                    <option value="Stitching" ${defaultType === 'Stitching' ? 'selected' : ''}>Stitching</option>
+                    <option value="Embroidery" ${defaultType === 'Embroidery' ? 'selected' : ''}>Embroidery</option>
+                    <option value="Fabric" ${defaultType === 'Fabric' ? 'selected' : ''}>Fabric</option>
+                    <option value="Trims">Trims & Laces</option>
+                    <option value="Custom">Custom</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <label class="form-label fs-12 text-muted fw-bold mb-1">Qty</label>
+                <input type="number" class="form-control form-control-sm text-center item-qty" value="${defaultQty}" min="1" onchange="calculateOrderTotals()">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fs-12 text-muted fw-bold mb-1">Rate (Price)</label>
+                <input type="number" class="form-control form-control-sm text-end item-price fw-bold" value="${defaultPrice}" min="0" onchange="calculateOrderTotals()">
+            </div>
+            <div class="col-md-1 text-end">
+                <label class="form-label fs-12 text-muted fw-bold mb-1">Delete</label>
+                <button type="button" class="btn btn-outline-danger btn-sm w-100" onclick="removeOrderItemRow(${rowIndex})"><i class="ri-delete-bin-line"></i></button>
+            </div>
+        </div>
+
+        <!-- Additional Charges & Measurements Action Bar -->
+        <div class="row g-2 align-items-center mt-2 pt-2 border-top">
+            <div class="col-md-7 d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-sm btn-outline-warning fw-bold" onclick="toggleItemMeasurements(${rowIndex})">
+                    <i class="ri-ruler-2-line me-1"></i> <span id="meas-btn-text-${rowIndex}">Set Measurements & Extra Charges for #${rowIndex}</span>
+                </button>
+                <span class="badge bg-warning-subtle text-warning border border-warning fs-11" id="meas-badge-${rowIndex}">Standard</span>
+            </div>
+            <div class="col-md-5 d-flex justify-content-end align-items-center gap-3">
+                <div class="d-flex align-items-center gap-1">
+                    <label class="fs-12 fw-bold text-muted mb-0">Extra Charge:</label>
+                    <input type="number" class="form-control form-control-sm text-end item-extra-charge border-warning fw-bold" style="width: 100px;" value="${defaultExtra}" min="0" placeholder="Extra Fee" onchange="calculateOrderTotals()">
+                </div>
+                <div class="fs-13 fw-bold text-primary">
+                    Subtotal: Rs. <span id="item-subtotal-${rowIndex}">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Collapsible Measurement Panel per Item -->
+        <div class="collapse mt-3 border rounded p-3 item-meas-panel" id="meas-panel-${rowIndex}">
+            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                <h6 class="fw-bold mb-0"><i class="ri-ruler-line me-1 text-warning"></i>Tailoring Measurements & Additional Fees for Line Item #${rowIndex}</h6>
+                <button type="button" class="btn-close btn-sm" onclick="toggleItemMeasurements(${rowIndex})"></button>
+            </div>
+
+            <!-- Tabbed Specs per Item -->
+            <ul class="nav nav-tabs nav-tabs-custom mb-3" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active py-1 px-2 fs-12 fw-bold" data-bs-toggle="tab" data-bs-target="#item-${rowIndex}-shirt" type="button">Shirt / Kameez</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link py-1 px-2 fs-12 fw-bold" data-bs-toggle="tab" data-bs-target="#item-${rowIndex}-trouser" type="button">Trouser / Lower</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link py-1 px-2 fs-12 fw-bold" data-bs-toggle="tab" data-bs-target="#item-${rowIndex}-embroidery" type="button">Embroidery & Work</button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <!-- Shirt Specs -->
+                <div class="tab-pane fade show active" id="item-${rowIndex}-shirt">
+                    <div class="row g-2">
+                        <div class="col-md-4 col-6"><label class="fs-11 fw-bold text-muted">Lambai (Length)</label><input type="text" class="form-control form-control-sm text-center meas-lambai" placeholder="38"></div>
+                        <div class="col-md-4 col-6"><label class="fs-11 fw-bold text-muted">Gheera (Daman)</label><input type="text" class="form-control form-control-sm text-center meas-gheera" placeholder="22"></div>
+                        <div class="col-md-4 col-6"><label class="fs-11 fw-bold text-muted">Bazu (Sleeve)</label><input type="text" class="form-control form-control-sm text-center meas-bazu" placeholder="20"></div>
+                        <div class="col-md-4 col-6"><label class="fs-11 fw-bold text-muted">Bazu Mori (Cuff)</label><input type="text" class="form-control form-control-sm text-center meas-bazu_mori" placeholder="5.5"></div>
+                        <div class="col-md-4 col-6"><label class="fs-11 fw-bold text-muted">Teera (Shoulder)</label><input type="text" class="form-control form-control-sm text-center meas-teera" placeholder="14"></div>
+                        <div class="col-md-4 col-6"><label class="fs-11 fw-bold text-muted">Chest (Bust)</label><input type="text" class="form-control form-control-sm text-center meas-chest" placeholder="19.5"></div>
+                        <div class="col-md-4 col-6"><label class="fs-11 fw-bold text-muted">Kamar (Waist)</label><input type="text" class="form-control form-control-sm text-center meas-kamar" placeholder="17.5"></div>
+                        <div class="col-md-4 col-6"><label class="fs-11 fw-bold text-muted">Hip Width</label><input type="text" class="form-control form-control-sm text-center meas-hip" placeholder="21"></div>
+                        <div class="col-md-4 col-6"><label class="fs-11 fw-bold text-muted">Chaak (Slit)</label><input type="text" class="form-control form-control-sm text-center meas-chaak" placeholder="12"></div>
+                    </div>
+                </div>
+
+                <!-- Trouser Specs -->
+                <div class="tab-pane fade" id="item-${rowIndex}-trouser">
+                    <div class="row g-2">
+                        <div class="col-md-6"><label class="fs-11 fw-bold text-muted">Lower Outfit Style</label>
+                            <select class="form-select form-select-sm meas-lower_style">
+                                <option value="Shalwar/Trouser">Standard Shalwar / Trouser</option>
+                                <option value="Lehenga/Gharara">Lehenga / Gharara</option>
+                                <option value="Churidar">Churidar (Gathered Pants)</option>
+                                <option value="Flipper">Flipper / Flapper (Wide-leg)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6"><label class="fs-11 fw-bold text-muted">Shalwar Lambai (Length)</label><input type="text" class="form-control form-control-sm text-center meas-shalwar_lambai" placeholder="37"></div>
+                        <div class="col-md-6"><label class="fs-11 fw-bold text-muted">Paincha (Bottom Opening)</label><input type="text" class="form-control form-control-sm text-center meas-paincha" placeholder="6.5"></div>
+                        <div class="col-md-6"><label class="fs-11 fw-bold text-muted">Thigh (Ghera)</label><input type="text" class="form-control form-control-sm text-center meas-thigh" placeholder="14"></div>
+                    </div>
+                </div>
+
+                <!-- Embroidery Specs -->
+                <div class="tab-pane fade" id="item-${rowIndex}-embroidery">
+                    <div class="row g-2">
+                        <div class="col-md-4"><label class="fs-11 fw-bold text-muted">Pattern / Design Code</label><input type="text" class="form-control form-control-sm meas-pattern_code" placeholder="EMB-101"></div>
+                        <div class="col-md-4"><label class="fs-11 fw-bold text-muted">Dupatta Specs</label><input type="text" class="form-control form-control-sm meas-dupatta_specs" placeholder="2.5 Yds"></div>
+                        <div class="col-md-4"><label class="fs-11 fw-bold text-muted">Thread/Zari Details</label><input type="text" class="form-control form-control-sm meas-thread_details" placeholder="Gold Zari"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    container.appendChild(itemCard);
+    calculateOrderTotals();
+}
+
+function removeOrderItemRow(rowIndex) {
+    const card = document.getElementById(`item-card-${rowIndex}`);
+    const container = document.getElementById('orderItemsContainer');
+    if (container.children.length > 1) {
+        card.remove();
+        calculateOrderTotals();
+    } else {
+        toastr.warning('At least one item is required in the order');
+    }
+}
+
+function toggleItemMeasurements(rowIndex) {
+    const panel = document.getElementById(`meas-panel-${rowIndex}`);
+    const bsCollapse = new bootstrap.Collapse(panel, { toggle: true });
+    const badge = document.getElementById(`meas-badge-${rowIndex}`);
+    badge.className = 'badge bg-warning-subtle text-warning border border-warning ms-2 fs-11';
+    badge.innerText = 'Configured';
+}
+
+function onItemProductChange(select, rowIndex) {
+    const card = document.getElementById(`item-card-${rowIndex}`);
+    const selectedId = select.value;
+    const productIdInput = card.querySelector('.item-product-id');
+    const nameInput = card.querySelector('.item-name');
+    const priceInput = card.querySelector('.item-price');
+    const typeSelect = card.querySelector('.item-type');
+
+    if (selectedId) {
+        const prod = availableProducts.find(p => p.id === selectedId);
+        if (prod) {
+            productIdInput.value = prod.id;
+            nameInput.value = prod.name;
+            priceInput.value = prod.saleprice || 0;
+            typeSelect.value = 'Fabric';
+        }
+    } else {
+        productIdInput.value = '';
+    }
+    calculateOrderTotals();
+}
+
+function calculateOrderTotals() {
+    let grossSubtotal = 0;
+    const cards = document.querySelectorAll('.item-row-card');
+    cards.forEach(card => {
+        const qty = parseFloat(card.querySelector('.item-qty').value) || 0;
+        const price = parseFloat(card.querySelector('.item-price').value) || 0;
+        const extraCharge = parseFloat(card.querySelector('.item-extra-charge').value) || 0;
+        const subtotal = (qty * price) + extraCharge;
+        grossSubtotal += subtotal;
+
+        const subtotalSpan = card.querySelector('[id^="item-subtotal-"]');
+        if (subtotalSpan) subtotalSpan.innerText = subtotal.toLocaleString();
+    });
+
+    const subtotalEl = document.getElementById('subtotalAmountInput');
+    if (subtotalEl) subtotalEl.value = grossSubtotal;
+
+    const discount = parseFloat(document.getElementById('discountInput').value) || 0;
+    const netTotal = Math.max(0, grossSubtotal - discount);
+
+    document.getElementById('totalAmountInput').value = netTotal;
+
+    const advance = parseFloat(document.getElementById('advancePaymentInput').value) || 0;
+    const balance = Math.max(0, netTotal - advance);
+    document.getElementById('balanceDisplay').innerText = `Rs. ${balance.toLocaleString()}`;
+}
+
+async function saveSalesOrderBooking(e) {
+    e.preventDefault();
+    const form = document.getElementById('bookingOrderForm');
+    const formData = new FormData(form);
+
+    // Collect items with associated per-item measurements and extra charges
+    const items = [];
+    const cards = document.querySelectorAll('.item-row-card');
+    cards.forEach(card => {
+        const productId = card.querySelector('.item-product-id').value;
+        const name = card.querySelector('.item-name').value.trim();
+        const type = card.querySelector('.item-type').value;
+        const qty = parseFloat(card.querySelector('.item-qty').value) || 1;
+        const price = parseFloat(card.querySelector('.item-price').value) || 0;
+        const extraCharge = parseFloat(card.querySelector('.item-extra-charge').value) || 0;
+
+        // Collect measurements for this item
+        const measurements = {
+            extra_charge: extraCharge,
+            lambai: card.querySelector('.meas-lambai')?.value || '',
+            gheera: card.querySelector('.meas-gheera')?.value || '',
+            bazu: card.querySelector('.meas-bazu')?.value || '',
+            bazu_mori: card.querySelector('.meas-bazu_mori')?.value || '',
+            teera: card.querySelector('.meas-teera')?.value || '',
+            chest: card.querySelector('.meas-chest')?.value || '',
+            kamar: card.querySelector('.meas-kamar')?.value || '',
+            hip: card.querySelector('.meas-hip')?.value || '',
+            chaak: card.querySelector('.meas-chaak')?.value || '',
+            lower_style: card.querySelector('.meas-lower_style')?.value || 'Shalwar/Trouser',
+            shalwar_lambai: card.querySelector('.meas-shalwar_lambai')?.value || '',
+            paincha: card.querySelector('.meas-paincha')?.value || '',
+            thigh: card.querySelector('.meas-thigh')?.value || '',
+            pattern_code: card.querySelector('.meas-pattern_code')?.value || '',
+            dupatta_specs: card.querySelector('.meas-dupatta_specs')?.value || '',
+            thread_details: card.querySelector('.meas-thread_details')?.value || ''
+        };
+
+        if (name) {
+            items.push({ product_id: productId || null, item_name: name, item_type: type, quantity: qty, price: price + (extraCharge / qty), measurements });
+        }
+    });
+
+    if (items.length === 0) {
+        toastr.error('Please add at least one line item');
+        return;
+    }
+
+    const payload = Object.fromEntries(formData.entries());
+    payload.items = items;
+
+    try {
+        const response = await fetch('/sales-orders/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            toastr.success(result.message || 'Order Booked!');
+            setTimeout(() => {
+                window.location.href = `/sales-orders/details/${result.orderId}`;
+            }, 1000);
+        } else {
+            toastr.error(result.message || 'Failed to save order');
+        }
+    } catch (err) {
+        console.error(err);
+        toastr.error(err.message || 'Server error');
+    }
+}
+</script>

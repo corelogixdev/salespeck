@@ -89,7 +89,7 @@ exports.form = async (req, res) => {
 
 exports.save = async (req, res) => {
   try {
-    const { customer, products, discountpercentage, totalPayment, totalPrice, ledger, transactionDate, revenueAccountId } = req.body;
+    const { customer, products, discountpercentage, totalPayment, totalPrice, ledger, transactionDate, revenueAccountId, salesorder_id } = req.body;
     const { user } = res.locals;
     const sale = await queries.sales.createSaleTransaction({
       userId: user.id,
@@ -102,6 +102,19 @@ exports.save = async (req, res) => {
       transactionDate,
       revenueAccountId
     });
+
+    if (salesorder_id) {
+      const { requirePrismaClient } = require('../utils/prismaClient');
+      const prisma = requirePrismaClient();
+      await prisma.sale.update({
+        where: { id: sale.id },
+        data: { salesorder_id }
+      });
+      await prisma.salesorder.update({
+        where: { id: salesorder_id },
+        data: { status: 'FULFILLED', updatedAt: new Date() }
+      });
+    }
 
     res.send({
       status: "success",
@@ -330,134 +343,4 @@ exports.getRevenueAccounts = async (req, res) => {
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
-};
-
-exports.serviceForm = async (req, res) => {
-  res.render("sales/service_form", { customers: [] });
-};
-
-exports.saveService = async (req, res) => {
-  try {
-    const { customer, products, discountpercentage, totalPayment, totalPrice, ledger, transactionDate, revenueAccountId } = req.body;
-    const { user } = res.locals;
-    const sale = await queries.sales.createServiceSaleTransaction({
-      userId: user.id,
-      customer,
-      discountpercentage,
-      totalPayment,
-      totalPrice,
-      ledger,
-      products,
-      transactionDate,
-      revenueAccountId
-    });
-
-    res.send({
-      status: "success",
-      message: "Service Sale created successfully",
-      saleId: sale.id
-    });
-
-  } catch (error) {
-    console.error("Service Sale creation error:", error);
-    res.status(500).send({ status: "error", message: error.message || "Internal Server Error" });
-  }
-};
-
-exports.getNextServiceInvoiceNum = async (req, res) => {
-    try {
-        const nextNum = await queries.helpers.getNextInvoiceNumber('SRV');
-        res.json({ success: true, nextNum });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
-
-exports.serviceProductsget = async (req, res) => {
-  let body = req.body;
-  let search = findLike(body);
-  if (req.body.barcode) {
-    search = { ...search, barcode: req.body.barcode };
-  }
-  search = { ...search, is_service: true };
-  let data = await queries.products.findForSale(search);
-  // Optional: We could filter by category 'Service', but for now let's return all,
-  // or let's assume the frontend will allow selecting existing products or creating new ones.
-  data = JSON.parse(JSON.stringify(data));
-  res.json(data);
-};
-
-exports.bulkResolveServices = async (req, res) => {
-  try {
-    const { services } = req.body;
-    if (!services || !Array.isArray(services)) {
-      return res.json({ success: false, message: 'Invalid services data' });
-    }
-
-    const resolvedProducts = [];
-    const names = [...new Set(services.filter(s => s.name).map(s => s.name))];
-    const existingProducts = await queries.products.findForSale({ name: { in: names } }, 5000);
-    const existingMap = new Map(existingProducts.map(p => [p.name, p]));
-
-    for (let item of services) {
-      if (!item.name) continue;
-      
-      const product = existingMap.get(item.name);
-      if (product) {
-        resolvedProducts.push({
-          id: product.id,
-          name: product.name,
-          saleprice: product.saleprice,
-          qty: item.qty || 1,
-          rate: item.rate !== '' ? item.rate : (product.saleprice || 0),
-          isNew: false
-        });
-      } else {
-        resolvedProducts.push({
-          id: null,
-          name: item.name,
-          saleprice: item.rate || 0,
-          qty: item.qty || 1,
-          rate: item.rate || 0,
-          isNew: true
-        });
-      }
-    }
-
-    res.json({ success: true, products: resolvedProducts });
-  } catch (error) {
-    console.error('Error resolving bulk services:', error);
-    res.json({ success: false, message: error.message || 'Internal Server Error' });
-  }
-};
-
-exports.createSingleService = async (req, res) => {
-  try {
-    const { name, rate } = req.body;
-    if (!name) return res.json({ success: false, message: 'Name is required' });
-
-    let product = await queries.products.findByName(name);
-    if (!product) {
-      const serviceCategory = await queries.categories.getOrCreateServiceCategory();
-      const newProductData = {
-        name: name,
-        saleprice: rate || 0,
-        is_service: true,
-        saleactive: true,
-        purchaseactive: false,
-        quantity: 0,
-        purchaseprice: 0,
-        discount: 0,
-        carrycost: 0,
-        category: serviceCategory.id,
-        createdby: req.session.user ? req.session.user.id : null
-      };
-      product = await queries.products.create(newProductData);
-    }
-    
-    res.json({ success: true, product: { id: product.id, name: product.name, saleprice: product.saleprice } });
-  } catch (error) {
-    console.error('Error creating single service:', error);
-    res.json({ success: false, message: error.message || 'Internal Server Error' });
-  }
 };

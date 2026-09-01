@@ -319,10 +319,48 @@ exports.Prisma.SaleScalarFieldEnum = {
   discountpercentage: 'discountpercentage',
   totalprice: 'totalprice',
   totalpayment: 'totalpayment',
+  salesorder_id: 'salesorder_id',
   createdby: 'createdby',
   updatedby: 'updatedby',
   source: 'source',
   printCount: 'printCount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SalesorderScalarFieldEnum = {
+  id: 'id',
+  ordernum: 'ordernum',
+  customer: 'customer',
+  user: 'user',
+  bookingDate: 'bookingDate',
+  deliveryDate: 'deliveryDate',
+  status: 'status',
+  fabricSource: 'fabricSource',
+  totalAmount: 'totalAmount',
+  advancePayment: 'advancePayment',
+  balanceAmount: 'balanceAmount',
+  designNotes: 'designNotes',
+  embroidererNotes: 'embroidererNotes',
+  tailorNotes: 'tailorNotes',
+  measurementData: 'measurementData',
+  createdby: 'createdby',
+  updatedby: 'updatedby',
+  source: 'source',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SalesorderitemsScalarFieldEnum = {
+  id: 'id',
+  salesorder_id: 'salesorder_id',
+  product_id: 'product_id',
+  item_name: 'item_name',
+  item_type: 'item_type',
+  quantity: 'quantity',
+  price: 'price',
+  subtotal: 'subtotal',
+  notes: 'notes',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -444,6 +482,8 @@ exports.Prisma.ModelName = {
   purchase: 'purchase',
   purchasedproducts: 'purchasedproducts',
   sale: 'sale',
+  salesorder: 'salesorder',
+  salesorderitems: 'salesorderitems',
   softwaresetting: 'softwaresetting',
   soldproducts: 'soldproducts',
   salereturn: 'salereturn',

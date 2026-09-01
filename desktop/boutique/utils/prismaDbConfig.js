@@ -14,10 +14,10 @@ function resolveProductionBaseDir() {
 function resolveDatabasePath() {
   const isPackagedRuntime = __dirname.includes("app.asar");
   if (isPackagedRuntime) {
-    return path.join(resolveProductionBaseDir(), "stitch.sqlite");
+    return path.join(resolveProductionBaseDir(), "boutique.sqlite");
   }
 
-  return path.join(__dirname, "..", "db", "stitch.sqlite");
+  return path.join(__dirname, "..", "db", "boutique.sqlite");
 }
 
 function ensureDatabaseDirectory() {

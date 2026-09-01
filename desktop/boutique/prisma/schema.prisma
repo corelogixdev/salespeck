@@ -223,6 +223,7 @@ model sale {
   discountpercentage String?
   totalprice         String?
   totalpayment       String?
+  salesorder_id      String?
   createdby          String?
   updatedby          String?
   source             String?
@@ -230,8 +231,57 @@ model sale {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @default(now())
 
+  salesorder         salesorder? @relation(fields: [salesorder_id], references: [id])
+
   @@index([invoicenum])
   @@index([createdAt])
+  @@index([salesorder_id])
+}
+
+model salesorder {
+  id               String            @id
+  ordernum         String            @unique
+  customer         String?
+  user             String?
+  bookingDate      DateTime          @default(now())
+  deliveryDate     DateTime?
+  status           String            @default("BOOKED") // BOOKED, IN_EMBROIDERY, IN_STITCHING, READY, FULFILLED, CANCELLED
+  fabricSource     String?           @default("CLIENT_PROVIDED") // CLIENT_PROVIDED, BOUTIQUE_STOCK
+  totalAmount      Float             @default(0)
+  advancePayment   Float             @default(0)
+  balanceAmount    Float             @default(0)
+  designNotes      String?
+  embroidererNotes String?
+  tailorNotes      String?
+  measurementData  String?           // JSON containing Lambai, Gheera, Bazu, Bazu Mori, Teera, Chest, Kamar, Hip, Chaak, Shalwar Lambai, Paincha, Thigh, Lower Style, etc.
+  createdby        String?
+  updatedby        String?
+  source           String?           @default("desktop")
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @default(now())
+  items            salesorderitems[]
+  sales            sale[]
+
+  @@index([ordernum])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model salesorderitems {
+  id            String     @id
+  salesorder_id String
+  product_id    String?
+  item_name     String
+  item_type     String?    // Fabric, Embroidery Work, Stitching Charge, Trims/Lace, Custom
+  quantity      Float      @default(1)
+  price         Float      @default(0)
+  subtotal      Float      @default(0)
+  notes         String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @default(now())
+  salesorder    salesorder @relation(fields: [salesorder_id], references: [id], onDelete: Cascade)
+
+  @@index([salesorder_id])
 }
 
 model softwaresetting {

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Workshop Job Slip - <%= order.ordernum %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #fff; color: #000; font-size: 13px; }
+        .ticket-box { max-width: 800px; margin: 20px auto; border: 2px solid #000; padding: 20px; }
+        .header-title { border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
+        .spec-table th, .spec-table td { border: 1px solid #000 !important; padding: 5px 8px; font-size: 12px; }
+        .spec-table th { background-color: #f0f0f0 !important; color: #000; text-transform: uppercase; font-weight: bold; }
+        .item-block { border: 1px solid #000; padding: 12px; margin-bottom: 15px; background: #fff; }
+        .notes-box { border: 1px dashed #000; padding: 10px; margin-top: 15px; background: #fafafa; }
+        @media print {
+            .no-print { display: none !important; }
+            .ticket-box { border: none; max-width: 100%; margin: 0; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container no-print my-3 text-center d-flex justify-content-center gap-2">
+    <a href="/sales-orders/details/<%= order.id %>" class="btn btn-outline-secondary btn-lg shadow-sm">
+        <i class="ri-arrow-left-line me-1"></i> Back to Order Details
+    </a>
+    <button onclick="window.print()" class="btn btn-primary btn-lg shadow">
+        <i class="ri-printer-line me-1"></i> Print Workshop Slip
+    </button>
+</div>
+
+<div class="ticket-box">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center header-title">
+        <div>
+            <h2 class="fw-bold mb-0">BOUTIQUE WORKSHOP SLIP</h2>
+            <p class="mb-0 text-uppercase fw-semibold">Tailor & Embroidery Production Ticket</p>
+        </div>
+        <div class="text-end">
+            <h3 class="fw-bold mb-0 text-danger"><%= order.ordernum %></h3>
+            <span class="badge bg-dark px-3 py-1 fs-14"><%= order.status %></span>
+        </div>
+    </div>
+
+    <!-- Info Row -->
+    <table class="table table-bordered spec-table mb-4">
+        <tr>
+            <th style="width: 20%;">Customer Name:</th>
+            <td style="width: 30%;" class="fw-bold"><%= customerDetails ? `${customerDetails.firstname || ''} ${customerDetails.lastname || ''}`.trim() : (order.customer || 'Client') %></td>
+            <th style="width: 20%;">Order Date:</th>
+            <td style="width: 30%;"><%= new Date(order.bookingDate).toLocaleDateString() %></td>
+        </tr>
+        <tr>
+            <th>Fabric Source:</th>
+            <td class="fw-bold"><%= order.fabricSource === 'BOUTIQUE_STOCK' ? 'Boutique Stock' : 'Client Provided' %></td>
+            <th>DELIVERY DUE DATE:</th>
+            <td class="fw-bold text-danger fs-15"><%= order.deliveryDate ? new Date(order.deliveryDate).toLocaleDateString() : 'URGENT' %></td>
+        </tr>
+    </table>
+
+    <!-- Ordered Items & Measurements Per Garment -->
+    <h4 class="fw-bold text-uppercase border-bottom border-2 border-dark pb-1 mb-3">Ordered Outfits & Tailoring Specs</h4>
+
+    <% (order.items || []).forEach((item, index) => { 
+        let itemMeas = {};
+        try {
+            if (item.notes && item.notes.startsWith('{')) {
+                itemMeas = JSON.parse(item.notes);
+            } else if (measurements.itemsMeasurements && measurements.itemsMeasurements[index]) {
+                itemMeas = measurements.itemsMeasurements[index];
+            }
+        } catch (e) {}
+    %>
+    <div class="item-block">
+        <div class="d-flex justify-content-between align-items-center border-bottom border-dark pb-2 mb-2">
+            <h5 class="fw-bold mb-0">Item #<%= index + 1 %>: <%= item.item_name %> (<%= item.item_type %>)</h5>
+            <span class="fw-bold">Qty: <%= item.quantity %></span>
+        </div>
+
+        <div class="row g-2">
+            <!-- Upper Body -->
+            <div class="col-6">
+                <h6 class="fw-bold text-uppercase mb-1">Shirt Specs (Inches)</h6>
+                <table class="table table-bordered spec-table mb-0">
+                    <tr><th>Lambai (Length)</th><td class="fw-bold text-center"><%= itemMeas.lambai || '-' %></td><th>Teera (Shoulder)</th><td class="fw-bold text-center"><%= itemMeas.teera || '-' %></td></tr>
+                    <tr><th>Gheera (Daman)</th><td class="fw-bold text-center"><%= itemMeas.gheera || '-' %></td><th>Chest</th><td class="fw-bold text-center"><%= itemMeas.chest || '-' %></td></tr>
+                    <tr><th>Bazu (Sleeve)</th><td class="fw-bold text-center"><%= itemMeas.bazu || '-' %></td><th>Kamar (Waist)</th><td class="fw-bold text-center"><%= itemMeas.kamar || '-' %></td></tr>
+                    <tr><th>Bazu Mori</th><td class="fw-bold text-center"><%= itemMeas.bazu_mori || '-' %></td><th>Hip</th><td class="fw-bold text-center"><%= itemMeas.hip || '-' %></td></tr>
+                    <tr><th>Chaak (Slit)</th><td class="fw-bold text-center" colspan="3"><%= itemMeas.chaak || '-' %></td></tr>
+                </table>
+            </div>
+
+            <!-- Lower Body & Work -->
+            <div class="col-6">
+                <h6 class="fw-bold text-uppercase mb-1">Trouser & Embroidery</h6>
+                <table class="table table-bordered spec-table mb-0">
+                    <tr><th>Lower Style</th><td class="fw-bold text-center" colspan="3"><%= itemMeas.lower_style || 'Trouser' %></td></tr>
+                    <tr><th>Shalwar Lambai</th><td class="fw-bold text-center"><%= itemMeas.shalwar_lambai || '-' %></td><th>Paincha</th><td class="fw-bold text-center"><%= itemMeas.paincha || '-' %></td></tr>
+                    <tr><th>Thigh</th><td class="fw-bold text-center" colspan="3"><%= itemMeas.thigh || '-' %></td></tr>
+                    <tr><th>Pattern Code</th><td class="fw-bold" colspan="3"><%= itemMeas.pattern_code || 'Standard' %></td></tr>
+                    <tr><th>Dupatta / Thread</th><td colspan="3"><%= itemMeas.dupatta_specs || 'Standard' %> | <%= itemMeas.thread_details || 'As Sample' %></td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <% }) %>
+
+    <!-- Work Notes -->
+    <% if (order.embroidererNotes || order.tailorNotes || order.designNotes) { %>
+    <div class="notes-box">
+        <h6 class="fw-bold text-uppercase mb-1">Special Production Notes:</h6>
+        <% if (order.embroidererNotes) { %><p class="mb-1"><strong>Embroiderer:</strong> <%= order.embroidererNotes %></p><% } %>
+        <% if (order.tailorNotes) { %><p class="mb-1"><strong>Tailor:</strong> <%= order.tailorNotes %></p><% } %>
+        <% if (order.designNotes) { %><p class="mb-0"><strong>General:</strong> <%= order.designNotes %></p><% } %>
+    </div>
+    <% } %>
+
+    <!-- Footer Signatures -->
+    <div class="row mt-5 pt-4">
+        <div class="col-4 text-center border-top border-dark pt-2">
+            <span class="fw-semibold">Master Tailor Sign</span>
+        </div>
+        <div class="col-4 text-center border-top border-dark pt-2">
+            <span class="fw-semibold">Embroiderer Sign</span>
+        </div>
+        <div class="col-4 text-center border-top border-dark pt-2">
+            <span class="fw-semibold">QC / Checked By</span>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -33,10 +33,73 @@
             createNewTab();
         });
 
+        // Check if salesorder_id URL parameter is present for fulfillment
+        setTimeout(() => {
+            checkAndLoadSalesOrderFromUrl();
+        }, 500);
+
         // Initialize clock updates
         updateAllClocks();
         setInterval(updateAllClocks, 1000);
     });
+
+    function checkAndLoadSalesOrderFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const salesOrderId = urlParams.get('salesorder_id');
+        if (salesOrderId && currentTabId) {
+            fetch(`/sales-orders/api/details/${salesOrderId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.order) {
+                        const order = data.order;
+                        const customerDetails = data.customerDetails;
+                        const tab = saleTabs.find(t => t.id === currentTabId);
+                        if (tab) {
+                            tab.salesorder_id = order.id;
+                            toastr.info(`Imported Sales Order ${order.ordernum} for fulfillment`);
+                            
+                            // Set Customer in Select2 dropdown and tab state
+                            const customerId = customerDetails ? customerDetails.id : order.customer;
+                            const customerText = customerDetails 
+                                ? `${customerDetails.firstname || ''} ${customerDetails.lastname || ''} (${customerDetails.phone || 'No phone'})`.trim()
+                                : order.customer;
+
+                            if (customerId) {
+                                tab.customer = customerId;
+                                const $customerSelect = $(`#customer-${currentTabId}`);
+                                if ($customerSelect.length) {
+                                    if ($customerSelect.find(`option[value="${customerId}"]`).length === 0) {
+                                        const newOption = new Option(customerText, customerId, true, true);
+                                        $customerSelect.append(newOption).trigger('change');
+                                    } else {
+                                        $customerSelect.val(customerId).trigger('change');
+                                    }
+                                    $customerSelect.trigger({
+                                        type: 'select2:select',
+                                        params: { data: { id: customerId, text: customerText } }
+                                    });
+                                }
+                            }
+                            
+                            (order.items || []).forEach(item => {
+                                if (item.product_id) {
+                                    const prodObj = {
+                                        id: item.product_id,
+                                        name: item.item_name,
+                                        saleprice: item.price,
+                                        quantity: 999, // default available check
+                                        discount: 0
+                                    };
+                                    allProducts.push(prodObj);
+                                    addProduct(prodObj, currentTabId);
+                                }
+                            });
+                        }
+                    }
+                })
+                .catch(err => console.error('Error importing sales order:', err));
+        }
+    }
 
     // Update all visible clocks
     function updateAllClocks() {
@@ -1070,7 +1133,8 @@
                                 ledger, 
                                 totalPayment: totalPaymentVal, 
                                 transactionDate, 
-                                revenueAccountId: finalRevenueAccountId 
+                                revenueAccountId: finalRevenueAccountId,
+                                salesorder_id: tab.salesorder_id || null
                             }),
                         }).then(async response => {
                             let data = await response.json();

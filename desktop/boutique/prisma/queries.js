@@ -957,10 +957,13 @@ const sales = {
           salesAccount = await tx.financeaccount.findFirst({ where: { code: '4100' } });
         }
 
-        // Resolve customer finance account (creates it if missing)
+        // Resolve customer finance account (creates it if missing, or uses Walk-in account)
         let customerAccountId = null;
         if (customer) {
           customerAccountId = await accounting.getOrCreateUserAccount(tx, customer, 'customer');
+        }
+        if (!customerAccountId) {
+          customerAccountId = await accounting.getOrCreateWalkinAccount(tx);
         }
 
         // ── JOURNAL 1: Invoice Raised ──
@@ -2530,6 +2533,32 @@ const accounting = {
     });
 
     return newAccount.id;
+  },
+  async getOrCreateWalkinAccount(tx) {
+    const client = tx || getPrisma();
+    let walkinAccount = await client.financeaccount.findFirst({
+      where: { code: '1130-WALK' }
+    });
+    if (walkinAccount) return walkinAccount.id;
+
+    let parentAccount = await client.financeaccount.findFirst({ where: { code: '1130' } });
+    if (!parentAccount) {
+      parentAccount = await client.financeaccount.findFirst({ where: { category: 'Asset' } });
+    }
+
+    walkinAccount = await client.financeaccount.create({
+      data: {
+        id: generateId(32),
+        name: 'Walk-in Customer Ledger',
+        code: '1130-WALK',
+        type: parentAccount ? parentAccount.type : 'Asset',
+        category: parentAccount ? parentAccount.category : 'Asset',
+        fk_parent_in_financeaccount: parentAccount ? parentAccount.id : null,
+        source: 'system-generated'
+      }
+    });
+
+    return walkinAccount.id;
   },
   async findAccountByName(name) {
     const prisma = getPrisma();

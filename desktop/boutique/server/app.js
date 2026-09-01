@@ -92,6 +92,7 @@ app.use('/products', routes.productRoutes);
 app.use('/users', routes.userRoutes);
 app.use('/settings', routes.settingRoutes);
 app.use('/sales', routes.saleRoutes);
+app.use('/sales-orders', routes.salesOrderRoutes);
 app.use('/accounting', routes.accountingRoutes);
 app.use('/reports', routes.reportRoutes);
 

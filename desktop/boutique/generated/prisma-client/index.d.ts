@@ -94,6 +94,16 @@ export type purchasedproducts = $Result.DefaultSelection<Prisma.$purchasedproduc
  */
 export type sale = $Result.DefaultSelection<Prisma.$salePayload>
 /**
+ * Model salesorder
+ * 
+ */
+export type salesorder = $Result.DefaultSelection<Prisma.$salesorderPayload>
+/**
+ * Model salesorderitems
+ * 
+ */
+export type salesorderitems = $Result.DefaultSelection<Prisma.$salesorderitemsPayload>
+/**
  * Model softwaresetting
  * 
  */
@@ -409,6 +419,26 @@ export class PrismaClient<
     * ```
     */
   get sale(): Prisma.saleDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.salesorder`: Exposes CRUD operations for the **salesorder** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Salesorders
+    * const salesorders = await prisma.salesorder.findMany()
+    * ```
+    */
+  get salesorder(): Prisma.salesorderDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.salesorderitems`: Exposes CRUD operations for the **salesorderitems** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Salesorderitems
+    * const salesorderitems = await prisma.salesorderitems.findMany()
+    * ```
+    */
+  get salesorderitems(): Prisma.salesorderitemsDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.softwaresetting`: Exposes CRUD operations for the **softwaresetting** model.
@@ -929,6 +959,8 @@ export namespace Prisma {
     purchase: 'purchase',
     purchasedproducts: 'purchasedproducts',
     sale: 'sale',
+    salesorder: 'salesorder',
+    salesorderitems: 'salesorderitems',
     softwaresetting: 'softwaresetting',
     soldproducts: 'soldproducts',
     salereturn: 'salereturn',
@@ -951,7 +983,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "sequelizeMeta" | "brand" | "cashclosing" | "category" | "financeaccount" | "account_journal" | "account_ledger" | "financetransaction" | "inventorylogs" | "product" | "productbatches" | "productsalepurchase" | "productsub" | "purchase" | "purchasedproducts" | "sale" | "softwaresetting" | "soldproducts" | "salereturn" | "salereturnitems" | "taxes" | "user" | "partytype"
+      modelProps: "sequelizeMeta" | "brand" | "cashclosing" | "category" | "financeaccount" | "account_journal" | "account_ledger" | "financetransaction" | "inventorylogs" | "product" | "productbatches" | "productsalepurchase" | "productsub" | "purchase" | "purchasedproducts" | "sale" | "salesorder" | "salesorderitems" | "softwaresetting" | "soldproducts" | "salereturn" | "salereturnitems" | "taxes" | "user" | "partytype"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2139,6 +2171,154 @@ export namespace Prisma {
           }
         }
       }
+      salesorder: {
+        payload: Prisma.$salesorderPayload<ExtArgs>
+        fields: Prisma.salesorderFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.salesorderFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.salesorderFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderPayload>
+          }
+          findFirst: {
+            args: Prisma.salesorderFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.salesorderFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderPayload>
+          }
+          findMany: {
+            args: Prisma.salesorderFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderPayload>[]
+          }
+          create: {
+            args: Prisma.salesorderCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderPayload>
+          }
+          createMany: {
+            args: Prisma.salesorderCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.salesorderCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderPayload>[]
+          }
+          delete: {
+            args: Prisma.salesorderDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderPayload>
+          }
+          update: {
+            args: Prisma.salesorderUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderPayload>
+          }
+          deleteMany: {
+            args: Prisma.salesorderDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.salesorderUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.salesorderUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderPayload>[]
+          }
+          upsert: {
+            args: Prisma.salesorderUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderPayload>
+          }
+          aggregate: {
+            args: Prisma.SalesorderAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSalesorder>
+          }
+          groupBy: {
+            args: Prisma.salesorderGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SalesorderGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.salesorderCountArgs<ExtArgs>
+            result: $Utils.Optional<SalesorderCountAggregateOutputType> | number
+          }
+        }
+      }
+      salesorderitems: {
+        payload: Prisma.$salesorderitemsPayload<ExtArgs>
+        fields: Prisma.salesorderitemsFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.salesorderitemsFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderitemsPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.salesorderitemsFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderitemsPayload>
+          }
+          findFirst: {
+            args: Prisma.salesorderitemsFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderitemsPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.salesorderitemsFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderitemsPayload>
+          }
+          findMany: {
+            args: Prisma.salesorderitemsFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderitemsPayload>[]
+          }
+          create: {
+            args: Prisma.salesorderitemsCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderitemsPayload>
+          }
+          createMany: {
+            args: Prisma.salesorderitemsCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.salesorderitemsCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderitemsPayload>[]
+          }
+          delete: {
+            args: Prisma.salesorderitemsDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderitemsPayload>
+          }
+          update: {
+            args: Prisma.salesorderitemsUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderitemsPayload>
+          }
+          deleteMany: {
+            args: Prisma.salesorderitemsDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.salesorderitemsUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.salesorderitemsUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderitemsPayload>[]
+          }
+          upsert: {
+            args: Prisma.salesorderitemsUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$salesorderitemsPayload>
+          }
+          aggregate: {
+            args: Prisma.SalesorderitemsAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSalesorderitems>
+          }
+          groupBy: {
+            args: Prisma.salesorderitemsGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SalesorderitemsGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.salesorderitemsCountArgs<ExtArgs>
+            result: $Utils.Optional<SalesorderitemsCountAggregateOutputType> | number
+          }
+        }
+      }
       softwaresetting: {
         payload: Prisma.$softwaresettingPayload<ExtArgs>
         fields: Prisma.softwaresettingFieldRefs
@@ -2781,6 +2961,8 @@ export namespace Prisma {
     purchase?: purchaseOmit
     purchasedproducts?: purchasedproductsOmit
     sale?: saleOmit
+    salesorder?: salesorderOmit
+    salesorderitems?: salesorderitemsOmit
     softwaresetting?: softwaresettingOmit
     soldproducts?: soldproductsOmit
     salereturn?: salereturnOmit
@@ -2922,6 +3104,46 @@ export namespace Prisma {
    */
   export type Account_journalCountOutputTypeCountLedger_entriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: account_ledgerWhereInput
+  }
+
+
+  /**
+   * Count Type SalesorderCountOutputType
+   */
+
+  export type SalesorderCountOutputType = {
+    items: number
+    sales: number
+  }
+
+  export type SalesorderCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    items?: boolean | SalesorderCountOutputTypeCountItemsArgs
+    sales?: boolean | SalesorderCountOutputTypeCountSalesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * SalesorderCountOutputType without action
+   */
+  export type SalesorderCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SalesorderCountOutputType
+     */
+    select?: SalesorderCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * SalesorderCountOutputType without action
+   */
+  export type SalesorderCountOutputTypeCountItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: salesorderitemsWhereInput
+  }
+
+  /**
+   * SalesorderCountOutputType without action
+   */
+  export type SalesorderCountOutputTypeCountSalesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: saleWhereInput
   }
 
 
@@ -19540,6 +19762,7 @@ export namespace Prisma {
     discountpercentage: string | null
     totalprice: string | null
     totalpayment: string | null
+    salesorder_id: string | null
     createdby: string | null
     updatedby: string | null
     source: string | null
@@ -19556,6 +19779,7 @@ export namespace Prisma {
     discountpercentage: string | null
     totalprice: string | null
     totalpayment: string | null
+    salesorder_id: string | null
     createdby: string | null
     updatedby: string | null
     source: string | null
@@ -19572,6 +19796,7 @@ export namespace Prisma {
     discountpercentage: number
     totalprice: number
     totalpayment: number
+    salesorder_id: number
     createdby: number
     updatedby: number
     source: number
@@ -19598,6 +19823,7 @@ export namespace Prisma {
     discountpercentage?: true
     totalprice?: true
     totalpayment?: true
+    salesorder_id?: true
     createdby?: true
     updatedby?: true
     source?: true
@@ -19614,6 +19840,7 @@ export namespace Prisma {
     discountpercentage?: true
     totalprice?: true
     totalpayment?: true
+    salesorder_id?: true
     createdby?: true
     updatedby?: true
     source?: true
@@ -19630,6 +19857,7 @@ export namespace Prisma {
     discountpercentage?: true
     totalprice?: true
     totalpayment?: true
+    salesorder_id?: true
     createdby?: true
     updatedby?: true
     source?: true
@@ -19733,6 +19961,7 @@ export namespace Prisma {
     discountpercentage: string | null
     totalprice: string | null
     totalpayment: string | null
+    salesorder_id: string | null
     createdby: string | null
     updatedby: string | null
     source: string | null
@@ -19768,12 +19997,14 @@ export namespace Prisma {
     discountpercentage?: boolean
     totalprice?: boolean
     totalpayment?: boolean
+    salesorder_id?: boolean
     createdby?: boolean
     updatedby?: boolean
     source?: boolean
     printCount?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    salesorder?: boolean | sale$salesorderArgs<ExtArgs>
   }, ExtArgs["result"]["sale"]>
 
   export type saleSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -19784,12 +20015,14 @@ export namespace Prisma {
     discountpercentage?: boolean
     totalprice?: boolean
     totalpayment?: boolean
+    salesorder_id?: boolean
     createdby?: boolean
     updatedby?: boolean
     source?: boolean
     printCount?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    salesorder?: boolean | sale$salesorderArgs<ExtArgs>
   }, ExtArgs["result"]["sale"]>
 
   export type saleSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -19800,12 +20033,14 @@ export namespace Prisma {
     discountpercentage?: boolean
     totalprice?: boolean
     totalpayment?: boolean
+    salesorder_id?: boolean
     createdby?: boolean
     updatedby?: boolean
     source?: boolean
     printCount?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    salesorder?: boolean | sale$salesorderArgs<ExtArgs>
   }, ExtArgs["result"]["sale"]>
 
   export type saleSelectScalar = {
@@ -19816,6 +20051,7 @@ export namespace Prisma {
     discountpercentage?: boolean
     totalprice?: boolean
     totalpayment?: boolean
+    salesorder_id?: boolean
     createdby?: boolean
     updatedby?: boolean
     source?: boolean
@@ -19824,11 +20060,22 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type saleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user" | "customer" | "invoicenum" | "discountpercentage" | "totalprice" | "totalpayment" | "createdby" | "updatedby" | "source" | "printCount" | "createdAt" | "updatedAt", ExtArgs["result"]["sale"]>
+  export type saleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user" | "customer" | "invoicenum" | "discountpercentage" | "totalprice" | "totalpayment" | "salesorder_id" | "createdby" | "updatedby" | "source" | "printCount" | "createdAt" | "updatedAt", ExtArgs["result"]["sale"]>
+  export type saleInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    salesorder?: boolean | sale$salesorderArgs<ExtArgs>
+  }
+  export type saleIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    salesorder?: boolean | sale$salesorderArgs<ExtArgs>
+  }
+  export type saleIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    salesorder?: boolean | sale$salesorderArgs<ExtArgs>
+  }
 
   export type $salePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "sale"
-    objects: {}
+    objects: {
+      salesorder: Prisma.$salesorderPayload<ExtArgs> | null
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       user: string | null
@@ -19837,6 +20084,7 @@ export namespace Prisma {
       discountpercentage: string | null
       totalprice: string | null
       totalpayment: string | null
+      salesorder_id: string | null
       createdby: string | null
       updatedby: string | null
       source: string | null
@@ -20237,6 +20485,7 @@ export namespace Prisma {
    */
   export interface Prisma__saleClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    salesorder<T extends sale$salesorderArgs<ExtArgs> = {}>(args?: Subset<T, sale$salesorderArgs<ExtArgs>>): Prisma__salesorderClient<$Result.GetResult<Prisma.$salesorderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -20273,6 +20522,7 @@ export namespace Prisma {
     readonly discountpercentage: FieldRef<"sale", 'String'>
     readonly totalprice: FieldRef<"sale", 'String'>
     readonly totalpayment: FieldRef<"sale", 'String'>
+    readonly salesorder_id: FieldRef<"sale", 'String'>
     readonly createdby: FieldRef<"sale", 'String'>
     readonly updatedby: FieldRef<"sale", 'String'>
     readonly source: FieldRef<"sale", 'String'>
@@ -20296,6 +20546,10 @@ export namespace Prisma {
      */
     omit?: saleOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: saleInclude<ExtArgs> | null
+    /**
      * Filter, which sale to fetch.
      */
     where: saleWhereUniqueInput
@@ -20314,6 +20568,10 @@ export namespace Prisma {
      */
     omit?: saleOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: saleInclude<ExtArgs> | null
+    /**
      * Filter, which sale to fetch.
      */
     where: saleWhereUniqueInput
@@ -20331,6 +20589,10 @@ export namespace Prisma {
      * Omit specific fields from the sale
      */
     omit?: saleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: saleInclude<ExtArgs> | null
     /**
      * Filter, which sale to fetch.
      */
@@ -20380,6 +20642,10 @@ export namespace Prisma {
      */
     omit?: saleOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: saleInclude<ExtArgs> | null
+    /**
      * Filter, which sale to fetch.
      */
     where?: saleWhereInput
@@ -20427,6 +20693,10 @@ export namespace Prisma {
      * Omit specific fields from the sale
      */
     omit?: saleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: saleInclude<ExtArgs> | null
     /**
      * Filter, which sales to fetch.
      */
@@ -20476,6 +20746,10 @@ export namespace Prisma {
      */
     omit?: saleOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: saleInclude<ExtArgs> | null
+    /**
      * The data needed to create a sale.
      */
     data: XOR<saleCreateInput, saleUncheckedCreateInput>
@@ -20507,6 +20781,10 @@ export namespace Prisma {
      * The data used to create many sales.
      */
     data: saleCreateManyInput | saleCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: saleIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -20521,6 +20799,10 @@ export namespace Prisma {
      * Omit specific fields from the sale
      */
     omit?: saleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: saleInclude<ExtArgs> | null
     /**
      * The data needed to update a sale.
      */
@@ -20573,6 +20855,10 @@ export namespace Prisma {
      * Limit how many sales to update.
      */
     limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: saleIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -20587,6 +20873,10 @@ export namespace Prisma {
      * Omit specific fields from the sale
      */
     omit?: saleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: saleInclude<ExtArgs> | null
     /**
      * The filter to search for the sale to update in case it exists.
      */
@@ -20614,6 +20904,10 @@ export namespace Prisma {
      */
     omit?: saleOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: saleInclude<ExtArgs> | null
+    /**
      * Filter which sale to delete.
      */
     where: saleWhereUniqueInput
@@ -20634,6 +20928,25 @@ export namespace Prisma {
   }
 
   /**
+   * sale.salesorder
+   */
+  export type sale$salesorderArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorder
+     */
+    select?: salesorderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorder
+     */
+    omit?: salesorderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderInclude<ExtArgs> | null
+    where?: salesorderWhereInput
+  }
+
+  /**
    * sale without action
    */
   export type saleDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -20645,6 +20958,2529 @@ export namespace Prisma {
      * Omit specific fields from the sale
      */
     omit?: saleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: saleInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model salesorder
+   */
+
+  export type AggregateSalesorder = {
+    _count: SalesorderCountAggregateOutputType | null
+    _avg: SalesorderAvgAggregateOutputType | null
+    _sum: SalesorderSumAggregateOutputType | null
+    _min: SalesorderMinAggregateOutputType | null
+    _max: SalesorderMaxAggregateOutputType | null
+  }
+
+  export type SalesorderAvgAggregateOutputType = {
+    totalAmount: number | null
+    advancePayment: number | null
+    balanceAmount: number | null
+  }
+
+  export type SalesorderSumAggregateOutputType = {
+    totalAmount: number | null
+    advancePayment: number | null
+    balanceAmount: number | null
+  }
+
+  export type SalesorderMinAggregateOutputType = {
+    id: string | null
+    ordernum: string | null
+    customer: string | null
+    user: string | null
+    bookingDate: Date | null
+    deliveryDate: Date | null
+    status: string | null
+    fabricSource: string | null
+    totalAmount: number | null
+    advancePayment: number | null
+    balanceAmount: number | null
+    designNotes: string | null
+    embroidererNotes: string | null
+    tailorNotes: string | null
+    measurementData: string | null
+    createdby: string | null
+    updatedby: string | null
+    source: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SalesorderMaxAggregateOutputType = {
+    id: string | null
+    ordernum: string | null
+    customer: string | null
+    user: string | null
+    bookingDate: Date | null
+    deliveryDate: Date | null
+    status: string | null
+    fabricSource: string | null
+    totalAmount: number | null
+    advancePayment: number | null
+    balanceAmount: number | null
+    designNotes: string | null
+    embroidererNotes: string | null
+    tailorNotes: string | null
+    measurementData: string | null
+    createdby: string | null
+    updatedby: string | null
+    source: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SalesorderCountAggregateOutputType = {
+    id: number
+    ordernum: number
+    customer: number
+    user: number
+    bookingDate: number
+    deliveryDate: number
+    status: number
+    fabricSource: number
+    totalAmount: number
+    advancePayment: number
+    balanceAmount: number
+    designNotes: number
+    embroidererNotes: number
+    tailorNotes: number
+    measurementData: number
+    createdby: number
+    updatedby: number
+    source: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SalesorderAvgAggregateInputType = {
+    totalAmount?: true
+    advancePayment?: true
+    balanceAmount?: true
+  }
+
+  export type SalesorderSumAggregateInputType = {
+    totalAmount?: true
+    advancePayment?: true
+    balanceAmount?: true
+  }
+
+  export type SalesorderMinAggregateInputType = {
+    id?: true
+    ordernum?: true
+    customer?: true
+    user?: true
+    bookingDate?: true
+    deliveryDate?: true
+    status?: true
+    fabricSource?: true
+    totalAmount?: true
+    advancePayment?: true
+    balanceAmount?: true
+    designNotes?: true
+    embroidererNotes?: true
+    tailorNotes?: true
+    measurementData?: true
+    createdby?: true
+    updatedby?: true
+    source?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SalesorderMaxAggregateInputType = {
+    id?: true
+    ordernum?: true
+    customer?: true
+    user?: true
+    bookingDate?: true
+    deliveryDate?: true
+    status?: true
+    fabricSource?: true
+    totalAmount?: true
+    advancePayment?: true
+    balanceAmount?: true
+    designNotes?: true
+    embroidererNotes?: true
+    tailorNotes?: true
+    measurementData?: true
+    createdby?: true
+    updatedby?: true
+    source?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SalesorderCountAggregateInputType = {
+    id?: true
+    ordernum?: true
+    customer?: true
+    user?: true
+    bookingDate?: true
+    deliveryDate?: true
+    status?: true
+    fabricSource?: true
+    totalAmount?: true
+    advancePayment?: true
+    balanceAmount?: true
+    designNotes?: true
+    embroidererNotes?: true
+    tailorNotes?: true
+    measurementData?: true
+    createdby?: true
+    updatedby?: true
+    source?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SalesorderAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which salesorder to aggregate.
+     */
+    where?: salesorderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of salesorders to fetch.
+     */
+    orderBy?: salesorderOrderByWithRelationInput | salesorderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: salesorderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` salesorders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` salesorders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned salesorders
+    **/
+    _count?: true | SalesorderCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SalesorderAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SalesorderSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SalesorderMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SalesorderMaxAggregateInputType
+  }
+
+  export type GetSalesorderAggregateType<T extends SalesorderAggregateArgs> = {
+        [P in keyof T & keyof AggregateSalesorder]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSalesorder[P]>
+      : GetScalarType<T[P], AggregateSalesorder[P]>
+  }
+
+
+
+
+  export type salesorderGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: salesorderWhereInput
+    orderBy?: salesorderOrderByWithAggregationInput | salesorderOrderByWithAggregationInput[]
+    by: SalesorderScalarFieldEnum[] | SalesorderScalarFieldEnum
+    having?: salesorderScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SalesorderCountAggregateInputType | true
+    _avg?: SalesorderAvgAggregateInputType
+    _sum?: SalesorderSumAggregateInputType
+    _min?: SalesorderMinAggregateInputType
+    _max?: SalesorderMaxAggregateInputType
+  }
+
+  export type SalesorderGroupByOutputType = {
+    id: string
+    ordernum: string
+    customer: string | null
+    user: string | null
+    bookingDate: Date
+    deliveryDate: Date | null
+    status: string
+    fabricSource: string | null
+    totalAmount: number
+    advancePayment: number
+    balanceAmount: number
+    designNotes: string | null
+    embroidererNotes: string | null
+    tailorNotes: string | null
+    measurementData: string | null
+    createdby: string | null
+    updatedby: string | null
+    source: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: SalesorderCountAggregateOutputType | null
+    _avg: SalesorderAvgAggregateOutputType | null
+    _sum: SalesorderSumAggregateOutputType | null
+    _min: SalesorderMinAggregateOutputType | null
+    _max: SalesorderMaxAggregateOutputType | null
+  }
+
+  type GetSalesorderGroupByPayload<T extends salesorderGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SalesorderGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SalesorderGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SalesorderGroupByOutputType[P]>
+            : GetScalarType<T[P], SalesorderGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type salesorderSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    ordernum?: boolean
+    customer?: boolean
+    user?: boolean
+    bookingDate?: boolean
+    deliveryDate?: boolean
+    status?: boolean
+    fabricSource?: boolean
+    totalAmount?: boolean
+    advancePayment?: boolean
+    balanceAmount?: boolean
+    designNotes?: boolean
+    embroidererNotes?: boolean
+    tailorNotes?: boolean
+    measurementData?: boolean
+    createdby?: boolean
+    updatedby?: boolean
+    source?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    items?: boolean | salesorder$itemsArgs<ExtArgs>
+    sales?: boolean | salesorder$salesArgs<ExtArgs>
+    _count?: boolean | SalesorderCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["salesorder"]>
+
+  export type salesorderSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    ordernum?: boolean
+    customer?: boolean
+    user?: boolean
+    bookingDate?: boolean
+    deliveryDate?: boolean
+    status?: boolean
+    fabricSource?: boolean
+    totalAmount?: boolean
+    advancePayment?: boolean
+    balanceAmount?: boolean
+    designNotes?: boolean
+    embroidererNotes?: boolean
+    tailorNotes?: boolean
+    measurementData?: boolean
+    createdby?: boolean
+    updatedby?: boolean
+    source?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["salesorder"]>
+
+  export type salesorderSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    ordernum?: boolean
+    customer?: boolean
+    user?: boolean
+    bookingDate?: boolean
+    deliveryDate?: boolean
+    status?: boolean
+    fabricSource?: boolean
+    totalAmount?: boolean
+    advancePayment?: boolean
+    balanceAmount?: boolean
+    designNotes?: boolean
+    embroidererNotes?: boolean
+    tailorNotes?: boolean
+    measurementData?: boolean
+    createdby?: boolean
+    updatedby?: boolean
+    source?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["salesorder"]>
+
+  export type salesorderSelectScalar = {
+    id?: boolean
+    ordernum?: boolean
+    customer?: boolean
+    user?: boolean
+    bookingDate?: boolean
+    deliveryDate?: boolean
+    status?: boolean
+    fabricSource?: boolean
+    totalAmount?: boolean
+    advancePayment?: boolean
+    balanceAmount?: boolean
+    designNotes?: boolean
+    embroidererNotes?: boolean
+    tailorNotes?: boolean
+    measurementData?: boolean
+    createdby?: boolean
+    updatedby?: boolean
+    source?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type salesorderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ordernum" | "customer" | "user" | "bookingDate" | "deliveryDate" | "status" | "fabricSource" | "totalAmount" | "advancePayment" | "balanceAmount" | "designNotes" | "embroidererNotes" | "tailorNotes" | "measurementData" | "createdby" | "updatedby" | "source" | "createdAt" | "updatedAt", ExtArgs["result"]["salesorder"]>
+  export type salesorderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    items?: boolean | salesorder$itemsArgs<ExtArgs>
+    sales?: boolean | salesorder$salesArgs<ExtArgs>
+    _count?: boolean | SalesorderCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type salesorderIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type salesorderIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $salesorderPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "salesorder"
+    objects: {
+      items: Prisma.$salesorderitemsPayload<ExtArgs>[]
+      sales: Prisma.$salePayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      ordernum: string
+      customer: string | null
+      user: string | null
+      bookingDate: Date
+      deliveryDate: Date | null
+      status: string
+      fabricSource: string | null
+      totalAmount: number
+      advancePayment: number
+      balanceAmount: number
+      designNotes: string | null
+      embroidererNotes: string | null
+      tailorNotes: string | null
+      measurementData: string | null
+      createdby: string | null
+      updatedby: string | null
+      source: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["salesorder"]>
+    composites: {}
+  }
+
+  type salesorderGetPayload<S extends boolean | null | undefined | salesorderDefaultArgs> = $Result.GetResult<Prisma.$salesorderPayload, S>
+
+  type salesorderCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<salesorderFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SalesorderCountAggregateInputType | true
+    }
+
+  export interface salesorderDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['salesorder'], meta: { name: 'salesorder' } }
+    /**
+     * Find zero or one Salesorder that matches the filter.
+     * @param {salesorderFindUniqueArgs} args - Arguments to find a Salesorder
+     * @example
+     * // Get one Salesorder
+     * const salesorder = await prisma.salesorder.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends salesorderFindUniqueArgs>(args: SelectSubset<T, salesorderFindUniqueArgs<ExtArgs>>): Prisma__salesorderClient<$Result.GetResult<Prisma.$salesorderPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Salesorder that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {salesorderFindUniqueOrThrowArgs} args - Arguments to find a Salesorder
+     * @example
+     * // Get one Salesorder
+     * const salesorder = await prisma.salesorder.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends salesorderFindUniqueOrThrowArgs>(args: SelectSubset<T, salesorderFindUniqueOrThrowArgs<ExtArgs>>): Prisma__salesorderClient<$Result.GetResult<Prisma.$salesorderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Salesorder that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salesorderFindFirstArgs} args - Arguments to find a Salesorder
+     * @example
+     * // Get one Salesorder
+     * const salesorder = await prisma.salesorder.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends salesorderFindFirstArgs>(args?: SelectSubset<T, salesorderFindFirstArgs<ExtArgs>>): Prisma__salesorderClient<$Result.GetResult<Prisma.$salesorderPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Salesorder that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salesorderFindFirstOrThrowArgs} args - Arguments to find a Salesorder
+     * @example
+     * // Get one Salesorder
+     * const salesorder = await prisma.salesorder.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends salesorderFindFirstOrThrowArgs>(args?: SelectSubset<T, salesorderFindFirstOrThrowArgs<ExtArgs>>): Prisma__salesorderClient<$Result.GetResult<Prisma.$salesorderPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Salesorders that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salesorderFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Salesorders
+     * const salesorders = await prisma.salesorder.findMany()
+     * 
+     * // Get first 10 Salesorders
+     * const salesorders = await prisma.salesorder.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const salesorderWithIdOnly = await prisma.salesorder.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends salesorderFindManyArgs>(args?: SelectSubset<T, salesorderFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$salesorderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Salesorder.
+     * @param {salesorderCreateArgs} args - Arguments to create a Salesorder.
+     * @example
+     * // Create one Salesorder
+     * const Salesorder = await prisma.salesorder.create({
+     *   data: {
+     *     // ... data to create a Salesorder
+     *   }
+     * })
+     * 
+     */
+    create<T extends salesorderCreateArgs>(args: SelectSubset<T, salesorderCreateArgs<ExtArgs>>): Prisma__salesorderClient<$Result.GetResult<Prisma.$salesorderPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Salesorders.
+     * @param {salesorderCreateManyArgs} args - Arguments to create many Salesorders.
+     * @example
+     * // Create many Salesorders
+     * const salesorder = await prisma.salesorder.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends salesorderCreateManyArgs>(args?: SelectSubset<T, salesorderCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Salesorders and returns the data saved in the database.
+     * @param {salesorderCreateManyAndReturnArgs} args - Arguments to create many Salesorders.
+     * @example
+     * // Create many Salesorders
+     * const salesorder = await prisma.salesorder.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Salesorders and only return the `id`
+     * const salesorderWithIdOnly = await prisma.salesorder.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends salesorderCreateManyAndReturnArgs>(args?: SelectSubset<T, salesorderCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$salesorderPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Salesorder.
+     * @param {salesorderDeleteArgs} args - Arguments to delete one Salesorder.
+     * @example
+     * // Delete one Salesorder
+     * const Salesorder = await prisma.salesorder.delete({
+     *   where: {
+     *     // ... filter to delete one Salesorder
+     *   }
+     * })
+     * 
+     */
+    delete<T extends salesorderDeleteArgs>(args: SelectSubset<T, salesorderDeleteArgs<ExtArgs>>): Prisma__salesorderClient<$Result.GetResult<Prisma.$salesorderPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Salesorder.
+     * @param {salesorderUpdateArgs} args - Arguments to update one Salesorder.
+     * @example
+     * // Update one Salesorder
+     * const salesorder = await prisma.salesorder.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends salesorderUpdateArgs>(args: SelectSubset<T, salesorderUpdateArgs<ExtArgs>>): Prisma__salesorderClient<$Result.GetResult<Prisma.$salesorderPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Salesorders.
+     * @param {salesorderDeleteManyArgs} args - Arguments to filter Salesorders to delete.
+     * @example
+     * // Delete a few Salesorders
+     * const { count } = await prisma.salesorder.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends salesorderDeleteManyArgs>(args?: SelectSubset<T, salesorderDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Salesorders.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salesorderUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Salesorders
+     * const salesorder = await prisma.salesorder.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends salesorderUpdateManyArgs>(args: SelectSubset<T, salesorderUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Salesorders and returns the data updated in the database.
+     * @param {salesorderUpdateManyAndReturnArgs} args - Arguments to update many Salesorders.
+     * @example
+     * // Update many Salesorders
+     * const salesorder = await prisma.salesorder.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Salesorders and only return the `id`
+     * const salesorderWithIdOnly = await prisma.salesorder.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends salesorderUpdateManyAndReturnArgs>(args: SelectSubset<T, salesorderUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$salesorderPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Salesorder.
+     * @param {salesorderUpsertArgs} args - Arguments to update or create a Salesorder.
+     * @example
+     * // Update or create a Salesorder
+     * const salesorder = await prisma.salesorder.upsert({
+     *   create: {
+     *     // ... data to create a Salesorder
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Salesorder we want to update
+     *   }
+     * })
+     */
+    upsert<T extends salesorderUpsertArgs>(args: SelectSubset<T, salesorderUpsertArgs<ExtArgs>>): Prisma__salesorderClient<$Result.GetResult<Prisma.$salesorderPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Salesorders.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salesorderCountArgs} args - Arguments to filter Salesorders to count.
+     * @example
+     * // Count the number of Salesorders
+     * const count = await prisma.salesorder.count({
+     *   where: {
+     *     // ... the filter for the Salesorders we want to count
+     *   }
+     * })
+    **/
+    count<T extends salesorderCountArgs>(
+      args?: Subset<T, salesorderCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SalesorderCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Salesorder.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SalesorderAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SalesorderAggregateArgs>(args: Subset<T, SalesorderAggregateArgs>): Prisma.PrismaPromise<GetSalesorderAggregateType<T>>
+
+    /**
+     * Group by Salesorder.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salesorderGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends salesorderGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: salesorderGroupByArgs['orderBy'] }
+        : { orderBy?: salesorderGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, salesorderGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSalesorderGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the salesorder model
+   */
+  readonly fields: salesorderFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for salesorder.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__salesorderClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    items<T extends salesorder$itemsArgs<ExtArgs> = {}>(args?: Subset<T, salesorder$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$salesorderitemsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    sales<T extends salesorder$salesArgs<ExtArgs> = {}>(args?: Subset<T, salesorder$salesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$salePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the salesorder model
+   */
+  interface salesorderFieldRefs {
+    readonly id: FieldRef<"salesorder", 'String'>
+    readonly ordernum: FieldRef<"salesorder", 'String'>
+    readonly customer: FieldRef<"salesorder", 'String'>
+    readonly user: FieldRef<"salesorder", 'String'>
+    readonly bookingDate: FieldRef<"salesorder", 'DateTime'>
+    readonly deliveryDate: FieldRef<"salesorder", 'DateTime'>
+    readonly status: FieldRef<"salesorder", 'String'>
+    readonly fabricSource: FieldRef<"salesorder", 'String'>
+    readonly totalAmount: FieldRef<"salesorder", 'Float'>
+    readonly advancePayment: FieldRef<"salesorder", 'Float'>
+    readonly balanceAmount: FieldRef<"salesorder", 'Float'>
+    readonly designNotes: FieldRef<"salesorder", 'String'>
+    readonly embroidererNotes: FieldRef<"salesorder", 'String'>
+    readonly tailorNotes: FieldRef<"salesorder", 'String'>
+    readonly measurementData: FieldRef<"salesorder", 'String'>
+    readonly createdby: FieldRef<"salesorder", 'String'>
+    readonly updatedby: FieldRef<"salesorder", 'String'>
+    readonly source: FieldRef<"salesorder", 'String'>
+    readonly createdAt: FieldRef<"salesorder", 'DateTime'>
+    readonly updatedAt: FieldRef<"salesorder", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * salesorder findUnique
+   */
+  export type salesorderFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorder
+     */
+    select?: salesorderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorder
+     */
+    omit?: salesorderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderInclude<ExtArgs> | null
+    /**
+     * Filter, which salesorder to fetch.
+     */
+    where: salesorderWhereUniqueInput
+  }
+
+  /**
+   * salesorder findUniqueOrThrow
+   */
+  export type salesorderFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorder
+     */
+    select?: salesorderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorder
+     */
+    omit?: salesorderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderInclude<ExtArgs> | null
+    /**
+     * Filter, which salesorder to fetch.
+     */
+    where: salesorderWhereUniqueInput
+  }
+
+  /**
+   * salesorder findFirst
+   */
+  export type salesorderFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorder
+     */
+    select?: salesorderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorder
+     */
+    omit?: salesorderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderInclude<ExtArgs> | null
+    /**
+     * Filter, which salesorder to fetch.
+     */
+    where?: salesorderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of salesorders to fetch.
+     */
+    orderBy?: salesorderOrderByWithRelationInput | salesorderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for salesorders.
+     */
+    cursor?: salesorderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` salesorders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` salesorders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of salesorders.
+     */
+    distinct?: SalesorderScalarFieldEnum | SalesorderScalarFieldEnum[]
+  }
+
+  /**
+   * salesorder findFirstOrThrow
+   */
+  export type salesorderFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorder
+     */
+    select?: salesorderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorder
+     */
+    omit?: salesorderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderInclude<ExtArgs> | null
+    /**
+     * Filter, which salesorder to fetch.
+     */
+    where?: salesorderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of salesorders to fetch.
+     */
+    orderBy?: salesorderOrderByWithRelationInput | salesorderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for salesorders.
+     */
+    cursor?: salesorderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` salesorders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` salesorders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of salesorders.
+     */
+    distinct?: SalesorderScalarFieldEnum | SalesorderScalarFieldEnum[]
+  }
+
+  /**
+   * salesorder findMany
+   */
+  export type salesorderFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorder
+     */
+    select?: salesorderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorder
+     */
+    omit?: salesorderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderInclude<ExtArgs> | null
+    /**
+     * Filter, which salesorders to fetch.
+     */
+    where?: salesorderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of salesorders to fetch.
+     */
+    orderBy?: salesorderOrderByWithRelationInput | salesorderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing salesorders.
+     */
+    cursor?: salesorderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` salesorders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` salesorders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of salesorders.
+     */
+    distinct?: SalesorderScalarFieldEnum | SalesorderScalarFieldEnum[]
+  }
+
+  /**
+   * salesorder create
+   */
+  export type salesorderCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorder
+     */
+    select?: salesorderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorder
+     */
+    omit?: salesorderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderInclude<ExtArgs> | null
+    /**
+     * The data needed to create a salesorder.
+     */
+    data: XOR<salesorderCreateInput, salesorderUncheckedCreateInput>
+  }
+
+  /**
+   * salesorder createMany
+   */
+  export type salesorderCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many salesorders.
+     */
+    data: salesorderCreateManyInput | salesorderCreateManyInput[]
+  }
+
+  /**
+   * salesorder createManyAndReturn
+   */
+  export type salesorderCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorder
+     */
+    select?: salesorderSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorder
+     */
+    omit?: salesorderOmit<ExtArgs> | null
+    /**
+     * The data used to create many salesorders.
+     */
+    data: salesorderCreateManyInput | salesorderCreateManyInput[]
+  }
+
+  /**
+   * salesorder update
+   */
+  export type salesorderUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorder
+     */
+    select?: salesorderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorder
+     */
+    omit?: salesorderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderInclude<ExtArgs> | null
+    /**
+     * The data needed to update a salesorder.
+     */
+    data: XOR<salesorderUpdateInput, salesorderUncheckedUpdateInput>
+    /**
+     * Choose, which salesorder to update.
+     */
+    where: salesorderWhereUniqueInput
+  }
+
+  /**
+   * salesorder updateMany
+   */
+  export type salesorderUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update salesorders.
+     */
+    data: XOR<salesorderUpdateManyMutationInput, salesorderUncheckedUpdateManyInput>
+    /**
+     * Filter which salesorders to update
+     */
+    where?: salesorderWhereInput
+    /**
+     * Limit how many salesorders to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * salesorder updateManyAndReturn
+   */
+  export type salesorderUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorder
+     */
+    select?: salesorderSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorder
+     */
+    omit?: salesorderOmit<ExtArgs> | null
+    /**
+     * The data used to update salesorders.
+     */
+    data: XOR<salesorderUpdateManyMutationInput, salesorderUncheckedUpdateManyInput>
+    /**
+     * Filter which salesorders to update
+     */
+    where?: salesorderWhereInput
+    /**
+     * Limit how many salesorders to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * salesorder upsert
+   */
+  export type salesorderUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorder
+     */
+    select?: salesorderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorder
+     */
+    omit?: salesorderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderInclude<ExtArgs> | null
+    /**
+     * The filter to search for the salesorder to update in case it exists.
+     */
+    where: salesorderWhereUniqueInput
+    /**
+     * In case the salesorder found by the `where` argument doesn't exist, create a new salesorder with this data.
+     */
+    create: XOR<salesorderCreateInput, salesorderUncheckedCreateInput>
+    /**
+     * In case the salesorder was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<salesorderUpdateInput, salesorderUncheckedUpdateInput>
+  }
+
+  /**
+   * salesorder delete
+   */
+  export type salesorderDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorder
+     */
+    select?: salesorderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorder
+     */
+    omit?: salesorderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderInclude<ExtArgs> | null
+    /**
+     * Filter which salesorder to delete.
+     */
+    where: salesorderWhereUniqueInput
+  }
+
+  /**
+   * salesorder deleteMany
+   */
+  export type salesorderDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which salesorders to delete
+     */
+    where?: salesorderWhereInput
+    /**
+     * Limit how many salesorders to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * salesorder.items
+   */
+  export type salesorder$itemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorderitems
+     */
+    select?: salesorderitemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorderitems
+     */
+    omit?: salesorderitemsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderitemsInclude<ExtArgs> | null
+    where?: salesorderitemsWhereInput
+    orderBy?: salesorderitemsOrderByWithRelationInput | salesorderitemsOrderByWithRelationInput[]
+    cursor?: salesorderitemsWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SalesorderitemsScalarFieldEnum | SalesorderitemsScalarFieldEnum[]
+  }
+
+  /**
+   * salesorder.sales
+   */
+  export type salesorder$salesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the sale
+     */
+    select?: saleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the sale
+     */
+    omit?: saleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: saleInclude<ExtArgs> | null
+    where?: saleWhereInput
+    orderBy?: saleOrderByWithRelationInput | saleOrderByWithRelationInput[]
+    cursor?: saleWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SaleScalarFieldEnum | SaleScalarFieldEnum[]
+  }
+
+  /**
+   * salesorder without action
+   */
+  export type salesorderDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorder
+     */
+    select?: salesorderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorder
+     */
+    omit?: salesorderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model salesorderitems
+   */
+
+  export type AggregateSalesorderitems = {
+    _count: SalesorderitemsCountAggregateOutputType | null
+    _avg: SalesorderitemsAvgAggregateOutputType | null
+    _sum: SalesorderitemsSumAggregateOutputType | null
+    _min: SalesorderitemsMinAggregateOutputType | null
+    _max: SalesorderitemsMaxAggregateOutputType | null
+  }
+
+  export type SalesorderitemsAvgAggregateOutputType = {
+    quantity: number | null
+    price: number | null
+    subtotal: number | null
+  }
+
+  export type SalesorderitemsSumAggregateOutputType = {
+    quantity: number | null
+    price: number | null
+    subtotal: number | null
+  }
+
+  export type SalesorderitemsMinAggregateOutputType = {
+    id: string | null
+    salesorder_id: string | null
+    product_id: string | null
+    item_name: string | null
+    item_type: string | null
+    quantity: number | null
+    price: number | null
+    subtotal: number | null
+    notes: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SalesorderitemsMaxAggregateOutputType = {
+    id: string | null
+    salesorder_id: string | null
+    product_id: string | null
+    item_name: string | null
+    item_type: string | null
+    quantity: number | null
+    price: number | null
+    subtotal: number | null
+    notes: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SalesorderitemsCountAggregateOutputType = {
+    id: number
+    salesorder_id: number
+    product_id: number
+    item_name: number
+    item_type: number
+    quantity: number
+    price: number
+    subtotal: number
+    notes: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SalesorderitemsAvgAggregateInputType = {
+    quantity?: true
+    price?: true
+    subtotal?: true
+  }
+
+  export type SalesorderitemsSumAggregateInputType = {
+    quantity?: true
+    price?: true
+    subtotal?: true
+  }
+
+  export type SalesorderitemsMinAggregateInputType = {
+    id?: true
+    salesorder_id?: true
+    product_id?: true
+    item_name?: true
+    item_type?: true
+    quantity?: true
+    price?: true
+    subtotal?: true
+    notes?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SalesorderitemsMaxAggregateInputType = {
+    id?: true
+    salesorder_id?: true
+    product_id?: true
+    item_name?: true
+    item_type?: true
+    quantity?: true
+    price?: true
+    subtotal?: true
+    notes?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SalesorderitemsCountAggregateInputType = {
+    id?: true
+    salesorder_id?: true
+    product_id?: true
+    item_name?: true
+    item_type?: true
+    quantity?: true
+    price?: true
+    subtotal?: true
+    notes?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SalesorderitemsAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which salesorderitems to aggregate.
+     */
+    where?: salesorderitemsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of salesorderitems to fetch.
+     */
+    orderBy?: salesorderitemsOrderByWithRelationInput | salesorderitemsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: salesorderitemsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` salesorderitems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` salesorderitems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned salesorderitems
+    **/
+    _count?: true | SalesorderitemsCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SalesorderitemsAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SalesorderitemsSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SalesorderitemsMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SalesorderitemsMaxAggregateInputType
+  }
+
+  export type GetSalesorderitemsAggregateType<T extends SalesorderitemsAggregateArgs> = {
+        [P in keyof T & keyof AggregateSalesorderitems]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSalesorderitems[P]>
+      : GetScalarType<T[P], AggregateSalesorderitems[P]>
+  }
+
+
+
+
+  export type salesorderitemsGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: salesorderitemsWhereInput
+    orderBy?: salesorderitemsOrderByWithAggregationInput | salesorderitemsOrderByWithAggregationInput[]
+    by: SalesorderitemsScalarFieldEnum[] | SalesorderitemsScalarFieldEnum
+    having?: salesorderitemsScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SalesorderitemsCountAggregateInputType | true
+    _avg?: SalesorderitemsAvgAggregateInputType
+    _sum?: SalesorderitemsSumAggregateInputType
+    _min?: SalesorderitemsMinAggregateInputType
+    _max?: SalesorderitemsMaxAggregateInputType
+  }
+
+  export type SalesorderitemsGroupByOutputType = {
+    id: string
+    salesorder_id: string
+    product_id: string | null
+    item_name: string
+    item_type: string | null
+    quantity: number
+    price: number
+    subtotal: number
+    notes: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: SalesorderitemsCountAggregateOutputType | null
+    _avg: SalesorderitemsAvgAggregateOutputType | null
+    _sum: SalesorderitemsSumAggregateOutputType | null
+    _min: SalesorderitemsMinAggregateOutputType | null
+    _max: SalesorderitemsMaxAggregateOutputType | null
+  }
+
+  type GetSalesorderitemsGroupByPayload<T extends salesorderitemsGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SalesorderitemsGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SalesorderitemsGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SalesorderitemsGroupByOutputType[P]>
+            : GetScalarType<T[P], SalesorderitemsGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type salesorderitemsSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    salesorder_id?: boolean
+    product_id?: boolean
+    item_name?: boolean
+    item_type?: boolean
+    quantity?: boolean
+    price?: boolean
+    subtotal?: boolean
+    notes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    salesorder?: boolean | salesorderDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["salesorderitems"]>
+
+  export type salesorderitemsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    salesorder_id?: boolean
+    product_id?: boolean
+    item_name?: boolean
+    item_type?: boolean
+    quantity?: boolean
+    price?: boolean
+    subtotal?: boolean
+    notes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    salesorder?: boolean | salesorderDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["salesorderitems"]>
+
+  export type salesorderitemsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    salesorder_id?: boolean
+    product_id?: boolean
+    item_name?: boolean
+    item_type?: boolean
+    quantity?: boolean
+    price?: boolean
+    subtotal?: boolean
+    notes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    salesorder?: boolean | salesorderDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["salesorderitems"]>
+
+  export type salesorderitemsSelectScalar = {
+    id?: boolean
+    salesorder_id?: boolean
+    product_id?: boolean
+    item_name?: boolean
+    item_type?: boolean
+    quantity?: boolean
+    price?: boolean
+    subtotal?: boolean
+    notes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type salesorderitemsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "salesorder_id" | "product_id" | "item_name" | "item_type" | "quantity" | "price" | "subtotal" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["salesorderitems"]>
+  export type salesorderitemsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    salesorder?: boolean | salesorderDefaultArgs<ExtArgs>
+  }
+  export type salesorderitemsIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    salesorder?: boolean | salesorderDefaultArgs<ExtArgs>
+  }
+  export type salesorderitemsIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    salesorder?: boolean | salesorderDefaultArgs<ExtArgs>
+  }
+
+  export type $salesorderitemsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "salesorderitems"
+    objects: {
+      salesorder: Prisma.$salesorderPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      salesorder_id: string
+      product_id: string | null
+      item_name: string
+      item_type: string | null
+      quantity: number
+      price: number
+      subtotal: number
+      notes: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["salesorderitems"]>
+    composites: {}
+  }
+
+  type salesorderitemsGetPayload<S extends boolean | null | undefined | salesorderitemsDefaultArgs> = $Result.GetResult<Prisma.$salesorderitemsPayload, S>
+
+  type salesorderitemsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<salesorderitemsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SalesorderitemsCountAggregateInputType | true
+    }
+
+  export interface salesorderitemsDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['salesorderitems'], meta: { name: 'salesorderitems' } }
+    /**
+     * Find zero or one Salesorderitems that matches the filter.
+     * @param {salesorderitemsFindUniqueArgs} args - Arguments to find a Salesorderitems
+     * @example
+     * // Get one Salesorderitems
+     * const salesorderitems = await prisma.salesorderitems.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends salesorderitemsFindUniqueArgs>(args: SelectSubset<T, salesorderitemsFindUniqueArgs<ExtArgs>>): Prisma__salesorderitemsClient<$Result.GetResult<Prisma.$salesorderitemsPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Salesorderitems that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {salesorderitemsFindUniqueOrThrowArgs} args - Arguments to find a Salesorderitems
+     * @example
+     * // Get one Salesorderitems
+     * const salesorderitems = await prisma.salesorderitems.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends salesorderitemsFindUniqueOrThrowArgs>(args: SelectSubset<T, salesorderitemsFindUniqueOrThrowArgs<ExtArgs>>): Prisma__salesorderitemsClient<$Result.GetResult<Prisma.$salesorderitemsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Salesorderitems that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salesorderitemsFindFirstArgs} args - Arguments to find a Salesorderitems
+     * @example
+     * // Get one Salesorderitems
+     * const salesorderitems = await prisma.salesorderitems.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends salesorderitemsFindFirstArgs>(args?: SelectSubset<T, salesorderitemsFindFirstArgs<ExtArgs>>): Prisma__salesorderitemsClient<$Result.GetResult<Prisma.$salesorderitemsPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Salesorderitems that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salesorderitemsFindFirstOrThrowArgs} args - Arguments to find a Salesorderitems
+     * @example
+     * // Get one Salesorderitems
+     * const salesorderitems = await prisma.salesorderitems.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends salesorderitemsFindFirstOrThrowArgs>(args?: SelectSubset<T, salesorderitemsFindFirstOrThrowArgs<ExtArgs>>): Prisma__salesorderitemsClient<$Result.GetResult<Prisma.$salesorderitemsPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Salesorderitems that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salesorderitemsFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Salesorderitems
+     * const salesorderitems = await prisma.salesorderitems.findMany()
+     * 
+     * // Get first 10 Salesorderitems
+     * const salesorderitems = await prisma.salesorderitems.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const salesorderitemsWithIdOnly = await prisma.salesorderitems.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends salesorderitemsFindManyArgs>(args?: SelectSubset<T, salesorderitemsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$salesorderitemsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Salesorderitems.
+     * @param {salesorderitemsCreateArgs} args - Arguments to create a Salesorderitems.
+     * @example
+     * // Create one Salesorderitems
+     * const Salesorderitems = await prisma.salesorderitems.create({
+     *   data: {
+     *     // ... data to create a Salesorderitems
+     *   }
+     * })
+     * 
+     */
+    create<T extends salesorderitemsCreateArgs>(args: SelectSubset<T, salesorderitemsCreateArgs<ExtArgs>>): Prisma__salesorderitemsClient<$Result.GetResult<Prisma.$salesorderitemsPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Salesorderitems.
+     * @param {salesorderitemsCreateManyArgs} args - Arguments to create many Salesorderitems.
+     * @example
+     * // Create many Salesorderitems
+     * const salesorderitems = await prisma.salesorderitems.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends salesorderitemsCreateManyArgs>(args?: SelectSubset<T, salesorderitemsCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Salesorderitems and returns the data saved in the database.
+     * @param {salesorderitemsCreateManyAndReturnArgs} args - Arguments to create many Salesorderitems.
+     * @example
+     * // Create many Salesorderitems
+     * const salesorderitems = await prisma.salesorderitems.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Salesorderitems and only return the `id`
+     * const salesorderitemsWithIdOnly = await prisma.salesorderitems.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends salesorderitemsCreateManyAndReturnArgs>(args?: SelectSubset<T, salesorderitemsCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$salesorderitemsPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Salesorderitems.
+     * @param {salesorderitemsDeleteArgs} args - Arguments to delete one Salesorderitems.
+     * @example
+     * // Delete one Salesorderitems
+     * const Salesorderitems = await prisma.salesorderitems.delete({
+     *   where: {
+     *     // ... filter to delete one Salesorderitems
+     *   }
+     * })
+     * 
+     */
+    delete<T extends salesorderitemsDeleteArgs>(args: SelectSubset<T, salesorderitemsDeleteArgs<ExtArgs>>): Prisma__salesorderitemsClient<$Result.GetResult<Prisma.$salesorderitemsPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Salesorderitems.
+     * @param {salesorderitemsUpdateArgs} args - Arguments to update one Salesorderitems.
+     * @example
+     * // Update one Salesorderitems
+     * const salesorderitems = await prisma.salesorderitems.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends salesorderitemsUpdateArgs>(args: SelectSubset<T, salesorderitemsUpdateArgs<ExtArgs>>): Prisma__salesorderitemsClient<$Result.GetResult<Prisma.$salesorderitemsPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Salesorderitems.
+     * @param {salesorderitemsDeleteManyArgs} args - Arguments to filter Salesorderitems to delete.
+     * @example
+     * // Delete a few Salesorderitems
+     * const { count } = await prisma.salesorderitems.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends salesorderitemsDeleteManyArgs>(args?: SelectSubset<T, salesorderitemsDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Salesorderitems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salesorderitemsUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Salesorderitems
+     * const salesorderitems = await prisma.salesorderitems.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends salesorderitemsUpdateManyArgs>(args: SelectSubset<T, salesorderitemsUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Salesorderitems and returns the data updated in the database.
+     * @param {salesorderitemsUpdateManyAndReturnArgs} args - Arguments to update many Salesorderitems.
+     * @example
+     * // Update many Salesorderitems
+     * const salesorderitems = await prisma.salesorderitems.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Salesorderitems and only return the `id`
+     * const salesorderitemsWithIdOnly = await prisma.salesorderitems.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends salesorderitemsUpdateManyAndReturnArgs>(args: SelectSubset<T, salesorderitemsUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$salesorderitemsPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Salesorderitems.
+     * @param {salesorderitemsUpsertArgs} args - Arguments to update or create a Salesorderitems.
+     * @example
+     * // Update or create a Salesorderitems
+     * const salesorderitems = await prisma.salesorderitems.upsert({
+     *   create: {
+     *     // ... data to create a Salesorderitems
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Salesorderitems we want to update
+     *   }
+     * })
+     */
+    upsert<T extends salesorderitemsUpsertArgs>(args: SelectSubset<T, salesorderitemsUpsertArgs<ExtArgs>>): Prisma__salesorderitemsClient<$Result.GetResult<Prisma.$salesorderitemsPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Salesorderitems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salesorderitemsCountArgs} args - Arguments to filter Salesorderitems to count.
+     * @example
+     * // Count the number of Salesorderitems
+     * const count = await prisma.salesorderitems.count({
+     *   where: {
+     *     // ... the filter for the Salesorderitems we want to count
+     *   }
+     * })
+    **/
+    count<T extends salesorderitemsCountArgs>(
+      args?: Subset<T, salesorderitemsCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SalesorderitemsCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Salesorderitems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SalesorderitemsAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SalesorderitemsAggregateArgs>(args: Subset<T, SalesorderitemsAggregateArgs>): Prisma.PrismaPromise<GetSalesorderitemsAggregateType<T>>
+
+    /**
+     * Group by Salesorderitems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {salesorderitemsGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends salesorderitemsGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: salesorderitemsGroupByArgs['orderBy'] }
+        : { orderBy?: salesorderitemsGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, salesorderitemsGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSalesorderitemsGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the salesorderitems model
+   */
+  readonly fields: salesorderitemsFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for salesorderitems.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__salesorderitemsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    salesorder<T extends salesorderDefaultArgs<ExtArgs> = {}>(args?: Subset<T, salesorderDefaultArgs<ExtArgs>>): Prisma__salesorderClient<$Result.GetResult<Prisma.$salesorderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the salesorderitems model
+   */
+  interface salesorderitemsFieldRefs {
+    readonly id: FieldRef<"salesorderitems", 'String'>
+    readonly salesorder_id: FieldRef<"salesorderitems", 'String'>
+    readonly product_id: FieldRef<"salesorderitems", 'String'>
+    readonly item_name: FieldRef<"salesorderitems", 'String'>
+    readonly item_type: FieldRef<"salesorderitems", 'String'>
+    readonly quantity: FieldRef<"salesorderitems", 'Float'>
+    readonly price: FieldRef<"salesorderitems", 'Float'>
+    readonly subtotal: FieldRef<"salesorderitems", 'Float'>
+    readonly notes: FieldRef<"salesorderitems", 'String'>
+    readonly createdAt: FieldRef<"salesorderitems", 'DateTime'>
+    readonly updatedAt: FieldRef<"salesorderitems", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * salesorderitems findUnique
+   */
+  export type salesorderitemsFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorderitems
+     */
+    select?: salesorderitemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorderitems
+     */
+    omit?: salesorderitemsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderitemsInclude<ExtArgs> | null
+    /**
+     * Filter, which salesorderitems to fetch.
+     */
+    where: salesorderitemsWhereUniqueInput
+  }
+
+  /**
+   * salesorderitems findUniqueOrThrow
+   */
+  export type salesorderitemsFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorderitems
+     */
+    select?: salesorderitemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorderitems
+     */
+    omit?: salesorderitemsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderitemsInclude<ExtArgs> | null
+    /**
+     * Filter, which salesorderitems to fetch.
+     */
+    where: salesorderitemsWhereUniqueInput
+  }
+
+  /**
+   * salesorderitems findFirst
+   */
+  export type salesorderitemsFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorderitems
+     */
+    select?: salesorderitemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorderitems
+     */
+    omit?: salesorderitemsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderitemsInclude<ExtArgs> | null
+    /**
+     * Filter, which salesorderitems to fetch.
+     */
+    where?: salesorderitemsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of salesorderitems to fetch.
+     */
+    orderBy?: salesorderitemsOrderByWithRelationInput | salesorderitemsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for salesorderitems.
+     */
+    cursor?: salesorderitemsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` salesorderitems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` salesorderitems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of salesorderitems.
+     */
+    distinct?: SalesorderitemsScalarFieldEnum | SalesorderitemsScalarFieldEnum[]
+  }
+
+  /**
+   * salesorderitems findFirstOrThrow
+   */
+  export type salesorderitemsFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorderitems
+     */
+    select?: salesorderitemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorderitems
+     */
+    omit?: salesorderitemsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderitemsInclude<ExtArgs> | null
+    /**
+     * Filter, which salesorderitems to fetch.
+     */
+    where?: salesorderitemsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of salesorderitems to fetch.
+     */
+    orderBy?: salesorderitemsOrderByWithRelationInput | salesorderitemsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for salesorderitems.
+     */
+    cursor?: salesorderitemsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` salesorderitems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` salesorderitems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of salesorderitems.
+     */
+    distinct?: SalesorderitemsScalarFieldEnum | SalesorderitemsScalarFieldEnum[]
+  }
+
+  /**
+   * salesorderitems findMany
+   */
+  export type salesorderitemsFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorderitems
+     */
+    select?: salesorderitemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorderitems
+     */
+    omit?: salesorderitemsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderitemsInclude<ExtArgs> | null
+    /**
+     * Filter, which salesorderitems to fetch.
+     */
+    where?: salesorderitemsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of salesorderitems to fetch.
+     */
+    orderBy?: salesorderitemsOrderByWithRelationInput | salesorderitemsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing salesorderitems.
+     */
+    cursor?: salesorderitemsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` salesorderitems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` salesorderitems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of salesorderitems.
+     */
+    distinct?: SalesorderitemsScalarFieldEnum | SalesorderitemsScalarFieldEnum[]
+  }
+
+  /**
+   * salesorderitems create
+   */
+  export type salesorderitemsCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorderitems
+     */
+    select?: salesorderitemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorderitems
+     */
+    omit?: salesorderitemsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderitemsInclude<ExtArgs> | null
+    /**
+     * The data needed to create a salesorderitems.
+     */
+    data: XOR<salesorderitemsCreateInput, salesorderitemsUncheckedCreateInput>
+  }
+
+  /**
+   * salesorderitems createMany
+   */
+  export type salesorderitemsCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many salesorderitems.
+     */
+    data: salesorderitemsCreateManyInput | salesorderitemsCreateManyInput[]
+  }
+
+  /**
+   * salesorderitems createManyAndReturn
+   */
+  export type salesorderitemsCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorderitems
+     */
+    select?: salesorderitemsSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorderitems
+     */
+    omit?: salesorderitemsOmit<ExtArgs> | null
+    /**
+     * The data used to create many salesorderitems.
+     */
+    data: salesorderitemsCreateManyInput | salesorderitemsCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderitemsIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * salesorderitems update
+   */
+  export type salesorderitemsUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorderitems
+     */
+    select?: salesorderitemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorderitems
+     */
+    omit?: salesorderitemsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderitemsInclude<ExtArgs> | null
+    /**
+     * The data needed to update a salesorderitems.
+     */
+    data: XOR<salesorderitemsUpdateInput, salesorderitemsUncheckedUpdateInput>
+    /**
+     * Choose, which salesorderitems to update.
+     */
+    where: salesorderitemsWhereUniqueInput
+  }
+
+  /**
+   * salesorderitems updateMany
+   */
+  export type salesorderitemsUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update salesorderitems.
+     */
+    data: XOR<salesorderitemsUpdateManyMutationInput, salesorderitemsUncheckedUpdateManyInput>
+    /**
+     * Filter which salesorderitems to update
+     */
+    where?: salesorderitemsWhereInput
+    /**
+     * Limit how many salesorderitems to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * salesorderitems updateManyAndReturn
+   */
+  export type salesorderitemsUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorderitems
+     */
+    select?: salesorderitemsSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorderitems
+     */
+    omit?: salesorderitemsOmit<ExtArgs> | null
+    /**
+     * The data used to update salesorderitems.
+     */
+    data: XOR<salesorderitemsUpdateManyMutationInput, salesorderitemsUncheckedUpdateManyInput>
+    /**
+     * Filter which salesorderitems to update
+     */
+    where?: salesorderitemsWhereInput
+    /**
+     * Limit how many salesorderitems to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderitemsIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * salesorderitems upsert
+   */
+  export type salesorderitemsUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorderitems
+     */
+    select?: salesorderitemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorderitems
+     */
+    omit?: salesorderitemsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderitemsInclude<ExtArgs> | null
+    /**
+     * The filter to search for the salesorderitems to update in case it exists.
+     */
+    where: salesorderitemsWhereUniqueInput
+    /**
+     * In case the salesorderitems found by the `where` argument doesn't exist, create a new salesorderitems with this data.
+     */
+    create: XOR<salesorderitemsCreateInput, salesorderitemsUncheckedCreateInput>
+    /**
+     * In case the salesorderitems was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<salesorderitemsUpdateInput, salesorderitemsUncheckedUpdateInput>
+  }
+
+  /**
+   * salesorderitems delete
+   */
+  export type salesorderitemsDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorderitems
+     */
+    select?: salesorderitemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorderitems
+     */
+    omit?: salesorderitemsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderitemsInclude<ExtArgs> | null
+    /**
+     * Filter which salesorderitems to delete.
+     */
+    where: salesorderitemsWhereUniqueInput
+  }
+
+  /**
+   * salesorderitems deleteMany
+   */
+  export type salesorderitemsDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which salesorderitems to delete
+     */
+    where?: salesorderitemsWhereInput
+    /**
+     * Limit how many salesorderitems to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * salesorderitems without action
+   */
+  export type salesorderitemsDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the salesorderitems
+     */
+    select?: salesorderitemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the salesorderitems
+     */
+    omit?: salesorderitemsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: salesorderitemsInclude<ExtArgs> | null
   }
 
 
@@ -28465,6 +31301,7 @@ export namespace Prisma {
     discountpercentage: 'discountpercentage',
     totalprice: 'totalprice',
     totalpayment: 'totalpayment',
+    salesorder_id: 'salesorder_id',
     createdby: 'createdby',
     updatedby: 'updatedby',
     source: 'source',
@@ -28474,6 +31311,49 @@ export namespace Prisma {
   };
 
   export type SaleScalarFieldEnum = (typeof SaleScalarFieldEnum)[keyof typeof SaleScalarFieldEnum]
+
+
+  export const SalesorderScalarFieldEnum: {
+    id: 'id',
+    ordernum: 'ordernum',
+    customer: 'customer',
+    user: 'user',
+    bookingDate: 'bookingDate',
+    deliveryDate: 'deliveryDate',
+    status: 'status',
+    fabricSource: 'fabricSource',
+    totalAmount: 'totalAmount',
+    advancePayment: 'advancePayment',
+    balanceAmount: 'balanceAmount',
+    designNotes: 'designNotes',
+    embroidererNotes: 'embroidererNotes',
+    tailorNotes: 'tailorNotes',
+    measurementData: 'measurementData',
+    createdby: 'createdby',
+    updatedby: 'updatedby',
+    source: 'source',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SalesorderScalarFieldEnum = (typeof SalesorderScalarFieldEnum)[keyof typeof SalesorderScalarFieldEnum]
+
+
+  export const SalesorderitemsScalarFieldEnum: {
+    id: 'id',
+    salesorder_id: 'salesorder_id',
+    product_id: 'product_id',
+    item_name: 'item_name',
+    item_type: 'item_type',
+    quantity: 'quantity',
+    price: 'price',
+    subtotal: 'subtotal',
+    notes: 'notes',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SalesorderitemsScalarFieldEnum = (typeof SalesorderitemsScalarFieldEnum)[keyof typeof SalesorderitemsScalarFieldEnum]
 
 
   export const SoftwaresettingScalarFieldEnum: {
@@ -29847,12 +32727,14 @@ export namespace Prisma {
     discountpercentage?: StringNullableFilter<"sale"> | string | null
     totalprice?: StringNullableFilter<"sale"> | string | null
     totalpayment?: StringNullableFilter<"sale"> | string | null
+    salesorder_id?: StringNullableFilter<"sale"> | string | null
     createdby?: StringNullableFilter<"sale"> | string | null
     updatedby?: StringNullableFilter<"sale"> | string | null
     source?: StringNullableFilter<"sale"> | string | null
     printCount?: IntNullableFilter<"sale"> | number | null
     createdAt?: DateTimeFilter<"sale"> | Date | string
     updatedAt?: DateTimeFilter<"sale"> | Date | string
+    salesorder?: XOR<SalesorderNullableScalarRelationFilter, salesorderWhereInput> | null
   }
 
   export type saleOrderByWithRelationInput = {
@@ -29863,12 +32745,14 @@ export namespace Prisma {
     discountpercentage?: SortOrderInput | SortOrder
     totalprice?: SortOrderInput | SortOrder
     totalpayment?: SortOrderInput | SortOrder
+    salesorder_id?: SortOrderInput | SortOrder
     createdby?: SortOrderInput | SortOrder
     updatedby?: SortOrderInput | SortOrder
     source?: SortOrderInput | SortOrder
     printCount?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    salesorder?: salesorderOrderByWithRelationInput
   }
 
   export type saleWhereUniqueInput = Prisma.AtLeast<{
@@ -29882,12 +32766,14 @@ export namespace Prisma {
     discountpercentage?: StringNullableFilter<"sale"> | string | null
     totalprice?: StringNullableFilter<"sale"> | string | null
     totalpayment?: StringNullableFilter<"sale"> | string | null
+    salesorder_id?: StringNullableFilter<"sale"> | string | null
     createdby?: StringNullableFilter<"sale"> | string | null
     updatedby?: StringNullableFilter<"sale"> | string | null
     source?: StringNullableFilter<"sale"> | string | null
     printCount?: IntNullableFilter<"sale"> | number | null
     createdAt?: DateTimeFilter<"sale"> | Date | string
     updatedAt?: DateTimeFilter<"sale"> | Date | string
+    salesorder?: XOR<SalesorderNullableScalarRelationFilter, salesorderWhereInput> | null
   }, "id">
 
   export type saleOrderByWithAggregationInput = {
@@ -29898,6 +32784,7 @@ export namespace Prisma {
     discountpercentage?: SortOrderInput | SortOrder
     totalprice?: SortOrderInput | SortOrder
     totalpayment?: SortOrderInput | SortOrder
+    salesorder_id?: SortOrderInput | SortOrder
     createdby?: SortOrderInput | SortOrder
     updatedby?: SortOrderInput | SortOrder
     source?: SortOrderInput | SortOrder
@@ -29922,12 +32809,235 @@ export namespace Prisma {
     discountpercentage?: StringNullableWithAggregatesFilter<"sale"> | string | null
     totalprice?: StringNullableWithAggregatesFilter<"sale"> | string | null
     totalpayment?: StringNullableWithAggregatesFilter<"sale"> | string | null
+    salesorder_id?: StringNullableWithAggregatesFilter<"sale"> | string | null
     createdby?: StringNullableWithAggregatesFilter<"sale"> | string | null
     updatedby?: StringNullableWithAggregatesFilter<"sale"> | string | null
     source?: StringNullableWithAggregatesFilter<"sale"> | string | null
     printCount?: IntNullableWithAggregatesFilter<"sale"> | number | null
     createdAt?: DateTimeWithAggregatesFilter<"sale"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"sale"> | Date | string
+  }
+
+  export type salesorderWhereInput = {
+    AND?: salesorderWhereInput | salesorderWhereInput[]
+    OR?: salesorderWhereInput[]
+    NOT?: salesorderWhereInput | salesorderWhereInput[]
+    id?: StringFilter<"salesorder"> | string
+    ordernum?: StringFilter<"salesorder"> | string
+    customer?: StringNullableFilter<"salesorder"> | string | null
+    user?: StringNullableFilter<"salesorder"> | string | null
+    bookingDate?: DateTimeFilter<"salesorder"> | Date | string
+    deliveryDate?: DateTimeNullableFilter<"salesorder"> | Date | string | null
+    status?: StringFilter<"salesorder"> | string
+    fabricSource?: StringNullableFilter<"salesorder"> | string | null
+    totalAmount?: FloatFilter<"salesorder"> | number
+    advancePayment?: FloatFilter<"salesorder"> | number
+    balanceAmount?: FloatFilter<"salesorder"> | number
+    designNotes?: StringNullableFilter<"salesorder"> | string | null
+    embroidererNotes?: StringNullableFilter<"salesorder"> | string | null
+    tailorNotes?: StringNullableFilter<"salesorder"> | string | null
+    measurementData?: StringNullableFilter<"salesorder"> | string | null
+    createdby?: StringNullableFilter<"salesorder"> | string | null
+    updatedby?: StringNullableFilter<"salesorder"> | string | null
+    source?: StringNullableFilter<"salesorder"> | string | null
+    createdAt?: DateTimeFilter<"salesorder"> | Date | string
+    updatedAt?: DateTimeFilter<"salesorder"> | Date | string
+    items?: SalesorderitemsListRelationFilter
+    sales?: SaleListRelationFilter
+  }
+
+  export type salesorderOrderByWithRelationInput = {
+    id?: SortOrder
+    ordernum?: SortOrder
+    customer?: SortOrderInput | SortOrder
+    user?: SortOrderInput | SortOrder
+    bookingDate?: SortOrder
+    deliveryDate?: SortOrderInput | SortOrder
+    status?: SortOrder
+    fabricSource?: SortOrderInput | SortOrder
+    totalAmount?: SortOrder
+    advancePayment?: SortOrder
+    balanceAmount?: SortOrder
+    designNotes?: SortOrderInput | SortOrder
+    embroidererNotes?: SortOrderInput | SortOrder
+    tailorNotes?: SortOrderInput | SortOrder
+    measurementData?: SortOrderInput | SortOrder
+    createdby?: SortOrderInput | SortOrder
+    updatedby?: SortOrderInput | SortOrder
+    source?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    items?: salesorderitemsOrderByRelationAggregateInput
+    sales?: saleOrderByRelationAggregateInput
+  }
+
+  export type salesorderWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    ordernum?: string
+    AND?: salesorderWhereInput | salesorderWhereInput[]
+    OR?: salesorderWhereInput[]
+    NOT?: salesorderWhereInput | salesorderWhereInput[]
+    customer?: StringNullableFilter<"salesorder"> | string | null
+    user?: StringNullableFilter<"salesorder"> | string | null
+    bookingDate?: DateTimeFilter<"salesorder"> | Date | string
+    deliveryDate?: DateTimeNullableFilter<"salesorder"> | Date | string | null
+    status?: StringFilter<"salesorder"> | string
+    fabricSource?: StringNullableFilter<"salesorder"> | string | null
+    totalAmount?: FloatFilter<"salesorder"> | number
+    advancePayment?: FloatFilter<"salesorder"> | number
+    balanceAmount?: FloatFilter<"salesorder"> | number
+    designNotes?: StringNullableFilter<"salesorder"> | string | null
+    embroidererNotes?: StringNullableFilter<"salesorder"> | string | null
+    tailorNotes?: StringNullableFilter<"salesorder"> | string | null
+    measurementData?: StringNullableFilter<"salesorder"> | string | null
+    createdby?: StringNullableFilter<"salesorder"> | string | null
+    updatedby?: StringNullableFilter<"salesorder"> | string | null
+    source?: StringNullableFilter<"salesorder"> | string | null
+    createdAt?: DateTimeFilter<"salesorder"> | Date | string
+    updatedAt?: DateTimeFilter<"salesorder"> | Date | string
+    items?: SalesorderitemsListRelationFilter
+    sales?: SaleListRelationFilter
+  }, "id" | "ordernum">
+
+  export type salesorderOrderByWithAggregationInput = {
+    id?: SortOrder
+    ordernum?: SortOrder
+    customer?: SortOrderInput | SortOrder
+    user?: SortOrderInput | SortOrder
+    bookingDate?: SortOrder
+    deliveryDate?: SortOrderInput | SortOrder
+    status?: SortOrder
+    fabricSource?: SortOrderInput | SortOrder
+    totalAmount?: SortOrder
+    advancePayment?: SortOrder
+    balanceAmount?: SortOrder
+    designNotes?: SortOrderInput | SortOrder
+    embroidererNotes?: SortOrderInput | SortOrder
+    tailorNotes?: SortOrderInput | SortOrder
+    measurementData?: SortOrderInput | SortOrder
+    createdby?: SortOrderInput | SortOrder
+    updatedby?: SortOrderInput | SortOrder
+    source?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: salesorderCountOrderByAggregateInput
+    _avg?: salesorderAvgOrderByAggregateInput
+    _max?: salesorderMaxOrderByAggregateInput
+    _min?: salesorderMinOrderByAggregateInput
+    _sum?: salesorderSumOrderByAggregateInput
+  }
+
+  export type salesorderScalarWhereWithAggregatesInput = {
+    AND?: salesorderScalarWhereWithAggregatesInput | salesorderScalarWhereWithAggregatesInput[]
+    OR?: salesorderScalarWhereWithAggregatesInput[]
+    NOT?: salesorderScalarWhereWithAggregatesInput | salesorderScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"salesorder"> | string
+    ordernum?: StringWithAggregatesFilter<"salesorder"> | string
+    customer?: StringNullableWithAggregatesFilter<"salesorder"> | string | null
+    user?: StringNullableWithAggregatesFilter<"salesorder"> | string | null
+    bookingDate?: DateTimeWithAggregatesFilter<"salesorder"> | Date | string
+    deliveryDate?: DateTimeNullableWithAggregatesFilter<"salesorder"> | Date | string | null
+    status?: StringWithAggregatesFilter<"salesorder"> | string
+    fabricSource?: StringNullableWithAggregatesFilter<"salesorder"> | string | null
+    totalAmount?: FloatWithAggregatesFilter<"salesorder"> | number
+    advancePayment?: FloatWithAggregatesFilter<"salesorder"> | number
+    balanceAmount?: FloatWithAggregatesFilter<"salesorder"> | number
+    designNotes?: StringNullableWithAggregatesFilter<"salesorder"> | string | null
+    embroidererNotes?: StringNullableWithAggregatesFilter<"salesorder"> | string | null
+    tailorNotes?: StringNullableWithAggregatesFilter<"salesorder"> | string | null
+    measurementData?: StringNullableWithAggregatesFilter<"salesorder"> | string | null
+    createdby?: StringNullableWithAggregatesFilter<"salesorder"> | string | null
+    updatedby?: StringNullableWithAggregatesFilter<"salesorder"> | string | null
+    source?: StringNullableWithAggregatesFilter<"salesorder"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"salesorder"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"salesorder"> | Date | string
+  }
+
+  export type salesorderitemsWhereInput = {
+    AND?: salesorderitemsWhereInput | salesorderitemsWhereInput[]
+    OR?: salesorderitemsWhereInput[]
+    NOT?: salesorderitemsWhereInput | salesorderitemsWhereInput[]
+    id?: StringFilter<"salesorderitems"> | string
+    salesorder_id?: StringFilter<"salesorderitems"> | string
+    product_id?: StringNullableFilter<"salesorderitems"> | string | null
+    item_name?: StringFilter<"salesorderitems"> | string
+    item_type?: StringNullableFilter<"salesorderitems"> | string | null
+    quantity?: FloatFilter<"salesorderitems"> | number
+    price?: FloatFilter<"salesorderitems"> | number
+    subtotal?: FloatFilter<"salesorderitems"> | number
+    notes?: StringNullableFilter<"salesorderitems"> | string | null
+    createdAt?: DateTimeFilter<"salesorderitems"> | Date | string
+    updatedAt?: DateTimeFilter<"salesorderitems"> | Date | string
+    salesorder?: XOR<SalesorderScalarRelationFilter, salesorderWhereInput>
+  }
+
+  export type salesorderitemsOrderByWithRelationInput = {
+    id?: SortOrder
+    salesorder_id?: SortOrder
+    product_id?: SortOrderInput | SortOrder
+    item_name?: SortOrder
+    item_type?: SortOrderInput | SortOrder
+    quantity?: SortOrder
+    price?: SortOrder
+    subtotal?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    salesorder?: salesorderOrderByWithRelationInput
+  }
+
+  export type salesorderitemsWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: salesorderitemsWhereInput | salesorderitemsWhereInput[]
+    OR?: salesorderitemsWhereInput[]
+    NOT?: salesorderitemsWhereInput | salesorderitemsWhereInput[]
+    salesorder_id?: StringFilter<"salesorderitems"> | string
+    product_id?: StringNullableFilter<"salesorderitems"> | string | null
+    item_name?: StringFilter<"salesorderitems"> | string
+    item_type?: StringNullableFilter<"salesorderitems"> | string | null
+    quantity?: FloatFilter<"salesorderitems"> | number
+    price?: FloatFilter<"salesorderitems"> | number
+    subtotal?: FloatFilter<"salesorderitems"> | number
+    notes?: StringNullableFilter<"salesorderitems"> | string | null
+    createdAt?: DateTimeFilter<"salesorderitems"> | Date | string
+    updatedAt?: DateTimeFilter<"salesorderitems"> | Date | string
+    salesorder?: XOR<SalesorderScalarRelationFilter, salesorderWhereInput>
+  }, "id">
+
+  export type salesorderitemsOrderByWithAggregationInput = {
+    id?: SortOrder
+    salesorder_id?: SortOrder
+    product_id?: SortOrderInput | SortOrder
+    item_name?: SortOrder
+    item_type?: SortOrderInput | SortOrder
+    quantity?: SortOrder
+    price?: SortOrder
+    subtotal?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: salesorderitemsCountOrderByAggregateInput
+    _avg?: salesorderitemsAvgOrderByAggregateInput
+    _max?: salesorderitemsMaxOrderByAggregateInput
+    _min?: salesorderitemsMinOrderByAggregateInput
+    _sum?: salesorderitemsSumOrderByAggregateInput
+  }
+
+  export type salesorderitemsScalarWhereWithAggregatesInput = {
+    AND?: salesorderitemsScalarWhereWithAggregatesInput | salesorderitemsScalarWhereWithAggregatesInput[]
+    OR?: salesorderitemsScalarWhereWithAggregatesInput[]
+    NOT?: salesorderitemsScalarWhereWithAggregatesInput | salesorderitemsScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"salesorderitems"> | string
+    salesorder_id?: StringWithAggregatesFilter<"salesorderitems"> | string
+    product_id?: StringNullableWithAggregatesFilter<"salesorderitems"> | string | null
+    item_name?: StringWithAggregatesFilter<"salesorderitems"> | string
+    item_type?: StringNullableWithAggregatesFilter<"salesorderitems"> | string | null
+    quantity?: FloatWithAggregatesFilter<"salesorderitems"> | number
+    price?: FloatWithAggregatesFilter<"salesorderitems"> | number
+    subtotal?: FloatWithAggregatesFilter<"salesorderitems"> | number
+    notes?: StringNullableWithAggregatesFilter<"salesorderitems"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"salesorderitems"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"salesorderitems"> | Date | string
   }
 
   export type softwaresettingWhereInput = {
@@ -31845,6 +34955,7 @@ export namespace Prisma {
     printCount?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    salesorder?: salesorderCreateNestedOneWithoutSalesInput
   }
 
   export type saleUncheckedCreateInput = {
@@ -31855,6 +34966,7 @@ export namespace Prisma {
     discountpercentage?: string | null
     totalprice?: string | null
     totalpayment?: string | null
+    salesorder_id?: string | null
     createdby?: string | null
     updatedby?: string | null
     source?: string | null
@@ -31877,6 +34989,7 @@ export namespace Prisma {
     printCount?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    salesorder?: salesorderUpdateOneWithoutSalesNestedInput
   }
 
   export type saleUncheckedUpdateInput = {
@@ -31887,6 +35000,7 @@ export namespace Prisma {
     discountpercentage?: NullableStringFieldUpdateOperationsInput | string | null
     totalprice?: NullableStringFieldUpdateOperationsInput | string | null
     totalpayment?: NullableStringFieldUpdateOperationsInput | string | null
+    salesorder_id?: NullableStringFieldUpdateOperationsInput | string | null
     createdby?: NullableStringFieldUpdateOperationsInput | string | null
     updatedby?: NullableStringFieldUpdateOperationsInput | string | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31903,6 +35017,7 @@ export namespace Prisma {
     discountpercentage?: string | null
     totalprice?: string | null
     totalpayment?: string | null
+    salesorder_id?: string | null
     createdby?: string | null
     updatedby?: string | null
     source?: string | null
@@ -31935,10 +35050,277 @@ export namespace Prisma {
     discountpercentage?: NullableStringFieldUpdateOperationsInput | string | null
     totalprice?: NullableStringFieldUpdateOperationsInput | string | null
     totalpayment?: NullableStringFieldUpdateOperationsInput | string | null
+    salesorder_id?: NullableStringFieldUpdateOperationsInput | string | null
     createdby?: NullableStringFieldUpdateOperationsInput | string | null
     updatedby?: NullableStringFieldUpdateOperationsInput | string | null
     source?: NullableStringFieldUpdateOperationsInput | string | null
     printCount?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type salesorderCreateInput = {
+    id: string
+    ordernum: string
+    customer?: string | null
+    user?: string | null
+    bookingDate?: Date | string
+    deliveryDate?: Date | string | null
+    status?: string
+    fabricSource?: string | null
+    totalAmount?: number
+    advancePayment?: number
+    balanceAmount?: number
+    designNotes?: string | null
+    embroidererNotes?: string | null
+    tailorNotes?: string | null
+    measurementData?: string | null
+    createdby?: string | null
+    updatedby?: string | null
+    source?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    items?: salesorderitemsCreateNestedManyWithoutSalesorderInput
+    sales?: saleCreateNestedManyWithoutSalesorderInput
+  }
+
+  export type salesorderUncheckedCreateInput = {
+    id: string
+    ordernum: string
+    customer?: string | null
+    user?: string | null
+    bookingDate?: Date | string
+    deliveryDate?: Date | string | null
+    status?: string
+    fabricSource?: string | null
+    totalAmount?: number
+    advancePayment?: number
+    balanceAmount?: number
+    designNotes?: string | null
+    embroidererNotes?: string | null
+    tailorNotes?: string | null
+    measurementData?: string | null
+    createdby?: string | null
+    updatedby?: string | null
+    source?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    items?: salesorderitemsUncheckedCreateNestedManyWithoutSalesorderInput
+    sales?: saleUncheckedCreateNestedManyWithoutSalesorderInput
+  }
+
+  export type salesorderUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ordernum?: StringFieldUpdateOperationsInput | string
+    customer?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: NullableStringFieldUpdateOperationsInput | string | null
+    bookingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    fabricSource?: NullableStringFieldUpdateOperationsInput | string | null
+    totalAmount?: FloatFieldUpdateOperationsInput | number
+    advancePayment?: FloatFieldUpdateOperationsInput | number
+    balanceAmount?: FloatFieldUpdateOperationsInput | number
+    designNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    embroidererNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    tailorNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    measurementData?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: salesorderitemsUpdateManyWithoutSalesorderNestedInput
+    sales?: saleUpdateManyWithoutSalesorderNestedInput
+  }
+
+  export type salesorderUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ordernum?: StringFieldUpdateOperationsInput | string
+    customer?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: NullableStringFieldUpdateOperationsInput | string | null
+    bookingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    fabricSource?: NullableStringFieldUpdateOperationsInput | string | null
+    totalAmount?: FloatFieldUpdateOperationsInput | number
+    advancePayment?: FloatFieldUpdateOperationsInput | number
+    balanceAmount?: FloatFieldUpdateOperationsInput | number
+    designNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    embroidererNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    tailorNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    measurementData?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: salesorderitemsUncheckedUpdateManyWithoutSalesorderNestedInput
+    sales?: saleUncheckedUpdateManyWithoutSalesorderNestedInput
+  }
+
+  export type salesorderCreateManyInput = {
+    id: string
+    ordernum: string
+    customer?: string | null
+    user?: string | null
+    bookingDate?: Date | string
+    deliveryDate?: Date | string | null
+    status?: string
+    fabricSource?: string | null
+    totalAmount?: number
+    advancePayment?: number
+    balanceAmount?: number
+    designNotes?: string | null
+    embroidererNotes?: string | null
+    tailorNotes?: string | null
+    measurementData?: string | null
+    createdby?: string | null
+    updatedby?: string | null
+    source?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type salesorderUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ordernum?: StringFieldUpdateOperationsInput | string
+    customer?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: NullableStringFieldUpdateOperationsInput | string | null
+    bookingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    fabricSource?: NullableStringFieldUpdateOperationsInput | string | null
+    totalAmount?: FloatFieldUpdateOperationsInput | number
+    advancePayment?: FloatFieldUpdateOperationsInput | number
+    balanceAmount?: FloatFieldUpdateOperationsInput | number
+    designNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    embroidererNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    tailorNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    measurementData?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type salesorderUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ordernum?: StringFieldUpdateOperationsInput | string
+    customer?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: NullableStringFieldUpdateOperationsInput | string | null
+    bookingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    fabricSource?: NullableStringFieldUpdateOperationsInput | string | null
+    totalAmount?: FloatFieldUpdateOperationsInput | number
+    advancePayment?: FloatFieldUpdateOperationsInput | number
+    balanceAmount?: FloatFieldUpdateOperationsInput | number
+    designNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    embroidererNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    tailorNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    measurementData?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type salesorderitemsCreateInput = {
+    id: string
+    product_id?: string | null
+    item_name: string
+    item_type?: string | null
+    quantity?: number
+    price?: number
+    subtotal?: number
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    salesorder: salesorderCreateNestedOneWithoutItemsInput
+  }
+
+  export type salesorderitemsUncheckedCreateInput = {
+    id: string
+    salesorder_id: string
+    product_id?: string | null
+    item_name: string
+    item_type?: string | null
+    quantity?: number
+    price?: number
+    subtotal?: number
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type salesorderitemsUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    product_id?: NullableStringFieldUpdateOperationsInput | string | null
+    item_name?: StringFieldUpdateOperationsInput | string
+    item_type?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: FloatFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
+    subtotal?: FloatFieldUpdateOperationsInput | number
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    salesorder?: salesorderUpdateOneRequiredWithoutItemsNestedInput
+  }
+
+  export type salesorderitemsUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    salesorder_id?: StringFieldUpdateOperationsInput | string
+    product_id?: NullableStringFieldUpdateOperationsInput | string | null
+    item_name?: StringFieldUpdateOperationsInput | string
+    item_type?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: FloatFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
+    subtotal?: FloatFieldUpdateOperationsInput | number
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type salesorderitemsCreateManyInput = {
+    id: string
+    salesorder_id: string
+    product_id?: string | null
+    item_name: string
+    item_type?: string | null
+    quantity?: number
+    price?: number
+    subtotal?: number
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type salesorderitemsUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    product_id?: NullableStringFieldUpdateOperationsInput | string | null
+    item_name?: StringFieldUpdateOperationsInput | string
+    item_type?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: FloatFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
+    subtotal?: FloatFieldUpdateOperationsInput | number
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type salesorderitemsUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    salesorder_id?: StringFieldUpdateOperationsInput | string
+    product_id?: NullableStringFieldUpdateOperationsInput | string | null
+    item_name?: StringFieldUpdateOperationsInput | string
+    item_type?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: FloatFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
+    subtotal?: FloatFieldUpdateOperationsInput | number
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -33549,6 +36931,11 @@ export namespace Prisma {
     totalAmount?: SortOrder
   }
 
+  export type SalesorderNullableScalarRelationFilter = {
+    is?: salesorderWhereInput | null
+    isNot?: salesorderWhereInput | null
+  }
+
   export type saleCountOrderByAggregateInput = {
     id?: SortOrder
     user?: SortOrder
@@ -33557,6 +36944,7 @@ export namespace Prisma {
     discountpercentage?: SortOrder
     totalprice?: SortOrder
     totalpayment?: SortOrder
+    salesorder_id?: SortOrder
     createdby?: SortOrder
     updatedby?: SortOrder
     source?: SortOrder
@@ -33577,6 +36965,7 @@ export namespace Prisma {
     discountpercentage?: SortOrder
     totalprice?: SortOrder
     totalpayment?: SortOrder
+    salesorder_id?: SortOrder
     createdby?: SortOrder
     updatedby?: SortOrder
     source?: SortOrder
@@ -33593,6 +36982,7 @@ export namespace Prisma {
     discountpercentage?: SortOrder
     totalprice?: SortOrder
     totalpayment?: SortOrder
+    salesorder_id?: SortOrder
     createdby?: SortOrder
     updatedby?: SortOrder
     source?: SortOrder
@@ -33603,6 +36993,166 @@ export namespace Prisma {
 
   export type saleSumOrderByAggregateInput = {
     printCount?: SortOrder
+  }
+
+  export type SalesorderitemsListRelationFilter = {
+    every?: salesorderitemsWhereInput
+    some?: salesorderitemsWhereInput
+    none?: salesorderitemsWhereInput
+  }
+
+  export type SaleListRelationFilter = {
+    every?: saleWhereInput
+    some?: saleWhereInput
+    none?: saleWhereInput
+  }
+
+  export type salesorderitemsOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type saleOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type salesorderCountOrderByAggregateInput = {
+    id?: SortOrder
+    ordernum?: SortOrder
+    customer?: SortOrder
+    user?: SortOrder
+    bookingDate?: SortOrder
+    deliveryDate?: SortOrder
+    status?: SortOrder
+    fabricSource?: SortOrder
+    totalAmount?: SortOrder
+    advancePayment?: SortOrder
+    balanceAmount?: SortOrder
+    designNotes?: SortOrder
+    embroidererNotes?: SortOrder
+    tailorNotes?: SortOrder
+    measurementData?: SortOrder
+    createdby?: SortOrder
+    updatedby?: SortOrder
+    source?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type salesorderAvgOrderByAggregateInput = {
+    totalAmount?: SortOrder
+    advancePayment?: SortOrder
+    balanceAmount?: SortOrder
+  }
+
+  export type salesorderMaxOrderByAggregateInput = {
+    id?: SortOrder
+    ordernum?: SortOrder
+    customer?: SortOrder
+    user?: SortOrder
+    bookingDate?: SortOrder
+    deliveryDate?: SortOrder
+    status?: SortOrder
+    fabricSource?: SortOrder
+    totalAmount?: SortOrder
+    advancePayment?: SortOrder
+    balanceAmount?: SortOrder
+    designNotes?: SortOrder
+    embroidererNotes?: SortOrder
+    tailorNotes?: SortOrder
+    measurementData?: SortOrder
+    createdby?: SortOrder
+    updatedby?: SortOrder
+    source?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type salesorderMinOrderByAggregateInput = {
+    id?: SortOrder
+    ordernum?: SortOrder
+    customer?: SortOrder
+    user?: SortOrder
+    bookingDate?: SortOrder
+    deliveryDate?: SortOrder
+    status?: SortOrder
+    fabricSource?: SortOrder
+    totalAmount?: SortOrder
+    advancePayment?: SortOrder
+    balanceAmount?: SortOrder
+    designNotes?: SortOrder
+    embroidererNotes?: SortOrder
+    tailorNotes?: SortOrder
+    measurementData?: SortOrder
+    createdby?: SortOrder
+    updatedby?: SortOrder
+    source?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type salesorderSumOrderByAggregateInput = {
+    totalAmount?: SortOrder
+    advancePayment?: SortOrder
+    balanceAmount?: SortOrder
+  }
+
+  export type SalesorderScalarRelationFilter = {
+    is?: salesorderWhereInput
+    isNot?: salesorderWhereInput
+  }
+
+  export type salesorderitemsCountOrderByAggregateInput = {
+    id?: SortOrder
+    salesorder_id?: SortOrder
+    product_id?: SortOrder
+    item_name?: SortOrder
+    item_type?: SortOrder
+    quantity?: SortOrder
+    price?: SortOrder
+    subtotal?: SortOrder
+    notes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type salesorderitemsAvgOrderByAggregateInput = {
+    quantity?: SortOrder
+    price?: SortOrder
+    subtotal?: SortOrder
+  }
+
+  export type salesorderitemsMaxOrderByAggregateInput = {
+    id?: SortOrder
+    salesorder_id?: SortOrder
+    product_id?: SortOrder
+    item_name?: SortOrder
+    item_type?: SortOrder
+    quantity?: SortOrder
+    price?: SortOrder
+    subtotal?: SortOrder
+    notes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type salesorderitemsMinOrderByAggregateInput = {
+    id?: SortOrder
+    salesorder_id?: SortOrder
+    product_id?: SortOrder
+    item_name?: SortOrder
+    item_type?: SortOrder
+    quantity?: SortOrder
+    price?: SortOrder
+    subtotal?: SortOrder
+    notes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type salesorderitemsSumOrderByAggregateInput = {
+    quantity?: SortOrder
+    price?: SortOrder
+    subtotal?: SortOrder
   }
 
   export type softwaresettingCountOrderByAggregateInput = {
@@ -34078,6 +37628,120 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type salesorderCreateNestedOneWithoutSalesInput = {
+    create?: XOR<salesorderCreateWithoutSalesInput, salesorderUncheckedCreateWithoutSalesInput>
+    connectOrCreate?: salesorderCreateOrConnectWithoutSalesInput
+    connect?: salesorderWhereUniqueInput
+  }
+
+  export type salesorderUpdateOneWithoutSalesNestedInput = {
+    create?: XOR<salesorderCreateWithoutSalesInput, salesorderUncheckedCreateWithoutSalesInput>
+    connectOrCreate?: salesorderCreateOrConnectWithoutSalesInput
+    upsert?: salesorderUpsertWithoutSalesInput
+    disconnect?: salesorderWhereInput | boolean
+    delete?: salesorderWhereInput | boolean
+    connect?: salesorderWhereUniqueInput
+    update?: XOR<XOR<salesorderUpdateToOneWithWhereWithoutSalesInput, salesorderUpdateWithoutSalesInput>, salesorderUncheckedUpdateWithoutSalesInput>
+  }
+
+  export type salesorderitemsCreateNestedManyWithoutSalesorderInput = {
+    create?: XOR<salesorderitemsCreateWithoutSalesorderInput, salesorderitemsUncheckedCreateWithoutSalesorderInput> | salesorderitemsCreateWithoutSalesorderInput[] | salesorderitemsUncheckedCreateWithoutSalesorderInput[]
+    connectOrCreate?: salesorderitemsCreateOrConnectWithoutSalesorderInput | salesorderitemsCreateOrConnectWithoutSalesorderInput[]
+    createMany?: salesorderitemsCreateManySalesorderInputEnvelope
+    connect?: salesorderitemsWhereUniqueInput | salesorderitemsWhereUniqueInput[]
+  }
+
+  export type saleCreateNestedManyWithoutSalesorderInput = {
+    create?: XOR<saleCreateWithoutSalesorderInput, saleUncheckedCreateWithoutSalesorderInput> | saleCreateWithoutSalesorderInput[] | saleUncheckedCreateWithoutSalesorderInput[]
+    connectOrCreate?: saleCreateOrConnectWithoutSalesorderInput | saleCreateOrConnectWithoutSalesorderInput[]
+    createMany?: saleCreateManySalesorderInputEnvelope
+    connect?: saleWhereUniqueInput | saleWhereUniqueInput[]
+  }
+
+  export type salesorderitemsUncheckedCreateNestedManyWithoutSalesorderInput = {
+    create?: XOR<salesorderitemsCreateWithoutSalesorderInput, salesorderitemsUncheckedCreateWithoutSalesorderInput> | salesorderitemsCreateWithoutSalesorderInput[] | salesorderitemsUncheckedCreateWithoutSalesorderInput[]
+    connectOrCreate?: salesorderitemsCreateOrConnectWithoutSalesorderInput | salesorderitemsCreateOrConnectWithoutSalesorderInput[]
+    createMany?: salesorderitemsCreateManySalesorderInputEnvelope
+    connect?: salesorderitemsWhereUniqueInput | salesorderitemsWhereUniqueInput[]
+  }
+
+  export type saleUncheckedCreateNestedManyWithoutSalesorderInput = {
+    create?: XOR<saleCreateWithoutSalesorderInput, saleUncheckedCreateWithoutSalesorderInput> | saleCreateWithoutSalesorderInput[] | saleUncheckedCreateWithoutSalesorderInput[]
+    connectOrCreate?: saleCreateOrConnectWithoutSalesorderInput | saleCreateOrConnectWithoutSalesorderInput[]
+    createMany?: saleCreateManySalesorderInputEnvelope
+    connect?: saleWhereUniqueInput | saleWhereUniqueInput[]
+  }
+
+  export type salesorderitemsUpdateManyWithoutSalesorderNestedInput = {
+    create?: XOR<salesorderitemsCreateWithoutSalesorderInput, salesorderitemsUncheckedCreateWithoutSalesorderInput> | salesorderitemsCreateWithoutSalesorderInput[] | salesorderitemsUncheckedCreateWithoutSalesorderInput[]
+    connectOrCreate?: salesorderitemsCreateOrConnectWithoutSalesorderInput | salesorderitemsCreateOrConnectWithoutSalesorderInput[]
+    upsert?: salesorderitemsUpsertWithWhereUniqueWithoutSalesorderInput | salesorderitemsUpsertWithWhereUniqueWithoutSalesorderInput[]
+    createMany?: salesorderitemsCreateManySalesorderInputEnvelope
+    set?: salesorderitemsWhereUniqueInput | salesorderitemsWhereUniqueInput[]
+    disconnect?: salesorderitemsWhereUniqueInput | salesorderitemsWhereUniqueInput[]
+    delete?: salesorderitemsWhereUniqueInput | salesorderitemsWhereUniqueInput[]
+    connect?: salesorderitemsWhereUniqueInput | salesorderitemsWhereUniqueInput[]
+    update?: salesorderitemsUpdateWithWhereUniqueWithoutSalesorderInput | salesorderitemsUpdateWithWhereUniqueWithoutSalesorderInput[]
+    updateMany?: salesorderitemsUpdateManyWithWhereWithoutSalesorderInput | salesorderitemsUpdateManyWithWhereWithoutSalesorderInput[]
+    deleteMany?: salesorderitemsScalarWhereInput | salesorderitemsScalarWhereInput[]
+  }
+
+  export type saleUpdateManyWithoutSalesorderNestedInput = {
+    create?: XOR<saleCreateWithoutSalesorderInput, saleUncheckedCreateWithoutSalesorderInput> | saleCreateWithoutSalesorderInput[] | saleUncheckedCreateWithoutSalesorderInput[]
+    connectOrCreate?: saleCreateOrConnectWithoutSalesorderInput | saleCreateOrConnectWithoutSalesorderInput[]
+    upsert?: saleUpsertWithWhereUniqueWithoutSalesorderInput | saleUpsertWithWhereUniqueWithoutSalesorderInput[]
+    createMany?: saleCreateManySalesorderInputEnvelope
+    set?: saleWhereUniqueInput | saleWhereUniqueInput[]
+    disconnect?: saleWhereUniqueInput | saleWhereUniqueInput[]
+    delete?: saleWhereUniqueInput | saleWhereUniqueInput[]
+    connect?: saleWhereUniqueInput | saleWhereUniqueInput[]
+    update?: saleUpdateWithWhereUniqueWithoutSalesorderInput | saleUpdateWithWhereUniqueWithoutSalesorderInput[]
+    updateMany?: saleUpdateManyWithWhereWithoutSalesorderInput | saleUpdateManyWithWhereWithoutSalesorderInput[]
+    deleteMany?: saleScalarWhereInput | saleScalarWhereInput[]
+  }
+
+  export type salesorderitemsUncheckedUpdateManyWithoutSalesorderNestedInput = {
+    create?: XOR<salesorderitemsCreateWithoutSalesorderInput, salesorderitemsUncheckedCreateWithoutSalesorderInput> | salesorderitemsCreateWithoutSalesorderInput[] | salesorderitemsUncheckedCreateWithoutSalesorderInput[]
+    connectOrCreate?: salesorderitemsCreateOrConnectWithoutSalesorderInput | salesorderitemsCreateOrConnectWithoutSalesorderInput[]
+    upsert?: salesorderitemsUpsertWithWhereUniqueWithoutSalesorderInput | salesorderitemsUpsertWithWhereUniqueWithoutSalesorderInput[]
+    createMany?: salesorderitemsCreateManySalesorderInputEnvelope
+    set?: salesorderitemsWhereUniqueInput | salesorderitemsWhereUniqueInput[]
+    disconnect?: salesorderitemsWhereUniqueInput | salesorderitemsWhereUniqueInput[]
+    delete?: salesorderitemsWhereUniqueInput | salesorderitemsWhereUniqueInput[]
+    connect?: salesorderitemsWhereUniqueInput | salesorderitemsWhereUniqueInput[]
+    update?: salesorderitemsUpdateWithWhereUniqueWithoutSalesorderInput | salesorderitemsUpdateWithWhereUniqueWithoutSalesorderInput[]
+    updateMany?: salesorderitemsUpdateManyWithWhereWithoutSalesorderInput | salesorderitemsUpdateManyWithWhereWithoutSalesorderInput[]
+    deleteMany?: salesorderitemsScalarWhereInput | salesorderitemsScalarWhereInput[]
+  }
+
+  export type saleUncheckedUpdateManyWithoutSalesorderNestedInput = {
+    create?: XOR<saleCreateWithoutSalesorderInput, saleUncheckedCreateWithoutSalesorderInput> | saleCreateWithoutSalesorderInput[] | saleUncheckedCreateWithoutSalesorderInput[]
+    connectOrCreate?: saleCreateOrConnectWithoutSalesorderInput | saleCreateOrConnectWithoutSalesorderInput[]
+    upsert?: saleUpsertWithWhereUniqueWithoutSalesorderInput | saleUpsertWithWhereUniqueWithoutSalesorderInput[]
+    createMany?: saleCreateManySalesorderInputEnvelope
+    set?: saleWhereUniqueInput | saleWhereUniqueInput[]
+    disconnect?: saleWhereUniqueInput | saleWhereUniqueInput[]
+    delete?: saleWhereUniqueInput | saleWhereUniqueInput[]
+    connect?: saleWhereUniqueInput | saleWhereUniqueInput[]
+    update?: saleUpdateWithWhereUniqueWithoutSalesorderInput | saleUpdateWithWhereUniqueWithoutSalesorderInput[]
+    updateMany?: saleUpdateManyWithWhereWithoutSalesorderInput | saleUpdateManyWithWhereWithoutSalesorderInput[]
+    deleteMany?: saleScalarWhereInput | saleScalarWhereInput[]
+  }
+
+  export type salesorderCreateNestedOneWithoutItemsInput = {
+    create?: XOR<salesorderCreateWithoutItemsInput, salesorderUncheckedCreateWithoutItemsInput>
+    connectOrCreate?: salesorderCreateOrConnectWithoutItemsInput
+    connect?: salesorderWhereUniqueInput
+  }
+
+  export type salesorderUpdateOneRequiredWithoutItemsNestedInput = {
+    create?: XOR<salesorderCreateWithoutItemsInput, salesorderUncheckedCreateWithoutItemsInput>
+    connectOrCreate?: salesorderCreateOrConnectWithoutItemsInput
+    upsert?: salesorderUpsertWithoutItemsInput
+    connect?: salesorderWhereUniqueInput
+    update?: XOR<XOR<salesorderUpdateToOneWithWhereWithoutItemsInput, salesorderUpdateWithoutItemsInput>, salesorderUncheckedUpdateWithoutItemsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -34600,6 +38264,375 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type salesorderCreateWithoutSalesInput = {
+    id: string
+    ordernum: string
+    customer?: string | null
+    user?: string | null
+    bookingDate?: Date | string
+    deliveryDate?: Date | string | null
+    status?: string
+    fabricSource?: string | null
+    totalAmount?: number
+    advancePayment?: number
+    balanceAmount?: number
+    designNotes?: string | null
+    embroidererNotes?: string | null
+    tailorNotes?: string | null
+    measurementData?: string | null
+    createdby?: string | null
+    updatedby?: string | null
+    source?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    items?: salesorderitemsCreateNestedManyWithoutSalesorderInput
+  }
+
+  export type salesorderUncheckedCreateWithoutSalesInput = {
+    id: string
+    ordernum: string
+    customer?: string | null
+    user?: string | null
+    bookingDate?: Date | string
+    deliveryDate?: Date | string | null
+    status?: string
+    fabricSource?: string | null
+    totalAmount?: number
+    advancePayment?: number
+    balanceAmount?: number
+    designNotes?: string | null
+    embroidererNotes?: string | null
+    tailorNotes?: string | null
+    measurementData?: string | null
+    createdby?: string | null
+    updatedby?: string | null
+    source?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    items?: salesorderitemsUncheckedCreateNestedManyWithoutSalesorderInput
+  }
+
+  export type salesorderCreateOrConnectWithoutSalesInput = {
+    where: salesorderWhereUniqueInput
+    create: XOR<salesorderCreateWithoutSalesInput, salesorderUncheckedCreateWithoutSalesInput>
+  }
+
+  export type salesorderUpsertWithoutSalesInput = {
+    update: XOR<salesorderUpdateWithoutSalesInput, salesorderUncheckedUpdateWithoutSalesInput>
+    create: XOR<salesorderCreateWithoutSalesInput, salesorderUncheckedCreateWithoutSalesInput>
+    where?: salesorderWhereInput
+  }
+
+  export type salesorderUpdateToOneWithWhereWithoutSalesInput = {
+    where?: salesorderWhereInput
+    data: XOR<salesorderUpdateWithoutSalesInput, salesorderUncheckedUpdateWithoutSalesInput>
+  }
+
+  export type salesorderUpdateWithoutSalesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ordernum?: StringFieldUpdateOperationsInput | string
+    customer?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: NullableStringFieldUpdateOperationsInput | string | null
+    bookingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    fabricSource?: NullableStringFieldUpdateOperationsInput | string | null
+    totalAmount?: FloatFieldUpdateOperationsInput | number
+    advancePayment?: FloatFieldUpdateOperationsInput | number
+    balanceAmount?: FloatFieldUpdateOperationsInput | number
+    designNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    embroidererNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    tailorNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    measurementData?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: salesorderitemsUpdateManyWithoutSalesorderNestedInput
+  }
+
+  export type salesorderUncheckedUpdateWithoutSalesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ordernum?: StringFieldUpdateOperationsInput | string
+    customer?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: NullableStringFieldUpdateOperationsInput | string | null
+    bookingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    fabricSource?: NullableStringFieldUpdateOperationsInput | string | null
+    totalAmount?: FloatFieldUpdateOperationsInput | number
+    advancePayment?: FloatFieldUpdateOperationsInput | number
+    balanceAmount?: FloatFieldUpdateOperationsInput | number
+    designNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    embroidererNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    tailorNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    measurementData?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: salesorderitemsUncheckedUpdateManyWithoutSalesorderNestedInput
+  }
+
+  export type salesorderitemsCreateWithoutSalesorderInput = {
+    id: string
+    product_id?: string | null
+    item_name: string
+    item_type?: string | null
+    quantity?: number
+    price?: number
+    subtotal?: number
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type salesorderitemsUncheckedCreateWithoutSalesorderInput = {
+    id: string
+    product_id?: string | null
+    item_name: string
+    item_type?: string | null
+    quantity?: number
+    price?: number
+    subtotal?: number
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type salesorderitemsCreateOrConnectWithoutSalesorderInput = {
+    where: salesorderitemsWhereUniqueInput
+    create: XOR<salesorderitemsCreateWithoutSalesorderInput, salesorderitemsUncheckedCreateWithoutSalesorderInput>
+  }
+
+  export type salesorderitemsCreateManySalesorderInputEnvelope = {
+    data: salesorderitemsCreateManySalesorderInput | salesorderitemsCreateManySalesorderInput[]
+  }
+
+  export type saleCreateWithoutSalesorderInput = {
+    id: string
+    user?: string | null
+    customer?: string | null
+    invoicenum?: string | null
+    discountpercentage?: string | null
+    totalprice?: string | null
+    totalpayment?: string | null
+    createdby?: string | null
+    updatedby?: string | null
+    source?: string | null
+    printCount?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type saleUncheckedCreateWithoutSalesorderInput = {
+    id: string
+    user?: string | null
+    customer?: string | null
+    invoicenum?: string | null
+    discountpercentage?: string | null
+    totalprice?: string | null
+    totalpayment?: string | null
+    createdby?: string | null
+    updatedby?: string | null
+    source?: string | null
+    printCount?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type saleCreateOrConnectWithoutSalesorderInput = {
+    where: saleWhereUniqueInput
+    create: XOR<saleCreateWithoutSalesorderInput, saleUncheckedCreateWithoutSalesorderInput>
+  }
+
+  export type saleCreateManySalesorderInputEnvelope = {
+    data: saleCreateManySalesorderInput | saleCreateManySalesorderInput[]
+  }
+
+  export type salesorderitemsUpsertWithWhereUniqueWithoutSalesorderInput = {
+    where: salesorderitemsWhereUniqueInput
+    update: XOR<salesorderitemsUpdateWithoutSalesorderInput, salesorderitemsUncheckedUpdateWithoutSalesorderInput>
+    create: XOR<salesorderitemsCreateWithoutSalesorderInput, salesorderitemsUncheckedCreateWithoutSalesorderInput>
+  }
+
+  export type salesorderitemsUpdateWithWhereUniqueWithoutSalesorderInput = {
+    where: salesorderitemsWhereUniqueInput
+    data: XOR<salesorderitemsUpdateWithoutSalesorderInput, salesorderitemsUncheckedUpdateWithoutSalesorderInput>
+  }
+
+  export type salesorderitemsUpdateManyWithWhereWithoutSalesorderInput = {
+    where: salesorderitemsScalarWhereInput
+    data: XOR<salesorderitemsUpdateManyMutationInput, salesorderitemsUncheckedUpdateManyWithoutSalesorderInput>
+  }
+
+  export type salesorderitemsScalarWhereInput = {
+    AND?: salesorderitemsScalarWhereInput | salesorderitemsScalarWhereInput[]
+    OR?: salesorderitemsScalarWhereInput[]
+    NOT?: salesorderitemsScalarWhereInput | salesorderitemsScalarWhereInput[]
+    id?: StringFilter<"salesorderitems"> | string
+    salesorder_id?: StringFilter<"salesorderitems"> | string
+    product_id?: StringNullableFilter<"salesorderitems"> | string | null
+    item_name?: StringFilter<"salesorderitems"> | string
+    item_type?: StringNullableFilter<"salesorderitems"> | string | null
+    quantity?: FloatFilter<"salesorderitems"> | number
+    price?: FloatFilter<"salesorderitems"> | number
+    subtotal?: FloatFilter<"salesorderitems"> | number
+    notes?: StringNullableFilter<"salesorderitems"> | string | null
+    createdAt?: DateTimeFilter<"salesorderitems"> | Date | string
+    updatedAt?: DateTimeFilter<"salesorderitems"> | Date | string
+  }
+
+  export type saleUpsertWithWhereUniqueWithoutSalesorderInput = {
+    where: saleWhereUniqueInput
+    update: XOR<saleUpdateWithoutSalesorderInput, saleUncheckedUpdateWithoutSalesorderInput>
+    create: XOR<saleCreateWithoutSalesorderInput, saleUncheckedCreateWithoutSalesorderInput>
+  }
+
+  export type saleUpdateWithWhereUniqueWithoutSalesorderInput = {
+    where: saleWhereUniqueInput
+    data: XOR<saleUpdateWithoutSalesorderInput, saleUncheckedUpdateWithoutSalesorderInput>
+  }
+
+  export type saleUpdateManyWithWhereWithoutSalesorderInput = {
+    where: saleScalarWhereInput
+    data: XOR<saleUpdateManyMutationInput, saleUncheckedUpdateManyWithoutSalesorderInput>
+  }
+
+  export type saleScalarWhereInput = {
+    AND?: saleScalarWhereInput | saleScalarWhereInput[]
+    OR?: saleScalarWhereInput[]
+    NOT?: saleScalarWhereInput | saleScalarWhereInput[]
+    id?: StringFilter<"sale"> | string
+    user?: StringNullableFilter<"sale"> | string | null
+    customer?: StringNullableFilter<"sale"> | string | null
+    invoicenum?: StringNullableFilter<"sale"> | string | null
+    discountpercentage?: StringNullableFilter<"sale"> | string | null
+    totalprice?: StringNullableFilter<"sale"> | string | null
+    totalpayment?: StringNullableFilter<"sale"> | string | null
+    salesorder_id?: StringNullableFilter<"sale"> | string | null
+    createdby?: StringNullableFilter<"sale"> | string | null
+    updatedby?: StringNullableFilter<"sale"> | string | null
+    source?: StringNullableFilter<"sale"> | string | null
+    printCount?: IntNullableFilter<"sale"> | number | null
+    createdAt?: DateTimeFilter<"sale"> | Date | string
+    updatedAt?: DateTimeFilter<"sale"> | Date | string
+  }
+
+  export type salesorderCreateWithoutItemsInput = {
+    id: string
+    ordernum: string
+    customer?: string | null
+    user?: string | null
+    bookingDate?: Date | string
+    deliveryDate?: Date | string | null
+    status?: string
+    fabricSource?: string | null
+    totalAmount?: number
+    advancePayment?: number
+    balanceAmount?: number
+    designNotes?: string | null
+    embroidererNotes?: string | null
+    tailorNotes?: string | null
+    measurementData?: string | null
+    createdby?: string | null
+    updatedby?: string | null
+    source?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sales?: saleCreateNestedManyWithoutSalesorderInput
+  }
+
+  export type salesorderUncheckedCreateWithoutItemsInput = {
+    id: string
+    ordernum: string
+    customer?: string | null
+    user?: string | null
+    bookingDate?: Date | string
+    deliveryDate?: Date | string | null
+    status?: string
+    fabricSource?: string | null
+    totalAmount?: number
+    advancePayment?: number
+    balanceAmount?: number
+    designNotes?: string | null
+    embroidererNotes?: string | null
+    tailorNotes?: string | null
+    measurementData?: string | null
+    createdby?: string | null
+    updatedby?: string | null
+    source?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sales?: saleUncheckedCreateNestedManyWithoutSalesorderInput
+  }
+
+  export type salesorderCreateOrConnectWithoutItemsInput = {
+    where: salesorderWhereUniqueInput
+    create: XOR<salesorderCreateWithoutItemsInput, salesorderUncheckedCreateWithoutItemsInput>
+  }
+
+  export type salesorderUpsertWithoutItemsInput = {
+    update: XOR<salesorderUpdateWithoutItemsInput, salesorderUncheckedUpdateWithoutItemsInput>
+    create: XOR<salesorderCreateWithoutItemsInput, salesorderUncheckedCreateWithoutItemsInput>
+    where?: salesorderWhereInput
+  }
+
+  export type salesorderUpdateToOneWithWhereWithoutItemsInput = {
+    where?: salesorderWhereInput
+    data: XOR<salesorderUpdateWithoutItemsInput, salesorderUncheckedUpdateWithoutItemsInput>
+  }
+
+  export type salesorderUpdateWithoutItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ordernum?: StringFieldUpdateOperationsInput | string
+    customer?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: NullableStringFieldUpdateOperationsInput | string | null
+    bookingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    fabricSource?: NullableStringFieldUpdateOperationsInput | string | null
+    totalAmount?: FloatFieldUpdateOperationsInput | number
+    advancePayment?: FloatFieldUpdateOperationsInput | number
+    balanceAmount?: FloatFieldUpdateOperationsInput | number
+    designNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    embroidererNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    tailorNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    measurementData?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sales?: saleUpdateManyWithoutSalesorderNestedInput
+  }
+
+  export type salesorderUncheckedUpdateWithoutItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ordernum?: StringFieldUpdateOperationsInput | string
+    customer?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: NullableStringFieldUpdateOperationsInput | string | null
+    bookingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    fabricSource?: NullableStringFieldUpdateOperationsInput | string | null
+    totalAmount?: FloatFieldUpdateOperationsInput | number
+    advancePayment?: FloatFieldUpdateOperationsInput | number
+    balanceAmount?: FloatFieldUpdateOperationsInput | number
+    designNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    embroidererNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    tailorNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    measurementData?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sales?: saleUncheckedUpdateManyWithoutSalesorderNestedInput
+  }
+
   export type account_ledgerCreateManyAccountInput = {
     id: string
     journal_id: string
@@ -34676,6 +38709,122 @@ export namespace Prisma {
     debit?: FloatFieldUpdateOperationsInput | number
     credit?: FloatFieldUpdateOperationsInput | number
     details?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type salesorderitemsCreateManySalesorderInput = {
+    id: string
+    product_id?: string | null
+    item_name: string
+    item_type?: string | null
+    quantity?: number
+    price?: number
+    subtotal?: number
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type saleCreateManySalesorderInput = {
+    id: string
+    user?: string | null
+    customer?: string | null
+    invoicenum?: string | null
+    discountpercentage?: string | null
+    totalprice?: string | null
+    totalpayment?: string | null
+    createdby?: string | null
+    updatedby?: string | null
+    source?: string | null
+    printCount?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type salesorderitemsUpdateWithoutSalesorderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    product_id?: NullableStringFieldUpdateOperationsInput | string | null
+    item_name?: StringFieldUpdateOperationsInput | string
+    item_type?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: FloatFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
+    subtotal?: FloatFieldUpdateOperationsInput | number
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type salesorderitemsUncheckedUpdateWithoutSalesorderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    product_id?: NullableStringFieldUpdateOperationsInput | string | null
+    item_name?: StringFieldUpdateOperationsInput | string
+    item_type?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: FloatFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
+    subtotal?: FloatFieldUpdateOperationsInput | number
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type salesorderitemsUncheckedUpdateManyWithoutSalesorderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    product_id?: NullableStringFieldUpdateOperationsInput | string | null
+    item_name?: StringFieldUpdateOperationsInput | string
+    item_type?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: FloatFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
+    subtotal?: FloatFieldUpdateOperationsInput | number
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type saleUpdateWithoutSalesorderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    user?: NullableStringFieldUpdateOperationsInput | string | null
+    customer?: NullableStringFieldUpdateOperationsInput | string | null
+    invoicenum?: NullableStringFieldUpdateOperationsInput | string | null
+    discountpercentage?: NullableStringFieldUpdateOperationsInput | string | null
+    totalprice?: NullableStringFieldUpdateOperationsInput | string | null
+    totalpayment?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    printCount?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type saleUncheckedUpdateWithoutSalesorderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    user?: NullableStringFieldUpdateOperationsInput | string | null
+    customer?: NullableStringFieldUpdateOperationsInput | string | null
+    invoicenum?: NullableStringFieldUpdateOperationsInput | string | null
+    discountpercentage?: NullableStringFieldUpdateOperationsInput | string | null
+    totalprice?: NullableStringFieldUpdateOperationsInput | string | null
+    totalpayment?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    printCount?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type saleUncheckedUpdateManyWithoutSalesorderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    user?: NullableStringFieldUpdateOperationsInput | string | null
+    customer?: NullableStringFieldUpdateOperationsInput | string | null
+    invoicenum?: NullableStringFieldUpdateOperationsInput | string | null
+    discountpercentage?: NullableStringFieldUpdateOperationsInput | string | null
+    totalprice?: NullableStringFieldUpdateOperationsInput | string | null
+    totalpayment?: NullableStringFieldUpdateOperationsInput | string | null
+    createdby?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedby?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    printCount?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
